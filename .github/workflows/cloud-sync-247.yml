@@ -1,0 +1,51 @@
+name: MoveSafe Cloud 24/7 Auto-Sync
+
+on:
+  schedule:
+    # Chạy tự động mỗi 30 phút, 24/24 suốt 365 ngày trên Cloud của GitHub
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Cho phép người dùng bấm nút "Run workflow" thủ công trên GitHub bất cứ lúc nào
+
+permissions:
+  contents: write
+
+jobs:
+  cloud-crawl-and-sync:
+    runs-on: ubuntu-latest
+    name: Cào dữ liệu rốn ngập & thời tiết 24/7
+
+    steps:
+      - name: 📥 Tải mã nguồn repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Cài đặt môi trường Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: 📦 Cài đặt thư viện dependencies
+        run: npm install --prefer-offline --no-audit
+
+      - name: 🤖 Kích hoạt Bot cào dữ liệu Đám mây 24/7
+        run: node server/bot-runner.js
+        env:
+          TOMTOM_KEY: ${{ secrets.TOMTOM_KEY }}
+          OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
+
+      - name: 🚀 Tự động Commit & Push dữ liệu mới nhất lên Cloud
+        run: |
+          git config --global user.name "MoveSafe Cloud Bot"
+          git config --global user.email "bot@movesafe.vn"
+          
+          # Kiểm tra xem file cache có sự thay đổi không
+          if [[ -n $(git status -s data/live_urban_cache.json) ]]; then
+            git add data/live_urban_cache.json
+            git commit -m "chore(cloud-sync): Tự động cập nhật rốn ngập & thời tiết 24/7 [skip ci]"
+            git push origin main
+            echo "✓ Đã cập nhật và đẩy dữ liệu cache mới nhất lên GitHub Cloud!"
+          else
+            echo "i Dữ liệu đã là mới nhất, không cần commit."
+          fi

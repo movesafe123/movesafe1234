@@ -1,6 +1,6 @@
 /**
  * MapEngine - Trình điều khiển bản đồ giao diện chuẩn Google Maps
- * Nền bản đồ sáng, trực quan, dễ nhìn, hỗ trợ TomTom Traffic Flow và Cảnh báo ngập
+ * Nền bản đồ sáng, trực quan, dễ nhìn, hỗ trợ TomTom Traffic Flow, Cảnh báo ngập & Trạm thời tiết đa điểm
  */
 
 class MapEngine {
@@ -13,11 +13,13 @@ class MapEngine {
       tomtomTraffic: null,
       floodMarkers: null,
       trafficMarkers: null,
+      weatherMarkers: null,
       routeSafeOutline: null,
       routeSafe: null,
       routeDanger: null
     };
     this.currentBase = 'standard';
+    this.weatherVisible = true;
   }
 
   init(containerId = 'map-container', initialCoords = [21.0285, 105.8542], zoom = 13) {
@@ -30,7 +32,7 @@ class MapEngine {
       attributionControl: false // Tắt dòng chữ bản quyền Leaflet ở góc bản đồ
     });
 
-    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn (Sạch sẽ 100%, không bị watermark API KEY REQUIRED)
+    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn
     this.layers.baseStandard = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -48,9 +50,10 @@ class MapEngine {
       { maxZoom: 19, opacity: 0.82 }
     ).addTo(this.map);
 
-    // Nhóm layer rốn ngập & kẹt xe
+    // Nhóm layer rốn ngập, kẹt xe và trạm thời tiết các quận
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
     this.layers.trafficMarkers = L.layerGroup().addTo(this.map);
+    this.layers.weatherMarkers = L.layerGroup().addTo(this.map);
   }
 
   setTomTomKey(key) {
@@ -74,12 +77,84 @@ class MapEngine {
     });
   }
 
-  // Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin
+  // 1. Vẽ các trạm thời tiết đa điểm chuẩn phong cách Google Maps Pin
+  renderWeatherStations(stations = []) {
+    if (!this.layers.weatherMarkers) return;
+    this.layers.weatherMarkers.clearLayers();
+
+    stations.forEach(st => {
+      const risk = st.floodRisk || { level: 'safe', text: 'Khô ráo', color: '#1e8e3e' };
+      const rainText = st.rain1h > 0 ? `${st.rain1h}mm` : 'Khô';
+      const riskClass = risk.level === 'danger' ? 'weather-danger' : (risk.level === 'warning' ? 'weather-warning' : (risk.level === 'caution' ? 'weather-caution' : 'weather-safe'));
+
+      const customIcon = L.divIcon({
+        className: 'gm-weather-pin-container',
+        html: `
+          <div class="gm-weather-pin ${riskClass}" title="${st.name}: ${st.temp}°C, ${st.description}">
+            <span class="gm-wp-icon">${st.icon || '🌦️'}</span>
+            <span class="gm-wp-temp">${st.temp}°</span>
+            <span class="gm-wp-rain">${rainText}</span>
+          </div>
+        `,
+        iconSize: [68, 28],
+        iconAnchor: [34, 14]
+      });
+
+      const marker = L.marker([st.lat, st.lng], { icon: customIcon });
+
+      const popupHtml = `
+        <div style="font-family: Roboto, sans-serif; min-width: 250px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 700; color: ${risk.color || '#1e8e3e'}; text-transform: uppercase;">
+              ${st.icon} ${risk.text}
+            </span>
+            <span style="background: ${risk.color || '#1e8e3e'}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px;">
+              ${st.temp}°C
+            </span>
+          </div>
+          <h3 style="font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
+            Trạm: ${st.name}
+          </h3>
+          <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
+            Tình trạng: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px;">
+            <div>🌧️ <strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
+            <div>💧 <strong>Độ ẩm:</strong> ${st.humidity}%</div>
+            <div>💨 <strong>Tốc độ gió:</strong> ${st.windSpeed} km/h</div>
+            <div>⚡ <strong>Cập nhật:</strong> 24/7 Live</div>
+          </div>
+          <div style="font-size: 12px; color: ${risk.color || '#1e8e3e'}; font-weight: 500; margin-bottom: 8px;">
+            💡 Đánh giá: ${st.rain1h >= 20 ? 'Nguy cơ ngập dồn các tuyến đường trũng xung quanh.' : (st.rain1h > 0 ? 'Mặt đường ướt trơn trượt, giảm tốc độ.' : 'Thời tiết thuận lợi cho việc lưu thông.')}
+          </div>
+          <button 
+            style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px; font-size: 12px; font-weight: 500; cursor: pointer;"
+            onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và nguy cơ ngập tại khu vực ${st.name} thế nào?')">
+            🤖 Hỏi AI Về Khu Vực Này
+          </button>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      this.layers.weatherMarkers.addLayer(marker);
+    });
+  }
+
+  // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin
   renderFloodPoints(floodPoints) {
     if (!this.layers.floodMarkers) return;
     this.layers.floodMarkers.clearLayers();
 
-    floodPoints.forEach(point => {
+    // Chỉ hiển thị các điểm ngập đang hoạt động thực tế (depth > 0 và chưa rút)
+    const activePoints = floodPoints.filter(point => point.depth_cm > 0 && point.danger_level !== 'safe');
+
+    // Nếu thời tiết tạnh ráo / nước đã rút hết: Giữ bản đồ sạch sẽ, khô ráo, không cắm ghim rác
+    if (activePoints.length === 0) {
+      return;
+    }
+
+    activePoints.forEach(point => {
+      // Đang có ngập thực tế (depth > 0)
       const isCritical = point.danger_level === 'critical';
       const depthText = point.depth_cm ? `${point.depth_cm}cm` : 'Ngập';
       const badgeClass = isCritical ? '' : 'badge-medium';
@@ -102,7 +177,6 @@ class MapEngine {
 
       const marker = L.marker([point.lat, point.lng], { icon: customIcon });
 
-      // Vòng tròn vùng trũng ngập bán kính nhẹ nhàng
       const circle = L.circle([point.lat, point.lng], {
         radius: isCritical ? 240 : 150,
         color: color,
@@ -146,34 +220,76 @@ class MapEngine {
     });
   }
 
-  // Vẽ các ghim sự cố giao thông TomTom / VOV
+  // 3. Vẽ các ghim sự cố giao thông TomTom / VOV theo đúng phân loại
   renderTrafficIncidents(incidents) {
     if (!this.layers.trafficMarkers) return;
     this.layers.trafficMarkers.clearLayers();
 
     incidents.forEach(inc => {
+      const isRoadwork = inc.type === 'roadwork';
+      const isClosure = inc.type === 'road_closure';
+      const isAccident = inc.type === 'accident';
+      const isRealJam = inc.isJam === true;
+
+      // Icon và màu sắc chuẩn theo bản chất sự cố
+      let pinIcon = '🚗';
+      let pinBg = '#f29900';
+      let headerText = '⚠️ Cảnh báo đường bộ';
+      let headerColor = '#b06000';
+
+      if (isRoadwork) {
+        pinIcon = '🚧';
+        pinBg = '#e37400';
+        headerText = '🚧 Công trường thi công bảo trì';
+        headerColor = '#b06000';
+      } else if (isClosure) {
+        pinIcon = '⛔';
+        pinBg = '#d93025';
+        headerText = '⛔ Đoạn đường tạm cấm / Rào chắn';
+        headerColor = '#d93025';
+      } else if (isAccident) {
+        pinIcon = '⚠️';
+        pinBg = '#ea4335';
+        headerText = '⚠️ Sự cố va chạm phương tiện';
+        headerColor = '#ea4335';
+      } else if (isRealJam) {
+        pinIcon = '🚗';
+        pinBg = '#d93025';
+        headerText = '🔴 Ùn tắc phương tiện cao điểm';
+        headerColor = '#d93025';
+      } else {
+        pinIcon = '🚗';
+        pinBg = '#1e8e3e';
+        headerText = '🟢 Lưu thông bình thường';
+        headerColor = '#1e8e3e';
+      }
+
       const customIcon = L.divIcon({
         className: 'gm-traffic-pin-container',
-        html: `<div class="gm-traffic-pin">🚗</div>`,
+        html: `<div class="gm-traffic-pin" style="background: ${pinBg}; display: flex; align-items: center; justify-content: center; font-size: 14px;">${pinIcon}</div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 14]
       });
 
       const marker = L.marker([inc.lat, inc.lng], { icon: customIcon });
 
+      const speedText = isClosure
+        ? 'Tạm cấm lưu thông một chiều phục vụ thi công'
+        : (isRealJam ? `Vận tốc ùn ứ: ~${inc.speedKmh || 8} km/h` : `Vận tốc lưu thông: ~${inc.speedKmh || 40} km/h`);
+
       const popupHtml = `
-        <div style="font-family: Roboto, sans-serif; min-width: 220px;">
-          <div style="font-size: 11px; font-weight: 700; color: #b06000; text-transform: uppercase; margin-bottom: 4px;">
-            ⚠️ Ùn tắc giao thông thời gian thực
+        <div style="font-family: Roboto, sans-serif; min-width: 240px;">
+          <div style="font-size: 11px; font-weight: 700; color: ${headerColor}; text-transform: uppercase; margin-bottom: 4px;">
+            ${headerText}
           </div>
-          <h4 style="font-size: 13px; font-weight: 700; color: #202124; margin-bottom: 6px;">
-            ${inc.description}
+          <h4 style="font-size: 13px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
+            ${inc.description || inc.categoryName || 'Sự cố trên tuyến đường'}
           </h4>
           <div style="font-size: 12px; color: #5f6368; margin-bottom: 4px;">
-            Vận tốc: <strong>~${inc.speedKmh || 8} km/h</strong> • Độ trễ: <strong style="color: #d93025;">+${Math.round((inc.delaySeconds || 300) / 60)} phút</strong>
+            ${speedText} ${inc.delaySeconds > 0 ? `• Độ trễ: <strong>+${Math.round(inc.delaySeconds / 60)} phút</strong>` : ''}
           </div>
-          <div style="font-size: 11px; color: #70757a;">
-            Nguồn: ${(inc.source || 'Cảm biến đô thị').replace(/API\s*v?\d*/gi, '').trim()}
+          <div style="font-size: 11px; color: #70757a; border-top: 1px solid #eee; padding-top: 4px; margin-top: 6px;">
+            🛰️ Vệ tinh TomTom Traffic v5 thời gian thực
           </div>
         </div>
       `;
@@ -183,14 +299,13 @@ class MapEngine {
     });
   }
 
-  // Vẽ tuyến đường chuẩn phong cách Google Maps
+  // 4. Vẽ tuyến đường chuẩn phong cách Google Maps
   displayRoute({ recommendedRoute, dangerRoute, hasHazard }) {
-    // Xóa tuyến đường cũ
     if (this.layers.routeSafeOutline) this.map.removeLayer(this.layers.routeSafeOutline);
     if (this.layers.routeSafe) this.map.removeLayer(this.layers.routeSafe);
     if (this.layers.routeDanger) this.map.removeLayer(this.layers.routeDanger);
 
-    // 1. Tuyến cũ nguy hiểm (nét đứt đỏ)
+    // Tuyến cũ nguy hiểm (nét đứt đỏ)
     if (hasHazard && dangerRoute) {
       this.layers.routeDanger = L.polyline(dangerRoute.polyline, {
         color: '#d93025',
@@ -200,23 +315,20 @@ class MapEngine {
       }).addTo(this.map);
     }
 
-    // 2. Tuyến né ngập an toàn (Đường Google Maps: viền trắng + ruột xanh lá đậm)
+    // Tuyến né ngập an toàn (viền trắng + ruột xanh lá đậm)
     if (recommendedRoute) {
-      // Viền ngoài màu trắng để nổi bật trên nền bản đồ
       this.layers.routeSafeOutline = L.polyline(recommendedRoute.polyline, {
         color: '#ffffff',
         weight: 10,
         opacity: 0.95
       }).addTo(this.map);
 
-      // Ruột màu xanh lá Google Maps
       this.layers.routeSafe = L.polyline(recommendedRoute.polyline, {
         color: '#1e8e3e',
         weight: 6,
         opacity: 1
       }).addTo(this.map);
 
-      // Căn chỉnh khung nhìn bản đồ
       this.map.fitBounds(this.layers.routeSafe.getBounds(), { padding: [60, 60] });
     }
   }
@@ -238,6 +350,13 @@ class MapEngine {
     if (!this.map) return;
     if (show) this.layers.trafficMarkers.addTo(this.map);
     else this.map.removeLayer(this.layers.trafficMarkers);
+  }
+
+  toggleWeather(show) {
+    if (!this.map) return;
+    this.weatherVisible = show;
+    if (show) this.layers.weatherMarkers.addTo(this.map);
+    else this.map.removeLayer(this.layers.weatherMarkers);
   }
 
   switchBaseMap(type) {

@@ -91,6 +91,49 @@ app.post('/api/ai/chat', async (req, res) => {
   }
 });
 
+// 6. API Server-Sent Events (SSE) Phát trực tiếp cập nhật 24/7 tới Client
+app.get('/api/live-stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  // Gửi dữ liệu khởi tạo
+  res.write(`data: ${JSON.stringify({ type: 'init', status: 'connected', data: botService.getData() })}\n\n`);
+
+  // Lắng nghe sự kiện cập nhật từ bot
+  const onUpdate = (data) => {
+    res.write(`data: ${JSON.stringify({ type: 'update', data })}\n\n`);
+  };
+
+  botService.on('data:updated', onUpdate);
+
+  // Ping giữ kết nối mỗi 20 giây
+  const keepAlive = setInterval(() => {
+    res.write(': keepalive\n\n');
+  }, 20000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+    botService.removeListener('data:updated', onUpdate);
+  });
+});
+
+// 7. API Kiểm tra sức khỏe hệ thống 24/7 (Health Check)
+app.get('/api/health', (req, res) => {
+  const data = botService.getData();
+  res.json({
+    status: 'healthy',
+    mode: 'cloud-24-7',
+    uptimeSeconds: Math.round(process.uptime()),
+    memoryUsageMB: Math.round(process.memoryUsage().rss / 1024 / 1024),
+    lastCrawl: data.lastUpdated,
+    stats: data.stats,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Fallback route cho Single Page Application
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
@@ -108,12 +151,13 @@ function startServer(port) {
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.warn(`[MoveSafe] ⚠️ Cổng ${port} đang bận, tự động chuyển sang cổng ${port + 1}...`);
-      startServer(port + 1);
+      const nextPort = Number(port) + 1;
+      console.warn(`[MoveSafe] ⚠️ Cổng ${port} đang bận, tự động chuyển sang cổng ${nextPort}...`);
+      startServer(nextPort);
     } else {
       console.error('[MoveSafe] Lỗi máy chủ:', err.message);
     }
   });
 }
 
-startServer(config.PORT || 3000);
+startServer(Number(config.PORT) || 3000);

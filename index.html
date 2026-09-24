@@ -79,11 +79,11 @@
 
     <!-- Category Filter Chips Dưới Thanh Tìm Kiếm -->
     <div class="gm-chips-scroll" id="gm-chips-scroll">
-      <button class="gm-chip gm-chip-danger" id="chip-flood-count">
-        🌊 Rốn ngập (11)
+      <button class="gm-chip gm-chip-safe" id="chip-flood-count">
+        🌊 Rốn ngập (0 - Khô ráo)
       </button>
-      <button class="gm-chip gm-chip-warning" id="chip-traffic-count">
-        🚗 Kẹt xe (50)
+      <button class="gm-chip gm-chip-safe" id="chip-traffic-count">
+        🚗 Ùn tắc (0 - Thông thoáng)
       </button>
       <button class="gm-chip" id="chip-ai-trigger">
         🤖 Trợ lý AI
@@ -97,6 +97,13 @@
 
   <!-- ==================== 3. CÔNG CỤ GÓC PHẢI TRÊN ==================== -->
   <div class="gm-top-right-tools">
+    <!-- Huy hiệu Cloud Live 24/7 tự động cập nhật -->
+    <div class="gm-live-cloud-pill" id="gm-live-status-pill" title="Hệ thống tự động cập nhật liên tục 24/24 trên Cloud">
+      <span class="pulse-dot-green"></span>
+      <span id="txt-cloud-status">Cloud 24/7</span>
+      <span class="gm-countdown-badge" id="badge-countdown">30s ↻</span>
+    </div>
+
     <select class="gm-city-select" id="city-select-gm">
       <option value="hanoi" selected>📍 Hà Nội</option>
       <option value="hcm">📍 TP. Hồ Chí Minh</option>
@@ -129,6 +136,10 @@
       <label class="gm-layer-item">
         <span>🌊 Điểm ngập HSDC/UDi</span>
         <input type="checkbox" id="chk-layer-flood" checked>
+      </label>
+      <label class="gm-layer-item">
+        <span>🌦️ Trạm thời tiết các quận</span>
+        <input type="checkbox" id="chk-layer-weather" checked>
       </label>
       <label class="gm-layer-item">
         <span>🛰️ Chế độ vệ tinh</span>
@@ -277,6 +288,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Toast Notification Container 24/7 Alerts -->
+  <div class="gm-toast-container" id="gm-toast-container"></div>
 
   <!-- Leaflet Map JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

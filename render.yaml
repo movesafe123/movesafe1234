@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: movesafe-vn-live
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: TOMTOM_KEY
+        sync: false
+      - key: OPENWEATHER_KEY
+        sync: false
+      - key: GEMINI_KEY
+        sync: false

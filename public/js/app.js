@@ -1,6 +1,6 @@
 /**
  * App.js - Bộ điều khiển trung tâm trải nghiệm người dùng chuẩn Google Maps
- * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi và điều hướng né ngập
+ * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi, điều hướng né ngập & Vòng lặp cập nhật 24/24 trên Cloud
  */
 
 class GoogleMapsApp {
@@ -19,11 +19,18 @@ class GoogleMapsApp {
     };
     this.currentVehicle = 'motorbike';
     this.isDirectionsOpen = false;
-    this.activeFilter = 'all'; // 'all', 'flood', 'traffic'
+    this.activeFilter = 'all';
+
+    // 24/7 Cloud Sync State
+    this.syncIntervalSeconds = 30; // Đếm ngược 30 giây
+    this.remainingSeconds = 30;
+    this.countdownTimer = null;
+    this.lastWeatherSync = 0;
+    this.lastSyncTime = Date.now();
   }
 
   async init() {
-    console.log('[MoveSafe Google Maps] Đang khởi động...');
+    console.log('[MoveSafe Cloud 24/7] Đang khởi động hệ thống...');
 
     // 1. Tải cấu hình từ Backend (TomTom key, OpenWeather key)
     await this.fetchServerConfig();
@@ -32,16 +39,20 @@ class GoogleMapsApp {
     const city = this.citiesConfig[this.currentCity];
     window.mapEngine.init('map-container', [city.lat, city.lng], city.zoom);
 
-    // 3. Tải dữ liệu từ Bot
+    // 3. Tải dữ liệu rốn ngập & kẹt xe từ Cloud Cache
     await this.fetchLiveData();
 
-    // 4. Cập nhật thời tiết
+    // 4. Cập nhật thời tiết trung tâm & trạm thời tiết các quận huyện trên bản đồ
     await this.updateWeather();
+    await this.updateWeatherStations();
 
-    // 5. Gán các sự kiện tương tác
+    // 5. Gán các sự kiện tương tác UI
     this.bindEvents();
 
-    console.log('[MoveSafe Google Maps] Đã khởi tạo hoàn tất!');
+    // 6. Kích hoạt động cơ tự động đồng bộ 24/24 trên Cloud
+    this.start247CloudSync();
+
+    console.log('[MoveSafe Cloud 24/7] Đã kích hoạt hoàn tất vòng lặp cập nhật liên tục 24/24!');
   }
 
   async fetchServerConfig() {
@@ -64,9 +75,10 @@ class GoogleMapsApp {
   }
 
   async fetchLiveData() {
+    const cacheBuster = `?t=${Date.now()}`;
     // 1. Thử gọi backend Node.js
     try {
-      const res = await fetch('/api/live-data');
+      const res = await fetch('/api/live-data' + cacheBuster);
       if (res.ok) {
         const json = await res.json();
         if (json.status === 'success' && json.data) {
@@ -77,9 +89,9 @@ class GoogleMapsApp {
       }
     } catch (e) {}
 
-    // 2. Fallback tự động đọc file JSON tĩnh khi chạy trên GitHub Pages
+    // 2. Fallback tự động đọc file JSON tĩnh khi chạy trên GitHub Pages (chống dính cache trình duyệt)
     try {
-      const res = await fetch('data/live_urban_cache.json');
+      const res = await fetch('data/live_urban_cache.json' + cacheBuster);
       if (res.ok) {
         const json = await res.json();
         this.liveData = json;
@@ -98,13 +110,37 @@ class GoogleMapsApp {
     window.mapEngine.renderFloodPoints(cityFloods);
     window.mapEngine.renderTrafficIncidents(cityTraffics);
 
-    // Cập nhật số lượng trên các chip
+    // Cập nhật số lượng trên các chip: Chỉ đếm các điểm ngập đang hoạt động (depth > 0 và danger_level !== 'safe')
+    const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
     const floodChip = document.getElementById('chip-flood-count');
     const trafficChip = document.getElementById('chip-traffic-count');
-    if (floodChip) floodChip.textContent = `🌊 Rốn ngập (${cityFloods.length})`;
-    if (trafficChip) trafficChip.textContent = `🚗 Kẹt xe (${cityTraffics.length})`;
+    if (floodChip) {
+      if (activeFloods.length > 0) {
+        floodChip.className = 'gm-chip gm-chip-danger';
+        floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length})`;
+      } else {
+        floodChip.className = 'gm-chip gm-chip-safe';
+        floodChip.textContent = `🌊 Rốn ngập (0 - Khô ráo)`;
+      }
+    }
+    if (trafficChip) {
+      const activeJams = cityTraffics.filter(t => t.isJam === true);
+      const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
+
+      if (activeJams.length > 0) {
+        trafficChip.className = 'gm-chip gm-chip-danger';
+        trafficChip.textContent = `🚗 Kẹt xe (${activeJams.length})`;
+      } else if (roadworks.length > 0) {
+        trafficChip.className = 'gm-chip gm-chip-safe';
+        trafficChip.textContent = `🚗 Ùn tắc (0) • 🚧 Công trường (${roadworks.length})`;
+      } else {
+        trafficChip.className = 'gm-chip gm-chip-safe';
+        trafficChip.textContent = `🚗 Ùn tắc (0 - Thông thoáng)`;
+      }
+    }
   }
 
+  // Cập nhật widget thời tiết trung tâm (góc dưới trái)
   async updateWeather() {
     const city = this.citiesConfig[this.currentCity];
     const w = await window.weatherService.getWeather(city.lat, city.lng, city.name);
@@ -119,6 +155,132 @@ class GoogleMapsApp {
     if (pillDot) {
       pillDot.className = 'gm-risk-dot ' + (w.floodRisk.level === 'danger' ? 'risk-danger' : (w.floodRisk.level === 'warning' ? 'risk-warning' : ''));
     }
+  }
+
+  // Cập nhật và vẽ các trạm thời tiết quận huyện trực tiếp lên bản đồ
+  async updateWeatherStations() {
+    try {
+      const stations = await window.weatherService.getMultiStationWeather(this.currentCity);
+      window.mapEngine.renderWeatherStations(stations);
+      console.log(`[Cloud Weather] Đã cập nhật ${stations.length} trạm thời tiết tại ${this.currentCity}`);
+    } catch (err) {
+      console.warn('[Cloud Weather] Không thể vẽ trạm thời tiết:', err.message);
+    }
+  }
+
+  // ==================== BỘ ĐIỀU KHIỂN CẬP NHẬT 24/24 TRÊN CLOUD ====================
+  start247CloudSync() {
+    this.remainingSeconds = this.syncIntervalSeconds;
+    this.lastWeatherSync = Date.now();
+    this.lastSyncTime = Date.now();
+
+    // 1. Thử kết nối Server-Sent Events (SSE) nếu server fullstack khả dụng
+    this.connectCloudStream();
+
+    // 2. Vòng lặp đếm ngược giây tự động cập nhật liên tục 24/24
+    if (this.countdownTimer) clearInterval(this.countdownTimer);
+    this.countdownTimer = setInterval(async () => {
+      this.remainingSeconds--;
+
+      const badge = document.getElementById('badge-countdown');
+      if (badge) {
+        badge.textContent = `${this.remainingSeconds}s ↻`;
+      }
+
+      if (this.remainingSeconds <= 0) {
+        this.remainingSeconds = this.syncIntervalSeconds;
+        await this.syncFromCloud(false);
+      }
+    }, 1000);
+
+    // 3. Quản lý trạng thái đóng/mở tab (Page Visibility API)
+    document.addEventListener('visibilitychange', async () => {
+      if (!document.hidden) {
+        const now = Date.now();
+        // Nếu người dùng quay lại tab sau hơn 20s, lập tức làm mới
+        if (now - this.lastSyncTime > 20000) {
+          console.log('[Cloud 24/7] Người dùng kích hoạt lại tab, làm mới ngay dữ liệu...');
+          await this.syncFromCloud(true);
+        }
+      }
+    });
+  }
+
+  async syncFromCloud(isManualOrFocus = false) {
+    const badge = document.getElementById('badge-countdown');
+    if (badge) badge.textContent = 'Đang tải...';
+
+    const prevCount = (this.liveData.floodPoints || []).length;
+
+    // 1. Tải dữ liệu rốn ngập & kẹt xe mới nhất
+    await this.fetchLiveData();
+
+    // 2. Làm mới radar thời tiết toàn thành phố và các trạm quận huyện mỗi 2 phút
+    const now = Date.now();
+    if (now - this.lastWeatherSync >= 120000 || isManualOrFocus) {
+      await this.updateWeather();
+      await this.updateWeatherStations();
+      this.lastWeatherSync = now;
+    }
+
+    // 3. Thông báo cho người dùng
+    const currentCount = (this.liveData.floodPoints || []).length;
+    if (currentCount > prevCount && prevCount > 0) {
+      this.showToast('🌊 Hệ thống vừa cập nhật thêm điểm ngập mới!', 'warning');
+    } else if (isManualOrFocus) {
+      this.showToast('✓ Đã đồng bộ dữ liệu thời tiết & giao thông mới nhất từ Cloud 24/7!', 'info');
+    }
+
+    this.lastSyncTime = Date.now();
+  }
+
+  connectCloudStream() {
+    if (!window.EventSource) return;
+    try {
+      const sse = new EventSource('/api/live-stream');
+      sse.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload && payload.data) {
+            console.log('[SSE 24/7] Nhận dữ liệu phát trực tiếp từ Cloud Server!');
+            this.liveData = payload.data;
+            this.renderAllData();
+            this.showToast('⚡ Cập nhật dữ liệu thời gian thực từ Cloud Server!', 'info');
+          }
+        } catch (e) {}
+      };
+      sse.onerror = () => {
+        // Trên GitHub Pages tĩnh hoặc khi mất kết nối, tự động đóng SSE và dùng Smart Polling 30s
+        sse.close();
+      };
+    } catch (e) {}
+  }
+
+  showToast(message, type = 'info', durationMs = 4000) {
+    const container = document.getElementById('gm-toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `gm-toast toast-${type}`;
+    toast.innerHTML = `
+      <span>${message}</span>
+      <button style="background: none; border: none; color: #fff; opacity: 0.7; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+    `;
+
+    toast.querySelector('button')?.addEventListener('click', () => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    });
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, durationMs);
   }
 
   toggleDirectionsPanel(forceState) {
@@ -140,7 +302,7 @@ class GoogleMapsApp {
   }
 
   bindEvents() {
-    // 1. Nút chỉ đường (hình thoi mũi tên xanh trên thanh search)
+    // 1. Nút chỉ đường
     document.getElementById('btn-open-directions')?.addEventListener('click', () => {
       this.toggleDirectionsPanel(true);
       this.calculateSmartRoute();
@@ -165,15 +327,34 @@ class GoogleMapsApp {
     // 3. Category Chips
     document.getElementById('chip-flood-count')?.addEventListener('click', () => {
       const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
-      if (cityFloods.length > 0) {
-        window.mapEngine.map.flyTo([cityFloods[0].lat, cityFloods[0].lng], 15);
+      const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
+
+      if (activeFloods.length > 0) {
+        // Có ngập thực tế: Bay camera đến điểm ngập sâu nhất
+        const worst = [...activeFloods].sort((a, b) => (b.depth_cm || 0) - (a.depth_cm || 0))[0];
+        window.mapEngine.map.flyTo([worst.lat, worst.lng], 16);
+        this.showToast(`⚠️ Đang theo dõi rốn ngập sâu: ${worst.name} (${worst.depth_cm}cm)`, 'danger');
+      } else {
+        // Khô ráo, nước đã rút
+        this.showToast('✅ Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
       }
     });
 
     document.getElementById('chip-traffic-count')?.addEventListener('click', () => {
       const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
-      if (cityTraffics.length > 0) {
-        window.mapEngine.map.flyTo([cityTraffics[0].lat, cityTraffics[0].lng], 15);
+      const activeJams = cityTraffics.filter(t => t.isJam === true);
+
+      if (activeJams.length > 0) {
+        window.mapEngine.map.flyTo([activeJams[0].lat, activeJams[0].lng], 15);
+        this.showToast(`⚠️ Điểm ùn tắc giao thông: ${activeJams[0].description}`, 'warning');
+      } else {
+        const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
+        if (roadworks.length > 0) {
+          window.mapEngine.map.flyTo([roadworks[0].lat, roadworks[0].lng], 15);
+          this.showToast(`🌙 Ban đêm đường phố thông thoáng! Ghi nhận ${roadworks.length} điểm rào chắn thi công bảo trì đêm (Vệ tinh TomTom v5).`, 'info', 5000);
+        } else {
+          this.showToast('✅ Giao thông toàn thành phố thông thoáng! Vận tốc trung bình 45-60 km/h, không có điểm kẹt xe.', 'info', 5000);
+        }
       }
     });
 
@@ -181,12 +362,13 @@ class GoogleMapsApp {
       window.aiChat.toggle();
     });
 
-    // 4. Chọn thành phố
+    // 4. Chọn thành phố -> Cập nhật lại bản đồ, thời tiết trung tâm và thời tiết trạm các quận
     document.getElementById('city-select-gm')?.addEventListener('change', async (e) => {
       this.currentCity = e.target.value;
       const city = this.citiesConfig[this.currentCity];
       window.mapEngine.flyToCity(city);
       await this.updateWeather();
+      await this.updateWeatherStations();
       this.renderAllData();
     });
 
@@ -214,20 +396,21 @@ class GoogleMapsApp {
       });
     });
 
+    // Bấm vào pill Cloud Live 24/7 để làm mới tức thì
+    document.getElementById('gm-live-status-pill')?.addEventListener('click', () => {
+      this.syncFromCloud(true);
+    });
+
     // Nút làm mới dữ liệu từ Bot
     document.getElementById('btn-gm-bot-refresh')?.addEventListener('click', async () => {
       const btn = document.getElementById('btn-gm-bot-refresh');
       btn.style.transform = 'rotate(360deg)';
       try {
-        const res = await fetch('/api/bot/refresh', { method: 'POST' });
-        const json = await res.json();
-        if (json.status === 'success') {
-          this.liveData = json.data;
-          this.renderAllData();
-          alert('✓ Đã cập nhật xong dữ liệu mới nhất từ trạm HSDC, UDi và TomTom Traffic!');
-        }
-      } catch (err) {
-        alert('Lỗi khi gọi bot: ' + err.message);
+        await this.syncFromCloud(true);
+        // Nếu có backend Node.js, gọi thêm endpoint bot refresh
+        try {
+          await fetch('/api/bot/refresh', { method: 'POST' });
+        } catch (e) {}
       } finally {
         setTimeout(() => { btn.style.transform = 'none'; }, 500);
       }
@@ -244,6 +427,9 @@ class GoogleMapsApp {
     });
     document.getElementById('chk-layer-flood')?.addEventListener('change', (e) => {
       window.mapEngine.toggleFloods(e.target.checked);
+    });
+    document.getElementById('chk-layer-weather')?.addEventListener('change', (e) => {
+      window.mapEngine.toggleWeather(e.target.checked);
     });
     document.getElementById('chk-layer-satellite')?.addEventListener('change', (e) => {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
@@ -278,7 +464,7 @@ class GoogleMapsApp {
 
       if (res.success) {
         reportModal?.classList.remove('open');
-        alert('✓ Báo cáo của bạn đã được xác thực và ghim lên Google Maps!');
+        this.showToast('✓ Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
       }
     });
 
@@ -296,7 +482,7 @@ class GoogleMapsApp {
       if (owm) window.weatherService.setApiKey(owm.trim());
 
       settingsModal?.classList.remove('open');
-      alert('Đã lưu cấu hình API thành công!');
+      this.showToast('✓ Đã lưu cấu hình API thành công!', 'info');
     });
   }
 

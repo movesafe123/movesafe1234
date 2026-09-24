@@ -689,6 +689,12 @@ body {
   color: #202124;
 }
 
+.gm-flood-badge.badge-safe {
+  background: #1e8e3e;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .gm-pin-point {
   width: 0;
   height: 0;
@@ -699,6 +705,21 @@ body {
 
 .gm-pin-point.point-medium {
   border-top-color: var(--gm-yellow);
+}
+
+.gm-pin-point.point-safe {
+  border-top-color: #1e8e3e;
+}
+
+.gm-chip-safe {
+  background: #e6f4ea !important;
+  color: #137333 !important;
+  border: 1px solid #ceead6 !important;
+  font-weight: 500 !important;
+}
+
+.gm-chip-safe:hover {
+  background: #ceead6 !important;
 }
 
 .gm-traffic-pin {
@@ -851,3 +872,203 @@ body {
   color: var(--gm-text-main);
   cursor: pointer;
 }
+
+/* ==========================================================================
+   Weather Stations Pin, Cloud 24/7 Live Indicator & Toast Alerts
+   ========================================================================== */
+
+/* Trạm thời tiết Google Maps Pin */
+.gm-weather-pin-container {
+  background: transparent !important;
+  border: none !important;
+}
+
+.gm-weather-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  padding: 3px 8px;
+  border-radius: 99px;
+  box-shadow: 0 2px 6px rgba(60,64,67,0.3);
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
+  color: #202124;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.gm-weather-pin:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(60,64,67,0.4);
+  z-index: 999;
+}
+
+.gm-wp-icon {
+  font-size: 12px;
+}
+
+.gm-wp-temp {
+  color: #202124;
+}
+
+.gm-wp-rain {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.gm-weather-pin.weather-safe {
+  border: 1px solid #ceead6;
+}
+.gm-weather-pin.weather-safe .gm-wp-rain {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.gm-weather-pin.weather-caution {
+  border: 1px solid #d2e3fc;
+}
+
+.gm-weather-pin.weather-warning {
+  border: 1.5px solid #f9ab00;
+  background: #fffdf0;
+}
+.gm-weather-pin.weather-warning .gm-wp-rain {
+  background: #fef7e0;
+  color: #b06000;
+  font-weight: 700;
+}
+
+.gm-weather-pin.weather-danger {
+  border: 1.5px solid #d93025;
+  background: #fff5f5;
+  animation: gm-danger-pulse 1.8s infinite;
+}
+.gm-weather-pin.weather-danger .gm-wp-rain {
+  background: #d93025;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+@keyframes gm-danger-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(217, 48, 37, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
+}
+
+/* Cloud 24/7 Live Status Pill */
+.gm-live-cloud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #ffffff;
+  padding: 6px 14px;
+  border-radius: 99px;
+  box-shadow: var(--gm-shadow-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: #202124;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.gm-live-cloud-pill:hover {
+  box-shadow: var(--gm-shadow-hover);
+  background: #f8f9fa;
+}
+
+.pulse-dot-green {
+  width: 9px;
+  height: 9px;
+  background-color: #1e8e3e;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+}
+
+.pulse-dot-green::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background-color: rgba(30, 142, 62, 0.4);
+  animation: pulse-ring 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.7); opacity: 1; }
+  80% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.gm-countdown-badge {
+  font-size: 11px;
+  color: #1a73e8;
+  background: #e8f0fe;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Toast Notification Container */
+.gm-toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 90vw;
+  width: 420px;
+}
+
+.gm-toast {
+  pointer-events: auto;
+  background: rgba(32, 33, 36, 0.94);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: toast-slide-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.gm-toast.toast-danger {
+  border-left: 4px solid #ea4335;
+}
+
+.gm-toast.toast-warning {
+  border-left: 4px solid #fbbc04;
+}
+
+.gm-toast.toast-info {
+  border-left: 4px solid #4285f4;
+}
+
+@keyframes toast-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
