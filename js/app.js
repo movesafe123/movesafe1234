@@ -18,8 +18,23 @@ class GoogleMapsApp {
       weatherAlerts: []
     };
     this.currentVehicle = 'motorbike';
+    this.currentAvoidLevel = 1; // Mức độ tránh né mặc định: An toàn tuyệt đối
     this.isDirectionsOpen = false;
     this.activeFilter = 'all';
+
+    // Trạng thái tọa độ & địa chỉ ngõ ngách thực tế
+    this.routeLocations = {
+      origin: { lat: 21.0365, lng: 105.7925, title: 'Cầu Giấy', fullAddress: 'Cầu Giấy, Hà Nội' },
+      destination: { lat: 21.0242, lng: 105.8542, title: 'Nhà Hát Lớn', fullAddress: 'Nhà Hát Lớn, Hoàn Kiếm, Hà Nội' }
+    };
+    this.routeMarkers = {
+      origin: null,
+      destination: null
+    };
+    this.searchResultMarker = null;
+    this.pickingLocationType = null;
+    this.autocompleteDebounce = { origin: null, dest: null };
+    this.lastRouteResult = null;
 
     // 24/7 Cloud Sync State
     this.syncIntervalSeconds = 30; // Đếm ngược 30 giây
@@ -46,8 +61,9 @@ class GoogleMapsApp {
     await this.updateWeather();
     await this.updateWeatherStations();
 
-    // 5. Gán các sự kiện tương tác UI
+    // 5. Gán các sự kiện tương tác UI & Tìm kiếm địa chỉ ngõ ngách
     this.bindEvents();
+    this.setupAddressAutocomplete();
 
     // 6. Kích hoạt động cơ tự động đồng bộ 24/24 trên Cloud
     this.start247CloudSync();
@@ -388,9 +404,13 @@ class GoogleMapsApp {
       this.currentCity = e.target.value;
       const city = this.citiesConfig[this.currentCity];
       window.mapEngine.flyToCity(city);
+      this.resetCityRouteDefaults();
       await this.updateWeather();
       await this.updateWeatherStations();
       this.renderAllData();
+      if (this.isDirectionsOpen) {
+        this.calculateSmartRoute();
+      }
     });
 
     // 5. Nút tìm đường trong bảng Directions
@@ -405,6 +425,27 @@ class GoogleMapsApp {
         tab.classList.add('active');
         this.currentVehicle = tab.getAttribute('data-mode');
         this.calculateSmartRoute();
+      });
+    });
+
+    // 5b. Bộ chọn 3 mức độ tránh né
+    document.querySelectorAll('.gm-avoidance-option').forEach(option => {
+      option.addEventListener('click', () => {
+        // Cập nhật trạng thái active của các option
+        document.querySelectorAll('.gm-avoidance-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        
+        // Cập nhật radio button
+        const radio = option.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        
+        // Lưu mức độ tránh né
+        this.currentAvoidLevel = parseInt(option.getAttribute('data-level'));
+        
+        // Tự động tính lại đường nếu panel đang mở
+        if (this.isDirectionsOpen) {
+          this.calculateSmartRoute();
+        }
       });
     });
 
@@ -456,10 +497,39 @@ class GoogleMapsApp {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
     });
 
-    // Click lên bản đồ sẽ tự động đóng AI chat và menu lớp
-    window.mapEngine.map?.on('click', () => {
+    // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến
+    window.mapEngine.map?.on('click', async (e) => {
       window.aiChat.close();
       document.getElementById('gm-layer-menu')?.classList.remove('open');
+
+      if (this.pickingLocationType) {
+        const type = this.pickingLocationType;
+        this.stopPickLocationOnMap();
+
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        this.showToast('🔍 Đang xác định ngõ ngách, địa chỉ...', 'info');
+
+        try {
+          const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
+          this.selectLocation(type, {
+            title: addrInfo.title,
+            subtitle: addrInfo.subtitle,
+            fullAddress: addrInfo.fullAddress,
+            lat,
+            lng
+          });
+          this.showToast(`✓ Đã chọn: ${addrInfo.title}`, 'info');
+        } catch (err) {
+          this.selectLocation(type, {
+            title: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
+            subtitle: 'Vị trí trên bản đồ',
+            fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            lat,
+            lng
+          });
+        }
+      }
     });
 
     // 7. Modals: Báo cáo & Cài đặt
@@ -513,102 +583,983 @@ class GoogleMapsApp {
     });
   }
 
-  handleSearch(query) {
+  // Đặt lại điểm mặc định khi chuyển thành phố
+  resetCityRouteDefaults() {
+    if (this.currentCity === 'hcm') {
+      this.routeLocations = {
+        origin: { lat: 10.7769, lng: 106.6811, title: 'Chợ Bến Thành', fullAddress: 'Chợ Bến Thành, Quận 1, TP. Hồ Chí Minh' },
+        destination: { lat: 10.7412, lng: 106.7325, title: 'Khu Đô Thị Phú Mỹ Hưng', fullAddress: 'Phú Mỹ Hưng, Quận 7, TP. Hồ Chí Minh' }
+      };
+    } else if (this.currentCity === 'danang') {
+      this.routeLocations = {
+        origin: { lat: 16.0678, lng: 108.2208, title: 'Cầu Rồng', fullAddress: 'Cầu Rồng, Hải Châu, Đà Nẵng' },
+        destination: { lat: 16.0471, lng: 108.2068, title: 'Sân Bay Quốc Tế Đà Nẵng', fullAddress: 'Sân Bay Quốc Tế Đà Nẵng' }
+      };
+    } else {
+      this.routeLocations = {
+        origin: { lat: 21.0365, lng: 105.7925, title: 'Cầu Giấy', fullAddress: 'Cầu Giấy, Hà Nội' },
+        destination: { lat: 21.0242, lng: 105.8542, title: 'Nhà Hát Lớn', fullAddress: 'Nhà Hát Lớn, Hoàn Kiếm, Hà Nội' }
+      };
+    }
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (originInput) originInput.value = this.routeLocations.origin.fullAddress;
+    if (destInput) destInput.value = this.routeLocations.destination.fullAddress;
+  }
+
+  // Thiết lập hệ thống tìm kiếm & gợi ý địa chỉ ngõ ngách chuẩn Google Maps
+  setupAddressAutocomplete() {
+    ['origin', 'dest'].forEach(type => {
+      const input = document.getElementById(`gm-route-${type}`);
+      const dropdown = document.getElementById(`dropdown-${type}`);
+      const clearBtn = document.getElementById(`btn-clear-${type}`);
+      if (!input || !dropdown) return;
+
+      const updateClearBtn = () => {
+        if (clearBtn) clearBtn.style.display = input.value.trim() ? 'flex' : 'none';
+      };
+      input.addEventListener('input', updateClearBtn);
+      updateClearBtn();
+
+      // Nút Xóa (Clear)
+      clearBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        input.value = '';
+        this.routeLocations[type] = null;
+        if (this.routeMarkers[type]) {
+          window.mapEngine.map.removeLayer(this.routeMarkers[type]);
+          this.routeMarkers[type] = null;
+        }
+        updateClearBtn();
+        dropdown.style.display = 'none';
+        input.focus();
+      });
+
+      // Khi Focus: Hiện gợi ý nhanh hoặc danh sách địa chỉ
+      input.addEventListener('focus', async () => {
+        const val = input.value.trim();
+        if (val.length >= 2) {
+          await this.renderAddressSuggestions(type, val);
+        } else {
+          this.renderQuickActions(type);
+        }
+      });
+
+      // Khi gõ phím: Debounce 280ms gọi API Geocoding
+      input.addEventListener('input', () => {
+        const val = input.value.trim();
+        clearTimeout(this.autocompleteDebounce[type]);
+        if (val.length < 2) {
+          this.renderQuickActions(type);
+          return;
+        }
+
+        dropdown.innerHTML = `
+          <div style="padding: 10px 14px; font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-block; animation: pulse-ring 1s infinite;">🔍</span> Đang tìm kiếm ngõ, ngách, địa chỉ...
+          </div>
+        `;
+        dropdown.style.display = 'flex';
+
+        this.autocompleteDebounce[type] = setTimeout(async () => {
+          await this.renderAddressSuggestions(type, val);
+        }, 280);
+      });
+
+      // Bắt phím điều hướng
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          dropdown.style.display = 'none';
+        } else if (e.key === 'Enter') {
+          dropdown.style.display = 'none';
+          this.calculateSmartRoute();
+        }
+      });
+    });
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#field-row-origin') && !e.target.closest('#field-row-dest')) {
+        document.getElementById('dropdown-origin')?.style.setProperty('display', 'none');
+        document.getElementById('dropdown-dest')?.style.setProperty('display', 'none');
+      }
+    });
+
+    // Nút GPS cho điểm đi
+    document.getElementById('btn-gps-origin')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await this.setOriginToMyLocation();
+    });
+
+    // Nút Chọn trên bản đồ cho điểm đến
+    document.getElementById('btn-pick-map-dest')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.startPickLocationOnMap('dest');
+    });
+
+    // Nút Swap (Đảo chiều)
+    document.getElementById('btn-swap-route')?.addEventListener('click', () => {
+      this.swapRouteLocations();
+    });
+
+    // Nút Hủy chế độ chọn trên bản đồ
+    document.getElementById('btn-cancel-pick-map')?.addEventListener('click', () => {
+      this.stopPickLocationOnMap();
+    });
+  }
+
+  // Render các tác vụ nhanh (Vị trí hiện tại, Chọn trên bản đồ)
+  renderQuickActions(type) {
+    const dropdown = document.getElementById(`dropdown-${type}`);
+    if (!dropdown) return;
+
+    dropdown.innerHTML = `
+      <div class="gm-suggestion-item gm-quick-action" data-action="gps">
+        <div class="gm-sugg-icon icon-gps">🎯</div>
+        <div class="gm-sugg-content">
+          <div class="gm-sugg-title">Vị trí của bạn</div>
+          <div class="gm-sugg-subtitle">Sử dụng định vị GPS hiện tại</div>
+        </div>
+      </div>
+      <div class="gm-suggestion-item gm-quick-action" data-action="map">
+        <div class="gm-sugg-icon">🗺️</div>
+        <div class="gm-sugg-content">
+          <div class="gm-sugg-title">Chọn trên bản đồ</div>
+          <div class="gm-sugg-subtitle">Click vào bất kỳ điểm nào trên bản đồ</div>
+        </div>
+      </div>
+    `;
+
+    dropdown.querySelectorAll('.gm-suggestion-item').forEach(item => {
+      item.addEventListener('click', async () => {
+        const action = item.getAttribute('data-action');
+        dropdown.style.display = 'none';
+        if (action === 'gps') {
+          if (type === 'origin') await this.setOriginToMyLocation();
+          else await this.setDestToMyLocation();
+        } else if (action === 'map') {
+          this.startPickLocationOnMap(type);
+        }
+      });
+    });
+
+    dropdown.style.display = 'flex';
+  }
+
+  // Render danh sách địa chỉ tìm thấy từ Geocoding
+  async renderAddressSuggestions(type, query) {
+    const dropdown = document.getElementById(`dropdown-${type}`);
+    if (!dropdown) return;
+
+    const mapCenter = window.mapEngine.map ? window.mapEngine.map.getCenter() : null;
+    const center = mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null;
+
+    try {
+      const results = await window.geocodingService.searchAddresses(query, {
+        city: this.currentCity,
+        center: center,
+        limit: 8
+      });
+
+      if (!results || results.length === 0) {
+        dropdown.innerHTML = `
+          <div style="padding: 10px 14px; font-size: 12px; color: #5f6368;">
+            Không tìm thấy địa chỉ khớp với "${query}".
+          </div>
+          <div class="gm-suggestion-item gm-quick-action" data-action="map">
+            <div class="gm-sugg-icon">🗺️</div>
+            <div class="gm-sugg-content">
+              <div class="gm-sugg-title">Chọn vị trí này trên bản đồ</div>
+              <div class="gm-sugg-subtitle">Click trực tiếp vào vị trí cần đến</div>
+            </div>
+          </div>
+        `;
+        dropdown.querySelector('[data-action="map"]')?.addEventListener('click', () => {
+          dropdown.style.display = 'none';
+          this.startPickLocationOnMap(type);
+        });
+        dropdown.style.display = 'flex';
+        return;
+      }
+
+      let html = '';
+      results.forEach((item, index) => {
+        const isAlley = item.type === 'alley';
+        const iconClass = isAlley ? 'icon-alley' : '';
+        html += `
+          <div class="gm-suggestion-item" data-index="${index}">
+            <div class="gm-sugg-icon ${iconClass}">${item.icon || '📍'}</div>
+            <div class="gm-sugg-content">
+              <div class="gm-sugg-title">${item.title}</div>
+              <div class="gm-sugg-subtitle">${item.subtitle}</div>
+            </div>
+            ${item.typeName ? `<span class="gm-sugg-tag">${item.typeName}</span>` : ''}
+          </div>
+        `;
+      });
+
+      dropdown.innerHTML = html;
+      dropdown.querySelectorAll('.gm-suggestion-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const idx = parseInt(el.getAttribute('data-index'));
+          const selected = results[idx];
+          if (selected) {
+            this.selectLocation(type, selected);
+          }
+          dropdown.style.display = 'none';
+        });
+      });
+
+      dropdown.style.display = 'flex';
+    } catch (e) {
+      console.warn('[Autocomplete error]', e);
+      dropdown.style.display = 'none';
+    }
+  }
+
+  // Xử lý khi chọn một địa điểm từ gợi ý
+  selectLocation(type, item) {
+    const input = document.getElementById(`gm-route-${type}`);
+    if (input) {
+      input.value = item.fullAddress || item.title;
+      const clearBtn = document.getElementById(`btn-clear-${type}`);
+      if (clearBtn) clearBtn.style.display = 'flex';
+    }
+
+    this.routeLocations[type] = {
+      lat: item.lat,
+      lng: item.lng,
+      title: item.title,
+      fullAddress: item.fullAddress || item.title
+    };
+
+    // Cập nhật marker A hoặc B trên bản đồ
+    this.updateRouteMarker(type, item.lat, item.lng, item.title);
+
+    // Di chuyển góc nhìn bản đồ
+    if (this.routeLocations.origin && this.routeLocations.destination) {
+      const bounds = L.latLngBounds(
+        [this.routeLocations.origin.lat, this.routeLocations.origin.lng],
+        [this.routeLocations.destination.lat, this.routeLocations.destination.lng]
+      );
+      window.mapEngine.map.fitBounds(bounds, { padding: [80, 80] });
+      this.calculateSmartRoute();
+    } else {
+      window.mapEngine.map.flyTo([item.lat, item.lng], 15);
+    }
+  }
+
+  // Cập nhật Marker A/B kéo thả được (Draggable) trên bản đồ
+  updateRouteMarker(type, lat, lng, title) {
+    const map = window.mapEngine.map;
+    if (!map) return;
+
+    if (this.routeMarkers[type]) {
+      map.removeLayer(this.routeMarkers[type]);
+    }
+
+    const isOrigin = type === 'origin';
+    const letter = isOrigin ? 'A' : 'B';
+    const pinClass = isOrigin ? 'pin-origin' : 'pin-dest';
+    const label = isOrigin ? 'Điểm xuất phát (A)' : 'Điểm đến (B)';
+
+    const icon = L.divIcon({
+      className: 'gm-marker-container',
+      html: `<div class="gm-route-pin ${pinClass}" title="${label}: ${title}">${letter}</div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+
+    const marker = L.marker([lat, lng], {
+      icon,
+      draggable: true,
+      zIndexOffset: 1000
+    }).addTo(map);
+
+    marker.bindPopup(`
+      <div style="font-family: var(--font-family); font-size: 13px;">
+        <strong>${label}</strong><br>
+        <span style="color: #202124;">${title}</span><br>
+        <small style="color: #1a73e8;">(Kéo thả ghim để đổi vị trí)</small>
+      </div>
+    `);
+
+    // Kéo thả ghim A hoặc B
+    marker.on('dragend', async () => {
+      const pos = marker.getLatLng();
+      const addrInfo = await window.geocodingService.reverseGeocode(pos.lat, pos.lng);
+      
+      const input = document.getElementById(`gm-route-${type}`);
+      if (input) input.value = addrInfo.fullAddress || addrInfo.title;
+
+      this.routeLocations[type] = {
+        lat: pos.lat,
+        lng: pos.lng,
+        title: addrInfo.title,
+        fullAddress: addrInfo.fullAddress
+      };
+
+      marker.setPopupContent(`
+        <div style="font-family: var(--font-family); font-size: 13px;">
+          <strong>${label}</strong><br>
+          <span style="color: #202124;">${addrInfo.fullAddress}</span>
+        </div>
+      `);
+
+      this.calculateSmartRoute();
+    });
+
+    this.routeMarkers[type] = marker;
+  }
+
+  // Bắt đầu chế độ click chọn trên bản đồ
+  startPickLocationOnMap(type) {
+    this.pickingLocationType = type;
+    const banner = document.getElementById('gm-pick-map-banner');
+    if (banner) {
+      const typeText = type === 'origin' ? 'Điểm xuất phát (A)' : 'Điểm đến (B)';
+      banner.querySelector('span').innerText = `🎯 Click vào điểm bất kỳ trên bản đồ để chọn ${typeText}...`;
+      banner.style.display = 'flex';
+    }
+
+    const container = document.getElementById('map-container');
+    if (container) container.style.cursor = 'crosshair';
+    this.showToast(`🎯 Hãy nhấp chuột vào một vị trí trên bản đồ để chọn ${type === 'origin' ? 'điểm đi' : 'điểm đến'}`, 'info');
+  }
+
+  // Kết thúc chế độ click chọn trên bản đồ
+  stopPickLocationOnMap() {
+    this.pickingLocationType = null;
+    const banner = document.getElementById('gm-pick-map-banner');
+    if (banner) banner.style.display = 'none';
+
+    const container = document.getElementById('map-container');
+    if (container) container.style.cursor = '';
+  }
+
+  // Đảo ngược điểm đi và điểm đến (Swap)
+  swapRouteLocations() {
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (!originInput || !destInput) return;
+
+    const tempVal = originInput.value;
+    originInput.value = destInput.value;
+    destInput.value = tempVal;
+
+    const tempLoc = this.routeLocations.origin;
+    this.routeLocations.origin = this.routeLocations.destination;
+    this.routeLocations.destination = tempLoc;
+
+    if (this.routeLocations.origin) {
+      this.updateRouteMarker('origin', this.routeLocations.origin.lat, this.routeLocations.origin.lng, this.routeLocations.origin.title);
+    }
+    if (this.routeLocations.destination) {
+      this.updateRouteMarker('dest', this.routeLocations.destination.lat, this.routeLocations.destination.lng, this.routeLocations.destination.title);
+    }
+
+    this.calculateSmartRoute();
+    this.showToast('⇄ Đã đảo ngược điểm đi và điểm đến', 'info');
+  }
+
+  // Lấy vị trí GPS hiện tại cho điểm đi
+  async setOriginToMyLocation() {
+    this.showToast('🎯 Đang xác định vị trí của bạn qua GPS...', 'info');
+    try {
+      const pos = await window.geocodingService.getCurrentPosition();
+      const input = document.getElementById('gm-route-origin');
+      if (input) input.value = pos.title;
+      this.routeLocations.origin = {
+        lat: pos.lat,
+        lng: pos.lng,
+        title: pos.title,
+        fullAddress: pos.fullAddress
+      };
+      this.updateRouteMarker('origin', pos.lat, pos.lng, pos.title);
+      this.showToast(`✓ Đã nhận diện vị trí: ${pos.title}`, 'info');
+      if (this.routeLocations.destination) {
+        this.calculateSmartRoute();
+      }
+    } catch (e) {
+      this.showToast(`⚠️ Không thể lấy GPS: ${e.message}`, 'warning');
+    }
+  }
+
+  // Lấy vị trí GPS cho điểm đến
+  async setDestToMyLocation() {
+    this.showToast('🎯 Đang xác định vị trí của bạn qua GPS...', 'info');
+    try {
+      const pos = await window.geocodingService.getCurrentPosition();
+      const input = document.getElementById('gm-route-dest');
+      if (input) input.value = pos.title;
+      this.routeLocations.destination = {
+        lat: pos.lat,
+        lng: pos.lng,
+        title: pos.title,
+        fullAddress: pos.fullAddress
+      };
+      this.updateRouteMarker('dest', pos.lat, pos.lng, pos.title);
+      this.showToast(`✓ Đã nhận diện vị trí: ${pos.title}`, 'info');
+      if (this.routeLocations.origin) {
+        this.calculateSmartRoute();
+      }
+    } catch (e) {
+      this.showToast(`⚠️ Không thể lấy GPS: ${e.message}`, 'warning');
+    }
+  }
+
+  // Điều hướng nhanh đến một địa điểm tìm thấy
+  routeToLocation(lat, lng, title) {
+    this.toggleDirectionsPanel(true);
+    const destInput = document.getElementById('gm-route-dest');
+    if (destInput) destInput.value = title;
+    this.routeLocations.destination = {
+      lat,
+      lng,
+      title,
+      fullAddress: title
+    };
+    this.updateRouteMarker('dest', lat, lng, title);
+    this.calculateSmartRoute();
+  }
+
+  // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps
+  translateStepInstruction(step) {
+    const raw = (step.instruction || '').toLowerCase();
+    const name = step.name || 'đoạn đường';
+    let turn = 'Tiếp tục đi';
+    let icon = '⬆️';
+
+    if (raw.includes('depart')) {
+      turn = 'Khởi hành từ';
+      icon = '🟢';
+    } else if (raw.includes('arrive')) {
+      turn = 'Đến điểm đích tại';
+      icon = '🏁';
+    } else if (raw.includes('right')) {
+      turn = 'Rẽ phải vào';
+      icon = '➡️';
+    } else if (raw.includes('left')) {
+      turn = 'Rẽ trái vào';
+      icon = '⬅️';
+    } else if (raw.includes('uturn')) {
+      turn = 'Quay đầu xe trên';
+      icon = '🔄';
+    } else if (raw.includes('roundabout') || raw.includes('rotary')) {
+      turn = 'Đi vào vòng xuyến rẽ vào';
+      icon = '🔄';
+    } else if (raw.includes('fork') || raw.includes('slight')) {
+      turn = 'Chếch hướng vào';
+      icon = '↗️';
+    }
+
+    const distText = step.distance > 1000
+      ? `${(step.distance / 1000).toFixed(1)} km`
+      : `${Math.round(step.distance)} m`;
+
+    return {
+      text: `${turn} <strong>${name}</strong>`,
+      dist: distText,
+      icon
+    };
+  }
+
+  // Bật/tắt xem danh sách chi tiết các ngõ ngách
+  toggleRouteSteps(index) {
+    const el = document.getElementById(`steps-list-${index}`);
+    if (el) {
+      const isHidden = el.style.display === 'none';
+      el.style.display = isHidden ? 'flex' : 'none';
+    }
+  }
+
+  // Xử lý tìm kiếm thông minh từ ô tìm kiếm chính
+  async handleSearch(query) {
     if (!query) return;
     const lower = query.toLowerCase();
 
-    // Tìm kiếm rốn ngập
+    // 1. Tìm kiếm rốn ngập trong dữ liệu đã có
     const matchedFlood = this.liveData.floodPoints.find(f => lower.includes(f.name.toLowerCase().slice(0, 8)));
     if (matchedFlood) {
       window.mapEngine.map.flyTo([matchedFlood.lat, matchedFlood.lng], 16);
+      this.showToast(`🌊 Rốn ngập: ${matchedFlood.name} (${matchedFlood.depth_cm}cm)`, 'danger');
       return;
     }
 
-    // Nếu hỏi lộ trình "từ A đến B"
+    // 2. Nếu hỏi lộ trình "từ A đến B" (hoặc "từ A về B", "từ A sang B")
     if (lower.includes('từ') && (lower.includes('đến') || lower.includes('về') || lower.includes('sang'))) {
       this.toggleDirectionsPanel(true);
       const parts = query.split(/đến|về|sang/i);
+      const rawOrigin = parts[0].replace(/từ/i, '').trim();
+      const rawDest = parts[1] ? parts[1].trim() : '';
+
       const originInput = document.getElementById('gm-route-origin');
       const destInput = document.getElementById('gm-route-dest');
-      if (originInput) originInput.value = parts[0].replace(/từ/i, '').trim();
-      if (destInput && parts[1]) destInput.value = parts[1].trim();
+      if (originInput) originInput.value = rawOrigin;
+      if (destInput) destInput.value = rawDest;
+
+      this.showToast('🔍 Đang tìm kiếm địa chỉ và phân tích lộ trình...', 'info');
+
+      // Tự động Geocode cả 2 điểm
+      const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+      const [origMatches, destMatches] = await Promise.all([
+        window.geocodingService.searchAddresses(rawOrigin, { city: this.currentCity, center: cityCenter, limit: 1 }),
+        window.geocodingService.searchAddresses(rawDest, { city: this.currentCity, center: cityCenter, limit: 1 })
+      ]);
+
+      if (origMatches && origMatches.length > 0) this.routeLocations.origin = origMatches[0];
+      if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
+
       this.calculateSmartRoute();
       return;
     }
 
-    // Nếu là câu hỏi khác -> mở trợ lý AI
+    // 3. Nếu là tìm kiếm địa chỉ, ngõ ngách, địa danh cụ thể (ví dụ: "Ngõ 168 Hào Nam", "Chợ Bến Thành", "Vincom")
+    try {
+      const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+      const matches = await window.geocodingService.searchAddresses(query, {
+        city: this.currentCity,
+        center: cityCenter,
+        limit: 3
+      });
+
+      if (matches && matches.length > 0) {
+        const top = matches[0];
+        window.mapEngine.map.flyTo([top.lat, top.lng], 16);
+
+        if (this.searchResultMarker) {
+          window.mapEngine.map.removeLayer(this.searchResultMarker);
+        }
+
+        const icon = L.divIcon({
+          className: 'gm-marker-container',
+          html: `<div style="font-size: 26px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 30]
+        });
+
+        this.searchResultMarker = L.marker([top.lat, top.lng], { icon }).addTo(window.mapEngine.map);
+        this.searchResultMarker.bindPopup(`
+          <div style="font-family: var(--font-family); min-width: 180px; padding: 4px;">
+            <div style="font-weight: 700; font-size: 14px; color: #202124;">${top.title}</div>
+            <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${top.subtitle}</div>
+            <button onclick="window.appState.routeToLocation(${top.lat}, ${top.lng}, '${top.title.replace(/'/g, "\\'")}')" 
+              style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              🔀 Chỉ đường đến đây
+            </button>
+          </div>
+        `).openPopup();
+
+        this.showToast(`📍 Đã tìm thấy: ${top.title}`, 'info');
+        return;
+      }
+    } catch (e) {
+      console.warn('Search geocoding error:', e);
+    }
+
+    // 4. Nếu là câu hỏi khác -> mở trợ lý AI
     window.aiChat.open();
     window.aiChat.sendMessage(query);
   }
 
+  // Tính toán lộ trình thông minh kết hợp Geocoding ngõ ngách & OSRM
   async calculateSmartRoute() {
     const resultsContainer = document.getElementById('gm-route-results');
+    const summaryContainer = document.getElementById('gm-route-summary');
+    
+    // Hiển thị loading
     if (resultsContainer) {
-      resultsContainer.innerHTML = '<div style="padding: 12px; font-size: 13px; color: #5f6368;">⏳ Đang tính toán tuyến đường an toàn né ngập...</div>';
+      const levelConfig = window.routingService.avoidanceLevels[this.currentAvoidLevel];
+      resultsContainer.innerHTML = `
+        <div style="padding: 16px; text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px; animation: pulse-ring 1.6s infinite;">🔍</div>
+          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách né ngập...</div>
+          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
+        </div>
+      `;
+    }
+    if (summaryContainer) summaryContainer.style.display = 'none';
+
+    // 1. Kiểm tra text trong ô input và tự động Geocode nếu cần
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    const originText = originInput?.value.trim();
+    const destText = destInput?.value.trim();
+
+    if (!originText || !destText) {
+      this.showToast('⚠️ Vui lòng nhập đầy đủ điểm đi và điểm đến', 'warning');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: #70757a; font-size: 13px;">
+            Vui lòng nhập điểm đi và điểm đến để tìm kiếm lộ trình.
+          </div>
+        `;
+      }
+      return;
     }
 
-    let origin = { lat: 21.0365, lng: 105.7925 }; // Cầu Giấy
-    let dest = { lat: 21.0242, lng: 105.8542 };   // Nhà Hát Lớn (Hoàn Kiếm qua Nguyễn Khuyến)
+    const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
 
-    if (this.currentCity === 'hcm') {
-      origin = { lat: 10.7769, lng: 106.6811 };
-      dest = { lat: 10.7412, lng: 106.7325 }; // Huỳnh Tấn Phát rốn ngập
+    // Geocode điểm đi nếu chưa có hoặc text thay đổi
+    if (!this.routeLocations.origin || (this.routeLocations.origin.fullAddress !== originText && this.routeLocations.origin.title !== originText)) {
+      try {
+        const matches = await window.geocodingService.searchAddresses(originText, {
+          city: this.currentCity,
+          center: cityCenter,
+          limit: 1
+        });
+        if (matches && matches.length > 0) {
+          this.routeLocations.origin = matches[0];
+        }
+      } catch (err) {
+        console.warn('Geocoding origin error:', err);
+      }
     }
+
+    // Geocode điểm đến nếu chưa có hoặc text thay đổi
+    if (!this.routeLocations.destination || (this.routeLocations.destination.fullAddress !== destText && this.routeLocations.destination.title !== destText)) {
+      try {
+        const matches = await window.geocodingService.searchAddresses(destText, {
+          city: this.currentCity,
+          center: cityCenter,
+          limit: 1
+        });
+        if (matches && matches.length > 0) {
+          this.routeLocations.destination = matches[0];
+        }
+      } catch (err) {
+        console.warn('Geocoding dest error:', err);
+      }
+    }
+
+    let origin = this.routeLocations.origin;
+    let dest = this.routeLocations.destination;
+
+    // Nếu vẫn không tìm được tọa độ
+    if (!origin || !dest) {
+      this.showToast('⚠️ Không tìm thấy địa chỉ cụ thể. Vui lòng bấm chọn gợi ý hoặc bấm "🗺️ Chọn trên bản đồ"', 'warning', 4500);
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `
+          <div style="padding: 14px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 6px;">📍</div>
+            <div style="color: #d93025; font-size: 13px; font-weight: 500;">Không xác định được địa chỉ</div>
+            <div style="color: #70757a; font-size: 12px; margin-top: 4px;">Hãy chọn từ danh sách gợi ý khi gõ hoặc bấm biểu tượng 🗺️ để chọn trực tiếp trên bản đồ.</div>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Cập nhật marker A và B trên bản đồ
+    this.updateRouteMarker('origin', origin.lat, origin.lng, origin.title || originText);
+    this.updateRouteMarker('dest', dest.lat, dest.lng, dest.title || destText);
 
     const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
+    const cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
 
     try {
-      const res = await window.routingService.calculateSmartSafeRoute({
-        origin,
-        destination: dest,
+      const result = await window.routingService.calculateMultiRoutes({
+        origin: { lat: origin.lat, lng: origin.lng },
+        destination: { lat: dest.lat, lng: dest.lng },
         floodPoints: cityFloods,
-        vehicleType: this.currentVehicle
+        trafficIncidents: cityTraffic,
+        vehicleType: this.currentVehicle,
+        avoidLevel: this.currentAvoidLevel
       });
 
-      window.mapEngine.displayRoute(res);
+      this.lastRouteResult = result;
 
-      if (resultsContainer) {
-        if (res.hasHazard) {
-          resultsContainer.innerHTML = `
-            <!-- Tuyến 1: Đề xuất né ngập an toàn -->
-            <div class="gm-route-card selected-safe">
-              <div class="gm-route-time gm-time-safe">
-                <span>~${res.recommendedRoute.durationMin} phút</span>
-                <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${res.recommendedRoute.distanceKm} km)</span>
-              </div>
-              <div class="gm-route-meta">Qua các tuyến phố cao ráo, hệ thống thoát nước tốt</div>
-              <div class="gm-route-tag gm-tag-safe">
-                ✓ Tuyến Đề Xuất Né Ngập (An toàn 100%)
-              </div>
-            </div>
+      // Vẽ tuyến đường lên bản đồ
+      this.displayMultiRoutes(result);
 
-            <!-- Tuyến 2: Tuyến cũ qua rốn ngập (Cảnh báo nguy hiểm) -->
-            <div class="gm-route-card hazard-card">
-              <div class="gm-route-time gm-time-hazard">
-                <span>~${res.dangerRoute.durationMin} phút</span>
-                <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${res.dangerRoute.distanceKm} km)</span>
-              </div>
-              <div class="gm-route-meta">Đi qua: <strong>${res.hazards.map(h => h.name).join(', ')}</strong></div>
-              <div class="gm-route-tag gm-tag-danger">
-                ⚠️ Rủi ro cao: Ngập sâu ${res.hazards[0].depth_cm}cm, nguy cơ chết máy
-              </div>
-            </div>
-          `;
-        } else {
-          resultsContainer.innerHTML = `
-            <div class="gm-route-card selected-safe">
-              <div class="gm-route-time gm-time-safe">
-                <span>~${res.recommendedRoute.durationMin} phút</span>
-                <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${res.recommendedRoute.distanceKm} km)</span>
-              </div>
-              <div class="gm-route-meta">Lộ trình thông thoáng, không phát hiện rốn ngập sâu</div>
-              <div class="gm-route-tag gm-tag-safe">✓ Tuyến Nhanh Nhất & An Toàn</div>
-            </div>
-          `;
-        }
+      // Render summary bar
+      if (summaryContainer) {
+        this.renderRouteSummary(summaryContainer, result);
       }
+
+      // Render route cards
+      if (resultsContainer) {
+        this.renderRouteCards(resultsContainer, result);
+      }
+
     } catch (e) {
-      if (resultsContainer) resultsContainer.innerHTML = `<div style="color: red; padding: 10px;">Lỗi: ${e.message}</div>`;
+      console.error('[Routing Error]', e);
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `
+          <div style="padding: 14px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 6px;">😥</div>
+            <div style="color: #d93025; font-size: 13px; font-weight: 500;">Lỗi tính toán tuyến đường</div>
+            <div style="color: #70757a; font-size: 12px; margin-top: 4px;">${e.message}</div>
+            <button onclick="window.appState.calculateSmartRoute()" 
+              style="margin-top: 10px; padding: 6px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+              🔄 Thử lại
+            </button>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // Vẽ đa tuyến đường lên bản đồ (với màu sắc & highlight theo từng chế độ)
+  displayMultiRoutes(result) {
+    const mapEng = window.mapEngine;
+    
+    // Xóa các layer route cũ
+    if (mapEng.layers.routeSafeOutline) mapEng.map.removeLayer(mapEng.layers.routeSafeOutline);
+    if (mapEng.layers.routeSafe) mapEng.map.removeLayer(mapEng.layers.routeSafe);
+    if (mapEng.layers.routeDanger) mapEng.map.removeLayer(mapEng.layers.routeDanger);
+    
+    // Xóa thêm các layer phụ nếu có
+    if (mapEng._extraRouteLayers) {
+      mapEng._extraRouteLayers.forEach(l => mapEng.map.removeLayer(l));
+    }
+    mapEng._extraRouteLayers = [];
+
+    const routes = result.routes;
+    const recommended = routes.find(r => r.isRecommended) || routes[0];
+
+    // Vẽ các tuyến phụ trước (nằm phía dưới)
+    routes.forEach((route, index) => {
+      if (route === recommended) return;
+      
+      const lineColor = route.color || '#70757a';
+      
+      const line = L.polyline(route.polyline, {
+        color: lineColor,
+        weight: 5,
+        opacity: 0.65,
+        dashArray: '6, 8',
+        interactive: true
+      }).addTo(mapEng.map);
+
+      // Cho phép click trực tiếp lên đường nét đứt trên bản đồ để chọn tuyến đó
+      line.on('click', () => {
+        this.selectRouteOnMap(index);
+      });
+
+      // Bind popup cho route
+      line.bindPopup(`
+        <div style="font-family: var(--font-family); padding: 4px;">
+          <strong style="color: ${lineColor}; font-size: 13px;">${route.label}</strong><br>
+          <span style="color: #202124; font-weight: 500;">${route.distanceKm} km • ~${route.durationMin} phút</span><br>
+          <span style="color: #5f6368; font-size: 11px;">${route.trafficDesc}</span><br>
+          <div style="margin-top: 4px; font-size: 11px; font-weight: 600; color: ${lineColor};">${route.tagText}</div>
+          <button onclick="window.appState.selectRouteOnMap(${index})" 
+            style="margin-top: 8px; width: 100%; padding: 5px 10px; background: ${lineColor}; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;">
+            👉 Chọn tuyến đường này
+          </button>
+        </div>
+      `);
+
+      mapEng._extraRouteLayers.push(line);
+    });
+
+    // Vẽ route recommended nổi bật nhất (nằm trên cùng)
+    if (recommended) {
+      mapEng.layers.routeSafeOutline = L.polyline(recommended.polyline, {
+        color: '#ffffff',
+        weight: 10,
+        opacity: 0.95
+      }).addTo(mapEng.map);
+
+      mapEng.layers.routeSafe = L.polyline(recommended.polyline, {
+        color: recommended.color || '#1e8e3e',
+        weight: 6,
+        opacity: 1
+      }).addTo(mapEng.map);
+
+      mapEng.layers.routeSafe.bindPopup(`
+        <div style="font-family: var(--font-family); padding: 4px;">
+          <strong style="color: ${recommended.color}; font-size: 13px;">✓ ${recommended.label} (Đang chọn)</strong><br>
+          <span style="color: #202124; font-weight: 600;">${recommended.distanceKm} km • ~${recommended.durationMin} phút</span><br>
+          <span style="font-size: 11px; color: #3c4043;">${recommended.trafficDesc}</span><br>
+          <div style="margin-top: 4px; font-size: 11px; color: ${recommended.color}; font-weight: 700;">${recommended.tagText}</div>
+        </div>
+      `);
+
+      mapEng.map.fitBounds(mapEng.layers.routeSafe.getBounds(), { padding: [60, 60] });
+    }
+  }
+
+  // Render summary bar
+  renderRouteSummary(container, result) {
+    const { routes } = result;
+    const recommended = routes.find(r => r.isRecommended) || routes[0];
+    
+    let badgeClass = 'badge-safe';
+    if (recommended.avoidLevel === 2) badgeClass = 'badge-warning';
+    if (recommended.avoidLevel === 3) badgeClass = 'badge-safe';
+
+    container.innerHTML = `
+      <span class="gm-summary-badge ${badgeClass}" style="background: ${recommended.color}; color: #fff;">
+        Mức ${recommended.avoidLevel}: ${recommended.label}
+      </span>
+      <span class="gm-summary-text">${recommended.trafficDesc}</span>
+    `;
+    container.style.display = 'flex';
+  }
+
+  // Render route cards phong cách Google Maps kèm thanh phân loại tắc đường trực quan & ngõ ngách
+  renderRouteCards(container, result) {
+    const { routes } = result;
+    let html = '';
+
+    routes.forEach((route, index) => {
+      let cardClass = '';
+      let labelClass = '';
+      let timeClass = '';
+
+      if (route.avoidLevel === 1) {
+        cardClass = route.isRecommended ? 'selected-safe' : 'alt-card';
+        labelClass = 'gm-route-label-safe';
+        timeClass = 'gm-time-safe';
+      } else if (route.avoidLevel === 2) {
+        cardClass = route.isRecommended ? 'selected-balanced' : 'alt-card';
+        labelClass = 'gm-route-label-warning';
+        timeClass = 'gm-time-warning';
+      } else {
+        cardClass = route.isRecommended ? 'selected-fastest' : 'alt-card';
+        labelClass = 'gm-route-label-fastest';
+        timeClass = 'gm-time-fastest';
+      }
+
+      // Render danh sách cảnh báo nếu có
+      let warningsHtml = '';
+      if (route.warnings && route.warnings.length > 0) {
+        const warningItems = route.warnings.slice(0, 3).map(w => {
+          const dotClass = w.hazardType === 'flood' ? 'dot-flood' : 'dot-traffic';
+          const label = w.hazardType === 'flood' 
+            ? `🌊 Ngập ${w.depth_cm}cm - ${w.name}`
+            : `🚗 ${w.description || w.categoryName || 'Ùn tắc'}`;
+          return `<div class="gm-warning-item"><span class="warn-dot ${dotClass}"></span> ${label}</div>`;
+        }).join('');
+        
+        const moreCount = route.warnings.length - 3;
+        warningsHtml = `
+          <div class="gm-route-warnings">
+            ${warningItems}
+            ${moreCount > 0 ? `<div class="gm-warning-item" style="color: #70757a;">+ ${moreCount} cảnh báo khác</div>` : ''}
+          </div>
+        `;
+      }
+
+      // Tính phần trăm thời gian thêm so với đường ngắn nhất
+      const shortest = routes.reduce((min, r) => r.durationMin < min.durationMin ? r : min, routes[0]);
+      const timeDiff = route.durationMin - shortest.durationMin;
+      const timeDiffText = timeDiff > 0 ? `<span style="font-size: 11px; color: #70757a; font-weight: 400;"> (+${timeDiff} phút)</span>` : '';
+
+      // Thanh đánh giá mức độ kẹt xe & ngập nước
+      const freeFlow = route.freeFlowPercent !== undefined ? route.freeFlowPercent : 100;
+      const moderate = route.moderatePercent !== undefined ? route.moderatePercent : 0;
+      const severe = route.severePercent !== undefined ? route.severePercent : 0;
+      const jam = route.jamPercent !== undefined ? route.jamPercent : (moderate + severe);
+
+      // Render chi tiết từng bước đi / ngõ ngách (Itinerary)
+      let stepsHtml = '';
+      if (route.steps && route.steps.length > 0) {
+        const stepItems = route.steps.map(s => {
+          const trans = this.translateStepInstruction(s);
+          return `
+            <div class="gm-step-item">
+              <span class="gm-step-icon">${trans.icon}</span>
+              <div class="gm-step-info">
+                <div class="gm-step-instruction">${trans.text}</div>
+                <div class="gm-step-distance">${trans.dist}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        stepsHtml = `
+          <div class="gm-route-steps-toggle" onclick="event.stopPropagation(); window.appState.toggleRouteSteps(${index})">
+            📋 Chi tiết lộ trình & các ngõ ngách (${route.steps.length} bước) ▾
+          </div>
+          <div class="gm-route-steps-list" id="steps-list-${index}" style="display: none;">
+            ${stepItems}
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
+          ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
+          <div class="gm-route-label ${labelClass}" style="color: ${route.color};">
+            ${route.avoidLevel === 1 ? '🛡️' : route.avoidLevel === 2 ? '⚖️' : '⚡'} ${route.label}
+          </div>
+          <div class="gm-route-time ${timeClass}">
+            <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
+            <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
+          </div>
+          <div class="gm-route-meta" style="font-size: 12px; color: #3c4043; margin-top: 2px;">${route.trafficDesc}</div>
+          
+          <!-- Phân loại mức độ tắc đường trực quan (Traffic Congestion Mini-Bar) -->
+          <div class="gm-traffic-bar-container">
+            <div class="gm-traffic-bar-header">
+              <span class="gm-traffic-bar-title">🚦 Đánh giá lưu thông:</span>
+              <span class="gm-traffic-bar-ratio" style="color: ${route.color};">
+                ${jam === 0 ? '100% Thông thoáng' : `${freeFlow}% thoáng • ${jam}% kẹt`}
+              </span>
+            </div>
+            <div class="gm-traffic-bar">
+              <div class="gm-traffic-bar-segment seg-green" style="width: ${freeFlow}%;" title="Thông thoáng: ${freeFlow}%"></div>
+              ${moderate > 0 ? `<div class="gm-traffic-bar-segment seg-yellow" style="width: ${moderate}%;" title="Đông nhẹ: ${moderate}%"></div>` : ''}
+              ${severe > 0 ? `<div class="gm-traffic-bar-segment seg-red" style="width: ${severe}%;" title="Kẹt cứng: ${severe}%"></div>` : ''}
+            </div>
+            <div class="gm-traffic-legend">
+              <span><span class="gm-traffic-legend-dot dot-green"></span> Thoáng (${freeFlow}%)</span>
+              <span><span class="gm-traffic-legend-dot dot-yellow"></span> Đông vừa (${moderate}%)</span>
+              <span><span class="gm-traffic-legend-dot dot-red"></span> Kẹt xe (${severe}%)</span>
+            </div>
+          </div>
+
+          <div class="gm-route-tag ${route.tagClass}" style="margin-top: 6px;">${route.tagText}</div>
+          ${warningsHtml}
+          ${stepsHtml}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // Khi người dùng click vào route card -> highlight tuyến đó trên bản đồ & đồng bộ radio button
+  selectRouteOnMap(routeIndex) {
+    if (!this.lastRouteResult || !this.lastRouteResult.routes) return;
+    const routes = this.lastRouteResult.routes;
+    const selectedRoute = routes[routeIndex];
+    if (!selectedRoute) return;
+
+    // Đồng bộ mức độ tránh né và radio button trong UI
+    this.currentAvoidLevel = selectedRoute.avoidLevel;
+    document.querySelectorAll('.gm-avoidance-option').forEach(o => {
+      const lvl = parseInt(o.getAttribute('data-level'));
+      if (lvl === selectedRoute.avoidLevel) {
+        o.classList.add('active');
+        const r = o.querySelector('input[type="radio"]');
+        if (r) r.checked = true;
+      } else {
+        o.classList.remove('active');
+      }
+    });
+
+    // Cập nhật isRecommended trên tất cả các route
+    routes.forEach((r, i) => {
+      r.isRecommended = (i === routeIndex);
+    });
+
+    // Render lại danh sách cards để đổi trạng thái active
+    const resultsContainer = document.getElementById('gm-route-results');
+    if (resultsContainer) {
+      this.renderRouteCards(resultsContainer, this.lastRouteResult);
+    }
+
+    // Vẽ lại tuyến trên map
+    this.displayMultiRoutes(this.lastRouteResult);
+
+    // Cập nhật summary
+    const summaryContainer = document.getElementById('gm-route-summary');
+    if (summaryContainer) {
+      this.renderRouteSummary(summaryContainer, this.lastRouteResult);
     }
   }
 }

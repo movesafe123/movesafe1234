@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- Google Maps Style CSS -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 <body>
 
@@ -47,7 +47,7 @@
       </button>
     </div>
 
-    <!-- Bảng chỉ đường Google Maps (Directions Panel) -->
+    <!-- Bảng chỉ đường Google Maps (Directions Panel) - Nâng cấp 3 mức độ -->
     <div class="gm-directions-panel" id="gm-directions-panel">
       <div class="gm-directions-header">
         <div class="gm-travel-modes">
@@ -58,17 +58,113 @@
       </div>
 
       <div class="gm-route-inputs">
-        <div class="gm-input-row">
-          <div class="gm-dot-origin"></div>
-          <input type="text" class="gm-route-text-input" id="gm-route-origin" value="Cầu Giấy" placeholder="Chọn điểm đi...">
+        <div class="gm-route-inputs-wrapper">
+          <!-- Cột biểu tượng chỉ dẫn (Track) -->
+          <div class="gm-route-track">
+            <div class="gm-dot-origin" title="Điểm xuất phát"></div>
+            <div class="gm-track-line"></div>
+            <div class="gm-dot-dest" title="Điểm đến"></div>
+          </div>
+
+          <!-- Các ô nhập địa chỉ kèm gợi ý ngõ ngách -->
+          <div class="gm-route-fields">
+            <!-- Điểm đi -->
+            <div class="gm-field-row" id="field-row-origin">
+              <input 
+                type="text" 
+                class="gm-route-text-input" 
+                id="gm-route-origin" 
+                value="Cầu Giấy, Hà Nội" 
+                placeholder="Chọn điểm đi (ngõ, ngách, phố, số nhà...)"
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button class="gm-input-clear-btn" id="btn-clear-origin" title="Xóa điểm đi">✕</button>
+              <button class="gm-input-action-btn" id="btn-gps-origin" title="Sử dụng vị trí của tôi">🎯</button>
+              
+              <!-- Dropdown gợi ý địa chỉ điểm đi -->
+              <div class="gm-autocomplete-dropdown" id="dropdown-origin" style="display: none;"></div>
+            </div>
+
+            <!-- Điểm đến -->
+            <div class="gm-field-row" id="field-row-dest">
+              <input 
+                type="text" 
+                class="gm-route-text-input" 
+                id="gm-route-dest" 
+                value="Nhà Hát Lớn, Hoàn Kiếm, Hà Nội" 
+                placeholder="Chọn điểm đến (ngõ, ngách, phố, số nhà...)"
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button class="gm-input-clear-btn" id="btn-clear-dest" title="Xóa điểm đến">✕</button>
+              <button class="gm-input-action-btn" id="btn-pick-map-dest" title="Chọn trên bản đồ">🗺️</button>
+              
+              <!-- Dropdown gợi ý địa chỉ điểm đến -->
+              <div class="gm-autocomplete-dropdown" id="dropdown-dest" style="display: none;"></div>
+            </div>
+          </div>
+
+          <!-- Nút Đổi Chiều Điểm Đi / Điểm Đến (Swap Button) chuẩn Google Maps -->
+          <button class="gm-btn-swap" id="btn-swap-route" title="Đảo ngược điểm đi và điểm đến">
+            ⇅
+          </button>
         </div>
-        <div class="gm-input-row">
-          <div class="gm-dot-dest"></div>
-          <input type="text" class="gm-route-text-input" id="gm-route-dest" value="Nhà Hát Lớn (Hoàn Kiếm)" placeholder="Chọn điểm đến...">
+
+        <!-- Banner thông báo khi đang trong chế độ click chọn trên bản đồ -->
+        <div class="gm-pick-map-banner" id="gm-pick-map-banner" style="display: none;">
+          <span>🎯 Click vào điểm bất kỳ trên bản đồ để chọn...</span>
+          <button id="btn-cancel-pick-map">Hủy</button>
         </div>
+
+        <!-- 3 MỨC ĐỘ TRÁNH NÉ -->
+        <div class="gm-avoidance-selector" id="gm-avoidance-selector">
+          <div class="gm-avoidance-label">Mức độ tránh né:</div>
+          <div class="gm-avoidance-options">
+            <label class="gm-avoidance-option gm-avoid-safe active" data-level="1" title="Tránh HOÀN TOÀN mọi đường ùn tắc & mọi điểm ngập lụt">
+              <input type="radio" name="avoidLevel" value="1" checked>
+              <div class="gm-avoid-radio"></div>
+              <div class="gm-avoid-content">
+                <span class="gm-avoid-icon">🛡️</span>
+                <div class="gm-avoid-text">
+                  <span class="gm-avoid-title">An toàn tuyệt đối</span>
+                  <span class="gm-avoid-desc">Tránh hoàn toàn ùn tắc & ngập lụt</span>
+                </div>
+              </div>
+            </label>
+            <label class="gm-avoidance-option gm-avoid-balanced" data-level="2" title="Chỉ tránh ùn tắc đỏ nặng & ngập sâu xe máy không đi được">
+              <input type="radio" name="avoidLevel" value="2">
+              <div class="gm-avoid-radio"></div>
+              <div class="gm-avoid-content">
+                <span class="gm-avoid-icon">⚖️</span>
+                <div class="gm-avoid-text">
+                  <span class="gm-avoid-title">Cân bằng thông minh</span>
+                  <span class="gm-avoid-desc">Tránh kẹt cứng & ngập sâu nguy hiểm</span>
+                </div>
+              </div>
+            </label>
+            <label class="gm-avoidance-option gm-avoid-fast" data-level="3" title="Đường ngắn nhất & nhanh nhất, không tránh gì">
+              <input type="radio" name="avoidLevel" value="3">
+              <div class="gm-avoid-radio"></div>
+              <div class="gm-avoid-content">
+                <span class="gm-avoid-icon">⚡</span>
+                <div class="gm-avoid-text">
+                  <span class="gm-avoid-title">Nhanh nhất</span>
+                  <span class="gm-avoid-desc">Đường ngắn nhất, không tránh gì</span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <button class="gm-btn-find-route" id="btn-find-route-submit">
-          🚀 Tìm Đường Né Ngập An Toàn
+          🚀 Tìm Đường Thông Minh
         </button>
+      </div>
+
+      <!-- Thông báo tóm tắt phân tích -->
+      <div class="gm-route-summary" id="gm-route-summary" style="display: none;">
+        <!-- Render tóm tắt kết quả phân tích -->
       </div>
 
       <!-- Danh sách lộ trình so sánh -->
@@ -299,12 +395,13 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Client-side Scripts -->
-  <script src="js/weather-service.js"></script>
-  <script src="js/routing-service.js"></script>
-  <script src="js/map-engine.js"></script>
-  <script src="js/crowdsource.js"></script>
-  <script src="js/ai-chat.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/geocoding-service.js?v=3.0"></script>
+  <script src="js/weather-service.js?v=3.0"></script>
+  <script src="js/routing-service.js?v=3.0"></script>
+  <script src="js/map-engine.js?v=3.0"></script>
+  <script src="js/crowdsource.js?v=3.0"></script>
+  <script src="js/ai-chat.js?v=3.0"></script>
+  <script src="js/app.js?v=3.0"></script>
 
 </body>
 </html>

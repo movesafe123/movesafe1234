@@ -279,7 +279,7 @@ body {
 }
 
 .gm-route-inputs {
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -287,29 +287,76 @@ body {
   border-bottom: 1px solid var(--gm-divider);
 }
 
-.gm-input-row {
+.gm-route-inputs-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--gm-surface);
-  border: 1px solid var(--gm-border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  position: relative;
+}
+
+/* Track chỉ dẫn (Google Maps origin-destination vertical track) */
+.gm-route-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  padding: 6px 0;
+  flex-shrink: 0;
 }
 
 .gm-dot-origin {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  border: 2px solid var(--gm-blue);
-  background: transparent;
+  border: 2.5px solid var(--gm-blue);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.gm-track-line {
+  width: 2px;
+  flex: 1;
+  background-image: linear-gradient(to bottom, #1a73e8 33%, rgba(255,255,255,0) 0%);
+  background-position: left;
+  background-size: 2px 6px;
+  background-repeat: repeat-y;
+  margin: 3px 0;
 }
 
 .gm-dot-dest {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--gm-red);
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+/* Các trường nhập liệu */
+.gm-route-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gm-field-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gm-surface);
+  border: 1px solid var(--gm-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.gm-field-row:focus-within {
+  border-color: var(--gm-blue);
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.25);
 }
 
 .gm-route-text-input {
@@ -317,9 +364,256 @@ body {
   border: none;
   outline: none;
   font-family: var(--font-family);
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--gm-text-main);
   background: transparent;
+  min-width: 0;
+}
+
+.gm-input-clear-btn {
+  background: transparent;
+  border: none;
+  color: #70757a;
+  font-size: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.gm-input-clear-btn:hover {
+  background: #e8eaed;
+  color: #202124;
+}
+
+.gm-input-action-btn {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.gm-input-action-btn:hover {
+  background: #e8eaed;
+}
+
+/* Nút đảo chiều (Swap button) */
+.gm-btn-swap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--gm-border);
+  background: var(--gm-surface);
+  color: var(--gm-text-sub);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.gm-btn-swap:hover {
+  background: #f1f3f4;
+  color: var(--gm-blue);
+  transform: rotate(180deg);
+}
+
+/* Dropdown Autocomplete cho ngõ, ngách, phố, số nhà */
+.gm-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid #dadce0;
+  z-index: 1200;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f3f4;
+  transition: background 0.15s ease;
+}
+
+.gm-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.gm-suggestion-item:hover,
+.gm-suggestion-item.active {
+  background: #f8f9fa;
+}
+
+.gm-sugg-icon {
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f3f4;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gm-sugg-icon.icon-alley {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.gm-sugg-icon.icon-gps {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.gm-sugg-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-sugg-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gm-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-sugg-subtitle {
+  font-size: 11px;
+  color: var(--gm-text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-sugg-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #e8eaed;
+  color: #3c4043;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Quick Action (Vị trí hiện tại, Chọn trên bản đồ) */
+.gm-quick-action {
+  background: #fafafa;
+  font-weight: 500;
+}
+
+.gm-quick-action .gm-sugg-title {
+  color: var(--gm-blue);
+}
+
+/* Banner chọn điểm trên bản đồ */
+.gm-pick-map-banner {
+  background: #e8f0fe;
+  border: 1px dashed #1a73e8;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.gm-pick-map-banner button {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Chi tiết từng bước đi / ngõ ngách (Turn-by-turn itinerary) */
+.gm-route-steps-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gm-blue);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  user-select: none;
+}
+
+.gm-route-steps-toggle:hover {
+  text-decoration: underline;
+}
+
+.gm-route-steps-list {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e8eaed;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gm-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #3c4043;
+  line-height: 1.4;
+}
+
+.gm-step-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.gm-step-info {
+  flex: 1;
+}
+
+.gm-step-instruction {
+  font-weight: 500;
+  color: #202124;
+}
+
+.gm-step-distance {
+  font-size: 11px;
+  color: #70757a;
 }
 
 .gm-btn-find-route {
@@ -348,7 +642,7 @@ body {
 
 /* Danh sách tuyến đường gợi ý (Route Cards phong cách Google Maps) */
 .gm-route-results {
-  max-height: 280px;
+  max-height: min(460px, calc(100vh - 360px));
   overflow-y: auto;
   padding: 10px 14px;
   display: flex;
@@ -416,6 +710,420 @@ body {
 .gm-tag-danger {
   background: #fad2cf;
   color: var(--gm-red);
+}
+
+.gm-tag-warning {
+  background: #fef7e0;
+  color: #b06000;
+}
+
+.gm-tag-fastest {
+  background: #e8f0fe;
+  color: var(--gm-blue);
+}
+
+.gm-tag-alt {
+  background: #f1f3f4;
+  color: var(--gm-text-sub);
+}
+
+.gm-tag-alt-safe {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+/* ==========================================================================
+   3 Mức Độ Tránh Né - Avoidance Level Selector (Google Maps Style)
+   ========================================================================== */
+.gm-avoidance-selector {
+  margin-top: 4px;
+  border-top: 1px solid var(--gm-divider);
+  padding-top: 10px;
+}
+
+.gm-avoidance-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gm-text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.gm-avoidance-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gm-avoidance-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--gm-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--gm-surface);
+  position: relative;
+}
+
+.gm-avoidance-option:hover {
+  background: #f8f9fa;
+  border-color: #bdc1c6;
+}
+
+.gm-avoidance-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom radio button */
+.gm-avoid-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #bdc1c6;
+  flex-shrink: 0;
+  transition: var(--transition);
+  position: relative;
+}
+
+.gm-avoid-radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gm-avoidance-option.active .gm-avoid-radio::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Level 1: An toàn - Green */
+.gm-avoid-safe.active {
+  border-color: var(--gm-green);
+  background: var(--gm-green-light);
+}
+.gm-avoid-safe.active .gm-avoid-radio {
+  border-color: var(--gm-green);
+}
+.gm-avoid-safe .gm-avoid-radio::after {
+  background: var(--gm-green);
+}
+
+/* Level 2: Cân bằng - Orange */
+.gm-avoid-balanced.active {
+  border-color: var(--gm-yellow);
+  background: var(--gm-yellow-light);
+}
+.gm-avoid-balanced.active .gm-avoid-radio {
+  border-color: #e37400;
+}
+.gm-avoid-balanced .gm-avoid-radio::after {
+  background: #e37400;
+}
+
+/* Level 3: Nhanh nhất - Blue */
+.gm-avoid-fast.active {
+  border-color: var(--gm-blue);
+  background: var(--gm-blue-light);
+}
+.gm-avoid-fast.active .gm-avoid-radio {
+  border-color: var(--gm-blue);
+}
+.gm-avoid-fast .gm-avoid-radio::after {
+  background: var(--gm-blue);
+}
+
+.gm-avoid-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-avoid-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gm-avoid-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gm-avoid-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gm-text-main);
+  line-height: 1.2;
+}
+
+.gm-avoid-desc {
+  font-size: 11px;
+  color: var(--gm-text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Route Summary Bar */
+.gm-route-summary {
+  padding: 10px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--gm-divider);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideDown 0.25s cubic-bezier(0,0,0.2,1);
+}
+
+.gm-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gm-summary-badge.badge-safe {
+  background: #cbf0d8;
+  color: var(--gm-green);
+}
+
+.gm-summary-badge.badge-warning {
+  background: #fef7e0;
+  color: #b06000;
+}
+
+.gm-summary-badge.badge-danger {
+  background: #fad2cf;
+  color: var(--gm-red);
+}
+
+.gm-summary-text {
+  flex: 1;
+  color: var(--gm-text-sub);
+  font-weight: 500;
+}
+
+/* Enhanced Route Cards for multi-route display */
+.gm-route-card.selected-safe {
+  border: 2px solid #1e8e3e !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 4px 12px rgba(30, 142, 62, 0.15) !important;
+}
+
+.gm-route-card.selected-balanced {
+  border: 2px solid #f9ab00 !important;
+  background: #fefcf3 !important;
+  box-shadow: 0 4px 12px rgba(249, 171, 0, 0.2) !important;
+}
+
+.gm-route-card.selected-fastest {
+  border: 2px solid #1a73e8 !important;
+  background: #f3f8ff !important;
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.18) !important;
+}
+
+.gm-route-card.alt-card {
+  border: 1px solid var(--gm-border);
+  background: #ffffff;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gm-route-card.alt-card:hover {
+  opacity: 1;
+  border-color: #9aa0a6;
+  box-shadow: 0 2px 8px rgba(60, 64, 67, 0.12);
+}
+
+/* Traffic Congestion Mini-Bar */
+.gm-traffic-bar-container {
+  margin-top: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e8eaed;
+}
+
+.gm-traffic-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.gm-traffic-bar-title {
+  font-weight: 600;
+  color: #3c4043;
+}
+
+.gm-traffic-bar-ratio {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.gm-traffic-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #dadce0;
+  gap: 1px;
+}
+
+.gm-traffic-bar-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.seg-green {
+  background-color: #1e8e3e;
+}
+
+.seg-yellow {
+  background-color: #f9ab00;
+}
+
+.seg-red {
+  background-color: #d93025;
+}
+
+.gm-traffic-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 10px;
+  color: #5f6368;
+  margin-top: 5px;
+}
+
+.gm-traffic-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gm-traffic-legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-green { background-color: #1e8e3e; }
+.dot-yellow { background-color: #f9ab00; }
+.dot-red { background-color: #d93025; }
+
+.gm-route-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.gm-route-label-safe { color: var(--gm-green); }
+.gm-route-label-danger { color: var(--gm-red); }
+.gm-route-label-warning { color: #b06000; }
+.gm-route-label-fastest { color: var(--gm-blue); }
+.gm-route-label-alt { color: var(--gm-text-muted); }
+
+.gm-time-warning { color: #b06000; }
+.gm-time-fastest { color: var(--gm-blue); }
+.gm-time-alt { color: var(--gm-text-muted); }
+
+/* Route hazard warning list in card */
+.gm-route-warnings {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gm-warning-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gm-text-sub);
+  padding: 2px 0;
+}
+
+.gm-warning-item .warn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gm-warning-item .warn-dot.dot-flood {
+  background: var(--gm-blue);
+}
+
+.gm-warning-item .warn-dot.dot-traffic {
+  background: var(--gm-red);
+}
+
+/* Route card click-to-select animation */
+.gm-route-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.gm-route-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.gm-route-card:active::after {
+  background: rgba(26, 115, 232, 0.08);
+}
+
+/* Recommended badge */
+.gm-recommended-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--gm-green);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 /* ==========================================================================
@@ -661,6 +1369,36 @@ body {
 /* ==========================================================================
    Google Maps Custom Markers
    ========================================================================== */
+.gm-route-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+  border: 2px solid #ffffff;
+  cursor: grab;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.gm-route-pin:active {
+  cursor: grabbing;
+  transform: scale(1.15);
+}
+
+.gm-route-pin.pin-origin {
+  background: #1e8e3e;
+}
+
+.gm-route-pin.pin-dest {
+  background: #d93025;
+}
+
 .gm-flood-pin {
   display: flex;
   flex-direction: column;

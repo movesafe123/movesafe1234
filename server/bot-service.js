@@ -535,7 +535,20 @@ class LocalUrbanBot extends EventEmitter {
       const isNightTime = (vnHour >= 22 || vnHour < 6); // 22h đêm - 6h sáng: đường rất vắng
       const isPeakHour = (vnHour >= 7 && vnHour <= 9) || (vnHour >= 17 && vnHour <= 19); // Giờ cao điểm
 
-      const mapped = incidents.slice(0, 25).map((inc, idx) => {
+      // Ưu tiên các sự cố kẹt xe có độ trễ lớn và nằm gần khu vực nội thành
+      const sortedIncidents = [...incidents].sort((a, b) => {
+        const delayA = a.properties?.magnitudeOfDelay || 0;
+        const delayB = b.properties?.magnitudeOfDelay || 0;
+        if (delayB !== delayA) return delayB - delayA;
+
+        const cA = a.geometry?.type === 'Point' ? a.geometry.coordinates : a.geometry?.coordinates?.[0] || [0, 0];
+        const cB = b.geometry?.type === 'Point' ? b.geometry.coordinates : b.geometry?.coordinates?.[0] || [0, 0];
+        const distA = Math.hypot(cA[1] - city.lat, cA[0] - city.lng);
+        const distB = Math.hypot(cB[1] - city.lat, cB[0] - city.lng);
+        return distA - distB;
+      });
+
+      const mapped = sortedIncidents.slice(0, 45).map((inc, idx) => {
         const rawDesc = inc.properties?.events?.[0]?.description || '';
         const iconCategory = inc.properties?.iconCategory;
         const delayLevel = inc.properties?.magnitudeOfDelay || 0;
