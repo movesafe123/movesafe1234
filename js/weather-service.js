@@ -14,7 +14,7 @@ const WEATHER_STATION_PRESETS = {
     { id: 'hn-ht', ward: 'P. Hàng Trống', name: 'Phường Hàng Trống (Phố Cổ)', lat: 21.0310, lng: 105.8500 },
     { id: 'hn-qt', ward: 'P. Quán Thánh', name: 'Phường Quán Thánh (Ba Đình)', lat: 21.0420, lng: 105.8410 },
     { id: 'hn-ocd', ward: 'P. Ô Chợ Dừa', name: 'Phường Ô Chợ Dừa (Đống Đa)', lat: 21.0190, lng: 105.8280 },
-    { id: 'hn-bk', ward: 'P. Bách Khoa', name: 'Phường Bách Khoa (Hai Bà Trưng)', lat: 21.0050, lng: 105.8460 },
+    { id: 'hn-bm', ward: 'P. Bạch Mai', name: 'Phường Bạch Mai (Hai Bà Trưng)', lat: 21.0020, lng: 105.8490 },
     { id: 'hn-ml', ward: 'P. Mộ Lao', name: 'Phường Mộ Lao (Hà Đông)', lat: 20.9810, lng: 105.7850 },
     { id: 'hn-hl', ward: 'P. Hoàng Liệt', name: 'Phường Hoàng Liệt (Linh Đàm)', lat: 20.9650, lng: 105.8370 },
     { id: 'hn-buoi', ward: 'P. Bưởi', name: 'Phường Bưởi (Tây Hồ)', lat: 21.0480, lng: 105.8120 },
