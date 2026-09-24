@@ -20,6 +20,8 @@ class MapEngine {
     };
     this.currentBase = 'standard';
     this.weatherVisible = true;
+    this.trafficVisible = true;
+    this.floodVisible = true;
   }
 
   init(containerId = 'map-container', initialCoords = [21.0285, 105.8542], zoom = 13) {
@@ -54,6 +56,48 @@ class MapEngine {
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
     this.layers.trafficMarkers = L.layerGroup().addTo(this.map);
     this.layers.weatherMarkers = L.layerGroup().addTo(this.map);
+
+    // Tự động kiểm soát hiển thị theo mức Zoom (LOD - Level of Detail)
+    this.map.on('zoom zoomend', () => {
+      this.handleZoomLevel();
+    });
+  }
+
+  // Tự động ẩn/hiện icon theo mức zoom
+  handleZoomLevel() {
+    if (!this.map) return;
+    const currentZoom = this.map.getZoom();
+
+    // 1. Khi lùi ra xa (Zoom < 12):
+    // Ẩn toàn bộ các ghim thời tiết phường và ghim kẹt xe li ti để bản đồ sạch sẽ, không bị đè lên nhau thành khối
+    if (currentZoom < 12) {
+      if (this.layers.weatherMarkers && this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      if (this.layers.trafficMarkers && this.map.hasLayer(this.layers.trafficMarkers)) {
+        this.map.removeLayer(this.layers.trafficMarkers);
+      }
+    } else {
+      // Khi zoom lại gần (Zoom >= 12):
+      // Hiện lại đầy đủ các trạm thời tiết của từng Phường và các ghim sự cố
+      if (this.weatherVisible && this.layers.weatherMarkers && !this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.addLayer(this.layers.weatherMarkers);
+      }
+      if (this.trafficVisible !== false && this.layers.trafficMarkers && !this.map.hasLayer(this.layers.trafficMarkers)) {
+        this.map.addLayer(this.layers.trafficMarkers);
+      }
+    }
+
+    // 2. Với rốn ngập: nếu lùi ra quá xa (Zoom < 10) thì tạm ẩn để tránh chật bản đồ
+    if (currentZoom < 10) {
+      if (this.layers.floodMarkers && this.map.hasLayer(this.layers.floodMarkers)) {
+        this.map.removeLayer(this.layers.floodMarkers);
+      }
+    } else {
+      if (this.floodVisible !== false && this.layers.floodMarkers && !this.map.hasLayer(this.layers.floodMarkers)) {
+        this.map.addLayer(this.layers.floodMarkers);
+      }
+    }
   }
 
   setTomTomKey(key) {
@@ -77,7 +121,7 @@ class MapEngine {
     });
   }
 
-  // 1. Vẽ các trạm thời tiết đa điểm chuẩn phong cách Google Maps Pin
+  // 1. Vẽ các trạm thời tiết cấp Phường đa điểm chuẩn phong cách Google Maps Pin
   renderWeatherStations(stations = []) {
     if (!this.layers.weatherMarkers) return;
     this.layers.weatherMarkers.clearLayers();
@@ -86,18 +130,20 @@ class MapEngine {
       const risk = st.floodRisk || { level: 'safe', text: 'Khô ráo', color: '#1e8e3e' };
       const rainText = st.rain1h > 0 ? `${st.rain1h}mm` : 'Khô';
       const riskClass = risk.level === 'danger' ? 'weather-danger' : (risk.level === 'warning' ? 'weather-warning' : (risk.level === 'caution' ? 'weather-caution' : 'weather-safe'));
+      const wardName = st.ward || st.name.split('(')[0].trim();
 
       const customIcon = L.divIcon({
         className: 'gm-weather-pin-container',
         html: `
           <div class="gm-weather-pin ${riskClass}" title="${st.name}: ${st.temp}°C, ${st.description}">
-            <span class="gm-wp-icon">${st.icon || '🌦️'}</span>
+            <span class="gm-wp-name">${wardName}</span>
+            <span class="gm-wp-icon">${st.icon || '☀️'}</span>
             <span class="gm-wp-temp">${st.temp}°</span>
             <span class="gm-wp-rain">${rainText}</span>
           </div>
         `,
-        iconSize: [68, 28],
-        iconAnchor: [34, 14]
+        iconSize: [120, 28],
+        iconAnchor: [60, 14]
       });
 
       const marker = L.marker([st.lat, st.lng], { icon: customIcon });
@@ -113,10 +159,10 @@ class MapEngine {
             </span>
           </div>
           <h3 style="font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
-            Trạm: ${st.name}
+            🏛️ ${st.name}
           </h3>
           <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
-            Tình trạng: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
+            Trạng thái: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px;">
             <div>🌧️ <strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
@@ -130,7 +176,7 @@ class MapEngine {
           <button 
             style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px; font-size: 12px; font-weight: 500; cursor: pointer;"
             onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và nguy cơ ngập tại khu vực ${st.name} thế nào?')">
-            🤖 Hỏi AI Về Khu Vực Này
+            🤖 Hỏi AI Về Phường Này
           </button>
         </div>
       `;
@@ -138,6 +184,8 @@ class MapEngine {
       marker.bindPopup(popupHtml);
       this.layers.weatherMarkers.addLayer(marker);
     });
+
+    this.handleZoomLevel();
   }
 
   // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin
@@ -218,6 +266,8 @@ class MapEngine {
       this.layers.floodMarkers.addLayer(marker);
       this.layers.floodMarkers.addLayer(circle);
     });
+
+    this.handleZoomLevel();
   }
 
   // 3. Vẽ các ghim sự cố giao thông TomTom / VOV theo đúng phân loại
@@ -297,6 +347,8 @@ class MapEngine {
       marker.bindPopup(popupHtml);
       this.layers.trafficMarkers.addLayer(marker);
     });
+
+    this.handleZoomLevel();
   }
 
   // 4. Vẽ tuyến đường chuẩn phong cách Google Maps
@@ -342,21 +394,20 @@ class MapEngine {
 
   toggleFloods(show) {
     if (!this.map) return;
-    if (show) this.layers.floodMarkers.addTo(this.map);
-    else this.map.removeLayer(this.layers.floodMarkers);
+    this.floodVisible = show;
+    this.handleZoomLevel();
   }
 
   toggleIncidents(show) {
     if (!this.map) return;
-    if (show) this.layers.trafficMarkers.addTo(this.map);
-    else this.map.removeLayer(this.layers.trafficMarkers);
+    this.trafficVisible = show;
+    this.handleZoomLevel();
   }
 
   toggleWeather(show) {
     if (!this.map) return;
     this.weatherVisible = show;
-    if (show) this.layers.weatherMarkers.addTo(this.map);
-    else this.map.removeLayer(this.layers.weatherMarkers);
+    this.handleZoomLevel();
   }
 
   switchBaseMap(type) {

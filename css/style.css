@@ -877,7 +877,7 @@ body {
    Weather Stations Pin, Cloud 24/7 Live Indicator & Toast Alerts
    ========================================================================== */
 
-/* Trạm thời tiết Google Maps Pin */
+/* Trạm thời tiết cấp Phường Google Maps Pin */
 .gm-weather-pin-container {
   background: transparent !important;
   border: none !important;
@@ -886,33 +886,52 @@ body {
 .gm-weather-pin {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #ffffff;
+  gap: 5px;
+  background: #ffffff !important;
   padding: 3px 8px;
   border-radius: 99px;
-  box-shadow: 0 2px 6px rgba(60,64,67,0.3);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
   font-family: var(--font-family);
   font-size: 11px;
-  font-weight: 700;
-  color: #202124;
+  font-weight: 600;
+  color: #202124 !important;
   white-space: nowrap;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   user-select: none;
+  border: 1.5px solid #dadce0;
 }
 
 .gm-weather-pin:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(60,64,67,0.4);
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   z-index: 999;
 }
 
+.gm-chip.gm-chip-inactive {
+  opacity: 0.55;
+  background: #f1f3f4;
+  color: #5f6368;
+  border-color: #dadce0;
+}
+
+.gm-wp-name {
+  font-weight: 700;
+  color: #1a73e8;
+  max-width: 95px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gm-wp-icon {
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .gm-wp-temp {
   color: #202124;
+  font-weight: 700;
 }
 
 .gm-wp-rain {
@@ -924,7 +943,7 @@ body {
 }
 
 .gm-weather-pin.weather-safe {
-  border: 1px solid #ceead6;
+  border-color: #34a853;
 }
 .gm-weather-pin.weather-safe .gm-wp-rain {
   background: #e6f4ea;
@@ -932,11 +951,11 @@ body {
 }
 
 .gm-weather-pin.weather-caution {
-  border: 1px solid #d2e3fc;
+  border-color: #1a73e8;
 }
 
 .gm-weather-pin.weather-warning {
-  border: 1.5px solid #f9ab00;
+  border-color: #f9ab00;
   background: #fffdf0;
 }
 .gm-weather-pin.weather-warning .gm-wp-rain {
@@ -946,7 +965,7 @@ body {
 }
 
 .gm-weather-pin.weather-danger {
-  border: 1.5px solid #d93025;
+  border-color: #d93025;
   background: #fff5f5;
   animation: gm-danger-pulse 1.8s infinite;
 }

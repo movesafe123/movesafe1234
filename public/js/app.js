@@ -325,6 +325,27 @@ class GoogleMapsApp {
     });
 
     // 3. Category Chips
+    document.getElementById('chip-weather-toggle')?.addEventListener('click', () => {
+      const city = this.citiesConfig[this.currentCity];
+      const currentZoom = window.mapEngine.map.getZoom();
+
+      if (currentZoom < 12) {
+        window.mapEngine.map.flyTo([city.lat, city.lng], 13);
+        this.showToast(`🌦️ Phóng to vào ${city.name} để xem chi tiết thời tiết & mưa từng phường!`, 'info', 4000);
+      } else {
+        const nextState = !window.mapEngine.weatherVisible;
+        window.mapEngine.toggleWeather(nextState);
+        const chip = document.getElementById('chip-weather-toggle');
+        if (nextState) {
+          chip?.classList.remove('gm-chip-inactive');
+          this.showToast(`🌦️ Đã bật hiển thị thời tiết các phường`, 'info');
+        } else {
+          chip?.classList.add('gm-chip-inactive');
+          this.showToast(`Đã ẩn trạm thời tiết các phường`, 'info');
+        }
+      }
+    });
+
     document.getElementById('chip-flood-count')?.addEventListener('click', () => {
       const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
       const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
