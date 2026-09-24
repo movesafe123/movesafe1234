@@ -22,8 +22,8 @@ module.exports = {
   
   // API Keys được nạp từ biến môi trường
   API_KEYS: {
-    OPENWEATHER: process.env.OPENWEATHER_KEY || '',
-    TOMTOM: process.env.TOMTOM_KEY || '',
+    OPENWEATHER: process.env.OPENWEATHER_KEY || '1e050d36d170249efaf439dcdb324228',
+    TOMTOM: process.env.TOMTOM_KEY || 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF',
     GEMINI: process.env.GEMINI_KEY || ''
   },
 

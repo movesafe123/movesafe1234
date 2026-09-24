@@ -469,7 +469,13 @@ class GoogleMapsApp {
     });
 
     const settingsModal = document.getElementById('modal-settings');
-    document.getElementById('btn-gm-open-settings')?.addEventListener('click', () => settingsModal?.classList.add('open'));
+    document.getElementById('btn-gm-open-settings')?.addEventListener('click', () => {
+      const geminiInput = document.getElementById('setting-gemini-key');
+      if (geminiInput) {
+        geminiInput.value = localStorage.getItem('movesafe_gemini_key') || '';
+      }
+      settingsModal?.classList.add('open');
+    });
     document.getElementById('btn-close-settings')?.addEventListener('click', () => settingsModal?.classList.remove('open'));
 
     document.getElementById('btn-save-settings')?.addEventListener('click', () => {
