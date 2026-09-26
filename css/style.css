@@ -1829,3 +1829,373 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ==================== MODAL MẠNG LƯỚI ĐƯỜNG LỚN & THỜI TIẾT CÁC PHƯỜNG HÀ NỘI ==================== */
+.modal-streets-card {
+  max-width: 880px !important;
+  width: 95% !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.modal-streets-card .modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.streets-filter-bar {
+  padding: 12px 20px 8px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.district-filter-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.district-filter-chips::-webkit-scrollbar {
+  height: 4px;
+}
+.district-filter-chips::-webkit-scrollbar-thumb {
+  background: #dadce0;
+  border-radius: 4px;
+}
+
+.dist-chip {
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.dist-chip:hover {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #aecbfa;
+}
+
+.dist-chip.active {
+  background: #1a73e8;
+  color: #ffffff;
+  border-color: #1a73e8;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(26,115,232,0.3);
+}
+
+.streets-modal-body {
+  overflow-y: auto;
+  padding: 16px 20px;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
+  background: #f8f9fa;
+}
+
+.ward-card {
+  background: #ffffff;
+  border: 1.5px solid #e8eaed;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.ward-card:hover {
+  border-color: #1a73e8;
+  box-shadow: 0 4px 14px rgba(26, 115, 232, 0.18);
+  transform: translateY(-2px);
+}
+
+.ward-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.ward-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #202124;
+  line-height: 1.3;
+}
+
+.ward-card-district {
+  font-size: 11px;
+  color: #5f6368;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.ward-card-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ward-card-weather.weather-safe {
+  background: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+}
+
+.ward-card-weather.weather-warning {
+  background: #fef7e0;
+  color: #b06000;
+  border: 1px solid #fce8b2;
+}
+
+.ward-card-weather.weather-danger {
+  background: #fce8e6;
+  color: #c5221f;
+  border: 1px solid #fad2cf;
+  font-weight: 700;
+}
+
+.ward-card-streets {
+  margin: 8px 0;
+  background: #f1f8ff;
+  border: 1px solid #c2e7ff;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.ward-card-streets-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #005ac1;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ward-card-street-tag {
+  display: inline-block;
+  background: #ffffff;
+  border: 1px solid #c2e7ff;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #1a73e8;
+  margin: 2px 3px 2px 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ward-card-street-tag:hover {
+  background: #1a73e8;
+  color: #ffffff;
+  border-color: #1a73e8;
+}
+
+.ward-card-hotspots {
+  font-size: 11px;
+  color: #5f6368;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.ward-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f3f4;
+}
+
+.btn-card-map {
+  flex: 1;
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s ease;
+}
+
+.btn-card-map:hover {
+  background: #1557b0;
+}
+
+.btn-card-ai {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border: 1px solid #c2e7ff;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-card-ai:hover {
+  background: #d2e3fc;
+}
+
+/* ==========================================================================
+   🤖 AI SMART SUGGESTION BOX (PASSIVE - KHÔNG TỐN REQUEST)
+   Gợi ý thông minh tự động khi tính tuyến đường
+   ========================================================================== */
+
+.gm-ai-suggestion {
+  margin: 8px 12px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8f0fe 0%, #f0f4ff 40%, #eef9ee 100%);
+  border: 1px solid #c2d9f7;
+  box-shadow: 0 2px 8px rgba(26,115,232,0.10), 0 1px 3px rgba(30,142,62,0.08);
+  animation: suggestion-fade-in 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes suggestion-fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gm-suggestion-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gm-blue);
+  letter-spacing: 0.02em;
+}
+
+.gm-suggestion-header .sug-icon {
+  font-size: 16px;
+  animation: pulse-suggestion 2.4s infinite;
+}
+
+@keyframes pulse-suggestion {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.gm-suggestion-header .sug-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--gm-blue);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.gm-suggestion-body {
+  padding: 4px 14px 10px;
+}
+
+.gm-suggestion-body .sug-main-advice {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gm-text-main);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.gm-suggestion-body .sug-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gm-suggestion-body .sug-detail-list li {
+  font-size: 12px;
+  color: var(--gm-text-sub);
+  line-height: 1.6;
+  padding: 3px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.gm-suggestion-body .sug-detail-list li .sug-li-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+  margin-top: 1px;
+}
+
+.gm-suggestion-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 14px 10px;
+  border-top: 1px solid #dde5f0;
+}
+
+.gm-suggestion-context .ctx-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid #e0e4ea;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--gm-text-sub);
+  white-space: nowrap;
+}
+
+.gm-suggestion-context .ctx-tag .ctx-icon {
+  font-size: 12px;
+}
+
+/* Collapse / Expand toggle */
+.gm-suggestion-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--gm-text-muted);
+  border-top: 1px solid #dde5f0;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.gm-suggestion-toggle:hover {
+  background: rgba(26,115,232,0.06);
+  color: var(--gm-blue);
+}

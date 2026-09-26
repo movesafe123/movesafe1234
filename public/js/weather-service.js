@@ -4,46 +4,39 @@
  * Hỗ trợ quét thời tiết đa điểm (Multi-Station Weather Layer) cho các quận huyện
  */
 
+const HANOI_PRESETS_DATA = (typeof HANOI_WARDS_DATA !== 'undefined' && Array.isArray(HANOI_WARDS_DATA))
+  ? HANOI_WARDS_DATA
+  : (typeof require !== 'undefined')
+    ? (function() { try { return require('./hanoi-wards-streets'); } catch(e) { return []; } })()
+    : [];
+
 const WEATHER_STATION_PRESETS = {
-  hanoi: [
-    { id: 'hn-xp', ward: 'P. Xuân Phương', name: 'Phường Xuân Phương (Nam Từ Liêm)', lat: 21.0335, lng: 105.7480 },
-    { id: 'hn-dvh', ward: 'P. Dịch Vọng Hậu', name: 'Phường Dịch Vọng Hậu (Cầu Giấy)', lat: 21.0330, lng: 105.7870 },
-    { id: 'hn-md1', ward: 'P. Mỹ Đình 1', name: 'Phường Mỹ Đình 1 (Nam Từ Liêm)', lat: 21.0180, lng: 105.7750 },
-    { id: 'hn-cd', ward: 'P. Cầu Diễn', name: 'Phường Cầu Diễn (Nam Từ Liêm)', lat: 21.0410, lng: 105.7650 },
-    { id: 'hn-tt', ward: 'P. Tràng Tiền', name: 'Phường Tràng Tiền (Hoàn Kiếm)', lat: 21.0250, lng: 105.8560 },
-    { id: 'hn-ht', ward: 'P. Hàng Trống', name: 'Phường Hàng Trống (Phố Cổ)', lat: 21.0310, lng: 105.8500 },
-    { id: 'hn-qt', ward: 'P. Quán Thánh', name: 'Phường Quán Thánh (Ba Đình)', lat: 21.0420, lng: 105.8410 },
-    { id: 'hn-ocd', ward: 'P. Ô Chợ Dừa', name: 'Phường Ô Chợ Dừa (Đống Đa)', lat: 21.0190, lng: 105.8280 },
-    { id: 'hn-bm', ward: 'P. Bạch Mai', name: 'Phường Bạch Mai (Hai Bà Trưng)', lat: 21.0020, lng: 105.8490 },
-    { id: 'hn-ml', ward: 'P. Mộ Lao', name: 'Phường Mộ Lao (Hà Đông)', lat: 20.9810, lng: 105.7850 },
-    { id: 'hn-hl', ward: 'P. Hoàng Liệt', name: 'Phường Hoàng Liệt (Linh Đàm)', lat: 20.9650, lng: 105.8370 },
-    { id: 'hn-buoi', ward: 'P. Bưởi', name: 'Phường Bưởi (Tây Hồ)', lat: 21.0480, lng: 105.8120 },
-    { id: 'hn-bd', ward: 'P. Bồ Đề', name: 'Phường Bồ Đề (Long Biên)', lat: 21.0380, lng: 105.8750 },
-    { id: 'hn-pd', ward: 'P. Phú Diễn', name: 'Phường Phú Diễn (Bắc Từ Liêm)', lat: 21.0500, lng: 105.7620 },
-    { id: 'hn-kd', ward: 'P. Khương Đình', name: 'Phường Khương Đình (Thanh Xuân)', lat: 20.9930, lng: 105.8180 },
-    { id: 'hn-nt', ward: 'P. Nghĩa Tân', name: 'Phường Nghĩa Tân (Cầu Giấy)', lat: 21.0440, lng: 105.7920 },
-    { id: 'hn-th', ward: 'P. Trung Hòa', name: 'Phường Trung Hòa (Cầu Giấy)', lat: 21.0090, lng: 105.7980 },
-    { id: 'hn-vt', ward: 'P. Vĩnh Tuy', name: 'Phường Vĩnh Tuy (Hai Bà Trưng)', lat: 20.9980, lng: 105.8670 }
+  hanoi: HANOI_PRESETS_DATA.length > 0 ? HANOI_PRESETS_DATA : [
+    { id: 'hn-xp', ward: 'P. Xuân Phương', name: 'Phường Xuân Phương (Nam Từ Liêm)', district: 'Nam Từ Liêm', lat: 21.0335, lng: 105.7480, mainStreets: ['Đường Xuân Phương (ĐT70)', 'Đường Trịnh Văn Bô', 'Đường Thị Cấm'] },
+    { id: 'hn-dvh', ward: 'P. Dịch Vọng Hậu', name: 'Phường Dịch Vọng Hậu (Cầu Giấy)', district: 'Cầu Giấy', lat: 21.0330, lng: 105.7870, mainStreets: ['Đường Xuân Thủy', 'Đường Duy Tân', 'Đường Trần Thái Tông'] },
+    { id: 'hn-md1', ward: 'P. Mỹ Đình 1', name: 'Phường Mỹ Đình 1 (Nam Từ Liêm)', district: 'Nam Từ Liêm', lat: 21.0180, lng: 105.7750, mainStreets: ['Đường Phạm Hùng', 'Đường Mễ Trì', 'Đường Đình Thôn'] },
+    { id: 'hn-cd', ward: 'P. Cầu Diễn', name: 'Phường Cầu Diễn (Nam Từ Liêm)', district: 'Nam Từ Liêm', lat: 21.0410, lng: 105.7650, mainStreets: ['Đường Cầu Diễn', 'Đường Hồ Tùng Mậu', 'Đường Nguyễn Đổng Chi'] },
+    { id: 'hn-pd', ward: 'P. Phú Diễn', name: 'Phường Phú Diễn (Bắc Từ Liêm)', district: 'Bắc Từ Liêm', lat: 21.0500, lng: 105.7620, mainStreets: ['Đường Cầu Diễn (QL32)', 'Đường Phú Diễn', 'Đường Hoàng Công Chất', 'Đường Đức Diễn'] }
   ],
   hcm: [
-    { id: 'hcm-bn', ward: 'P. Bến Nghé', name: 'Phường Bến Nghé (Quận 1)', lat: 10.7769, lng: 106.7008 },
-    { id: 'hcm-bt', ward: 'P. Bến Thành', name: 'Phường Bến Thành (Quận 1)', lat: 10.7725, lng: 106.6980 },
-    { id: 'hcm-td', ward: 'P. Thảo Điền', name: 'Phường Thảo Điền (TP. Thủ Đức)', lat: 10.8052, lng: 106.7351 },
-    { id: 'hcm-tp', ward: 'P. Tân Phong', name: 'Phường Tân Phong (Phú Mỹ Hưng, Q.7)', lat: 10.7320, lng: 106.7150 },
-    { id: 'hcm-p15', ward: 'P. 15 Tân Bình', name: 'Phường 15 (Tân Bình - Sân Bay)', lat: 10.8150, lng: 106.6380 },
-    { id: 'hcm-hx', ward: 'P. 25 Bình Thạnh', name: 'Phường 25 (Hàng Xanh, Bình Thạnh)', lat: 10.8012, lng: 106.7118 },
-    { id: 'hcm-q5', ward: 'P. 11 Quận 5', name: 'Phường 11 (Chợ Lớn, Quận 5)', lat: 10.7550, lng: 106.6650 },
-    { id: 'hcm-apd', ward: 'P. An Phú Đông', name: 'Phường An Phú Đông (Quận 12)', lat: 10.8492, lng: 106.6178 },
-    { id: 'hcm-btd', ward: 'P. Bình Trị Đông', name: 'Phường Bình Trị Đông (Bình Tân)', lat: 10.7650, lng: 106.5980 },
-    { id: 'hcm-hbc', ward: 'P. Hiệp Bình Chánh', name: 'Phường Hiệp Bình Chánh (Thủ Đức)', lat: 10.8290, lng: 106.7240 }
+    { id: 'hcm-bn', ward: 'P. Bến Nghé', name: 'Phường Bến Nghé (Quận 1)', lat: 10.7769, lng: 106.7008, mainStreets: ['Đường Đồng Khởi', 'Đường Lê Duẩn', 'Đường Nguyễn Huệ'] },
+    { id: 'hcm-bt', ward: 'P. Bến Thành', name: 'Phường Bến Thành (Quận 1)', lat: 10.7725, lng: 106.6980, mainStreets: ['Đường Lê Lợi', 'Đường Hàm Nghi', 'Đường Cách Mạng Tháng 8'] },
+    { id: 'hcm-td', ward: 'P. Thảo Điền', name: 'Phường Thảo Điền (TP. Thủ Đức)', lat: 10.8052, lng: 106.7351, mainStreets: ['Đường Quốc Hương', 'Đường Xuân Thủy', 'Đường Thảo Điền'] },
+    { id: 'hcm-tp', ward: 'P. Tân Phong', name: 'Phường Tân Phong (Phú Mỹ Hưng, Q.7)', lat: 10.7320, lng: 106.7150, mainStreets: ['Đại lộ Nguyễn Văn Linh', 'Đường Nguyễn Thị Thập', 'Đường Nguyễn Đức Cảnh'] },
+    { id: 'hcm-p15', ward: 'P. 15 Tân Bình', name: 'Phường 15 (Tân Bình - Sân Bay)', lat: 10.8150, lng: 106.6380, mainStreets: ['Đường Cộng Hòa', 'Đường Trường Chinh', 'Đường Hoàng Hoa Thám'] },
+    { id: 'hcm-hx', ward: 'P. 25 Bình Thạnh', name: 'Phường 25 (Hàng Xanh, Bình Thạnh)', lat: 10.8012, lng: 106.7118, mainStreets: ['Đường Điện Biên Phủ', 'Đường Xô Viết Nghệ Tĩnh', 'Đường D2 Nguyễn Gia Trí'] },
+    { id: 'hcm-q5', ward: 'P. 11 Quận 5', name: 'Phường 11 (Chợ Lớn, Quận 5)', lat: 10.7550, lng: 106.6650, mainStreets: ['Đường Hải Thượng Lãn Ông', 'Đường Hồng Bàng', 'Đường Châu Văn Liêm'] },
+    { id: 'hcm-apd', ward: 'P. An Phú Đông', name: 'Phường An Phú Đông (Quận 12)', lat: 10.8492, lng: 106.6178, mainStreets: ['Quốc lộ 1A', 'Đường An Phú Đông 03', 'Đường Vườn Lài'] },
+    { id: 'hcm-btd', ward: 'P. Bình Trị Đông', name: 'Phường Bình Trị Đông (Bình Tân)', lat: 10.7650, lng: 106.5980, mainStreets: ['Đường Tên Lửa', 'Đường Tỉnh Lộ 10', 'Đường Hương Lộ 2'] },
+    { id: 'hcm-hbc', ward: 'P. Hiệp Bình Chánh', name: 'Phường Hiệp Bình Chánh (Thủ Đức)', lat: 10.8290, lng: 106.7240, mainStreets: ['Đường Phạm Văn Đồng', 'Quốc lộ 13', 'Đường Hiệp Bình'] }
   ],
   danang: [
-    { id: 'dn-tt', ward: 'P. Thạch Thang', name: 'Phường Thạch Thang (Hải Châu)', lat: 16.0740, lng: 108.2200 },
-    { id: 'dn-pm', ward: 'P. Phước Mỹ', name: 'Phường Phước Mỹ (Sơn Trà - Mỹ Khê)', lat: 16.0650, lng: 108.2430 },
-    { id: 'dn-ma', ward: 'P. Mỹ An', name: 'Phường Mỹ An (Ngũ Hành Sơn)', lat: 16.0420, lng: 108.2420 },
-    { id: 'dn-hk', ward: 'P. Hòa Khánh Bắc', name: 'Phường Hòa Khánh Bắc (Liên Chiểu)', lat: 16.0780, lng: 108.1500 },
-    { id: 'dn-kt', ward: 'P. Khuê Trung', name: 'Phường Khuê Trung (Cẩm Lệ)', lat: 16.0250, lng: 108.2050 },
-    { id: 'dn-ahb', ward: 'P. An Hải Bắc', name: 'Phường An Hải Bắc (Sơn Trà)', lat: 16.0690, lng: 108.2320 }
+    { id: 'dn-tt', ward: 'P. Thạch Thang', name: 'Phường Thạch Thang (Hải Châu)', lat: 16.0740, lng: 108.2200, mainStreets: ['Đường Bạch Đằng', 'Đường Trần Phú', 'Đường Lê Duẩn'] },
+    { id: 'dn-pm', ward: 'P. Phước Mỹ', name: 'Phường Phước Mỹ (Sơn Trà - Mỹ Khê)', lat: 16.0650, lng: 108.2430, mainStreets: ['Đường Võ Nguyên Giáp', 'Đường Phạm Văn Đồng', 'Đường Võ Văn Kiệt'] },
+    { id: 'dn-ma', ward: 'P. Mỹ An', name: 'Phường Mỹ An (Ngũ Hành Sơn)', lat: 16.0420, lng: 108.2420, mainStreets: ['Đường Võ Nguyên Giáp', 'Đường Ngũ Hành Sơn', 'Đường Hồ Xuân Hương'] },
+    { id: 'dn-hk', ward: 'P. Hòa Khánh Bắc', name: 'Phường Hòa Khánh Bắc (Liên Chiểu)', lat: 16.0780, lng: 108.1500, mainStreets: ['Đường Nguyễn Lương Bằng', 'Đường Tôn Đức Thắng', 'Đường Ngô Thì Nhậm'] },
+    { id: 'dn-kt', ward: 'P. Khuê Trung', name: 'Phường Khuê Trung (Cẩm Lệ)', lat: 16.0250, lng: 108.2050, mainStreets: ['Đường Cách Mạng Tháng 8', 'Đường Nguyễn Hữu Thọ', 'Đường Lê Đại Hành'] },
+    { id: 'dn-ahb', ward: 'P. An Hải Bắc', name: 'Phường An Hải Bắc (Sơn Trà)', lat: 16.0690, lng: 108.2320, mainStreets: ['Đường Ngô Quyền', 'Đường Trần Hưng Đạo', 'Đường Phạm Văn Đồng'] }
   ]
 };
 
@@ -182,9 +175,14 @@ class WeatherService {
           id: st.id,
           name: st.name,
           ward: st.ward || '',
+          district: st.district || '',
           city: cityKey,
           lat: st.lat,
           lng: st.lng,
+          isHub: st.isHub !== false,
+          mainStreets: st.mainStreets || [],
+          trafficHotspots: st.trafficHotspots || [],
+          floodVulnerability: st.floodVulnerability || '',
           temp,
           feelsLike,
           rain1h: rain,
@@ -209,9 +207,15 @@ class WeatherService {
         return {
           id: st.id,
           name: st.name,
+          ward: st.ward || '',
+          district: st.district || '',
           city: cityKey,
           lat: st.lat,
           lng: st.lng,
+          isHub: st.isHub !== false,
+          mainStreets: st.mainStreets || [],
+          trafficHotspots: st.trafficHotspots || [],
+          floodVulnerability: st.floodVulnerability || '',
           temp: 26,
           feelsLike: 29,
           rain1h: 0,

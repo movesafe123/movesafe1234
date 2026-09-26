@@ -1,5 +1,6 @@
 const axios = require('axios');
 const botService = require('./bot-service');
+const HANOI_WARDS_DATA = require('../js/hanoi-wards-streets');
 
 class AIAssistantService {
   async processQuery({ query, city = 'hanoi', userApiKey = '' }) {
@@ -29,6 +30,41 @@ class AIAssistantService {
     const lower = query.toLowerCase();
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
 
+    // 0. Nhận diện nếu câu hỏi liên quan đến Phường hoặc Tuyến đường lớn ở Hà Nội
+    let matchedWard = null;
+    if (city === 'hanoi' && typeof HANOI_WARDS_DATA !== 'undefined') {
+      matchedWard = HANOI_WARDS_DATA.find(w => {
+        const cleanWard = w.ward.toLowerCase().replace(/p\./g, '').trim();
+        const fullWard = w.name.toLowerCase();
+        if (lower.includes(cleanWard) || lower.includes(fullWard)) return true;
+        return w.mainStreets.some(st => {
+          const cleanSt = st.toLowerCase().replace(/đường|phố|quốc lộ|đại lộ/gi, '').trim();
+          return cleanSt.length >= 3 && lower.includes(cleanSt);
+        });
+      });
+    }
+
+    // Nếu người dùng hỏi cụ thể về phường hoặc tuyến đường thuộc phường
+    if (matchedWard && (lower.includes('phường') || lower.includes('đường') || lower.includes('phố') || lower.includes('thời tiết') || lower.includes('ngập') || lower.includes('tắc'))) {
+      const streetsList = matchedWard.mainStreets.join(', ');
+      const hotspotsList = matchedWard.trafficHotspots.join('; ');
+      
+      return {
+        text: `🏛️ **Thông tin Giao thông & Mạng lưới Đường lớn tại ${matchedWard.name}**:\n\n` +
+              `• 🛣️ **Các trục đường huyết mạch qua phường**: ${streetsList}.\n` +
+              `• 🚦 **Điểm giao cắt & Nút nghẽn**: ${hotspotsList}.\n` +
+              `• 🌊 **Đặc điểm ngập úng**: ${matchedWard.floodVulnerability}.\n` +
+              `• 💡 **Đánh giá lưu thông**: ${matchedWard.description}\n\n` +
+              `🌦️ Thời tiết khu vực hiện tại tạnh ráo, tầm nhìn tốt. Bạn có thể nhấn trực tiếp vào ghim của phường này trên bản đồ để xem chi tiết!`,
+        action: {
+          type: 'FOCUS_POINT',
+          lat: matchedWard.lat,
+          lng: matchedWard.lng,
+          name: matchedWard.name
+        }
+      };
+    }
+
     // 1. Hỏi về tình trạng tắc đường, kẹt xe trên tuyến đường cụ thể
     if (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('kẹt xe')) {
       // Nhận diện một số tuyến đường đặc thù hay tắc ở Hà Nội & TP.HCM
@@ -57,9 +93,30 @@ class AIAssistantService {
     }
 
     // 2. Hỏi về lộ trình / tìm đường tránh ngập (Ví dụ: từ A đến B)
-    if (lower.includes('tìm đường') || lower.includes('lộ trình') || lower.includes('chỉ đường') || (lower.includes('từ') && lower.includes('đến'))) {
-      const floodNames = floods.map(f => f.name).join(', ');
-      
+    if (lower.includes('tìm đường') || lower.includes('lộ trình') || lower.includes('chỉ đường') || (lower.includes('từ') && (lower.includes('đến') || lower.includes('về') || lower.includes('sang') || lower.includes('qua')))) {
+      // Nhận diện Điểm đi và Điểm đến
+      const routeRegex = /(?:từ|đi từ|chỉ đường từ|lộ trình từ)\s+(.*?)\s+(?:đến|về|sang|qua)\s+(.*?)(?:\.|\?|,|né ngập|tránh tắc|không ngập|$)/i;
+      const rMatch = query.match(routeRegex);
+      if (rMatch && rMatch[1] && rMatch[2]) {
+        const originClean = rMatch[1].replace(/^(tôi|bạn|hãy|giúp|với)/i, '').trim();
+        const destClean = rMatch[2].replace(/(\?|!|\.|né ngập|tránh tắc|tránh ngập|an toàn)$/i, '').trim();
+
+        if (originClean.length >= 2 && destClean.length >= 2) {
+          return {
+            text: `🎯 **Đã kích hoạt tự động vẽ lộ trình thông minh trên bản đồ!**\n\n` +
+                  `📍 **Lộ trình**: Điểm đi: **${originClean}** ➔ Điểm đến: **${destClean}**\n` +
+                  `🛡️ **Điều phối tự động né ngập & ùn tắc**: MoveSafe tự động kích hoạt chế độ **An toàn tuyệt đối (Né 100% rốn ngập)**. Nếu phát hiện rốn ngập sâu trên trục chính, hệ thống sẽ bẻ hướng sang hành lang đường vòng cao ráo.\n\n` +
+                  `*Bản đồ tác chiến và bảng chỉ đường đã được mở tự động cho bạn!*`,
+            action: {
+              type: 'AUTO_ROUTE',
+              origin: originClean,
+              destination: destClean,
+              avoidLevel: 1
+            }
+          };
+        }
+      }
+
       let matchedFlood = floods.find(f => {
         const words = f.name.toLowerCase().split(/[(),-]/);
         return words.some(w => w.trim().length > 3 && lower.includes(w.trim()));
@@ -84,7 +141,7 @@ class AIAssistantService {
               `Hiện tại hệ thống Bot ghi nhận đang có **${floods.length} điểm ngập cục bộ** và **${traffics.length} điểm ùn ứ**.\n\n` +
               `📍 **Các rốn ngập cần tránh tuyệt đối**:\n` +
               floods.slice(0, 3).map(f => `• **${f.name}**: Ngập sâu ${f.depth_cm}cm (${f.passable_motorbike ? 'Xe máy đi chậm' : 'Xe máy KHÔNG THỂ QUA'})`).join('\n') +
-              `\n\n👉 **Gợi ý**: Bạn có thể nhập trực tiếp Điểm đi và Điểm đến vào thanh tìm kiếm phía trên để MoveSafe kích hoạt thuật toán tự động bẻ hướng né ngập tức thì!`,
+              `\n\n👉 **Gợi ý**: Bạn có thể nói hoặc gõ ví dụ *"Tìm đường từ Cầu Giấy đến Hoàn Kiếm"* để MoveSafe tự động vẽ đường né ngập tức thì!`,
         action: { type: 'SHOW_FLOOD_LAYER' }
       };
     }
@@ -165,7 +222,8 @@ class AIAssistantService {
 
       instructions = `YÊU CẦU TRẢ LỜI:
 1. Trả lời đúng trọng tâm câu hỏi của người dùng. Không liệt kê lan man những thông tin không liên quan.
-2. Nếu hỏi đường, gợi ý lộ trình kết hợp cả né ngập và né kẹt xe. Súc tích, định dạng Markdown rõ ràng.`;
+2. Nếu hỏi đường, gợi ý lộ trình kết hợp cả né ngập và né kẹt xe. Súc tích, định dạng Markdown rõ ràng.
+3. ĐẶC BIỆT: Nếu người dùng hỏi đường đi / lộ trình từ [Điểm A] đến [Điểm B], ở dòng cuối cùng của câu trả lời hãy ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] để ứng dụng tự động vẽ tuyến đường né ngập.`;
     }
 
     const contextPrompt = `Bạn là Trợ lý AI Giao Thông MoveSafe VN thông minh.
@@ -193,11 +251,33 @@ ${instructions}`;
           contents: [{ parts: [{ text: contextPrompt }] }]
         }, { timeout: 12000 });
 
-        const reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        let reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply && reply.trim().length > 0) {
+          let action = { type: 'SHOW_FLOOD_LAYER' };
+          const routeMatch = reply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
+          if (routeMatch) {
+            action = {
+              type: 'AUTO_ROUTE',
+              origin: routeMatch[1].trim(),
+              destination: routeMatch[2].trim(),
+              avoidLevel: 1
+            };
+            reply = reply.replace(/\[ACTION_ROUTE:\s*.*?\s*->\s*.*?\]/i, '').trim();
+          } else {
+            const qMatch = query.match(/(?:từ|đi từ|chỉ đường từ)\s+(.*?)\s+(?:đến|về|sang|qua)\s+(.*?)(?:\.|\?|,|né ngập|tránh tắc|$)/i);
+            if (qMatch && qMatch[1] && qMatch[2]) {
+              action = {
+                type: 'AUTO_ROUTE',
+                origin: qMatch[1].replace(/^(tôi|bạn|hãy)/i, '').trim(),
+                destination: qMatch[2].replace(/(\?|!|\.|né ngập)$/i, '').trim(),
+                avoidLevel: 1
+              };
+            }
+          }
+
           return {
             text: reply.trim(),
-            action: { type: 'SHOW_FLOOD_LAYER' },
+            action,
             modelUsed: model
           };
         }

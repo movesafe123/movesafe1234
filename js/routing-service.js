@@ -91,13 +91,12 @@ class RoutingService {
     for (const r of routes) {
       const isDuplicate = distinct.some(d => {
         const distDiff = Math.abs(d.distanceMeters - r.distanceMeters);
-        // Nếu độ dài chênh lệch dưới 100m, kiểm tra điểm giữa
         if (distDiff < 100) {
           const mid1 = d.polyline[Math.floor(d.polyline.length / 2)];
           const mid2 = r.polyline[Math.floor(r.polyline.length / 2)];
           if (mid1 && mid2) {
             const midDist = this.getDistanceMeters(mid1[0], mid1[1], mid2[0], mid2[1]);
-            if (midDist < 200) return true; // Trùng đường
+            if (midDist < 200) return true;
           }
         }
         return false;
@@ -108,6 +107,70 @@ class RoutingService {
       }
     }
     return distinct;
+  }
+
+  /**
+   * Phát hiện tuyến đường có quay đầu (backtracking / U-turn).
+   * Kiểm tra xem tuyến đường có đi QUÁ điểm đến rồi quay lại không.
+   * Trả về true nếu tuyến bị lỗi backtrack.
+   */
+  detectBacktracking(polyline, originLat, originLng, destLat, destLng) {
+    if (!polyline || polyline.length < 10) return false;
+
+    // Khoảng cách thẳng A→B
+    const directDist = this.getDistanceMeters(originLat, originLng, destLat, destLng);
+    if (directDist < 500) return false; // Quá ngắn để kiểm tra
+
+    // Đo tiến trình dọc tuyến: tại mỗi điểm, tính khoảng cách còn lại đến B
+    // Nếu khoảng cách đến B tăng lên đáng kể rồi lại giảm → backtracking
+    let maxDistToDestSoFar = 0;
+    let minDistToDestAfterMax = Infinity;
+    let maxDistIndex = 0;
+
+    const sampleStep = Math.max(1, Math.floor(polyline.length / 40)); // Lấy ~40 điểm mẫu
+    const distancesToDest = [];
+
+    for (let i = 0; i < polyline.length; i += sampleStep) {
+      const pt = polyline[i];
+      const distToDest = this.getDistanceMeters(pt[0], pt[1], destLat, destLng);
+      distancesToDest.push({ index: i, dist: distToDest });
+    }
+
+    // Tìm điểm xa nhất khỏi đích trên nửa sau tuyến đường
+    const halfIdx = Math.floor(distancesToDest.length / 3);
+    for (let i = halfIdx; i < distancesToDest.length; i++) {
+      if (distancesToDest[i].dist > maxDistToDestSoFar) {
+        maxDistToDestSoFar = distancesToDest[i].dist;
+        maxDistIndex = i;
+      }
+    }
+
+    // Sau điểm xa nhất, khoảng cách có giảm mạnh về lại B không?
+    for (let i = maxDistIndex; i < distancesToDest.length; i++) {
+      minDistToDestAfterMax = Math.min(minDistToDestAfterMax, distancesToDest[i].dist);
+    }
+
+    // Nếu điểm xa nhất vượt qua B > 30% khoảng cách thẳng A→B → backtracking
+    const overshootRatio = maxDistToDestSoFar / directDist;
+    const dropAfterMax = maxDistToDestSoFar - minDistToDestAfterMax;
+
+    if (overshootRatio > 0.6 && dropAfterMax > directDist * 0.25) {
+      return true; // Có quay đầu
+    }
+
+    return false;
+  }
+
+  /**
+   * Kiểm tra tuyến đường có quá dài so với đường thẳng không (vòng quá mức)
+   */
+  isExcessiveDetour(route, directDistMeters) {
+    // Cho phép tuyến vòng tối đa gấp 1.8x so với đường thẳng
+    const maxRatio = 1.8;
+    if (directDistMeters > 0 && route.distanceMeters > directDistMeters * maxRatio) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -126,7 +189,6 @@ class RoutingService {
     polyline.forEach(pt => {
       let isPointCongested = false;
 
-      // So khớp sự cố giao thông TomTom & VOV
       for (const inc of trafficIncidents) {
         const dist = this.getDistanceMeters(pt[0], pt[1], inc.lat, inc.lng);
         if (dist <= 300) {
@@ -149,7 +211,6 @@ class RoutingService {
         }
       }
 
-      // So khớp điểm ngập HSDC / UDi
       for (const fl of floodPoints) {
         const dist = this.getDistanceMeters(pt[0], pt[1], fl.lat, fl.lng);
         if (dist <= 250) {
@@ -173,10 +234,8 @@ class RoutingService {
     const moderateCount = matchedTraffics.filter(t => t.isJam && (!t.speedKmh || (t.speedKmh >= 12 && t.speedKmh < 25))).length;
     const deepFloodCount = matchedFloods.filter(f => f.depth_cm >= (vehicleType === 'motorbike' ? 20 : 35)).length;
 
-    // Điểm số tắc nghẽn tổng hợp
     const congestionScore = (severeCount * 50) + (deepFloodCount * 80) + (moderateCount * 20) + (matchedFloods.length * 15) + (jamPercent * 1.5);
 
-    // Thời gian di chuyển thực tế (phút)
     let realDurationMin = Math.round(route.durationSeconds / 60);
     matchedTraffics.forEach(t => {
       const delayMin = Math.round((t.delaySeconds || 180) / 60);
@@ -203,39 +262,49 @@ class RoutingService {
 
   /**
    * Phân loại và xây dựng 3 chế độ tuyến đường KHÁC BIỆT NHAU
+   * Sửa lỗi: Không còn chọn tuyến xa nhất (vòng nhất) làm "an toàn".
+   * Logic mới: Safe = tuyến ít nguy hiểm nhất VÀ không quá dài so với shortest.
    */
   buildThreeDistinctModes(candidates, activeAvoidLevel, vehicleType, config) {
+    if (candidates.length === 0) throw new Error('Không có tuyến đường khả dụng');
+
     // Sắp xếp theo cự ly
     const sortedByDistance = [...candidates].sort((a, b) => a.distanceMeters - b.distanceMeters);
-    // Sắp xếp theo mức độ tắc nghẽn
-    const sortedByCongestion = [...candidates].sort((a, b) => a.congestionScore - b.congestionScore);
-
-    // Tuyến 3: Nhanh nhất (Luôn là tuyến trực tiếp có cự ly ngắn nhất)
     const shortestRoute = sortedByDistance[0];
+    const shortestDist = shortestRoute.distanceMeters;
 
-    // Tuyến 1: An toàn tuyệt đối (Tuyến ít tắc nhất / sạch chướng ngại nhất)
-    let safeRoute = sortedByCongestion[0];
-    if (safeRoute === shortestRoute && candidates.length > 1) {
-      safeRoute = sortedByDistance[sortedByDistance.length - 1];
+    // Sắp xếp theo mức độ tắc nghẽn (thấp = an toàn hơn)
+    // Kết hợp thêm hệ số phạt quãng đường vòng quá mức
+    const sortedBySafety = [...candidates].sort((a, b) => {
+      const penaltyA = a.distanceMeters > shortestDist * 1.5 ? 50 : 0;
+      const penaltyB = b.distanceMeters > shortestDist * 1.5 ? 50 : 0;
+      return (a.congestionScore + penaltyA) - (b.congestionScore + penaltyB);
+    });
+
+    // Tuyến 3: Nhanh nhất = cự ly ngắn nhất
+    const fastestRoute = shortestRoute;
+
+    // Tuyến 1: An toàn = ít nguy hiểm nhất (congestionScore thấp nhất),
+    // nhưng nếu trùng với shortest thì lấy tuyến tiếp theo
+    let safeRoute = sortedBySafety[0];
+    if (safeRoute === fastestRoute && candidates.length > 1) {
+      // Lấy tuyến an toàn nhất KHÔNG PHẢI shortest, nhưng phải hợp lý về cự ly
+      safeRoute = sortedBySafety.find(r => r !== fastestRoute) || sortedBySafety[1] || fastestRoute;
     }
 
-    // Tuyến 2: Cân bằng (Tuyến thứ 2 ở mức vừa phải)
-    let balancedRoute = candidates.find(r => r !== shortestRoute && r !== safeRoute);
+    // Tuyến 2: Cân bằng = tuyến còn lại (không phải safe, không phải fastest)
+    let balancedRoute = candidates.find(r => r !== fastestRoute && r !== safeRoute);
     if (!balancedRoute) {
-      balancedRoute = candidates.length > 1 ? candidates[1] : shortestRoute;
+      // Nếu chỉ có 2 tuyến hoặc ít hơn, tạo bản sao của shortest với label khác
+      balancedRoute = candidates.length > 1 ? candidates[1] : fastestRoute;
     }
 
-    // Thiết lập tỷ lệ trực quan chuẩn xác:
-    // Tuyến 1 (An toàn): Tỷ lệ tắc 0% hoặc tối thiểu (100% thông thoáng)
-    const safeJam = Math.min(safeRoute.jamPercent, 4);
+    // Tính tỷ lệ tắc/thoáng thực tế (không bịa số)
+    const safeJam = safeRoute.jamPercent;
     const safeFree = 100 - safeJam;
-
-    // Tuyến 2 (Cân bằng): Tỷ lệ tắc nhẹ (khoảng 8-16%, né 100% kẹt cứng)
-    const balJam = Math.max(8, Math.min(balancedRoute.jamPercent, 18));
+    const balJam = balancedRoute.jamPercent;
     const balFree = 100 - balJam;
-
-    // Tuyến 3 (Nhanh nhất): Tỷ lệ tắc cao hơn do đi xuyên trục chính đông đúc (25-45%)
-    const fastJam = Math.max(28, shortestRoute.jamPercent);
+    const fastJam = fastestRoute.jamPercent;
     const fastFree = 100 - fastJam;
 
     const routeSafe = {
@@ -245,7 +314,9 @@ class RoutingService {
       sublabel: '🛡️ Tránh hoàn toàn ùn tắc & ngập lụt',
       tagText: `🛡️ ${safeJam}% tắc • ${safeFree}% đường thông thoáng`,
       tagClass: 'gm-tag-safe',
-      trafficDesc: 'Đi đường vòng tránh qua các ngõ phố thông thoáng, 0% kẹt xe & không ngập nước',
+      trafficDesc: safeJam === 0
+        ? 'Đường hoàn toàn thông thoáng, không ngập, không kẹt xe'
+        : 'Đi đường vòng nhẹ tránh qua các điểm ùn tắc & ngập nước',
       jamPercent: safeJam,
       freeFlowPercent: safeFree,
       moderatePercent: safeJam,
@@ -260,7 +331,7 @@ class RoutingService {
       routeType: 'balanced',
       label: 'Cân bằng thông minh',
       sublabel: '⚖️ Né kẹt xe đỏ đậm & ngập sâu xe máy',
-      tagText: `⚖️ Né 100% kẹt cứng • Chỉ ~${balJam}% đông nhẹ`,
+      tagText: `⚖️ ${balJam}% tắc • ${balFree}% thông thoáng`,
       tagClass: 'gm-tag-warning',
       trafficDesc: 'Né các điểm nghẽn kẹt cứng, chỉ đi qua đoạn đông vừa để tối ưu cự ly',
       jamPercent: balJam,
@@ -273,11 +344,11 @@ class RoutingService {
     };
 
     const routeFastest = {
-      ...shortestRoute,
+      ...fastestRoute,
       routeType: 'fastest',
       label: 'Nhanh nhất (Trục chính)',
       sublabel: '⚡ Tuyến ngắn nhất, không tránh gì',
-      tagText: `⚡ Ngắn nhất (${shortestRoute.distanceKm} km) • Đi trục chính`,
+      tagText: `⚡ Ngắn nhất (${fastestRoute.distanceKm} km) • Đi trục chính`,
       tagClass: 'gm-tag-fastest',
       trafficDesc: 'Đi thẳng trục đường chính trực tiếp, chấp nhận qua các đoạn ùn tắc',
       jamPercent: fastJam,
@@ -289,7 +360,6 @@ class RoutingService {
       avoidLevel: 3
     };
 
-    // Đưa route được chọn (recommended) lên đầu danh sách
     let routes = [routeSafe, routeBalanced, routeFastest];
     if (activeAvoidLevel === 2) {
       routes = [routeBalanced, routeSafe, routeFastest];
@@ -301,71 +371,117 @@ class RoutingService {
       avoidLevel: activeAvoidLevel,
       config,
       routes,
-      totalHazards: shortestRoute.warnings.length,
-      floodHazards: shortestRoute.matchedFloods,
-      trafficHazards: shortestRoute.matchedTraffics
+      totalHazards: fastestRoute.warnings.length,
+      floodHazards: fastestRoute.matchedFloods,
+      trafficHazards: fastestRoute.matchedTraffics
     };
   }
 
   /**
    * THUẬT TOÁN CHÍNH: Tính toán đa tuyến đường với 3 mức độ tránh né
+   * 
+   * Sửa lỗi:
+   * 1. Offset waypoint giảm từ 0.012° (1.3km) xuống tối đa 0.006° (~650m)
+   * 2. Waypoint đặt tại 1/3 quãng đường (thay vì midpoint) → tránh đi quá đích
+   * 3. Thêm bộ lọc backtracking → loại bỏ tuyến có quay đầu 180°
+   * 4. Thêm bộ lọc excessive detour → loại tuyến vòng > 1.8x đường thẳng
    */
   async calculateMultiRoutes({ origin, destination, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1 }) {
     const config = this.avoidanceLevels[avoidLevel];
     
-    // 1. Tính toán các điểm bypass vuông góc để lấy nhiều hành lang giao thông thực tế
     const dLat = destination.lat - origin.lat;
     const dLng = destination.lng - origin.lng;
     const len = Math.hypot(dLat, dLng);
-    const midLat = (origin.lat + destination.lat) / 2;
-    const midLng = (origin.lng + destination.lng) / 2;
+    const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
 
-    // Khoảng cách offset thích ứng theo cự ly chuyến đi (từ 500m đến 1.2km)
-    const offsetDeg = Math.min(0.012, Math.max(0.005, len * 0.25));
-    const offNorth = { lat: midLat - (dLng / len) * offsetDeg, lng: midLng + (dLat / len) * offsetDeg };
-    const offSouth = { lat: midLat + (dLng / len) * offsetDeg, lng: midLng - (dLat / len) * offsetDeg };
+    // Đặt waypoint tại 1/3 quãng đường từ origin (KHÔNG PHẢI midpoint)
+    // Điều này tránh việc tuyến đi vượt quá destination rồi quay lại
+    const wpLat = origin.lat + dLat * 0.33;
+    const wpLng = origin.lng + dLng * 0.33;
 
-    // 2. Gọi OSRM đồng thời cho 3 hành lang khác nhau
+    // Offset nhỏ hơn nhiều: tối đa ~650m, tối thiểu ~200m
+    // Tỷ lệ offset giảm theo cự ly để tuyến ngắn không bị vòng quá mức
+    const offsetDeg = Math.min(0.006, Math.max(0.002, len * 0.12));
+
+    // Pháp tuyến vuông góc với hướng A→B
+    const perpLat = -(dLng / len);
+    const perpLng = (dLat / len);
+
+    const offA = { lat: wpLat + perpLat * offsetDeg, lng: wpLng + perpLng * offsetDeg };
+    const offB = { lat: wpLat - perpLat * offsetDeg, lng: wpLng - perpLng * offsetDeg };
+
+    // Gọi OSRM đồng thời cho 3 hành lang
     const fetchPromises = [
-      // Tuyến trực tiếp
+      // Tuyến trực tiếp (BẮT BUỘC có alternatives)
       this.fetchOsrmRoute([
         [origin.lng, origin.lat],
         [destination.lng, destination.lat]
       ]).catch(() => []),
-      // Tuyến qua hành lang Bắc/Đông
+      // Tuyến lệch A (nhẹ sang 1 bên)
       this.fetchOsrmRoute([
         [origin.lng, origin.lat],
-        [offNorth.lng, offNorth.lat],
+        [offA.lng, offA.lat],
         [destination.lng, destination.lat]
       ]).catch(() => []),
-      // Tuyến qua hành lang Nam/Tây
+      // Tuyến lệch B (nhẹ sang bên kia)
       this.fetchOsrmRoute([
         [origin.lng, origin.lat],
-        [offSouth.lng, offSouth.lat],
+        [offB.lng, offB.lat],
         [destination.lng, destination.lat]
       ]).catch(() => [])
     ];
 
-    const [directRoutes, northRoutes, southRoutes] = await Promise.all(fetchPromises);
+    const [directRoutes, sideARoutes, sideBRoutes] = await Promise.all(fetchPromises);
 
     let rawCandidates = [];
     if (directRoutes && directRoutes.length > 0) rawCandidates.push(...directRoutes);
-    if (northRoutes && northRoutes.length > 0) rawCandidates.push(northRoutes[0]);
-    if (southRoutes && southRoutes.length > 0) rawCandidates.push(southRoutes[0]);
+    if (sideARoutes && sideARoutes.length > 0) rawCandidates.push(sideARoutes[0]);
+    if (sideBRoutes && sideBRoutes.length > 0) rawCandidates.push(sideBRoutes[0]);
 
     if (rawCandidates.length === 0) {
       throw new Error('Không thể kết nối đến máy chủ định tuyến OSRM');
     }
 
-    // Lọc loại bỏ các tuyến trùng lặp
-    const distinctCandidates = this.filterDistinctRoutes(rawCandidates);
+    // ===== BỘ LỌC CHẤT LƯỢNG TUYẾN ĐƯỜNG =====
+    
+    // Lọc 1: Loại bỏ tuyến trùng lặp hình học
+    let goodCandidates = this.filterDistinctRoutes(rawCandidates);
 
-    // 3. Phân tích chi tiết mức độ ùn tắc & ngập lụt trên từng tuyến đường
-    const analyzedRoutes = distinctCandidates.map(route => 
+    // Lọc 2: Loại bỏ tuyến có quay đầu (backtracking / U-turn)
+    goodCandidates = goodCandidates.filter(route => {
+      const hasBacktrack = this.detectBacktracking(
+        route.polyline, origin.lat, origin.lng, destination.lat, destination.lng
+      );
+      if (hasBacktrack) {
+        console.warn(`[Routing] ⚠️ Loại bỏ tuyến ${route.distanceKm}km vì phát hiện quay đầu (U-turn)`);
+      }
+      return !hasBacktrack;
+    });
+
+    // Lọc 3: Loại bỏ tuyến vòng quá mức (> 1.8x đường thẳng)
+    goodCandidates = goodCandidates.filter(route => {
+      const isExcessive = this.isExcessiveDetour(route, directDistMeters);
+      if (isExcessive) {
+        console.warn(`[Routing] ⚠️ Loại bỏ tuyến ${route.distanceKm}km vì vòng quá mức (thẳng: ${(directDistMeters/1000).toFixed(1)}km)`);
+      }
+      return !isExcessive;
+    });
+
+    // Nếu sau khi lọc không còn tuyến nào, dùng lại tuyến trực tiếp
+    if (goodCandidates.length === 0) {
+      if (directRoutes && directRoutes.length > 0) {
+        goodCandidates = [directRoutes[0]];
+      } else {
+        throw new Error('Không tìm được tuyến đường hợp lệ (tất cả đều bị quay đầu hoặc vòng quá mức)');
+      }
+    }
+
+    // Phân tích chi tiết mức độ ùn tắc & ngập lụt trên từng tuyến
+    const analyzedRoutes = goodCandidates.map(route => 
       this.evaluateRouteCongestion(route, floodPoints, trafficIncidents, vehicleType)
     );
 
-    // 4. Sắp xếp và phân loại chính xác 3 tuyến đường theo 3 mức độ tránh né
+    // Sắp xếp và phân loại 3 tuyến theo 3 mức độ tránh né
     return this.buildThreeDistinctModes(analyzedRoutes, avoidLevel, vehicleType, config);
   }
 }

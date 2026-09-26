@@ -177,8 +177,13 @@ class GoogleMapsApp {
   async updateWeatherStations() {
     try {
       const stations = await window.weatherService.getMultiStationWeather(this.currentCity);
+      this.latestWeatherStations = stations;
       window.mapEngine.renderWeatherStations(stations);
       console.log(`[Cloud Weather] Đã cập nhật ${stations.length} trạm thời tiết tại ${this.currentCity}`);
+      const streetsModal = document.getElementById('modal-hanoi-streets');
+      if (streetsModal && streetsModal.classList.contains('open')) {
+        this.filterHanoiStreets();
+      }
     } catch (err) {
       console.warn('[Cloud Weather] Không thể vẽ trạm thời tiết:', err.message);
     }
@@ -581,6 +586,241 @@ class GoogleMapsApp {
       settingsModal?.classList.remove('open');
       this.showToast('✓ Đã lưu cấu hình API thành công!', 'info');
     });
+
+    // 8. Modal Danh mục đường lớn & Thời tiết các phường Hà Nội
+    document.getElementById('chip-hanoi-streets')?.addEventListener('click', () => {
+      this.openHanoiStreetsModal();
+    });
+
+    document.getElementById('btn-close-hanoi-streets')?.addEventListener('click', () => {
+      this.closeHanoiStreetsModal();
+    });
+
+    document.getElementById('modal-hanoi-streets')?.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'modal-hanoi-streets') {
+        this.closeHanoiStreetsModal();
+      }
+    });
+
+    document.querySelectorAll('#district-filter-chips .dist-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#district-filter-chips .dist-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.selectedStreetsDistrict = chip.getAttribute('data-district') || 'all';
+        this.filterHanoiStreets();
+      });
+    });
+
+    document.getElementById('input-search-streets')?.addEventListener('input', () => {
+      this.filterHanoiStreets();
+    });
+
+    document.getElementById('btn-reset-streets-filter')?.addEventListener('click', () => {
+      const input = document.getElementById('input-search-streets');
+      if (input) input.value = '';
+      this.selectedStreetsDistrict = 'all';
+      document.querySelectorAll('#district-filter-chips .dist-chip').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-district') === 'all');
+      });
+      this.renderHanoiStreetsCards('all', '');
+    });
+  }
+
+  // ==================== QUẢN LÝ DANH MỤC ĐƯỜNG LỚN & PHƯỜNG HÀ NỘI ====================
+  openHanoiStreetsModal() {
+    const modal = document.getElementById('modal-hanoi-streets');
+    if (!modal) return;
+    modal.classList.add('open');
+    this.selectedStreetsDistrict = 'all';
+    const input = document.getElementById('input-search-streets');
+    if (input) input.value = '';
+
+    document.querySelectorAll('#district-filter-chips .dist-chip').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-district') === 'all');
+    });
+
+    this.renderHanoiStreetsCards('all', '');
+  }
+
+  closeHanoiStreetsModal() {
+    const modal = document.getElementById('modal-hanoi-streets');
+    if (modal) modal.classList.remove('open');
+  }
+
+  filterHanoiStreets() {
+    const input = document.getElementById('input-search-streets');
+    const keyword = input ? input.value.trim().toLowerCase() : '';
+    this.renderHanoiStreetsCards(this.selectedStreetsDistrict || 'all', keyword);
+  }
+
+  renderHanoiStreetsCards(filterDistrict = 'all', keyword = '') {
+    const container = document.getElementById('streets-cards-container');
+    if (!container) return;
+
+    const wardsData = window.HANOI_WARDS_DATA || [];
+    if (!wardsData || wardsData.length === 0) {
+      container.innerHTML = `
+        <div style="padding: 30px; text-align: center; color: #5f6368;">
+          Đang tải dữ liệu mạng lưới đường và các phường Hà Nội...
+        </div>
+      `;
+      return;
+    }
+
+    const filtered = wardsData.filter(ward => {
+      if (filterDistrict !== 'all' && ward.district !== filterDistrict) {
+        return false;
+      }
+      if (keyword) {
+        const nameMatch = ward.name.toLowerCase().includes(keyword);
+        const distMatch = ward.district.toLowerCase().includes(keyword);
+        const streetMatch = (ward.mainStreets || []).some(st => st.toLowerCase().includes(keyword));
+        const hotspotMatch = (ward.trafficHotspots || []).some(h => h.toLowerCase().includes(keyword));
+        if (!nameMatch && !distMatch && !streetMatch && !hotspotMatch) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 40px 20px; text-align: center; color: #5f6368;">
+          <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+          <div style="font-weight: 600; font-size: 15px; color: #202124;">Không tìm thấy phường hoặc tuyến đường khớp với "${keyword}"</div>
+          <div style="font-size: 13px; margin-top: 4px;">Hãy thử tìm kiếm với tên đường (VD: Cầu Diễn, Hoàng Công Chất, Đức Diễn...) hoặc chọn quận khác.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const stations = this.latestWeatherStations || (window.mapEngine ? window.mapEngine.allWeatherStations : []) || [];
+    const stationMap = new Map();
+    stations.forEach(st => {
+      stationMap.set(st.name, st);
+    });
+
+    let html = '';
+    filtered.forEach(ward => {
+      const liveWeather = stationMap.get(ward.name);
+      const temp = liveWeather ? liveWeather.temp : 26;
+      const desc = liveWeather ? liveWeather.description : 'Khô ráo';
+      const icon = liveWeather ? (liveWeather.icon || '☀️') : '☀️';
+      const risk = liveWeather ? (liveWeather.floodRisk || { level: 'safe', text: 'Khô ráo' }) : { level: 'safe', text: 'Khô ráo' };
+      const riskBadgeClass = risk.level === 'danger' ? 'danger' : (risk.level === 'warning' ? 'warning' : 'safe');
+
+      const streetsTags = (ward.mainStreets || []).map(st => `
+        <span class="ward-card-street-tag" 
+              title="Bấm để kiểm tra chi tiết tuyến đường ${st}"
+              onclick="window.appState && window.appState.searchStreetFromWard('${st.replace(/'/g, "\\'")}', '${ward.name.replace(/'/g, "\\'")}')">
+          ${st}
+        </span>
+      `).join('');
+
+      let hotspotsHtml = '';
+      if (ward.trafficHotspots && ward.trafficHotspots.length > 0) {
+        hotspotsHtml = `
+          <div class="ward-card-hotspots">
+            🚦 <strong>Giao cắt trọng điểm:</strong> ${ward.trafficHotspots.join(' • ')}
+          </div>
+        `;
+      }
+
+      let floodNoteHtml = '';
+      if (ward.floodVulnerability) {
+        floodNoteHtml = `
+          <div class="ward-card-flood">
+            🌊 <strong>Lưu ý úng ngập:</strong> ${ward.floodVulnerability}
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="ward-card ${ward.isHub ? 'hub-card' : ''}">
+          <div class="ward-card-header">
+            <div>
+              <div class="ward-card-title">
+                ${ward.name}
+                ${ward.isHub ? '<span style="font-size: 10px; background: #e8f0fe; color: #1a73e8; padding: 1px 6px; border-radius: 4px; font-weight: 600;">Trung tâm</span>' : ''}
+              </div>
+              <div class="ward-card-sub">Quận ${ward.district} • Hà Nội</div>
+            </div>
+            <div class="ward-weather-pill weather-pill-${riskBadgeClass}">
+              <span>${icon}</span>
+              <span>${temp}°C</span>
+              <span>•</span>
+              <span style="font-weight: 500;">${desc}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; font-weight: 600; color: #5f6368; margin-bottom: 4px; text-transform: uppercase;">
+            🛣️ Các trục đường huyết mạch (${(ward.mainStreets || []).length} tuyến):
+          </div>
+          <div class="ward-card-streets">
+            ${streetsTags}
+          </div>
+
+          ${hotspotsHtml}
+          ${floodNoteHtml}
+
+          <div class="ward-card-footer">
+            <button class="btn-card-map" 
+                    onclick="window.appState && window.appState.flyToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
+              📍 Xem Trên Bản Đồ
+            </button>
+            <button class="btn-card-ai" 
+                    onclick="window.appState && window.appState.askAiAboutWard('${ward.name.replace(/'/g, "\\'")}', '${ward.district.replace(/'/g, "\\'")}')">
+              🤖 Hỏi AI Về Phường
+            </button>
+            <button class="btn-card-route" 
+                    title="Chỉ đường đến ${ward.name}"
+                    onclick="window.appState && window.appState.routeToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
+              🔀 Đến Đây
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  flyToWardFromCard(lat, lng, wardName) {
+    this.closeHanoiStreetsModal();
+    if (this.currentCity !== 'hanoi') {
+      this.currentCity = 'hanoi';
+      const citySelect = document.getElementById('city-select-gm');
+      if (citySelect) citySelect.value = 'hanoi';
+      const city = this.citiesConfig['hanoi'];
+      window.mapEngine.flyToCity(city);
+    }
+    
+    window.mapEngine.map.flyTo([lat, lng], 15);
+    this.showToast(`🏛️ Đã chuyển góc nhìn đến ${wardName}`, 'info');
+
+    setTimeout(() => {
+      if (window.mapEngine && typeof window.mapEngine.openWardPopup === 'function') {
+        window.mapEngine.openWardPopup(lat, lng);
+      }
+    }, 600);
+  }
+
+  askAiAboutWard(wardName, district) {
+    this.closeHanoiStreetsModal();
+    window.aiChat.open();
+    window.aiChat.sendMessage(`Tình hình thời tiết, các trục đường lớn và điểm kẹt xe ngập úng tại ${wardName}, Quận ${district} hiện nay thế nào?`);
+  }
+
+  routeToWardFromCard(lat, lng, wardName) {
+    this.closeHanoiStreetsModal();
+    this.routeToLocation(lat, lng, `${wardName}, Hà Nội`);
+  }
+
+  searchStreetFromWard(streetName, wardName) {
+    this.closeHanoiStreetsModal();
+    this.showToast(`🛣️ Tuyến đường lớn: ${streetName} (${wardName})`, 'info', 4000);
+    window.aiChat.open();
+    window.aiChat.sendMessage(`Tình hình giao thông, ngập nước và lộ trình lưu thông trên đường ${streetName} qua khu vực ${wardName} như thế nào?`);
   }
 
   // Đặt lại điểm mặc định khi chuyển thành phố
@@ -1086,6 +1326,50 @@ class GoogleMapsApp {
       return;
     }
 
+    // 1b. Tìm kiếm theo danh mục 76 Phường & 299 Tuyến đường lớn Hà Nội
+    if (window.HANOI_WARDS_DATA && window.HANOI_WARDS_DATA.length > 0) {
+      const cleanQuery = lower.replace(/^đường\s+|^phố\s+|^phường\s+|^xã\s+|^quốc lộ\s+/i, '').trim();
+
+      // Kiểm tra tên phường (ví dụ: Tây Tựu, Phú Diễn, Phúc Diễn, Cầu Diễn, Mai Dịch...)
+      let targetWard = window.HANOI_WARDS_DATA.find(w => {
+        const wName = w.name.toLowerCase();
+        const rawWName = wName.replace(/^phường\s+|^xã\s+/i, '').trim();
+        return lower.includes(wName) || lower.includes(rawWName) || (cleanQuery.length >= 3 && rawWName.includes(cleanQuery));
+      });
+
+      let matchedStreetName = '';
+      if (!targetWard && cleanQuery.length >= 3) {
+        // Kiểm tra tên đường trong danh mục các trục đường lớn (ví dụ: Hoàng Công Chất, Cầu Diễn, Đức Diễn...)
+        for (const w of window.HANOI_WARDS_DATA) {
+          const st = (w.mainStreets || []).find(s => {
+            const sLower = s.toLowerCase();
+            const cleanSt = sLower.replace(/^đường\s+|^phố\s+|^quốc lộ\s+/i, '').trim();
+            return lower.includes(sLower) || (cleanQuery.length >= 3 && (cleanSt.includes(cleanQuery) || cleanQuery.includes(cleanSt)));
+          });
+          if (st) {
+            targetWard = w;
+            matchedStreetName = st;
+            break;
+          }
+        }
+      }
+
+      if (targetWard) {
+        if (this.currentCity !== 'hanoi') {
+          this.currentCity = 'hanoi';
+          const citySelect = document.getElementById('city-select-gm');
+          if (citySelect) citySelect.value = 'hanoi';
+          await this.updateWeatherStations();
+        }
+        this.flyToWardFromCard(targetWard.lat, targetWard.lng, targetWard.name);
+        const streetInfo = matchedStreetName 
+          ? ` • Tuyến đường: ${matchedStreetName}` 
+          : ` • Các đường lớn: ${(targetWard.mainStreets || []).slice(0, 3).join(', ')}`;
+        this.showToast(`🏛️ ${targetWard.name} (${targetWard.district})${streetInfo}`, 'info', 5000);
+        return;
+      }
+    }
+
     // 2. Nếu hỏi lộ trình "từ A đến B" (hoặc "từ A về B", "từ A sang B")
     if (lower.includes('từ') && (lower.includes('đến') || lower.includes('về') || lower.includes('sang'))) {
       this.toggleDirectionsPanel(true);
@@ -1160,6 +1444,44 @@ class GoogleMapsApp {
     // 4. Nếu là câu hỏi khác -> mở trợ lý AI
     window.aiChat.open();
     window.aiChat.sendMessage(query);
+  }
+
+  // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công)
+  async triggerChatRoute(originStr, destStr, avoidLevel = 1) {
+    this.toggleDirectionsPanel(true);
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (originInput) originInput.value = originStr;
+    if (destInput) destInput.value = destStr;
+
+    this.currentAvoidLevel = avoidLevel;
+    // Cập nhật giao diện radio 3 mức độ tránh né
+    document.querySelectorAll('.gm-avoidance-option').forEach(o => {
+      const lvl = parseInt(o.getAttribute('data-level'));
+      if (lvl === avoidLevel) {
+        o.classList.add('active');
+        const radio = o.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      } else {
+        o.classList.remove('active');
+      }
+    });
+
+    this.showToast(`🚀 AI tự động vẽ lộ trình né ngập: ${originStr} ➔ ${destStr}`, 'info', 4500);
+
+    const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+    const [origMatches, destMatches] = await Promise.all([
+      window.geocodingService.searchAddresses(originStr, { city: this.currentCity, center: cityCenter, limit: 1 }),
+      window.geocodingService.searchAddresses(destStr, { city: this.currentCity, center: cityCenter, limit: 1 })
+    ]);
+
+    if (origMatches && origMatches.length > 0) this.routeLocations.origin = origMatches[0];
+    else this.routeLocations.origin = { title: originStr, fullAddress: originStr, lat: cityCenter.lat, lng: cityCenter.lng };
+
+    if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
+    else this.routeLocations.destination = { title: destStr, fullAddress: destStr, lat: cityCenter.lat, lng: cityCenter.lng };
+
+    await this.calculateSmartRoute();
   }
 
   // Tính toán lộ trình thông minh kết hợp Geocoding ngõ ngách & OSRM
@@ -1282,6 +1604,9 @@ class GoogleMapsApp {
         this.renderRouteCards(resultsContainer, result);
       }
 
+      // 🤖 GỢI Ý THÔNG MINH TỰ ĐỘNG (Passive AI - Không tốn lượt API request)
+      this.generateSmartSuggestion(result);
+
     } catch (e) {
       console.error('[Routing Error]', e);
       if (resultsContainer) {
@@ -1298,6 +1623,178 @@ class GoogleMapsApp {
         `;
       }
     }
+  }
+
+  /**
+   * 🤖 GỢI Ý THÔNG MINH TỰ ĐỘNG (PASSIVE AI - KHÔNG TỐN LƯỢT API REQUEST)
+   * Phân tích ngữ cảnh: thời gian, phương tiện, thời tiết, ngập, kẹt xe
+   * và đưa ra lời khuyên tùy từng trường hợp cụ thể.
+   * Chạy 100% logic tất định trên Client, KHÔNG gọi Gemini API.
+   */
+  generateSmartSuggestion(result) {
+    const box = document.getElementById('gm-ai-suggestion');
+    if (!box) return;
+
+    const now = new Date();
+    const vnNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+    const vnHour = vnNow.getHours();
+    const vnMinute = vnNow.getMinutes();
+    const vnDay = vnNow.getDay(); // 0 = CN, 6 = T7
+    const timeStr = `${String(vnHour).padStart(2,'0')}:${String(vnMinute).padStart(2,'0')}`;
+    const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    const dayName = dayNames[vnDay];
+    const dateStr = `${vnNow.getDate()}/${vnNow.getMonth()+1}/${vnNow.getFullYear()}`;
+
+    const vehicle = this.currentVehicle; // 'motorbike' hoặc 'car'
+    const vehicleName = vehicle === 'motorbike' ? 'Xe máy' : 'Ô tô';
+    const routes = result.routes || [];
+    const recommended = routes.find(r => r.isRecommended) || routes[0];
+    if (!recommended) { box.style.display = 'none'; return; }
+
+    // Lấy dữ liệu ngập & kẹt xe trong thành phố hiện tại
+    const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity && f.depth_cm > 0 && f.danger_level !== 'safe');
+    const cityJams = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity && t.isJam === true);
+    const routeFloods = recommended.matchedFloods || [];
+    const routeTraffics = recommended.matchedTraffics || [];
+
+    // Lấy thời tiết
+    const weatherStations = (this.liveData.weatherStations || {})[this.currentCity] || [];
+    const maxRain = weatherStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+    const avgTemp = weatherStations.length > 0
+      ? Math.round(weatherStations.reduce((sum, s) => sum + (s.temp || 26), 0) / weatherStations.length)
+      : 26;
+
+    // ====== PHÂN TÍCH TÌNH HUỐNG ======
+    const isPeakMorning = (vnHour >= 7 && vnHour <= 9);
+    const isPeakEvening = (vnHour >= 17 && vnHour <= 19);
+    const isPeakHour = isPeakMorning || isPeakEvening;
+    const isLateNight = (vnHour >= 22 || vnHour < 5);
+    const isEarlyMorning = (vnHour >= 5 && vnHour < 7);
+    const isMidday = (vnHour >= 11 && vnHour < 14);
+    const isWeekend = (vnDay === 0 || vnDay === 6);
+    const isRaining = maxRain >= 1.0;
+    const isHeavyRain = maxRain >= 10;
+    const isStormRain = maxRain >= 25;
+    const hasRouteFlood = routeFloods.length > 0;
+    const hasRouteJam = routeTraffics.filter(t => t.isJam).length > 0;
+    const hasDeepFlood = routeFloods.some(f => f.depth_cm >= (vehicle === 'motorbike' ? 20 : 35));
+    const distKm = parseFloat(recommended.distanceKm) || 5;
+    const isLongTrip = distKm > 12;
+
+    // ====== TẠO LỜI KHUYÊN CHÍNH ======
+    let mainAdvice = '';
+    const details = [];
+
+    // 1. Thời điểm trong ngày
+    if (isPeakMorning) {
+      mainAdvice = `⏰ Đang là giờ cao điểm sáng (${timeStr}) — Lưu lượng xe rất đông trên các trục chính.`;
+      if (vehicle === 'motorbike') {
+        details.push({ icon: '🛵', text: `Xe máy nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
+      } else {
+        details.push({ icon: '🚗', text: `Ô tô nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
+      }
+    } else if (isPeakEvening) {
+      mainAdvice = `⏰ Đang là giờ cao điểm chiều (${timeStr}) — Mật độ phương tiện tan tầm rất lớn.`;
+      if (vehicle === 'motorbike') {
+        details.push({ icon: '🛵', text: `Xe máy nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
+      } else {
+        details.push({ icon: '🚗', text: `Ô tô nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
+      }
+    } else if (isLateNight) {
+      mainAdvice = `🌙 Ban đêm (${timeStr}) — Đường phố rất vắng, di chuyển thuận lợi.`;
+      details.push({ icon: '⚡', text: `Lúc này mọi tuyến đều thông thoáng. Chọn Tuyến Nhanh nhất (⚡) để tiết kiệm thời gian!` });
+      details.push({ icon: '⚠️', text: `Chú ý: Một số đoạn có rào chắn thi công đêm (trải thảm nhựa / sửa cống). Quan sát đèn hiệu.` });
+    } else if (isEarlyMorning) {
+      mainAdvice = `🌅 Đầu sáng sớm (${timeStr}) — Tầm nhìn hạn chế, đường chưa đông.`;
+      details.push({ icon: '⚡', text: `Giao thông thưa thớt, bạn có thể chọn Tuyến Nhanh nhất (⚡). Bật đèn phương tiện sáng rõ!` });
+    } else if (isMidday && !isWeekend) {
+      mainAdvice = `☀️ Giữa trưa (${timeStr}) — Giao thông nội thành tương đối thoáng.`;
+      details.push({ icon: '⚖️', text: `Lượng xe vừa phải. Chọn Tuyến Cân bằng (⚖️) để đi nhanh và không quá xa so với đường thẳng.` });
+    } else if (isWeekend && !isPeakHour) {
+      mainAdvice = `🎉 ${dayName} (${timeStr}) — Cuối tuần giao thông khá dễ chịu.`;
+      details.push({ icon: '⚡', text: `Cuối tuần đường ít xe, chọn Tuyến Nhanh nhất (⚡) hoàn toàn phù hợp!` });
+    } else {
+      mainAdvice = `📊 ${dayName} ${timeStr} — Lưu lượng giao thông ở mức trung bình.`;
+      details.push({ icon: '⚖️', text: `Giao thông ổn định. Tuyến Cân bằng (⚖️) là lựa chọn hợp lý cho khung giờ này.` });
+    }
+
+    // 2. Thời tiết & Mưa ngập
+    if (isStormRain) {
+      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${vehicle === 'motorbike' ? 'Xe máy cực kỳ dễ chết máy bugi!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
+    } else if (isHeavyRain) {
+      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${vehicle === 'motorbike' ? 'Xe máy nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
+    } else if (isRaining) {
+      details.push({ icon: '🌦️', text: `Mưa nhẹ rải rác (${maxRain} mm/h). Đường hơi trơn, bật đèn và giảm tốc độ.` });
+    }
+    if (avgTemp >= 37) {
+      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${vehicle === 'car' ? 'Kiểm tra nước làm mát ô tô.' : ''}` });
+    }
+
+    // 3. Ngập trên tuyến
+    if (hasDeepFlood) {
+      const worstFlood = routeFloods.sort((a,b) => b.depth_cm - a.depth_cm)[0];
+      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${vehicle === 'motorbike' ? 'Xe máy KHÔNG THỂ QUA — hệ thống đã tự động bẻ hướng sang đường cao ráo!' : 'Ô tô gầm thấp nguy cơ thủy kích, chọn Tuyến An toàn!'}` });
+    } else if (hasRouteFlood) {
+      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. Giảm tốc khi qua vùng nước đọng.` });
+    }
+
+    // 4. Kẹt xe trên tuyến
+    if (hasRouteJam) {
+      const worstJam = routeTraffics.filter(t => t.isJam).sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0))[0];
+      const delayMin = worstJam ? Math.round((worstJam.delaySeconds || 300) / 60) : 5;
+      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${vehicle === 'motorbike' ? 'Xe máy có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
+    }
+
+    // 5. Phương tiện cụ thể
+    if (vehicle === 'motorbike') {
+      if (isLongTrip) {
+        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho xe máy. Nếu chở đồ cồng kềnh / nặng, ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️).` });
+      }
+      if (isRaining || isHeavyRain) {
+        details.push({ icon: '🧥', text: `Chuẩn bị áo mưa bộ. Tránh đỗ xe ở tầng hầm khu vực trũng.` });
+      }
+    } else {
+      if (isLongTrip) {
+        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. Ô tô nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu.` });
+      }
+      if (isPeakHour) {
+        details.push({ icon: '🅿️', text: `Giờ cao điểm — Cân nhắc bãi đỗ xe tại điểm đến trước khi xuất phát.` });
+      }
+    }
+
+    // 6. Kết luận tuyến đề xuất
+    const recLabel = recommended.avoidLevel === 1 ? '🛡️ An toàn tuyệt đối' : recommended.avoidLevel === 2 ? '⚖️ Cân bằng thông minh' : '⚡ Nhanh nhất';
+    details.push({ icon: '✅', text: `<strong>Đề xuất: ${recLabel}</strong> — ${recommended.distanceKm} km, ~${recommended.durationMin} phút (${recommended.trafficDesc}).` });
+
+    // ====== RENDER HTML ======
+    const contextTags = [
+      { icon: '🕐', text: `${timeStr} ${dayName}` },
+      { icon: vehicle === 'motorbike' ? '🛵' : '🚗', text: vehicleName },
+      { icon: maxRain >= 1 ? '🌧️' : '☀️', text: maxRain >= 1 ? `Mưa ${maxRain}mm` : `${avgTemp}°C Khô ráo` },
+      { icon: '🌊', text: `${cityFloods.length} rốn ngập` },
+      { icon: '🚦', text: `${cityJams.length} điểm tắc` }
+    ];
+
+    box.innerHTML = `
+      <div class="gm-suggestion-header">
+        <span class="sug-icon">🤖</span>
+        <span>Gợi ý thông minh</span>
+        <span class="sug-badge">⚡ Tự động • Không tốn lượt</span>
+      </div>
+      <div class="gm-suggestion-body">
+        <div class="sug-main-advice">${mainAdvice}</div>
+        <ul class="sug-detail-list">
+          ${details.map(d => `<li><span class="sug-li-icon">${d.icon}</span><span>${d.text}</span></li>`).join('')}
+        </ul>
+      </div>
+      <div class="gm-suggestion-context">
+        ${contextTags.map(t => `<span class="ctx-tag"><span class="ctx-icon">${t.icon}</span> ${t.text}</span>`).join('')}
+      </div>
+      <div class="gm-suggestion-toggle" onclick="this.parentElement.querySelector('.gm-suggestion-body').style.display = this.parentElement.querySelector('.gm-suggestion-body').style.display === 'none' ? 'block' : 'none'; this.textContent = this.textContent.includes('Thu gọn') ? '📖 Xem gợi ý chi tiết' : '📕 Thu gọn'">
+        📕 Thu gọn
+      </div>
+    `;
+    box.style.display = 'block';
   }
 
   // Vẽ đa tuyến đường lên bản đồ (với màu sắc & highlight theo từng chế độ)

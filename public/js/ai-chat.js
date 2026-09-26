@@ -150,11 +150,15 @@ class AIChat {
           // Thực hiện hành động trên bản đồ nếu có
           if (data.response.action && window.mapEngine) {
             const act = data.response.action;
-            if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
-              window.appState.switchMode('map');
+            if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
+              if (window.appState && window.appState.triggerChatRoute) {
+                window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1);
+              }
+            } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
+              if (window.appState && window.appState.switchMode) window.appState.switchMode('map');
               window.mapEngine.map.flyTo([act.lat, act.lng], 16);
             } else if (act.type === 'SHOW_FLOOD_LAYER') {
-              window.appState.switchMode('map');
+              if (window.appState && window.appState.switchMode) window.appState.switchMode('map');
             }
           }
         }
@@ -168,9 +172,29 @@ class AIChat {
     // 2. Thử gọi trực tiếp Google Gemini API qua Client (dành cho GitHub Pages hoặc khi backend bận)
     if (geminiKey) {
       try {
-        const geminiReply = await this.callDirectGemini(query, currentCity, geminiKey);
+        let geminiReply = await this.callDirectGemini(query, currentCity, geminiKey);
         this.messages.pop();
+
+        let autoOrigin = null;
+        let autoDest = null;
+        const routeMatch = geminiReply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
+        if (routeMatch) {
+          autoOrigin = routeMatch[1].trim();
+          autoDest = routeMatch[2].trim();
+          geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*->\s*.*?\]/i, '').trim();
+        } else {
+          const qMatch = query.match(/(?:từ|đi từ|chỉ đường từ)\s+(.*?)\s+(?:đến|về|sang|qua)\s+(.*?)(?:\.|\?|,|né ngập|tránh tắc|$)/i);
+          if (qMatch && qMatch[1] && qMatch[2]) {
+            autoOrigin = qMatch[1].replace(/^(tôi|bạn|hãy)/i, '').trim();
+            autoDest = qMatch[2].replace(/(\?|!|\.|né ngập)$/i, '').trim();
+          }
+        }
+
         this.addBotMessage(geminiReply);
+
+        if (autoOrigin && autoDest && window.appState && window.appState.triggerChatRoute) {
+          window.appState.triggerChatRoute(autoOrigin, autoDest, 1);
+        }
         return;
       } catch (geminiErr) {
         console.warn('[AIChat] Direct Gemini call fallback to local rule engine:', geminiErr);
@@ -182,6 +206,78 @@ class AIChat {
     const floods = window.appState ? window.appState.liveData.floodPoints.filter(f => f.city === currentCity) : [];
     const traffics = window.appState ? window.appState.liveData.trafficIncidents.filter(t => t.city === currentCity) : [];
     const lower = query.toLowerCase();
+
+    // 3a. Kiểm tra nếu hỏi lộ trình từ A đến B (Tự động vẽ đường né ngập trên bản đồ)
+    const routeRegex = /(?:từ|đi từ|chỉ đường từ|lộ trình từ)\s+(.*?)\s+(?:đến|về|sang|qua)\s+(.*?)(?:\.|\?|,|né ngập|tránh tắc|không ngập|$)/i;
+    const rMatch = query.match(routeRegex);
+    if (rMatch && rMatch[1] && rMatch[2]) {
+      const orig = rMatch[1].replace(/^(tôi|bạn|hãy|giúp)/i, '').trim();
+      const dest = rMatch[2].replace(/(\?|!|\.|né ngập|tránh tắc|không ngập)$/i, '').trim();
+
+      if (orig.length >= 2 && dest.length >= 2) {
+        let reply = `🎯 **Đã kích hoạt tự động vẽ lộ trình thông minh trên bản đồ!**\n\n` +
+                    `📍 **Lộ trình**: Điểm đi: **${orig}** ➔ Điểm đến: **${dest}**\n` +
+                    `🛡️ **Điều phối tự động né ngập & ùn tắc**: MoveSafe tự động chọn chế độ **An toàn tuyệt đối (Né 100% rốn ngập)**. Nếu phát hiện rốn ngập sâu trên trục chính, hệ thống sẽ tự động bẻ hướng sang hành lang đường vòng cao ráo.\n\n` +
+                    `*Bản đồ tác chiến và bảng chỉ đường đã được mở tự động cho bạn!*`;
+        this.addBotMessage(reply);
+        if (window.appState && window.appState.triggerChatRoute) {
+          window.appState.triggerChatRoute(orig, dest, 1);
+        }
+        return;
+      }
+    }
+
+    // 3b. Kiểm tra nếu hỏi về phường hoặc trục đường cụ thể tại Hà Nội
+    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
+      let matchedWard = window.HANOI_WARDS_DATA.find(w => {
+        const wLower = w.name.toLowerCase();
+        const rawWName = wLower.replace(/^phường\s+|^xã\s+/i, '').trim();
+        return lower.includes(wLower) || lower.includes(rawWName) || (lower.includes(w.district.toLowerCase()) && lower.includes(rawWName));
+      });
+
+      let matchedStreetName = '';
+      if (!matchedWard) {
+        for (const w of window.HANOI_WARDS_DATA) {
+          const st = (w.mainStreets || []).find(s => {
+            const cleanSt = s.toLowerCase().replace(/^đường\s+|^phố\s+|^quốc lộ\s+/i, '').trim();
+            return lower.includes(s.toLowerCase()) || (cleanSt.length >= 4 && lower.includes(cleanSt));
+          });
+          if (st) {
+            matchedWard = w;
+            matchedStreetName = st;
+            break;
+          }
+        }
+      }
+
+      if (matchedWard) {
+        const liveStations = (window.appState && window.appState.latestWeatherStations) || [];
+        const stWeather = liveStations.find(s => s.name === matchedWard.name);
+        const temp = stWeather ? stWeather.temp : 26;
+        const desc = stWeather ? stWeather.description : 'Khô ráo';
+        const rain = stWeather ? stWeather.rain1h : 0;
+        const weatherText = rain > 0 ? `🌧️ ${temp}°C, mưa ${rain}mm (${desc})` : `☀️ ${temp}°C, khô ráo (${desc})`;
+
+        let reply = `🏛️ **Thông tin Giao thông & Thời tiết: ${matchedWard.name} (Q. ${matchedWard.district})**\n\n`;
+        reply += `🌦️ **Thời tiết hiện tại**: ${weatherText}\n`;
+        reply += `🛣️ **Các trục đường huyết mạch qua phường**:\n` +
+                 (matchedWard.mainStreets || []).map(s => `  • **${s}**`).join('\n') + `\n\n`;
+        if (matchedWard.trafficHotspots && matchedWard.trafficHotspots.length > 0) {
+          reply += `🚦 **Điểm giao cắt & Nút thắt ùn tắc thường gặp**:\n` +
+                   matchedWard.trafficHotspots.map(h => `  • ${h}`).join('\n') + `\n\n`;
+        }
+        if (matchedWard.floodVulnerability) {
+          reply += `🌊 **Đặc điểm ngập úng mùa mưa bão**: ${matchedWard.floodVulnerability}\n\n`;
+        }
+        reply += `💡 **Gợi ý**: Bạn có thể bấm vào ghim **${matchedWard.name}** trên bản đồ hoặc bấm **🔀 Chỉ đường** để MoveSafe tự động vạch lộ trình né ùn tắc & ngập úng!`;
+
+        this.addBotMessage(reply);
+        if (window.mapEngine && window.mapEngine.map) {
+          window.mapEngine.map.flyTo([matchedWard.lat, matchedWard.lng], 15);
+        }
+        return;
+      }
+    }
 
     let reply = `🚗 **Phân tích Trợ lý AI MoveSafe**:\n\n`;
     if (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('kẹt xe')) {
@@ -218,6 +314,20 @@ class AIChat {
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
 
     let dynamicContext = '';
+    // Thêm ngữ cảnh phường và trục đường Hà Nội nếu có
+    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
+      const matched = window.HANOI_WARDS_DATA.find(w => {
+        const wLower = w.name.toLowerCase();
+        const rawWName = wLower.replace(/^phường\s+|^xã\s+/i, '').trim();
+        return lower.includes(wLower) || lower.includes(rawWName) || (w.mainStreets || []).some(s => lower.includes(s.toLowerCase()));
+      });
+      if (matched) {
+        dynamicContext += `Dữ liệu địa phương Hà Nội về ${matched.name} (Q. ${matched.district}):
+- Các trục đường lớn: ${matched.mainStreets.join(', ')}
+- Điểm giao cắt trọng điểm: ${matched.trafficHotspots.join(' • ')}
+- Đặc điểm ngập úng mùa mưa: ${matched.floodVulnerability}\n\n`;
+      }
+    }
     let instructions = '';
 
     if (isAskingTrafficOnly) {
@@ -245,7 +355,8 @@ class AIChat {
 
       instructions = `YÊU CẦU TRẢ LỜI:
 1. Trả lời đúng trọng tâm câu hỏi của người dùng. Không liệt kê lan man những thông tin không liên quan.
-2. Nếu hỏi đường, gợi ý lộ trình kết hợp cả né ngập và né kẹt xe. Súc tích, định dạng Markdown rõ ràng.`;
+2. Nếu hỏi đường, gợi ý lộ trình kết hợp cả né ngập và né kẹt xe. Súc tích, định dạng Markdown rõ ràng.
+3. ĐẶC BIỆT: Nếu người dùng hỏi đường đi / lộ trình từ [Điểm A] đến [Điểm B], ở dòng cuối cùng của câu trả lời hãy ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] để ứng dụng tự động vẽ tuyến đường né ngập.`;
     }
 
     const prompt = `Bạn là Trợ lý AI Giao Thông MoveSafe VN thông minh.

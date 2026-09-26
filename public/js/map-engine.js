@@ -68,27 +68,25 @@ class MapEngine {
     if (!this.map) return;
     const currentZoom = this.map.getZoom();
 
-    // 1. Khi lùi ra xa (Zoom < 12):
-    // Ẩn toàn bộ các ghim thời tiết phường và ghim kẹt xe li ti để bản đồ sạch sẽ, không bị đè lên nhau thành khối
+    // 1. Cập nhật các trạm thời tiết theo mức zoom
+    if (this.weatherVisible && this.layers.weatherMarkers) {
+      this.updateWeatherMarkersByZoom(currentZoom);
+    } else if (this.layers.weatherMarkers && this.map.hasLayer(this.layers.weatherMarkers)) {
+      this.map.removeLayer(this.layers.weatherMarkers);
+    }
+
+    // 2. Với traffic markers
     if (currentZoom < 12) {
-      if (this.layers.weatherMarkers && this.map.hasLayer(this.layers.weatherMarkers)) {
-        this.map.removeLayer(this.layers.weatherMarkers);
-      }
       if (this.layers.trafficMarkers && this.map.hasLayer(this.layers.trafficMarkers)) {
         this.map.removeLayer(this.layers.trafficMarkers);
       }
     } else {
-      // Khi zoom lại gần (Zoom >= 12):
-      // Hiện lại đầy đủ các trạm thời tiết của từng Phường và các ghim sự cố
-      if (this.weatherVisible && this.layers.weatherMarkers && !this.map.hasLayer(this.layers.weatherMarkers)) {
-        this.map.addLayer(this.layers.weatherMarkers);
-      }
       if (this.trafficVisible !== false && this.layers.trafficMarkers && !this.map.hasLayer(this.layers.trafficMarkers)) {
         this.map.addLayer(this.layers.trafficMarkers);
       }
     }
 
-    // 2. Với rốn ngập: nếu lùi ra quá xa (Zoom < 10) thì tạm ẩn để tránh chật bản đồ
+    // 3. Với rốn ngập: nếu lùi ra quá xa (Zoom < 10) thì tạm ẩn để tránh chật bản đồ
     if (currentZoom < 10) {
       if (this.layers.floodMarkers && this.map.hasLayer(this.layers.floodMarkers)) {
         this.map.removeLayer(this.layers.floodMarkers);
@@ -98,6 +96,36 @@ class MapEngine {
         this.map.addLayer(this.layers.floodMarkers);
       }
     }
+  }
+
+  // Cập nhật marker theo mức zoom: Zoom 12 hiển thị các phường trung tâm, Zoom >= 13 hiển thị toàn bộ tất cả phường
+  updateWeatherMarkersByZoom(currentZoom) {
+    if (!this.layers.weatherMarkers || !this.allWeatherStations) return;
+
+    if (currentZoom < 12) {
+      if (this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      return;
+    }
+
+    if (!this.map.hasLayer(this.layers.weatherMarkers)) {
+      this.map.addLayer(this.layers.weatherMarkers);
+    }
+
+    // Nếu zoom = 12: chỉ vẽ các phường trọng điểm (isHub !== false) để tránh chật chội
+    // Nếu zoom >= 13: vẽ toàn bộ 100% tất cả các phường (Phú Diễn, Tây Tựu, Cầu Diễn, Xuân Phương, Mai Dịch, v.v.)
+    const targetStations = (currentZoom === 12 && this.allWeatherStations.length > 25)
+      ? this.allWeatherStations.filter(s => s.isHub !== false)
+      : this.allWeatherStations;
+
+    if (this._lastRenderedStationCount === targetStations.length && this.layers.weatherMarkers.getLayers().length > 0) {
+      return;
+    }
+    this._lastRenderedStationCount = targetStations.length;
+
+    this.layers.weatherMarkers.clearLayers();
+    this.createWeatherMarkers(targetStations);
   }
 
   setTomTomKey(key) {
@@ -121,11 +149,17 @@ class MapEngine {
     });
   }
 
-  // 1. Vẽ các trạm thời tiết cấp Phường đa điểm chuẩn phong cách Google Maps Pin
+  // 1. Nhận danh sách các trạm thời tiết và phân bổ lên bản đồ
   renderWeatherStations(stations = []) {
+    this.allWeatherStations = stations;
+    this._lastRenderedStationCount = -1;
     if (!this.layers.weatherMarkers) return;
-    this.layers.weatherMarkers.clearLayers();
+    const currentZoom = this.map ? this.map.getZoom() : 13;
+    this.updateWeatherMarkersByZoom(currentZoom);
+  }
 
+  // Tạo các marker thời tiết có dữ liệu chi tiết về các đường lớn
+  createWeatherMarkers(stations = []) {
     stations.forEach(st => {
       const risk = st.floodRisk || { level: 'safe', text: 'Khô ráo', color: '#1e8e3e' };
       const rainText = st.rain1h > 0 ? `${st.rain1h}mm` : 'Khô';
@@ -148,44 +182,113 @@ class MapEngine {
 
       const marker = L.marker([st.lat, st.lng], { icon: customIcon });
 
+      // Tạo HTML danh sách các trục đường lớn
+      let streetsHtml = '';
+      if (st.mainStreets && st.mainStreets.length > 0) {
+        streetsHtml = `
+          <div style="background: #f1f8ff; border: 1px solid #c2e7ff; border-radius: 6px; padding: 7px 9px; margin-bottom: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #005ac1; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+              <span>🛣️ CÁC TRỤC ĐƯỜNG LỚN (${st.mainStreets.length} tuyến):</span>
+              <span style="font-size: 10px; color: #5f6368; font-weight: 400;">Bấm vào để kiểm tra</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${st.mainStreets.map(street => `
+                <span class="gm-street-badge" 
+                      style="display: inline-block; background: #ffffff; border: 1px solid #c2e7ff; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 500; color: #1a73e8; cursor: pointer; transition: all 0.15s ease;"
+                      onmouseover="this.style.background='#1a73e8'; this.style.color='#fff';"
+                      onmouseout="this.style.background='#fff'; this.style.color='#1a73e8';"
+                      onclick="window.appState && window.appState.searchStreetFromWard('${street.replace(/'/g, "\\'")}', '${st.name.replace(/'/g, "\\'")}')"
+                      title="Bấm để kiểm tra và phân tích lưu thông trên ${street}">
+                  ${street}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Điểm giao cắt / Rủi ro
+      let extraInfoHtml = '';
+      if (st.trafficHotspots && st.trafficHotspots.length > 0) {
+        extraInfoHtml += `
+          <div style="font-size: 11px; color: #5f6368; margin-bottom: 6px;">
+            🚦 <strong>Giao cắt trọng điểm:</strong> ${st.trafficHotspots.join(' • ')}
+          </div>
+        `;
+      }
+      if (st.floodVulnerability) {
+        extraInfoHtml += `
+          <div style="font-size: 11px; color: #d93025; margin-bottom: 6px;">
+            🌊 <strong>Lưu ý ngập úng:</strong> ${st.floodVulnerability}
+          </div>
+        `;
+      }
+
       const popupHtml = `
-        <div style="font-family: Roboto, sans-serif; min-width: 250px;">
+        <div style="font-family: Roboto, sans-serif; min-width: 290px; max-width: 330px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: ${risk.color || '#1e8e3e'}; text-transform: uppercase;">
               ${st.icon} ${risk.text}
             </span>
-            <span style="background: ${risk.color || '#1e8e3e'}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px;">
+            <span style="background: ${risk.color || '#1e8e3e'}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px;">
               ${st.temp}°C
             </span>
           </div>
-          <h3 style="font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #202124; margin-bottom: 4px; line-height: 1.3;">
             🏛️ ${st.name}
           </h3>
           <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
             Trạng thái: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px;">
+
+          <!-- Danh sách các trục đường lớn thuộc phường -->
+          ${streetsHtml}
+
+          <!-- Các chỉ số khí tượng -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 6px 8px; font-size: 11px; margin-bottom: 8px;">
             <div>🌧️ <strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
             <div>💧 <strong>Độ ẩm:</strong> ${st.humidity}%</div>
             <div>💨 <strong>Tốc độ gió:</strong> ${st.windSpeed} km/h</div>
-            <div>⚡ <strong>Cập nhật:</strong> 24/7 Live</div>
+            <div>⚡ <strong>Cập nhật:</strong> 24/7 Live Radar</div>
           </div>
+
+          ${extraInfoHtml}
+
           <div style="font-size: 12px; color: ${risk.color || '#1e8e3e'}; font-weight: 500; margin-bottom: 8px;">
-            💡 Đánh giá: ${st.rain1h >= 20 ? 'Nguy cơ ngập dồn các tuyến đường trũng xung quanh.' : (st.rain1h > 0 ? 'Mặt đường ướt trơn trượt, giảm tốc độ.' : 'Thời tiết thuận lợi cho việc lưu thông.')}
+            💡 Đánh giá: ${st.rain1h >= 20 ? 'Nguy cơ ngập dồn các tuyến đường trũng xung quanh.' : (st.rain1h > 0 ? 'Mặt đường ướt trơn trượt, giảm tốc độ.' : 'Thời tiết thuận lợi cho việc lưu thông trên các trục đường.')}
           </div>
-          <button 
-            style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px; font-size: 12px; font-weight: 500; cursor: pointer;"
-            onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và nguy cơ ngập tại khu vực ${st.name} thế nào?')">
-            🤖 Hỏi AI Về Phường Này
-          </button>
+
+          <div style="display: flex; gap: 6px; margin-top: 6px;">
+            <button 
+              style="flex: 1; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
+              onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và các tuyến đường lớn tại ${st.name} thế nào?')">
+              🤖 Hỏi AI Về Phường & Đường
+            </button>
+            <button 
+              style="background: #e8f0fe; color: #1a73e8; border: 1px solid #c2e7ff; border-radius: 4px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
+              onclick="window.appState && window.appState.routeToLocation(${st.lat}, ${st.lng}, '${st.name.replace(/'/g, "\\'")}')">
+              🔀 Đến Đây
+            </button>
+          </div>
         </div>
       `;
 
       marker.bindPopup(popupHtml);
       this.layers.weatherMarkers.addLayer(marker);
     });
+  }
 
-    this.handleZoomLevel();
+  // Mở popup thông tin trạm/phường theo tọa độ
+  openWardPopup(lat, lng) {
+    if (!this.layers.weatherMarkers) return;
+    this.layers.weatherMarkers.eachLayer(layer => {
+      if (layer && typeof layer.getLatLng === 'function') {
+        const pos = layer.getLatLng();
+        if (Math.abs(pos.lat - lat) < 0.003 && Math.abs(pos.lng - lng) < 0.003) {
+          layer.openPopup();
+        }
+      }
+    });
   }
 
   // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin

@@ -167,6 +167,11 @@
         <!-- Render tóm tắt kết quả phân tích -->
       </div>
 
+      <!-- 🤖 GỢI Ý THÔNG MINH TỰ ĐỘNG TỪ AI (PASSIVE - KHÔNG TỐN LƯỢT REQUEST) -->
+      <div class="gm-ai-suggestion" id="gm-ai-suggestion" style="display: none;">
+        <!-- Render bởi generateSmartSuggestion() -->
+      </div>
+
       <!-- Danh sách lộ trình so sánh -->
       <div class="gm-route-results" id="gm-route-results">
         <!-- Render kết quả tuyến đường -->
@@ -177,6 +182,9 @@
     <div class="gm-chips-scroll" id="gm-chips-scroll">
       <button class="gm-chip" id="chip-weather-toggle" title="Bật/Tắt & Xem thời tiết chi tiết từng phường">
         🌦️ Thời tiết phường
+      </button>
+      <button class="gm-chip" id="chip-hanoi-streets" title="Xem danh sách các tuyến đường lớn theo từng phường ở Hà Nội">
+        🛣️ Tuyến đường lớn Hà Nội
       </button>
       <button class="gm-chip gm-chip-safe" id="chip-flood-count">
         🌊 Rốn ngập (0 - Khô ráo)
@@ -348,6 +356,60 @@
     </div>
   </div>
 
+  <!-- ==================== 7b. MODAL: DANH MỤC ĐƯỜNG LỚN & THỜI TIẾT CÁC PHƯỜNG HÀ NỘI ==================== -->
+  <div class="modal-overlay" id="modal-hanoi-streets">
+    <div class="modal-card modal-streets-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: #202124; display: flex; align-items: center; gap: 8px;">
+            <span>🛣️</span> <span>Mạng Lưới Đường Lớn & Thời Tiết Các Phường Hà Nội</span>
+          </h3>
+          <p style="font-size: 12px; color: #5f6368; margin: 3px 0 0 0;">
+            Hệ thống dữ liệu thời gian thực: 76 phường/xã và 299 trục đường huyết mạch thủ đô
+          </p>
+        </div>
+        <button class="gm-btn-icon" id="btn-close-hanoi-streets">✕</button>
+      </div>
+
+      <!-- Thanh tìm kiếm & Lọc quận -->
+      <div class="streets-filter-bar">
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <input 
+            type="text" 
+            id="input-search-streets" 
+            class="form-control" 
+            placeholder="🔍 Tìm nhanh: tên đường (VD: Cầu Diễn, Hoàng Công Chất...) hoặc tên phường (VD: Phú Diễn, Tây Tựu...)"
+            style="font-size: 13px;"
+          >
+          <button type="button" class="btn-gm-cancel" id="btn-reset-streets-filter" style="white-space: nowrap;">
+            Đặt lại
+          </button>
+        </div>
+
+        <div class="district-filter-chips" id="district-filter-chips">
+          <button class="dist-chip active" data-district="all">Tất cả (76 phường)</button>
+          <button class="dist-chip" data-district="Bắc Từ Liêm">Bắc Từ Liêm</button>
+          <button class="dist-chip" data-district="Nam Từ Liêm">Nam Từ Liêm</button>
+          <button class="dist-chip" data-district="Cầu Giấy">Cầu Giấy</button>
+          <button class="dist-chip" data-district="Đống Đa">Đống Đa</button>
+          <button class="dist-chip" data-district="Ba Đình">Ba Đình</button>
+          <button class="dist-chip" data-district="Hoàn Kiếm">Hoàn Kiếm</button>
+          <button class="dist-chip" data-district="Hai Bà Trưng">Hai Bà Trưng</button>
+          <button class="dist-chip" data-district="Thanh Xuân">Thanh Xuân</button>
+          <button class="dist-chip" data-district="Tây Hồ">Tây Hồ</button>
+          <button class="dist-chip" data-district="Hà Đông">Hà Đông</button>
+          <button class="dist-chip" data-district="Hoàng Mai">Hoàng Mai</button>
+          <button class="dist-chip" data-district="Long Biên">Long Biên</button>
+          <button class="dist-chip" data-district="Hoài Đức">Hoài Đức</button>
+        </div>
+      </div>
+
+      <div class="modal-body streets-modal-body" id="streets-cards-container">
+        <!-- Render tự động bởi JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== 8. MODAL: CÀI ĐẶT API KEYS ==================== -->
   <div class="modal-overlay" id="modal-settings">
     <div class="modal-card">
@@ -395,13 +457,14 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Client-side Scripts -->
-  <script src="js/geocoding-service.js?v=3.0"></script>
-  <script src="js/weather-service.js?v=3.0"></script>
-  <script src="js/routing-service.js?v=3.0"></script>
-  <script src="js/map-engine.js?v=3.0"></script>
-  <script src="js/crowdsource.js?v=3.0"></script>
-  <script src="js/ai-chat.js?v=3.0"></script>
-  <script src="js/app.js?v=3.0"></script>
+  <script src="js/hanoi-wards-streets.js?v=3.1"></script>
+  <script src="js/geocoding-service.js?v=3.1"></script>
+  <script src="js/weather-service.js?v=3.1"></script>
+  <script src="js/routing-service.js?v=3.1"></script>
+  <script src="js/map-engine.js?v=3.1"></script>
+  <script src="js/crowdsource.js?v=3.1"></script>
+  <script src="js/ai-chat.js?v=3.1"></script>
+  <script src="js/app.js?v=3.1"></script>
 
 </body>
 </html>
