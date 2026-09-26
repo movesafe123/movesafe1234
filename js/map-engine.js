@@ -98,27 +98,60 @@ class MapEngine {
     }
   }
 
-  // Cập nhật marker theo mức zoom: Zoom 12 hiển thị các phường trung tâm, Zoom >= 13 hiển thị toàn bộ tất cả phường
+  // Cập nhật marker theo mức zoom: Ẩn bớt để tránh chật bản đồ
+  // - Nếu có tuyến đường: Chỉ hiện thời tiết ở các phường tuyến đường đi qua.
+  // - Nếu không có tuyến đường: Zoom < 14 ẩn hết, Zoom 14 hiện trung tâm, Zoom >= 15 hiện tất cả.
   updateWeatherMarkersByZoom(currentZoom) {
     if (!this.layers.weatherMarkers || !this.allWeatherStations) return;
 
-    if (currentZoom < 12) {
-      if (this.map.hasLayer(this.layers.weatherMarkers)) {
-        this.map.removeLayer(this.layers.weatherMarkers);
-      }
-      return;
+    let targetStations = [];
+    let hasActiveRoute = false;
+    let activePolyline = null;
+
+    if (window.appState && window.appState.lastRouteResult && window.appState.lastRouteResult.routes) {
+        const recommended = window.appState.lastRouteResult.routes.find(r => r.isRecommended) || window.appState.lastRouteResult.routes[0];
+        if (recommended && recommended.polyline) {
+            hasActiveRoute = true;
+            activePolyline = recommended.polyline;
+        }
     }
 
-    if (!this.map.hasLayer(this.layers.weatherMarkers)) {
-      this.map.addLayer(this.layers.weatherMarkers);
+    if (hasActiveRoute && currentZoom < 14) {
+        // Nếu đang vẽ tuyến đường và zoom out, CHỈ hiện thời tiết các phường mà tuyến đường đi qua (< 1km)
+        targetStations = this.allWeatherStations.filter(station => {
+            const sampleStep = Math.max(1, Math.floor(activePolyline.length / 20)); // Lấy ~20 điểm mẫu
+            return activePolyline.some((pt, idx) => {
+                if (idx % sampleStep !== 0) return false;
+                const dLat = (station.lat - pt[0]) * 111000;
+                const dLng = (station.lng - pt[1]) * 111000;
+                return (dLat * dLat + dLng * dLng) < (1200 * 1200); // Bán kính ~1.2km
+            });
+        });
+    } else if (currentZoom < 14) {
+        // Zoom out và không có tuyến đường -> Ẩn toàn bộ
+        if (this.map.hasLayer(this.layers.weatherMarkers)) {
+            this.map.removeLayer(this.layers.weatherMarkers);
+        }
+        return;
+    } else {
+        // Zoom gần (>= 14): Hiện bình thường
+        targetStations = (currentZoom === 14 && this.allWeatherStations.length > 25)
+          ? this.allWeatherStations.filter(s => s.isHub !== false)
+          : this.allWeatherStations;
     }
 
-    // Nếu zoom = 12: chỉ vẽ các phường trọng điểm (isHub !== false) để tránh chật chội
-    // Nếu zoom >= 13: vẽ toàn bộ 100% tất cả các phường (Phú Diễn, Tây Tựu, Cầu Diễn, Xuân Phương, Mai Dịch, v.v.)
-    const targetStations = (currentZoom === 12 && this.allWeatherStations.length > 25)
-      ? this.allWeatherStations.filter(s => s.isHub !== false)
-      : this.allWeatherStations;
+    if (targetStations.length > 0) {
+        if (!this.map.hasLayer(this.layers.weatherMarkers)) {
+            this.map.addLayer(this.layers.weatherMarkers);
+        }
+    } else {
+        if (this.map.hasLayer(this.layers.weatherMarkers)) {
+            this.map.removeLayer(this.layers.weatherMarkers);
+        }
+        return;
+    }
 
+    // Tránh render lại nếu số lượng không đổi
     if (this._lastRenderedStationCount === targetStations.length && this.layers.weatherMarkers.getLayers().length > 0) {
       return;
     }

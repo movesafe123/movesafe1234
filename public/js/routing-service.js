@@ -119,45 +119,29 @@ class RoutingService {
 
     // Khoảng cách thẳng A→B
     const directDist = this.getDistanceMeters(originLat, originLng, destLat, destLng);
-    if (directDist < 500) return false; // Quá ngắn để kiểm tra
+    if (directDist < 1000) return false; // Quá ngắn, không cần kiểm tra
 
-    // Đo tiến trình dọc tuyến: tại mỗi điểm, tính khoảng cách còn lại đến B
-    // Nếu khoảng cách đến B tăng lên đáng kể rồi lại giảm → backtracking
-    let maxDistToDestSoFar = 0;
-    let minDistToDestAfterMax = Infinity;
-    let maxDistIndex = 0;
+    const sampleStep = Math.max(1, Math.floor(polyline.length / 50)); 
+    let minDistSoFar = Infinity;
 
-    const sampleStep = Math.max(1, Math.floor(polyline.length / 40)); // Lấy ~40 điểm mẫu
-    const distancesToDest = [];
+    // Khoảng cách cho phép tăng lên (bị ngược hướng) tối đa trước khi coi là backtracking
+    // Ví dụ: đang đi tiến về đích, nhưng lại phải đi vòng ngược lại xa hơn 1.5km
+    const backtrackThreshold = Math.max(1500, directDist * 0.25); 
 
     for (let i = 0; i < polyline.length; i += sampleStep) {
       const pt = polyline[i];
-      const distToDest = this.getDistanceMeters(pt[0], pt[1], destLat, destLng);
-      distancesToDest.push({ index: i, dist: distToDest });
-    }
-
-    // Tìm điểm xa nhất khỏi đích trên nửa sau tuyến đường
-    const halfIdx = Math.floor(distancesToDest.length / 3);
-    for (let i = halfIdx; i < distancesToDest.length; i++) {
-      if (distancesToDest[i].dist > maxDistToDestSoFar) {
-        maxDistToDestSoFar = distancesToDest[i].dist;
-        maxDistIndex = i;
+      const currentDist = this.getDistanceMeters(pt[0], pt[1], destLat, destLng);
+      
+      if (currentDist < minDistSoFar) {
+        minDistSoFar = currentDist;
+      }
+      
+      // Nếu khoảng cách hiện tại xa hơn khoảng cách nhỏ nhất đã đạt được > threshold
+      // Tức là tuyến đường đang đi ngược ra xa khỏi điểm đến một cách đáng kể
+      if (currentDist > minDistSoFar + backtrackThreshold) {
+        return true; 
       }
     }
-
-    // Sau điểm xa nhất, khoảng cách có giảm mạnh về lại B không?
-    for (let i = maxDistIndex; i < distancesToDest.length; i++) {
-      minDistToDestAfterMax = Math.min(minDistToDestAfterMax, distancesToDest[i].dist);
-    }
-
-    // Nếu điểm xa nhất vượt qua B > 30% khoảng cách thẳng A→B → backtracking
-    const overshootRatio = maxDistToDestSoFar / directDist;
-    const dropAfterMax = maxDistToDestSoFar - minDistToDestAfterMax;
-
-    if (overshootRatio > 0.6 && dropAfterMax > directDist * 0.25) {
-      return true; // Có quay đầu
-    }
-
     return false;
   }
 

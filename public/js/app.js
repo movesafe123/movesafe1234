@@ -502,17 +502,18 @@ class GoogleMapsApp {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
     });
 
-    // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến
+    // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến (hoặc hiện POI)
     window.mapEngine.map?.on('click', async (e) => {
       window.aiChat.close();
       document.getElementById('gm-layer-menu')?.classList.remove('open');
+
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
 
       if (this.pickingLocationType) {
         const type = this.pickingLocationType;
         this.stopPickLocationOnMap();
 
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
         this.showToast('🔍 Đang xác định ngõ ngách, địa chỉ...', 'info');
 
         try {
@@ -533,6 +534,43 @@ class GoogleMapsApp {
             lat,
             lng
           });
+        }
+      } else {
+        // Thêm tính năng click chọn địa điểm tự do như Google Maps
+        if (this._tempClickMarker) window.mapEngine.map.removeLayer(this._tempClickMarker);
+        
+        this._tempClickMarker = L.marker([lat, lng], {
+            icon: L.divIcon({ className: 'gm-temp-click-icon', html: '<div class="spinner"></div>' })
+        }).addTo(window.mapEngine.map);
+
+        try {
+            const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
+            
+            // Xây dựng popup chuẩn Google Maps
+            const popupContent = `
+              <div class="gm-poi-popup">
+                <div class="gm-poi-title">${addrInfo.title}</div>
+                <div class="gm-poi-address">${addrInfo.subtitle}</div>
+                <div class="gm-poi-coords">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+                <div class="gm-poi-actions">
+                  <button class="gm-btn-dir from" onclick="window.appState.setRouteFromPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
+                    <span class="icon">📍</span> Từ đây
+                  </button>
+                  <button class="gm-btn-dir to" onclick="window.appState.setRouteToPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
+                    <span class="icon">🏁</span> Tới đây
+                  </button>
+                </div>
+              </div>
+            `;
+            
+            this._tempClickMarker.bindPopup(popupContent, {
+                closeButton: true,
+                className: 'gm-poi-popup-container',
+                minWidth: 260
+            }).openPopup();
+            
+        } catch (err) {
+            this._tempClickMarker.bindPopup(`Vị trí: ${lat.toFixed(5)}, ${lng.toFixed(5)}`).openPopup();
         }
       }
     });
@@ -1058,6 +1096,25 @@ class GoogleMapsApp {
   }
 
   // Xử lý khi chọn một địa điểm từ gợi ý
+  // --- GOOGLE MAPS POI CLICKS ---
+  setRouteFromPOI(lat, lng, title, fullAddress) {
+    if (this._tempClickMarker && window.mapEngine.map) {
+      window.mapEngine.map.removeLayer(this._tempClickMarker);
+      this._tempClickMarker = null;
+    }
+    this.selectLocation('origin', { lat, lng, title, subtitle: fullAddress, fullAddress });
+    this.showToast('📍 Đã đặt Điểm Đi: ' + title, 'info');
+  }
+
+  setRouteToPOI(lat, lng, title, fullAddress) {
+    if (this._tempClickMarker && window.mapEngine.map) {
+      window.mapEngine.map.removeLayer(this._tempClickMarker);
+      this._tempClickMarker = null;
+    }
+    this.selectLocation('destination', { lat, lng, title, subtitle: fullAddress, fullAddress });
+    this.showToast('🏁 Đã đặt Điểm Đến: ' + title, 'info');
+  }
+
   selectLocation(type, item) {
     const input = document.getElementById(`gm-route-${type}`);
     if (input) {
