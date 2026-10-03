@@ -1679,11 +1679,34 @@ class GoogleMapsApp {
     const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
     const cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
 
-    // [GIAI ĐOẠN 4]: Lấy dữ liệu dự báo từ AI (Supabase) nếu thanh trượt > 0
+    // [GIAI ĐOẠN 4 & 5]: Lấy dữ liệu dự báo từ AI (Supabase) nếu thanh trượt > 0
     if (this.currentPredictionOffset > 0 && window.supabaseService) {
       const predictions = await window.supabaseService.getTrafficPrediction(this.currentPredictionOffset);
       if (predictions && predictions.length > 0) {
         this.showToast(`🤖 AI: Áp dụng dự báo kẹt xe cho +${this.currentPredictionOffset}h tới để tìm đường.`, 'info', 4000);
+      }
+      
+      const floodPreds = await window.supabaseService.getFloodPredictions(this.currentPredictionOffset);
+      if (floodPreds && floodPreds.length > 0) {
+        this.showToast(`🌊 AI: Phát hiện ${floodPreds.length} điểm có nguy cơ ngập lụt sau ${this.currentPredictionOffset}h tới!`, 'warning', 5000);
+        
+        // Chuyển đổi dữ liệu AI sang format của bản đồ
+        const aiFloodPoints = floodPreds.map(f => ({
+          lat: f.lat,
+          lng: f.lng,
+          depth_cm: f.predicted_depth_cm,
+          danger_level: f.predicted_depth_cm > 30 ? 'high' : 'medium',
+          name: `[AI DỰ BÁO] ${f.location_name}`
+        }));
+        
+        if (window.mapEngine) {
+          window.mapEngine.renderFloodPoints(aiFloodPoints);
+        }
+      }
+    } else {
+      // Khôi phục lại dữ liệu ngập lụt hiện tại (Live data) nếu thanh trượt = 0
+      if (window.mapEngine) {
+        window.mapEngine.renderFloodPoints(cityFloods);
       }
     }
 

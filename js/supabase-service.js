@@ -81,6 +81,25 @@ class SupabaseService {
       }, 300);
     });
   }
+
+  // Lấy dự báo ngập lụt từ AI
+  async getFloodPredictions(offsetHours) {
+    if (offsetHours === 0) return []; // Không có offset thì không lấy dự báo
+    
+    console.log(`Lấy dữ liệu dự báo NGẬP LỤT từ AI cho +${offsetHours}h tới...`);
+    
+    if (this.supabase && this.SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE') {
+      const { data, error } = await this.supabase
+        .from('flood_predictions')
+        .select('*')
+        .eq('target_hour', offsetHours);
+        
+      if (!error && data && data.length > 0) {
+        return data;
+      }
+    }
+    return [];
+  }
 }
 
 // Khởi tạo service

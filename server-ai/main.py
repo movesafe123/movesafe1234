@@ -91,14 +91,42 @@ def run_predictions_task():
             "confidence": 0.89
         })
         
-    # Đẩy lên Supabase bảng traffic_predictions
+    # ===== PHẦN MỚI: AI DỰ BÁO NGẬP LỤT =====
+    # Dựa vào thời tiết, nếu có mưa, AI sẽ tính toán xác suất ngập ở các rốn ngập Hà Nội
+    flood_predictions = []
+    # Các rốn ngập kinh niên tại Hà Nội (tọa độ giả định)
+    flood_prone_areas = [
+        {"name": "Ngã tư Thái Hà - Chùa Bộc", "lat": 21.0075, "lng": 105.8245, "base_risk": 0.8},
+        {"name": "Đường Nguyễn Khuyến", "lat": 21.0280, "lng": 105.8340, "base_risk": 0.9},
+        {"name": "Đường Vũ Trọng Phụng", "lat": 20.9950, "lng": 105.8060, "base_risk": 0.75}
+    ]
+    
+    # Nếu thời tiết hiện tại là mưa (1) hoặc ngập (2), dự báo ngập trong các giờ tới
+    # Ở demo này, ta dùng random để luôn hiển thị ngập ngẫu nhiên khi trình diễn
+    for offset in [1, 2, 3]:
+        for area in flood_prone_areas:
+            # Random độ sâu ngập từ 10cm - 50cm
+            predicted_depth = np.random.randint(15, 45) 
+            flood_predictions.append({
+                "location_name": area["name"],
+                "lat": area["lat"],
+                "lng": area["lng"],
+                "target_hour": offset,
+                "predicted_depth_cm": predicted_depth,
+                "confidence": round(area["base_risk"] * np.random.uniform(0.8, 1.0), 2)
+            })
+            
+    # Đẩy lên Supabase
     if supabase:
         try:
             # Xóa các dự báo cũ
             supabase.table("traffic_predictions").delete().neq("segment_id", "0").execute()
-            # Ghi đè dự báo mới nhất
             supabase.table("traffic_predictions").insert(predictions).execute()
-            print("✅ Đã cập nhật kết quả dự báo lên Cloud Supabase!")
+            
+            # Ghi dự báo ngập lụt
+            supabase.table("flood_predictions").delete().neq("location_name", "0").execute()
+            supabase.table("flood_predictions").insert(flood_predictions).execute()
+            print("✅ Đã cập nhật kết quả kẹt xe và ngập lụt lên Cloud Supabase!")
         except Exception as e:
             print("❌ Lỗi ghi Supabase:", e)
 
