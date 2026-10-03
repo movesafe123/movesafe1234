@@ -423,15 +423,52 @@ class GoogleMapsApp {
       this.calculateSmartRoute();
     });
 
-    // Chuyển phương tiện (Xe máy / Ô tô)
+    // Chuyển phương tiện (Xe máy / Ô tô / Xe điện)
     document.querySelectorAll('.gm-mode-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.gm-mode-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         this.currentVehicle = tab.getAttribute('data-mode');
+        
+        // Tự động bật layer Trạm sạc nếu chọn xe điện
+        const evLayerItem = document.getElementById('layer-item-ev');
+        if (this.currentVehicle === 'ebike' || this.currentVehicle === 'ecar') {
+          if (evLayerItem) evLayerItem.style.display = 'flex';
+          const chkEv = document.getElementById('chk-layer-ev');
+          if (chkEv && !chkEv.checked) {
+             chkEv.checked = true;
+             if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(true);
+          }
+        } else {
+          if (evLayerItem) evLayerItem.style.display = 'none';
+          const chkEv = document.getElementById('chk-layer-ev');
+          if (chkEv && chkEv.checked) {
+             chkEv.checked = false;
+             if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(false);
+          }
+        }
+        
         this.calculateSmartRoute();
       });
     });
+
+    // Lắng nghe thanh trượt dự báo giao thông
+    const predictionSlider = document.getElementById('traffic-prediction-slider');
+    if (predictionSlider) {
+      predictionSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        const labels = ['Hiện tại', '+1 Giờ tới', '+2 Giờ tới', '+3 Giờ tới'];
+        const labelEl = document.getElementById('prediction-time-label');
+        if (labelEl) labelEl.textContent = labels[val];
+        this.currentPredictionOffset = val;
+      });
+      predictionSlider.addEventListener('change', () => {
+        // Gọi lại routing với time offset nếu bảng chỉ đường đang mở
+        if (this.isDirectionsOpen) {
+          this.calculateSmartRoute();
+        }
+      });
+    }
 
     // 5b. Bộ chọn 3 mức độ tránh né
     document.querySelectorAll('.gm-avoidance-option').forEach(option => {
@@ -500,6 +537,9 @@ class GoogleMapsApp {
     });
     document.getElementById('chk-layer-satellite')?.addEventListener('change', (e) => {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
+    });
+    document.getElementById('chk-layer-ev')?.addEventListener('change', (e) => {
+      if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(e.target.checked);
     });
 
     // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến (hoặc hiện POI)
@@ -1116,14 +1156,17 @@ class GoogleMapsApp {
   }
 
   selectLocation(type, item) {
-    const input = document.getElementById(`gm-route-${type}`);
+    const inputId = type === 'destination' ? 'dest' : type;
+    const stateKey = type === 'dest' ? 'destination' : type;
+
+    const input = document.getElementById(`gm-route-${inputId}`);
     if (input) {
       input.value = item.fullAddress || item.title;
-      const clearBtn = document.getElementById(`btn-clear-${type}`);
+      const clearBtn = document.getElementById(`btn-clear-${inputId}`);
       if (clearBtn) clearBtn.style.display = 'flex';
     }
 
-    this.routeLocations[type] = {
+    this.routeLocations[stateKey] = {
       lat: item.lat,
       lng: item.lng,
       title: item.title,
@@ -1131,7 +1174,7 @@ class GoogleMapsApp {
     };
 
     // Cập nhật marker A hoặc B trên bản đồ
-    this.updateRouteMarker(type, item.lat, item.lng, item.title);
+    this.updateRouteMarker(inputId, item.lat, item.lng, item.title);
 
     // Di chuyển góc nhìn bản đồ
     if (this.routeLocations.origin && this.routeLocations.destination) {
@@ -1636,6 +1679,14 @@ class GoogleMapsApp {
     const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
     const cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
 
+    // [GIAI ĐOẠN 4]: Lấy dữ liệu dự báo từ AI (Supabase) nếu thanh trượt > 0
+    if (this.currentPredictionOffset > 0 && window.supabaseService) {
+      const predictions = await window.supabaseService.getTrafficPrediction(this.currentPredictionOffset);
+      if (predictions && predictions.length > 0) {
+        this.showToast(`🤖 AI: Áp dụng dự báo kẹt xe cho +${this.currentPredictionOffset}h tới để tìm đường.`, 'info', 4000);
+      }
+    }
+
     try {
       const result = await window.routingService.calculateMultiRoutes({
         origin: { lat: origin.lat, lng: origin.lng },
@@ -1939,16 +1990,30 @@ class GoogleMapsApp {
   renderRouteSummary(container, result) {
     const { routes } = result;
     const recommended = routes.find(r => r.isRecommended) || routes[0];
+    const fastestRoute = routes.find(r => r.avoidLevel === 3) || routes[0];
     
     let badgeClass = 'badge-safe';
     if (recommended.avoidLevel === 2) badgeClass = 'badge-warning';
     if (recommended.avoidLevel === 3) badgeClass = 'badge-safe';
 
+    let insightHtml = '';
+    if (recommended.avoidLevel !== 3 && recommended.duration_min > fastestRoute.duration_min) {
+      const diff = Math.round(recommended.duration_min - fastestRoute.duration_min);
+      insightHtml = `<div style="font-size: 12px; color: #1e8e3e; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+        <span style="font-size: 16px;">💡</span> Lộ trình này chậm hơn ${diff} phút nhưng an toàn, giúp bạn tránh kẹt xe và đường ngập.
+      </div>`;
+    }
+
     container.innerHTML = `
-      <span class="gm-summary-badge ${badgeClass}" style="background: ${recommended.color}; color: #fff;">
-        Mức ${recommended.avoidLevel}: ${recommended.label}
-      </span>
-      <span class="gm-summary-text">${recommended.trafficDesc}</span>
+      <div style="display: flex; flex-direction: column; width: 100%;">
+        <div style="display: flex; align-items: center;">
+          <span class="gm-summary-badge ${badgeClass}" style="background: ${recommended.color}; color: #fff;">
+            Mức ${recommended.avoidLevel}: ${recommended.label}
+          </span>
+          <span class="gm-summary-text">${recommended.trafficDesc}</span>
+        </div>
+        ${insightHtml}
+      </div>
     `;
     container.style.display = 'flex';
   }

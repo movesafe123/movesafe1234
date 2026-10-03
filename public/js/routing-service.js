@@ -64,7 +64,8 @@ class RoutingService {
   // Gọi OSRM lấy tọa độ đường đi
   async fetchOsrmRoute(waypoints) {
     const coordsStr = waypoints.map(w => `${w[0]},${w[1]}`).join(';');
-    const url = `${this.osrmBaseUrl}/${coordsStr}?overview=full&geometries=geojson&steps=true&alternatives=true`;
+    // Request up to 3 alternatives natively from OSRM
+    const url = `${this.osrmBaseUrl}/${coordsStr}?overview=full&geometries=geojson&steps=true&alternatives=3`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Không thể tính toán tuyến đường OSRM');
@@ -91,12 +92,12 @@ class RoutingService {
     for (const r of routes) {
       const isDuplicate = distinct.some(d => {
         const distDiff = Math.abs(d.distanceMeters - r.distanceMeters);
-        if (distDiff < 100) {
+        if (distDiff < 150) { // Tăng nhẹ ngưỡng để giữ lại các route khác nhau
           const mid1 = d.polyline[Math.floor(d.polyline.length / 2)];
           const mid2 = r.polyline[Math.floor(r.polyline.length / 2)];
           if (mid1 && mid2) {
             const midDist = this.getDistanceMeters(mid1[0], mid1[1], mid2[0], mid2[1]);
-            if (midDist < 200) return true;
+            if (midDist < 250) return true;
           }
         }
         return false;
@@ -124,9 +125,8 @@ class RoutingService {
     const sampleStep = Math.max(1, Math.floor(polyline.length / 50)); 
     let minDistSoFar = Infinity;
 
-    // Khoảng cách cho phép tăng lên (bị ngược hướng) tối đa trước khi coi là backtracking
-    // Ví dụ: đang đi tiến về đích, nhưng lại phải đi vòng ngược lại xa hơn 1.5km
-    const backtrackThreshold = Math.max(1500, directDist * 0.25); 
+    // Nới lỏng: chỉ khi đi ngược > 3km hoặc 40% quãng đường thẳng mới coi là quay đầu
+    const backtrackThreshold = Math.max(3000, directDist * 0.4); 
 
     for (let i = 0; i < polyline.length; i += sampleStep) {
       const pt = polyline[i];
@@ -136,8 +136,6 @@ class RoutingService {
         minDistSoFar = currentDist;
       }
       
-      // Nếu khoảng cách hiện tại xa hơn khoảng cách nhỏ nhất đã đạt được > threshold
-      // Tức là tuyến đường đang đi ngược ra xa khỏi điểm đến một cách đáng kể
       if (currentDist > minDistSoFar + backtrackThreshold) {
         return true; 
       }
@@ -149,8 +147,8 @@ class RoutingService {
    * Kiểm tra tuyến đường có quá dài so với đường thẳng không (vòng quá mức)
    */
   isExcessiveDetour(route, directDistMeters) {
-    // Cho phép tuyến vòng tối đa gấp 1.8x so với đường thẳng
-    const maxRatio = 1.8;
+    // Cho phép tuyến vòng tối đa gấp 2.2x so với đường thẳng
+    const maxRatio = 2.2;
     if (directDistMeters > 0 && route.distanceMeters > directDistMeters * maxRatio) {
       return true;
     }
@@ -378,41 +376,28 @@ class RoutingService {
     const len = Math.hypot(dLat, dLng);
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
 
-    // Đặt waypoint tại 1/3 quãng đường từ origin (KHÔNG PHẢI midpoint)
-    // Điều này tránh việc tuyến đi vượt quá destination rồi quay lại
-    const wpLat = origin.lat + dLat * 0.33;
-    const wpLng = origin.lng + dLng * 0.33;
+    // Tính toán waypoint lệch 1/3 và 2/3 để đa dạng hóa lộ trình
+    const wp1Lat = origin.lat + dLat * 0.33;
+    const wp1Lng = origin.lng + dLng * 0.33;
+    
+    const wp2Lat = origin.lat + dLat * 0.66;
+    const wp2Lng = origin.lng + dLng * 0.66;
 
-    // Offset nhỏ hơn nhiều: tối đa ~650m, tối thiểu ~200m
-    // Tỷ lệ offset giảm theo cự ly để tuyến ngắn không bị vòng quá mức
-    const offsetDeg = Math.min(0.006, Math.max(0.002, len * 0.12));
-
-    // Pháp tuyến vuông góc với hướng A→B
+    // Tăng offset lên để tạo ra các tuyến đường thực sự khác biệt (tối đa ~1.2km, tối thiểu ~450m)
+    const offsetDeg = Math.min(0.012, Math.max(0.004, len * 0.15));
     const perpLat = -(dLng / len);
     const perpLng = (dLat / len);
 
-    const offA = { lat: wpLat + perpLat * offsetDeg, lng: wpLng + perpLng * offsetDeg };
-    const offB = { lat: wpLat - perpLat * offsetDeg, lng: wpLng - perpLng * offsetDeg };
+    // Tuyến A bị kéo lệch ở 1/3 quãng đường
+    const offA = { lat: wp1Lat + perpLat * offsetDeg, lng: wp1Lng + perpLng * offsetDeg };
+    // Tuyến B bị kéo lệch ở 2/3 quãng đường (về hướng ngược lại)
+    const offB = { lat: wp2Lat - perpLat * offsetDeg, lng: wp2Lng - perpLng * offsetDeg };
 
     // Gọi OSRM đồng thời cho 3 hành lang
     const fetchPromises = [
-      // Tuyến trực tiếp (BẮT BUỘC có alternatives)
-      this.fetchOsrmRoute([
-        [origin.lng, origin.lat],
-        [destination.lng, destination.lat]
-      ]).catch(() => []),
-      // Tuyến lệch A (nhẹ sang 1 bên)
-      this.fetchOsrmRoute([
-        [origin.lng, origin.lat],
-        [offA.lng, offA.lat],
-        [destination.lng, destination.lat]
-      ]).catch(() => []),
-      // Tuyến lệch B (nhẹ sang bên kia)
-      this.fetchOsrmRoute([
-        [origin.lng, origin.lat],
-        [offB.lng, offB.lat],
-        [destination.lng, destination.lat]
-      ]).catch(() => [])
+      this.fetchOsrmRoute([[origin.lng, origin.lat], [destination.lng, destination.lat]]).catch(() => []),
+      this.fetchOsrmRoute([[origin.lng, origin.lat], [offA.lng, offA.lat], [destination.lng, destination.lat]]).catch(() => []),
+      this.fetchOsrmRoute([[origin.lng, origin.lat], [offB.lng, offB.lat], [destination.lng, destination.lat]]).catch(() => [])
     ];
 
     const [directRoutes, sideARoutes, sideBRoutes] = await Promise.all(fetchPromises);
@@ -428,35 +413,31 @@ class RoutingService {
 
     // ===== BỘ LỌC CHẤT LƯỢNG TUYẾN ĐƯỜNG =====
     
-    // Lọc 1: Loại bỏ tuyến trùng lặp hình học
     let goodCandidates = this.filterDistinctRoutes(rawCandidates);
 
-    // Lọc 2: Loại bỏ tuyến có quay đầu (backtracking / U-turn)
     goodCandidates = goodCandidates.filter(route => {
       const hasBacktrack = this.detectBacktracking(
         route.polyline, origin.lat, origin.lng, destination.lat, destination.lng
       );
       if (hasBacktrack) {
         console.warn(`[Routing] ⚠️ Loại bỏ tuyến ${route.distanceKm}km vì phát hiện quay đầu (U-turn)`);
+        return false;
       }
-      return !hasBacktrack;
-    });
-
-    // Lọc 3: Loại bỏ tuyến vòng quá mức (> 1.8x đường thẳng)
-    goodCandidates = goodCandidates.filter(route => {
+      
       const isExcessive = this.isExcessiveDetour(route, directDistMeters);
       if (isExcessive) {
         console.warn(`[Routing] ⚠️ Loại bỏ tuyến ${route.distanceKm}km vì vòng quá mức (thẳng: ${(directDistMeters/1000).toFixed(1)}km)`);
+        return false;
       }
-      return !isExcessive;
+      return true;
     });
 
-    // Nếu sau khi lọc không còn tuyến nào, dùng lại tuyến trực tiếp
     if (goodCandidates.length === 0) {
+      // Bắt buộc phải có ít nhất 1 đường
       if (directRoutes && directRoutes.length > 0) {
         goodCandidates = [directRoutes[0]];
       } else {
-        throw new Error('Không tìm được tuyến đường hợp lệ (tất cả đều bị quay đầu hoặc vòng quá mức)');
+        throw new Error('Đường đi quá phức tạp, không thể tính toán');
       }
     }
 

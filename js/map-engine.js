@@ -16,7 +16,8 @@ class MapEngine {
       weatherMarkers: null,
       routeSafeOutline: null,
       routeSafe: null,
-      routeDanger: null
+      routeDanger: null,
+      evLayer: null
     };
     this.currentBase = 'standard';
     this.weatherVisible = true;
@@ -56,6 +57,7 @@ class MapEngine {
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
     this.layers.trafficMarkers = L.layerGroup().addTo(this.map);
     this.layers.weatherMarkers = L.layerGroup().addTo(this.map);
+    this.layers.evLayer = L.layerGroup(); // Không addTo(this.map) ngay từ đầu
 
     // Tự động kiểm soát hiển thị theo mức Zoom (LOD - Level of Detail)
     this.map.on('zoom zoomend', () => {
@@ -556,6 +558,35 @@ class MapEngine {
       this.map.removeLayer(this.layers.baseSatellite);
       this.layers.baseStandard.addTo(this.map);
       this.currentBase = 'standard';
+    }
+  }
+
+  async toggleEV(show) {
+    if (!this.map) return;
+    if (show) {
+      if (!this.map.hasLayer(this.layers.evLayer)) {
+        this.layers.evLayer.addTo(this.map);
+      }
+      // Nạp dữ liệu từ Supabase nếu layer đang rỗng
+      if (this.layers.evLayer.getLayers().length === 0 && window.supabaseService) {
+        const stations = await window.supabaseService.getEVStations();
+        stations.forEach(st => {
+          const marker = L.circleMarker([st.lat, st.lng], {
+            radius: 8,
+            fillColor: "#1e8e3e",
+            color: "#ffffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+          });
+          marker.bindPopup(`<b>⚡ ${st.name}</b><br>Nhà cung cấp: ${st.provider}<br>Số cổng sạc: ${st.capacity}`);
+          this.layers.evLayer.addLayer(marker);
+        });
+      }
+    } else {
+      if (this.map.hasLayer(this.layers.evLayer)) {
+        this.map.removeLayer(this.layers.evLayer);
+      }
     }
   }
 

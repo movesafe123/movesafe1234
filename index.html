@@ -53,6 +53,8 @@
         <div class="gm-travel-modes">
           <button class="gm-mode-tab active" data-mode="motorbike">🛵 Xe máy</button>
           <button class="gm-mode-tab" data-mode="car">🚗 Ô tô</button>
+          <button class="gm-mode-tab" data-mode="ebike">⚡ Xe máy điện</button>
+          <button class="gm-mode-tab" data-mode="ecar">🚙 Ô tô điện</button>
         </div>
         <button class="gm-btn-icon" id="btn-close-directions" title="Đóng chỉ đường">✕</button>
       </div>
@@ -157,6 +159,18 @@
           </div>
         </div>
 
+        <!-- THANH TRƯỢT DỰ BÁO GIAO THÔNG -->
+        <div class="gm-prediction-slider-container" style="margin-top: 15px; padding: 0 16px;">
+          <div style="font-size: 13px; font-weight: 500; margin-bottom: 8px;">Dự báo giao thông: <span id="prediction-time-label" style="color: var(--gm-blue); font-weight: 700;">Hiện tại</span></div>
+          <input type="range" id="traffic-prediction-slider" min="0" max="3" step="1" value="0" style="width: 100%; cursor: pointer;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--gm-text-sub); margin-top: 4px;">
+            <span>Now</span>
+            <span>+1h</span>
+            <span>+2h</span>
+            <span>+3h</span>
+          </div>
+        </div>
+
         <button class="gm-btn-find-route" id="btn-find-route-submit">
           🚀 Tìm Đường Thông Minh
         </button>
@@ -247,6 +261,10 @@
       <label class="gm-layer-item">
         <span>🌦️ Trạm thời tiết các quận</span>
         <input type="checkbox" id="chk-layer-weather" checked>
+      </label>
+      <label class="gm-layer-item" id="layer-item-ev" style="display: none;">
+        <span>⚡ Trạm sạc xe điện</span>
+        <input type="checkbox" id="chk-layer-ev" checked>
       </label>
       <label class="gm-layer-item">
         <span>🛰️ Chế độ vệ tinh</span>
@@ -456,7 +474,11 @@
   <!-- Leaflet Map JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Client-side Scripts -->
+  <script src="js/supabase-service.js"></script>
   <script src="js/hanoi-wards-streets.js?v=3.1"></script>
   <script src="js/geocoding-service.js?v=3.1"></script>
   <script src="js/weather-service.js?v=3.1"></script>

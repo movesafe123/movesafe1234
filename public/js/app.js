@@ -1116,14 +1116,17 @@ class GoogleMapsApp {
   }
 
   selectLocation(type, item) {
-    const input = document.getElementById(`gm-route-${type}`);
+    const inputId = type === 'destination' ? 'dest' : type;
+    const stateKey = type === 'dest' ? 'destination' : type;
+
+    const input = document.getElementById(`gm-route-${inputId}`);
     if (input) {
       input.value = item.fullAddress || item.title;
-      const clearBtn = document.getElementById(`btn-clear-${type}`);
+      const clearBtn = document.getElementById(`btn-clear-${inputId}`);
       if (clearBtn) clearBtn.style.display = 'flex';
     }
 
-    this.routeLocations[type] = {
+    this.routeLocations[stateKey] = {
       lat: item.lat,
       lng: item.lng,
       title: item.title,
@@ -1131,7 +1134,7 @@ class GoogleMapsApp {
     };
 
     // Cập nhật marker A hoặc B trên bản đồ
-    this.updateRouteMarker(type, item.lat, item.lng, item.title);
+    this.updateRouteMarker(inputId, item.lat, item.lng, item.title);
 
     // Di chuyển góc nhìn bản đồ
     if (this.routeLocations.origin && this.routeLocations.destination) {

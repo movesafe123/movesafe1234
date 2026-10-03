@@ -2274,3 +2274,69 @@ body {
 }
 .gm-btn-dir.to:hover { background: #1557b0; }
 
+
+/* ==========================================================================
+   GIAI ĐOẠN 1: TÙY CHỈNH GIAO DIỆN GLASSMORPHISM & TIME SLIDER
+   ========================================================================== */
+
+/* Hộp tìm kiếm và Bảng chỉ đường kiểu Glassmorphism (Kính mờ) */
+.gm-search-box, .gm-directions-panel {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Thẻ chọn chế độ xe điện (Nổi bật hơn khi active) */
+.gm-mode-tab[data-mode="ebike"].active, .gm-mode-tab[data-mode="ecar"].active {
+  background: linear-gradient(135deg, #e6f4ea, #ceebd6) !important;
+  border-color: #1e8e3e !important;
+  color: #1e8e3e !important;
+  box-shadow: 0 0 8px rgba(30, 142, 62, 0.3) !important;
+}
+
+/* Style cho thanh trượt dự báo giao thông */
+.gm-prediction-slider-container {
+  padding: 10px 16px;
+  background: rgba(240, 244, 248, 0.5);
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 1px solid #e8eaed;
+}
+
+#traffic-prediction-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #d1d5db;
+  border-radius: 5px;
+  outline: none;
+}
+
+#traffic-prediction-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1a73e8;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+#traffic-prediction-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Cập nhật UI 3 Chế độ Tìm Đường cho nổi bật (Neon Border) */
+.gm-avoidance-option.active {
+  box-shadow: 0 0 10px rgba(26, 115, 232, 0.15);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+.gm-avoidance-option.gm-avoid-safe.active { border-color: #1e8e3e; box-shadow: 0 0 12px rgba(30, 142, 62, 0.2); }
+.gm-avoidance-option.gm-avoid-balanced.active { border-color: #f9ab00; box-shadow: 0 0 12px rgba(249, 171, 0, 0.2); }
+.gm-avoidance-option.gm-avoid-fast.active { border-color: #1a73e8; box-shadow: 0 0 12px rgba(26, 115, 232, 0.2); }
+
