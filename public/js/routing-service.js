@@ -214,16 +214,18 @@ class RoutingService {
     let jamPercent = totalPoints > 0 ? Math.round((affectedPoints / totalPoints) * 100) : 0;
     const severeCount = matchedTraffics.filter(t => t.isJam && (t.speedKmh < 12 || t.delaySeconds >= 600)).length;
     const moderateCount = matchedTraffics.filter(t => t.isJam && (!t.speedKmh || (t.speedKmh >= 12 && t.speedKmh < 25))).length;
-    const deepFloodCount = matchedFloods.filter(f => f.depth_cm >= (vehicleType === 'motorbike' ? 20 : 35)).length;
+    const isMotorbikeType = (vehicleType === 'motorbike' || vehicleType === 'emotorbike');
+    const deepFloodCount = matchedFloods.filter(f => f.depth_cm >= (isMotorbikeType ? 20 : 35)).length;
 
     const congestionScore = (severeCount * 50) + (deepFloodCount * 80) + (moderateCount * 20) + (matchedFloods.length * 15) + (jamPercent * 1.5);
 
     let realDurationMin = Math.round(route.durationSeconds / 60);
     matchedTraffics.forEach(t => {
       const delayMin = Math.round((t.delaySeconds || 180) / 60);
-      realDurationMin += Math.min(delayMin, 10);
+      // Gỡ bỏ mức trần 10 phút để thời gian dự báo tăng vọt
+      realDurationMin += Math.min(delayMin, 60); 
     });
-    if (vehicleType === 'motorbike') {
+    if (vehicleType === 'motorbike' || vehicleType === 'emotorbike') {
       realDurationMin = Math.max(3, Math.round(realDurationMin * 0.9));
     }
 

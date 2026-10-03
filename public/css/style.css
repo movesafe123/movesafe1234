@@ -881,6 +881,91 @@ body {
   text-overflow: ellipsis;
 }
 
+/* ==========================================================================
+   Forecast Selector (Dự báo giao thông)
+   ========================================================================== */
+.gm-forecast-selector {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--gm-divider);
+  background: var(--gm-surface);
+}
+
+.gm-forecast-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.gm-forecast-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gm-text-main);
+}
+
+.gm-forecast-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gm-blue);
+}
+
+.gm-forecast-slider-container {
+  padding: 0 10px;
+}
+
+.gm-forecast-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--gm-divider);
+  border-radius: 2px;
+  outline: none;
+  margin: 10px 0;
+  position: relative;
+}
+
+.gm-forecast-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gm-blue);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 2px solid #fff;
+  transition: transform 0.1s;
+}
+
+.gm-forecast-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.gm-forecast-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gm-blue);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 2px solid #fff;
+  transition: transform 0.1s;
+}
+
+.gm-forecast-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.gm-forecast-marks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--gm-text-muted);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
 /* Route Summary Bar */
 .gm-route-summary {
   padding: 10px 16px;
@@ -2274,3 +2359,9 @@ body {
 }
 .gm-btn-dir.to:hover { background: #1557b0; }
 
+path.gm-traffic-cloud {
+  filter: blur(15px) !important;
+  pointer-events: none !important;
+  mix-blend-mode: multiply !important;
+  transition: all 0.5s ease;
+}

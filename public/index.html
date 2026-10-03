@@ -53,6 +53,8 @@
         <div class="gm-travel-modes">
           <button class="gm-mode-tab active" data-mode="motorbike">🛵 Xe máy</button>
           <button class="gm-mode-tab" data-mode="car">🚗 Ô tô</button>
+          <button class="gm-mode-tab" data-mode="emotorbike">⚡ Xe máy điện</button>
+          <button class="gm-mode-tab" data-mode="ecar">🚙 Ô tô điện</button>
         </div>
         <button class="gm-btn-icon" id="btn-close-directions" title="Đóng chỉ đường">✕</button>
       </div>
@@ -154,6 +156,23 @@
                 </div>
               </div>
             </label>
+          </div>
+        </div>
+
+        <!-- DỰ BÁO GIAO THÔNG (Traffic Forecast) -->
+        <div class="gm-forecast-selector" id="gm-forecast-selector">
+          <div class="gm-forecast-header">
+            <span class="gm-forecast-label">Dự báo giao thông:</span>
+            <span class="gm-forecast-value" id="gm-forecast-value-text">Hiện tại</span>
+          </div>
+          <div class="gm-forecast-slider-container">
+            <input type="range" id="gm-forecast-slider" class="gm-forecast-slider" min="0" max="3" value="0" step="1">
+            <div class="gm-forecast-marks">
+              <span>Now</span>
+              <span>+1h</span>
+              <span>+2h</span>
+              <span>+3h</span>
+            </div>
           </div>
         </div>
 

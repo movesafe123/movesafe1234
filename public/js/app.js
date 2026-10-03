@@ -19,6 +19,7 @@ class GoogleMapsApp {
     };
     this.currentVehicle = 'motorbike';
     this.currentAvoidLevel = 1; // Mức độ tránh né mặc định: An toàn tuyệt đối
+    this.currentForecastTime = 0; // 0 = Hiện tại, 1 = +1h, 2 = +2h, 3 = +3h
     this.isDirectionsOpen = false;
     this.activeFilter = 'all';
 
@@ -453,6 +454,34 @@ class GoogleMapsApp {
         }
       });
     });
+
+    // 5c. Thanh trượt dự báo giao thông
+    const forecastSlider = document.getElementById('gm-forecast-slider');
+    const forecastValueText = document.getElementById('gm-forecast-value-text');
+    if (forecastSlider && forecastValueText) {
+      forecastSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        this.currentForecastTime = val;
+        
+        if (val === 0) {
+          forecastValueText.textContent = 'Hiện tại';
+          forecastValueText.style.color = 'var(--gm-text-main)';
+        } else {
+          forecastValueText.textContent = `+${val} Giờ tới`;
+          forecastValueText.style.color = 'var(--gm-blue)';
+        }
+      });
+      forecastSlider.addEventListener('change', (e) => {
+        const val = parseInt(e.target.value);
+        if (val > 0) {
+          this.showToast(`🤖 AI: Áp dụng dự báo kẹt xe cho +${val}h tới để tìm đường.`, 'info');
+        }
+        // Tự động tính lại đường nếu panel đang mở
+        if (this.isDirectionsOpen) {
+          this.calculateSmartRoute();
+        }
+      });
+    }
 
     // 6. Cụm nút điều khiển góc dưới bên phải
     document.getElementById('btn-gm-zoom-in')?.addEventListener('click', () => window.mapEngine.zoomIn());
@@ -1552,11 +1581,16 @@ class GoogleMapsApp {
     // Hiển thị loading
     if (resultsContainer) {
       const levelConfig = window.routingService.avoidanceLevels[this.currentAvoidLevel];
+      const forecastText = this.currentForecastTime > 0 
+        ? `<div style="margin-top: 6px; color: #1a73e8; font-weight: 500; font-size: 12px;">⏳ AI đang mô phỏng mật độ giao thông +${this.currentForecastTime}h tới...</div>` 
+        : '';
+      
       resultsContainer.innerHTML = `
-        <div style="padding: 16px; text-align: center;">
-          <div style="font-size: 24px; margin-bottom: 8px; animation: pulse-ring 1.6s infinite;">🔍</div>
-          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách né ngập...</div>
-          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
+        <div style="padding: 20px 16px; text-align: center; animation: fadeIn 0.3s ease;">
+          <div style="font-size: 24px; margin-bottom: 8px;">🔍</div>
+          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách...</div>
+          ${forecastText}
+          <div style="font-size: 11px; color: #70757a; margin-top: 6px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
         </div>
       `;
     }
@@ -1637,7 +1671,34 @@ class GoogleMapsApp {
     this.updateRouteMarker('dest', dest.lat, dest.lng, dest.title || destText);
 
     const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
-    const cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+    let cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+
+    // MÔ PHỎNG DỰ BÁO: Tăng mức độ kẹt xe dựa trên mốc thời gian dự báo
+    if (this.currentForecastTime > 0) {
+      cityTraffic = cityTraffic.map(t => {
+        if (t.isJam) {
+          // 1h = +5p, 2h = +12p, 3h = +25p kẹt xe thêm
+          const penaltyMultiplier = this.currentForecastTime === 1 ? 300 : (this.currentForecastTime === 2 ? 720 : 1500);
+          return {
+            ...t,
+            delaySeconds: (t.delaySeconds || 120) + penaltyMultiplier,
+            speedKmh: Math.max(2, (t.speedKmh || 15) - (this.currentForecastTime * 5))
+          };
+        }
+        return t;
+      });
+    }
+
+    // Hiển thị kẹt xe dự báo trực quan lên bản đồ
+    if (window.mapEngine && typeof window.mapEngine.renderTrafficIncidents === 'function') {
+      window.mapEngine.renderTrafficIncidents(cityTraffic);
+    }
+
+    // Thủ thuật UX: Tạo delay nhân tạo 400ms để người dùng kịp nhìn thấy hiệu ứng loading của AI
+    // Nếu không có delay, API trả về quá nhanh khiến màn hình bị giật nháy
+    if (this.currentForecastTime > 0) {
+      await new Promise(r => setTimeout(r, 400));
+    }
 
     try {
       const result = await window.routingService.calculateMultiRoutes({
@@ -1705,8 +1766,12 @@ class GoogleMapsApp {
     const dayName = dayNames[vnDay];
     const dateStr = `${vnNow.getDate()}/${vnNow.getMonth()+1}/${vnNow.getFullYear()}`;
 
-    const vehicle = this.currentVehicle; // 'motorbike' hoặc 'car'
-    const vehicleName = vehicle === 'motorbike' ? 'Xe máy' : 'Ô tô';
+    const vehicle = this.currentVehicle; // 'motorbike', 'car', 'emotorbike', 'ecar'
+    let vehicleName = 'Phương tiện';
+    if (vehicle === 'motorbike') vehicleName = 'Xe máy';
+    if (vehicle === 'car') vehicleName = 'Ô tô';
+    if (vehicle === 'emotorbike') vehicleName = 'Xe máy điện';
+    if (vehicle === 'ecar') vehicleName = 'Ô tô điện';
     const routes = result.routes || [];
     const recommended = routes.find(r => r.isRecommended) || routes[0];
     if (!recommended) { box.style.display = 'none'; return; }
@@ -1737,7 +1802,9 @@ class GoogleMapsApp {
     const isStormRain = maxRain >= 25;
     const hasRouteFlood = routeFloods.length > 0;
     const hasRouteJam = routeTraffics.filter(t => t.isJam).length > 0;
-    const hasDeepFlood = routeFloods.some(f => f.depth_cm >= (vehicle === 'motorbike' ? 20 : 35));
+    const isMotorbikeType = (vehicle === 'motorbike' || vehicle === 'emotorbike');
+    const isElectric = (vehicle === 'emotorbike' || vehicle === 'ecar');
+    const hasDeepFlood = routeFloods.some(f => f.depth_cm >= (isMotorbikeType ? 20 : 35));
     const distKm = parseFloat(recommended.distanceKm) || 5;
     const isLongTrip = distKm > 12;
 
@@ -1745,20 +1812,38 @@ class GoogleMapsApp {
     let mainAdvice = '';
     const details = [];
 
+    // 0. Nếu có áp dụng Dự báo giao thông
+    if (this.currentForecastTime === 1) {
+      details.push({ 
+        icon: '🔮', 
+        text: `<strong>Dự báo +1h tới:</strong> Mật độ giao thông bắt đầu có dấu hiệu đông dần lên tại các chốt giao thông chính.` 
+      });
+    } else if (this.currentForecastTime === 2) {
+      details.push({ 
+        icon: '🔮', 
+        text: `<strong>Dự báo +2h tới (Ùn ứ nặng):</strong> AI cảnh báo lưu lượng xe sẽ tăng đột biến, tốc độ di chuyển cực chậm.` 
+      });
+    } else if (this.currentForecastTime === 3) {
+      details.push({ 
+        icon: '🔮', 
+        text: `<strong>Dự báo +3h tới (Đỉnh điểm kẹt xe):</strong> Cảnh báo đỏ! Toàn bộ các trục đường trung tâm dự báo kẹt cứng cục bộ. Nên cân nhắc dời lịch trình nếu có thể.` 
+      });
+    }
+
     // 1. Thời điểm trong ngày
     if (isPeakMorning) {
       mainAdvice = `⏰ Đang là giờ cao điểm sáng (${timeStr}) — Lưu lượng xe rất đông trên các trục chính.`;
-      if (vehicle === 'motorbike') {
-        details.push({ icon: '🛵', text: `Xe máy nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
+      if (isMotorbikeType) {
+        details.push({ icon: '🛵', text: `${vehicleName} nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `Ô tô nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
+        details.push({ icon: '🚗', text: `${vehicleName} nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
       }
     } else if (isPeakEvening) {
       mainAdvice = `⏰ Đang là giờ cao điểm chiều (${timeStr}) — Mật độ phương tiện tan tầm rất lớn.`;
-      if (vehicle === 'motorbike') {
-        details.push({ icon: '🛵', text: `Xe máy nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
+      if (isMotorbikeType) {
+        details.push({ icon: '🛵', text: `${vehicleName} nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `Ô tô nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
+        details.push({ icon: '🚗', text: `${vehicleName} nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
       }
     } else if (isLateNight) {
       mainAdvice = `🌙 Ban đêm (${timeStr}) — Đường phố rất vắng, di chuyển thuận lợi.`;
@@ -1780,42 +1865,42 @@ class GoogleMapsApp {
 
     // 2. Thời tiết & Mưa ngập
     if (isStormRain) {
-      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${vehicle === 'motorbike' ? 'Xe máy cực kỳ dễ chết máy bugi!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
+      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${isMotorbikeType ? 'Xe 2 bánh cực kỳ dễ chết máy!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
     } else if (isHeavyRain) {
-      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${vehicle === 'motorbike' ? 'Xe máy nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
+      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${isMotorbikeType ? 'Xe 2 bánh nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
     } else if (isRaining) {
       details.push({ icon: '🌦️', text: `Mưa nhẹ rải rác (${maxRain} mm/h). Đường hơi trơn, bật đèn và giảm tốc độ.` });
     }
     if (avgTemp >= 37) {
-      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${vehicle === 'car' ? 'Kiểm tra nước làm mát ô tô.' : ''}` });
+      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${(!isMotorbikeType && !isElectric) ? 'Kiểm tra nước làm mát ô tô.' : ''} ${isElectric ? 'Lưu ý nhiệt độ pin xe điện có thể tăng nhanh khi trời nắng nóng.' : ''}` });
     }
 
     // 3. Ngập trên tuyến
     if (hasDeepFlood) {
       const worstFlood = routeFloods.sort((a,b) => b.depth_cm - a.depth_cm)[0];
-      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${vehicle === 'motorbike' ? 'Xe máy KHÔNG THỂ QUA — hệ thống đã tự động bẻ hướng sang đường cao ráo!' : 'Ô tô gầm thấp nguy cơ thủy kích, chọn Tuyến An toàn!'}` });
+      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${isElectric ? 'TUYỆT ĐỐI TRÁNH ĐỂ BẢO VỆ PIN XE ĐIỆN!' : (isMotorbikeType ? 'Xe 2 bánh KHÔNG THỂ QUA!' : 'Ô tô gầm thấp nguy cơ thủy kích!')} Hệ thống đã ưu tiên Tuyến An toàn.` });
     } else if (hasRouteFlood) {
-      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. Giảm tốc khi qua vùng nước đọng.` });
+      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. ${isElectric ? 'Cẩn thận nước văng vào gầm xe bảo vệ pin.' : 'Giảm tốc khi qua vùng nước đọng.'}` });
     }
 
     // 4. Kẹt xe trên tuyến
     if (hasRouteJam) {
       const worstJam = routeTraffics.filter(t => t.isJam).sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0))[0];
       const delayMin = worstJam ? Math.round((worstJam.delaySeconds || 300) / 60) : 5;
-      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${vehicle === 'motorbike' ? 'Xe máy có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
+      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${isMotorbikeType ? 'Xe 2 bánh có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
     }
 
     // 5. Phương tiện cụ thể
-    if (vehicle === 'motorbike') {
+    if (isMotorbikeType) {
       if (isLongTrip) {
-        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho xe máy. Nếu chở đồ cồng kềnh / nặng, ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️).` });
+        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho ${vehicleName}. Ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️). ${isElectric ? 'Chú ý dung lượng pin khả dụng.' : ''}` });
       }
       if (isRaining || isHeavyRain) {
         details.push({ icon: '🧥', text: `Chuẩn bị áo mưa bộ. Tránh đỗ xe ở tầng hầm khu vực trũng.` });
       }
     } else {
       if (isLongTrip) {
-        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. Ô tô nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu.` });
+        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. ${vehicleName} nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu. ${isElectric ? 'Cân nhắc trạm sạc trên lộ trình nếu pin thấp.' : ''}` });
       }
       if (isPeakHour) {
         details.push({ icon: '🅿️', text: `Giờ cao điểm — Cân nhắc bãi đỗ xe tại điểm đến trước khi xuất phát.` });

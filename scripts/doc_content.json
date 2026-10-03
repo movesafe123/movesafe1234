@@ -1,0 +1,21 @@
+{
+  "sectionTitle": "4.2. Hình ảnh minh họa giao diện và tính năng hệ thống thực tế",
+  "items": [
+    {
+      "imagePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\web du thi\\public\\screenshots\\hinh1_tongquan_bando.png",
+      "caption": "Hình 1: Giao diện tổng quan hệ thống MoveSafe VN - Giám sát thời tiết, cảnh báo rốn ngập HSDC/UDi và lưu lượng giao thông TomTom thời gian thực tại Hà Nội."
+    },
+    {
+      "imagePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\web du thi\\public\\screenshots\\hinh2_dieu_huong_ai.png",
+      "caption": "Hình 2: Phân hệ Dẫn đường thông minh (Smart Routing) - Đề xuất tuyến đường tối ưu né ngập đa phương tiện kết hợp thanh trượt dự báo giao thông AI (+1h tới) và gợi ý phân tích tự động."
+    },
+    {
+      "imagePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\web du thi\\public\\screenshots\\hinh3_tro_ly_ai.png",
+      "caption": "Hình 3: Trợ lý giao thông AI Copilot - Tư vấn trực tiếp tình trạng ngập nước, cảnh báo ùn tắc và hướng dẫn lộ trình di chuyển an toàn cho người dân."
+    },
+    {
+      "imagePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\web du thi\\public\\screenshots\\hinh4_bao_cao_cong_dong.png",
+      "caption": "Hình 4: Phân hệ Báo cáo cộng đồng (Crowdsourcing) - Cho phép người tham gia giao thông trực tiếp cập nhật điểm ngập sâu và sự cố đường bộ theo thời gian thực."
+    }
+  ]
+}

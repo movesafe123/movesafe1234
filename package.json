@@ -26,5 +26,8 @@
     "cors": "^2.8.5",
     "docx": "^9.7.2",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.12.0"
   }
 }

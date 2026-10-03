@@ -482,6 +482,9 @@ class MapEngine {
 
       marker.bindPopup(popupHtml);
       this.layers.trafficMarkers.addLayer(marker);
+
+      marker.bindPopup(popupHtml);
+      this.layers.trafficMarkers.addLayer(marker);
     });
 
     this.handleZoomLevel();
@@ -511,11 +514,55 @@ class MapEngine {
         opacity: 0.95
       }).addTo(this.map);
 
-      this.layers.routeSafe = L.polyline(recommendedRoute.polyline, {
-        color: '#1e8e3e',
-        weight: 6,
-        opacity: 1
-      }).addTo(this.map);
+      this.layers.routeSafe = L.featureGroup().addTo(this.map);
+      
+      const poly = recommendedRoute.polyline;
+      const traffics = recommendedRoute.matchedTraffics || [];
+      const sortedTraffics = [...traffics].sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0));
+
+      let currentSegmentColor = null;
+      let currentSegmentPoints = [];
+      
+      const flushSegment = () => {
+          if (currentSegmentPoints.length > 1) {
+              L.polyline(currentSegmentPoints, {
+                  color: currentSegmentColor,
+                  weight: 6,
+                  opacity: 1
+              }).addTo(this.layers.routeSafe);
+          }
+      };
+
+      for(let i = 0; i < poly.length; i++) {
+         const p = poly[i];
+         let pointColor = '#1e8e3e'; // Mặc định xanh lá
+         
+         for (const t of sortedTraffics) {
+             const dist = this.map.distance(p, [t.lat, t.lng]);
+             const delayMins = Math.round((t.delaySeconds || 0) / 60);
+             // Lan truyền độ dài kẹt xe trên tuyến đường dựa vào số phút trễ
+             const radius = Math.min(1500, 100 + (delayMins * 30)); 
+             
+             if (dist < radius) {
+                 pointColor = delayMins > 20 ? '#8b0000' : (delayMins > 5 ? '#d93025' : '#f29900');
+                 break;
+             }
+         }
+         
+         if (pointColor !== currentSegmentColor) {
+             if (currentSegmentPoints.length > 0) {
+                 currentSegmentPoints.push(p); // Nối mượt nét vẽ
+                 flushSegment();
+                 currentSegmentPoints = [p];
+             } else {
+                 currentSegmentPoints = [p];
+             }
+             currentSegmentColor = pointColor;
+         } else {
+             currentSegmentPoints.push(p);
+         }
+      }
+      flushSegment();
 
       this.map.fitBounds(this.layers.routeSafe.getBounds(), { padding: [60, 60] });
     }

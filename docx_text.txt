@@ -1,0 +1,357 @@
+﻿TRƯỜNG ĐẠI HỌC CÔNG NGHỆ ĐÔNG Á 
+KHOA CÔNG NGHỆ THÔNG TIN 
+  
+  
+ 
+CUỘC THI 
+CENTRIC DATA AI  2026 
+ 
+Chủ
+ 
+đề
+: 
+...
+Tên
+ 
+đề
+ 
+tài
+: 
+Hệ
+ 
+thống
+ 
+di
+ chuyển an 
+toàn ,
+ 
+thông
+ 
+minh
+ 
+ 
+<w:tab w:val="center" w:pos="2944"/><w:tab w:val="center" w:pos="5475"/></w:tabs><w:spacing w:after="250" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="0" w:firstLine="0"/><w:jc w:val="left"/><w:rPr><w:szCs w:val="26"/><w:lang w:val="vi-VN"/></w:rPr></w:pPr><w:r w:rsidRPr="009038BE"><w:rPr><w:rFonts w:ascii="Calibri" w:eastAsia="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:szCs w:val="26"/></w:rPr><w:tab/></w:r><w:r w:rsidRPr="009038BE"><w:rPr><w:b/><w:szCs w:val="26"/></w:rPr><w:t xml:space="preserve">Sinh 
+viên
+ 
+thực
+ 
+hiện
+:  
+</w:r><w:proofErr w:type="spellStart"/><w:r w:rsidR="009038BE" w:rsidRPr="009038BE"><w:rPr><w:szCs w:val="26"/></w:rPr><w:t>Nguyễn
+ Hồng Phúc
+<w:tab w:val="center" w:pos="4907"/></w:tabs><w:spacing w:after="250" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="0" w:firstLine="0"/><w:jc w:val="left"/><w:rPr><w:szCs w:val="26"/><w:lang w:val="vi-VN"/></w:rPr></w:pPr><w:r w:rsidRPr="009038BE"><w:rPr><w:szCs w:val="26"/></w:rPr><w:t xml:space="preserve"> 
+<w:t>Hà
+ mạnh tiến
+ 
+ 
+ 
+BẮC NINH - 2026 
+A. THÔNG TIN ĐỘI THI 
+Giảng
+ 
+viên
+ 
+hướng
+ 
+dẫn
+: 
+ThS
+. Lê 
+Thùy
+ Dung 
+Tên
+ 
+cá
+ 
+nhân
+/
+đội
+ 
+thi
+:
+ 
+Phạm
+ Hoàng 
+Hiệp
+ 
+- 
+<w:t xml:space="preserve">Thành 
+viên
+:
+ 01 
+<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:w="10640" w:type="dxa"/><w:tblInd w:w="-571" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="121" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="69" w:type="dxa"/></w:tblCellMar><w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/></w:tblPr><w:tblGrid><w:gridCol w:w="580"/><w:gridCol w:w="2260"/><w:gridCol w:w="1840"/><w:gridCol w:w="2420"/><w:gridCol w:w="1700"/><w:gridCol w:w="1840"/></w:tblGrid><w:tr w:rsidR="00E34508" w14:paraId="01E1FA5C" w14:textId="77777777"><w:trPr><w:trHeight w:val="860"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="580" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="7E0155BD" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="78" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:lastRenderedPageBreak/><w:t>T
+T 
+<w:tcPr><w:tcW w:w="2260" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="7179F368" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="65" w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:b/></w:rPr><w:t>Họ
+ 
+và
+ 
+tên
+ 
+<w:tcPr><w:tcW w:w="1840" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="6E7BE333" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="75" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:b/></w:rPr><w:t>Lớp
+ 
+niên
+ 
+chế
+ 
+<w:tcPr><w:tcW w:w="2420" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="21C816A3" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="55" w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">Email 
+<w:tcPr><w:tcW w:w="1700" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="14192F7A" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:b/></w:rPr><w:t>Số
+ 
+điện
+ 
+thoại
+ 
+<w:tcPr><w:tcW w:w="1840" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="253F2101" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="65" w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:b/></w:rPr><w:t>Nhiệm
+ 
+vụ
+ 
+<w:trPr><w:trHeight w:val="860"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="580" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="554E4A7A" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="0" w:right="60" w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r><w:t xml:space="preserve">1 
+<w:tcPr><w:tcW w:w="2260" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="378C06DC" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="42" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:t>Phạm
+ Hoàng 
+Hiệp
+ 
+<w:tcPr><w:tcW w:w="1840" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="11EFFCEB" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="27" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r><w:t xml:space="preserve">DCCNTT.14.3 
+<w:tcPr><w:tcW w:w="2420" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="3EC6726D" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="11" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r><w:t>20231206@eaut.edu
+.
+vn
+ 
+<w:tcPr><w:tcW w:w="1700" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="2412AAB5" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="72" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r><w:t xml:space="preserve">0392931333 
+<w:tcPr><w:tcW w:w="1840" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders><w:vAlign w:val="center"/></w:tcPr><w:p w14:paraId="7B2B99DF" w14:textId="77777777" w:rsidR="00E34508" w:rsidRDefault="00000000"><w:pPr><w:spacing w:after="0" w:line="259" w:lineRule="auto"/><w:ind w:left="76" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:t>Trưởng
+ 
+nhóm
+ 
+ 
+B. LỜI CAM ĐOAN 
+<w:tab w:val="center" w:pos="2070"/></w:tabs><w:spacing w:after="164"/><w:ind w:left="-15" w:right="0" w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r><w:t xml:space="preserve"> 
+</w:r><w:proofErr w:type="spellStart"/><w:r><w:t>Chúng
+ 
+tôi
+ cam 
+đoan
+ 
+rằng
+: 
+Dự
+ 
+án
+ 
+này
+ 
+là
+ 
+sản
+ 
+phẩm
+ 
+tự
+ 
+nghiên
+ 
+cứu
+ 
+và
+ 
+phát
+ 
+triển
+ 
+của
+ 
+nhóm
+ 
+Không
+ 
+sao
+ 
+chép
+ 
+từ
+ 
+các
+ 
+nguồn
+ 
+khác
+ 
+mà
+ 
+không
+ 
+trích
+ 
+dẫn
+ 
+Không
+ vi 
+phạm
+ 
+bản
+ 
+quyền
+ 
+về
+ 
+dữ
+ 
+liệu
+, code, 
+và
+ 
+tài
+ 
+nguyên
+ 
+sử
+ 
+dụng
+ 
+Tuân
+ 
+thủ
+ 
+các
+ 
+quy
+ 
+định
+ 
+về
+ 
+đạo
+ 
+đức
+ 
+nghiên
+ 
+cứu
+ 
+và
+ 
+xử
+ 
+lý
+ 
+dữ
+ 
+liệu
+ 
+Chịu
+ 
+hoàn
+ 
+toàn
+ 
+trách
+ 
+nhiệm
+ 
+về
+ 
+nội
+ dung 
+thuyết
+ 
+minh
+ 
+này
+ 
+ 
+C. NỘI DUNG THUYẾT MINH 
+gian thực (Real-time). Tuy nhiên, đối với những người có kế hoạch di chuyển trong tương lai (ví dụ: 1 đến 3 tiếng sau), họ thiếu đi một công cụ để 
+dự báo trước tình trạng kẹt xe và ngập lụt
+. Điều này dẫn đến việc người dân thường xuyên rơi vào thế bị động, đi vào các tuyến đường đang ngập nước hoặc ùn tắc nghiêm trọng.
+Bên cạnh đó, với sự phát triển bùng nổ của xe điện (EV), việc thiếu vắng một bản đồ tích hợp chuyên dụng để tra cứu nhanh các trạm sạc, tủ thay pin cũng là một "nỗi đau" (pain-point) lớn của người dùng xe xanh.
+1.2. Ý tưởng giải pháp
+Ý tưởng cốt lõi:
+MoveSafe VN là một nền tảng Web Bản đồ (Smart Map) kết hợp Trí tuệ Nhân tạo (AI). Hệ thống không chỉ cung cấp tính năng tìm đường cơ bản mà còn sở hữu các năng lực vượt trội:
+AI Dự báo tương lai:
+ Sử dụng mô hình học máy (XGBoost) kết hợp với dữ liệu thời tiết và lịch sử giao thông để dự báo mức độ kẹt xe và rủi ro ngập lụt trong 1h, 2h, 3h tới.
+Tìm đường thông minh (Smart Routing):
+ Khi người dùng chọn thời gian khởi hành trong tương lai, thuật toán tìm đường sẽ tự động 
+né các rốn ngập
+ và 
+tránh các điểm kẹt xe
+ do AI vừa dự báo.
+Mạng lưới Trạm sạc (EV Stations):
+ Tích hợp lớp dữ liệu (Layer) hiển thị vị trí các trạm sạc ô tô/xe máy điện (VinFast, Selex, EVOne...) ngay trên bản đồ.
+Đối tượng hướng đến:
+Người dân tại các đô thị lớn có nhu cầu di chuyển hàng ngày.
+Người sử dụng phương tiện chạy điện (EV) cần tìm trạm sạc.
+Các tài xế công nghệ, đơn vị vận tải cần lộ trình tối ưu để tiết kiệm nhiên liệu và thời gian.
+Tầm quan trọng và tác động:
+Dự án giúp người dân chủ động né tránh kẹt xe, giảm thiểu hư hỏng phương tiện do ngập nước. Về vĩ mô, MoveSafe góp phần giảm lượng khí thải carbon do các phương tiện nhích từng chút một trong đám đông kẹt xe, thúc đẩy lối sống xanh (Green Lifestyle).
+2. Dữ liệu
+Dự án được xây dựng theo hướng 
+Data-Centric AI
+, trong đó chất lượng dữ liệu được đặt lên hàng đầu để mô hình có thể dự đoán chính xác.
+2.1. Nguồn dữ liệu
+Hệ thống sử dụng các nhóm dữ liệu cốt lõi sau:
+Dữ liệu Lịch sử Giao thông (Traffic History):
+ Tập dữ liệu gồm các đặc trưng như: Mã đoạn đường (Segment ID), Thời gian trong ngày (Hour), Điều kiện thời tiết (Sunny, Rain, Flood) và Output là Mức độ kẹt xe (Level 0-5).
+Dữ liệu Rốn ngập (Flood Prone Areas):
+ Tọa độ (Lat, Lng) của các điểm thường xuyên ngập lụt tại Hà Nội (VD: Thái Hà, Nguyễn Khuyến, Vũ Trọng Phụng) kèm theo hệ số rủi ro ngập.
+Dữ liệu Trạm sạc (EV Stations):
+ Thông tin vị trí, nhà cung cấp và sức chứa của các trạm sạc thực tế.
+2.2. Xử lý dữ liệu
+Dữ liệu được làm sạch và chuẩn hóa trước khi đưa vào mô hình học máy.
+Thời gian (Timestamp) được bóc tách thành các biến phân loại (Categorical variables) như 
+hour_of_day
+, 
+is_rush_hour
+.
+Điều kiện thời tiết được mã hóa (Encoding) thành các giá trị số học phục vụ cho quá trình huấn luyện của thuật toán XGBoost.
+3. Phương pháp và Công nghệ
+3.1. Phương pháp phân tích và Mô hình AI
+Dự án ứng dụng mô hình học máy 
+XGBoost (eXtreme Gradient Boosting)
+ cho bài toán Hồi quy/Phân loại mức độ kẹt xe.
+Lý do chọn XGBoost:
+ Đây là thuật toán mạnh mẽ với dữ liệu dạng bảng (Tabular Data), có tốc độ huấn luyện siêu tốc và độ chính xác cao, rất phù hợp để triển khai trên các máy chủ có tài nguyên giới hạn.
+Cơ chế dự báo ngập lụt:
+ Dựa trên API Thời tiết theo thời gian thực. Bất cứ khi nào hệ thống nhận diện có mưa lớn, AI sẽ tính toán xác suất ngập tại các tọa độ rốn ngập kinh niên và nhả kết quả độ sâu ngập (cm) dự kiến.
+3.2. Công nghệ triển khai
+Hệ thống được thiết kế theo kiến trúc Microservices linh hoạt:
+Frontend (Giao diện người dùng):
+ HTML5, Vanilla JavaScript, CSS3. Sử dụng thư viện 
+Leaflet.js
+ để render bản đồ chuẩn xác và API của 
+TomTom
+ để vẽ lộ trình (Routing). Giao diện hỗ trợ chuẩn UI/UX hiện đại với Dark/Light Mode.
+Backend AI (Máy chủ tính toán):
+ Viết bằng 
+Python
+ kết hợp framework 
+FastAPI
+. Chịu trách nhiệm chạy mô hình XGBoost và cung cấp RESTful API.
+Cơ sở dữ liệu (Database):
+ 
+PostgreSQL
+ tích hợp tiện ích mở rộng 
+PostGIS
+ (triển khai trên nền tảng đám mây Supabase), cho phép lưu trữ và truy vấn dữ liệu không gian (tọa độ GPS) siêu tốc.
+Hosting:
+ Frontend được hosting tĩnh trên GitHub Pages, Backend AI được triển khai trên Render.com.
+4. Kết quả và Đánh giá
+4.1. Kết quả đạt được
+Xây dựng thành công Prototype ứng dụng Web có tính tương tác cao. Bản đồ tải mượt mà với các hiệu ứng vi mô (micro-animations).
+Mô hình AI XGBoost hoạt động ổn định trên môi trường Cloud, khả năng phản hồi truy vấn dự báo (1h-3h tới) chỉ dưới 1 giây.
+Luồng dữ liệu khép kín: Frontend gọi lệnh -&gt; Backend AI phân tích và ghi vào Supabase -&gt; Frontend tự động kéo dữ liệu từ Supabase và vẽ cảnh báo (Marker) lên bản đồ.
+Chức năng tìm đường (Smart Routing) đã hoạt động thực tế, sinh ra các cảnh báo bằng Toast notification khi lộ trình đi qua vùng rủi ro.
+4.2. Ưu điểm và Hạn chế
+Ưu điểm:
+ Hệ thống nhẹ, tốc độ cao, AI được tách bạch rõ ràng giúp dễ dàng nâng cấp mô hình độc lập mà không ảnh hưởng tới Giao diện.
+Hạn chế:
+ Hiện tại mô hình đang chạy chủ yếu trên dữ liệu giả lập (Synthetic Data) do nhóm tự tổng hợp để chứng minh tính khả thi (Proof of Concept). Trong thực tế cần nguồn dữ liệu khổng lồ từ Sở Giao thông Vận tải.
+5. Kế hoạch triển khai (Hướng phát triển)
+Giai đoạn 1 (Đã hoàn thành):
+ Xây dựng MVP (Minimum Viable Product), tích hợp thành công Bản đồ, Supabase, và AI Server.
+Giai đoạn 2 (Hoàn thiện đi thi):
+ Thu thập thêm dữ liệu thật từ các trạm quan trắc thời tiết, cải thiện độ mượt của luồng tìm đường. Chuẩn bị slide thuyết trình.
+Giai đoạn 3 (Thương mại hóa / Tương lai):
+ Ký kết hợp tác chia sẻ dữ liệu với các hãng xe công nghệ (Grab, Be) để có nguồn dữ liệu tốc độ di chuyển thật của tài xế, từ đó Re-train mô hình AI đạt độ chính xác &gt;95%.
+D. PHỤ LỤC
+1. Kho lưu trữ mã nguồn (GitHub):
+[Link GitHub của bạn: movesafe123/movesafe1234]
+2. Demo trực tuyến:
+Link Frontend: [Điền link Github Pages của bạn]
+Link API AI: 
+https://movesafe1234.onrender.com
