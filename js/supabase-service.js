@@ -49,11 +49,30 @@ class SupabaseService {
   async getTrafficPrediction(offsetHours) {
     if (offsetHours === 0) return null; // Dùng live data
     
-    console.log(`Lấy dữ liệu dự báo cho +${offsetHours}h tới...`);
-    // Giai đoạn hiện tại: Mock Data
+    console.log(`Lấy dữ liệu dự báo từ AI (Cloud) cho +${offsetHours}h tới...`);
+    
+    // Đọc từ bảng traffic_predictions (nơi Server Python lưu kết quả)
+    if (this.supabase && this.SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE') {
+      const { data, error } = await this.supabase
+        .from('traffic_predictions')
+        .select('*')
+        .eq('target_hour', offsetHours);
+        
+      if (!error && data && data.length > 0) {
+        // AI chỉ trả về mức độ (level), ta gán tọa độ ngẫu nhiên hoặc theo segment_id
+        // (Trong phiên bản thật, segment_id sẽ mapping với 1 mảng tọa độ)
+        return data.map(pred => ({
+          lat: 21.033 + (Math.random() - 0.5) * 0.05,
+          lng: 105.800 + (Math.random() - 0.5) * 0.05,
+          level: pred.predicted_level,
+          description: `AI Dự báo kẹt xe mức ${pred.predicted_level}/5 sau ${offsetHours}h (Độ tin cậy: ${pred.confidence * 100}%)`
+        }));
+      }
+    }
+
+    // Nếu AI chưa chạy hoặc lỗi mạng, trả về Mock Data dự phòng:
     return new Promise(resolve => {
       setTimeout(() => {
-        // Giả lập 1 số điểm kẹt xe
         const mockPredictions = [
           { lat: 21.033, lng: 105.800, level: 4, description: `Dự báo kẹt xe mức 4 tại nút giao Cầu Giấy sau ${offsetHours}h` },
           { lat: 21.008, lng: 105.820, level: 3, description: `Dự báo ùn ứ mức 3 ngã tư Tây Sơn sau ${offsetHours}h` }
