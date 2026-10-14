@@ -7,7 +7,7 @@ class CrowdsourceService {
   constructor() {
     this.channel = new BroadcastChannel('movesafe_realtime_channel');
     this.channel.onmessage = (event) => {
-      if (event.data && event.data.type === 'NEW_REPORT') {
+      if (event.data && event.data.type === 'NEW_REPORT' && event.data.report) {
         console.log('[Realtime Sync] Nhận báo cáo mới từ tab khác:', event.data.report);
         this.handleIncomingReport(event.data.report);
       }
@@ -33,20 +33,29 @@ class CrowdsourceService {
   }
 
   handleIncomingReport(report) {
+    if (!report || !report.id) return;
     this.playAlertTone();
-    if (window.mapEngine && window.appState) {
+
+    if (window.appState && window.appState.liveData) {
+      // Chống thêm trùng ID báo cáo
+      const existingFlood = window.appState.liveData.floodPoints.some(f => f.id === report.id);
+      const existingTraffic = window.appState.liveData.trafficIncidents.some(t => t.id === report.id);
+      if (existingFlood || existingTraffic) return;
+
       if (report.type === 'flood') {
         window.appState.liveData.floodPoints.unshift(report);
-        window.mapEngine.renderFloodPoints(window.appState.liveData.floodPoints);
       } else {
         window.appState.liveData.trafficIncidents.unshift(report);
-        window.mapEngine.renderTrafficIncidents(window.appState.liveData.trafficIncidents);
       }
-      window.appState.updateStatsCounters();
+
+      // Vẽ lại dữ liệu cho thành phố hiện tại & cập nhật bộ đếm
+      window.appState.renderAllData();
     }
   }
 
   async submitReport(formData) {
+    let reportData = null;
+
     try {
       const res = await fetch('/api/crowdsource/report', {
         method: 'POST',
@@ -56,40 +65,51 @@ class CrowdsourceService {
 
       const data = await res.json();
       if (data.status === 'success' && data.report) {
-        // Đồng bộ tới các tab khác
-        this.channel.postMessage({
-          type: 'NEW_REPORT',
-          report: data.report
-        });
-
-        // Cập nhật ngay trên máy người dùng
-        this.handleIncomingReport(data.report);
-        return { success: true, report: data.report };
+        reportData = data.report;
       } else {
-        throw new Error(data.message || 'Lỗi khi gửi báo cáo');
+        throw new Error(data.message || 'Lỗi khi gửi báo cáo lên server');
       }
-    } catch (err) {
-      console.error('Lỗi gửi báo cáo cộng đồng:', err);
-      // Giả lập lưu cục bộ nếu server bận
-      const localReport = {
+    } catch (networkErr) {
+      console.warn('Lỗi kết nối server, chuyển sang lưu báo cáo cục bộ:', networkErr.message);
+      // Giả lập lưu cục bộ nếu server không phản hồi
+      reportData = {
         id: `local-${Date.now()}`,
         name: formData.locationName || 'Điểm do bạn vừa báo cáo',
         city: formData.city || 'hanoi',
         lat: parseFloat(formData.lat),
         lng: parseFloat(formData.lng),
         type: formData.type || 'flood',
-        depth_cm: parseInt(formData.depth_cm) || 25,
-        danger_level: parseInt(formData.depth_cm) > 30 ? 'critical' : 'medium',
-        passable_motorbike: parseInt(formData.depth_cm) < 20,
-        passable_car: parseInt(formData.depth_cm) < 35,
+        depth_cm: parseInt(formData.depth_cm, 10) || 25,
+        danger_level: parseInt(formData.depth_cm, 10) > 30 ? 'critical' : 'medium',
+        passable_motorbike: parseInt(formData.depth_cm, 10) < 20,
+        passable_car: parseInt(formData.depth_cm, 10) < 35,
         source: 'Báo cáo trực tiếp từ bạn',
         pump_status: 'Vừa ghi nhận',
         advice: 'Cần chú ý giảm tốc độ.',
         updated_at: new Date().toISOString()
       };
-      this.handleIncomingReport(localReport);
-      return { success: true, report: localReport };
     }
+
+    if (reportData) {
+      // 1. Đồng bộ tới các tab khác
+      try {
+        this.channel.postMessage({
+          type: 'NEW_REPORT',
+          report: reportData
+        });
+      } catch (e) {}
+
+      // 2. Cập nhật ngay trên máy người dùng
+      try {
+        this.handleIncomingReport(reportData);
+      } catch (renderErr) {
+        console.error('Lỗi khi vẽ báo cáo lên bản đồ:', renderErr);
+      }
+
+      return { success: true, report: reportData };
+    }
+
+    return { success: false, message: 'Không thể tạo báo cáo sự cố' };
   }
 }
 

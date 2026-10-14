@@ -76,7 +76,12 @@ const STREET_GEO_DICTIONARY = [
   { name: 'Vòng xoay Dân Chủ', city: 'hcm', lat: 10.7766, lng: 106.6811, area: 'Quận 3' },
   { name: 'Đường Trường Chinh - Ngã tư An Sương', city: 'hcm', lat: 10.8492, lng: 106.6178, area: 'Quận 12' },
   { name: 'Đường Nguyễn Hữu Cảnh', city: 'hcm', lat: 10.7895, lng: 106.7142, area: 'Bình Thạnh' },
-  { name: 'Đường Xô Viết Nghệ Tĩnh', city: 'hcm', lat: 10.8089, lng: 106.7145, area: 'Bình Thạnh' }
+  { name: 'Đường Xô Viết Nghệ Tĩnh', city: 'hcm', lat: 10.8089, lng: 106.7145, area: 'Bình Thạnh' },
+  // Đà Nẵng
+  { name: 'Cầu Rồng - Đường Nguyễn Văn Linh', city: 'danang', lat: 16.0610, lng: 108.2230, area: 'Hải Châu' },
+  { name: 'Đường Điện Biên Phủ - Ngã ba Huế', city: 'danang', lat: 16.0680, lng: 108.1880, area: 'Thanh Khê' },
+  { name: 'Đường Bạch Đằng - Cầu Sông Hàn', city: 'danang', lat: 16.0714, lng: 108.2260, area: 'Hải Châu' },
+  { name: 'Đường Ngô Quyền - Cầu Tiên Sơn', city: 'danang', lat: 16.0350, lng: 108.2380, area: 'Ngũ Hành Sơn' }
 ];
 
 // Danh mục rốn ngập địa phương (HSDC Hà Nội & UDi Maps TP.HCM)
@@ -300,15 +305,19 @@ class LocalUrbanBot extends EventEmitter {
 
     this.crawlPromise = (async () => {
       try {
-        const results = await Promise.allSettled([
+        // 1. Quét song song tin tức VOV, TomTom giao thông và thời tiết các đô thị
+        await Promise.allSettled([
           this.crawlVOVTraffic(),
-          this.crawlNCHMFWeather(),
           this.fetchTomTomIncidents('hanoi'),
           this.fetchTomTomIncidents('hcm'),
+          this.fetchTomTomIncidents('danang'),
           this.crawlWeatherStations('hanoi'),
           this.crawlWeatherStations('hcm'),
           this.crawlWeatherStations('danang')
         ]);
+
+        // 2. Phân tích cảnh báo KTTV sau khi đã có dữ liệu lượng mưa thực tế
+        await this.crawlNCHMFWeather();
 
         // Đọc thêm báo cáo cộng đồng từ file crowdsource và dọn dẹp các báo cáo cũ quá 2 giờ
         let crowdsourced = [];
@@ -347,10 +356,19 @@ class LocalUrbanBot extends EventEmitter {
           trafficAlerts: this.cachedData.trafficIncidents.length + this.cachedData.vovTrafficNews.length
         };
 
-        // Lưu vào đĩa
+        // Lưu vào đĩa cache thời gian thực
         try {
           fs.writeFileSync(CACHE_FILE, JSON.stringify(this.cachedData, null, 2), 'utf-8');
           console.log(`[Bot] ✓ Đã hoàn tất cập nhật dữ liệu. Tổng điểm ngập: ${this.cachedData.stats.totalFloods}, Điểm kẹt xe/sự cố: ${this.cachedData.stats.trafficAlerts}`);
+
+          // Ghi dữ liệu vào chuỗi lịch sử (Cơ chế Cửa sổ trượt 7 ngày)
+          try {
+            const historyService = require('./history-service');
+            historyService.recordSnapshot(this.cachedData);
+          } catch (hErr) {
+            console.warn('[Bot] Lỗi ghi lịch sử thời gian thực:', hErr.message);
+          }
+
           // Phát sự kiện realtime cho SSE
           this.emit('data:updated', this.cachedData);
         } catch (err) {
@@ -378,41 +396,49 @@ class LocalUrbanBot extends EventEmitter {
 
       const $ = cheerio.load(response.data);
       const articles = [];
+      const seenLinks = new Set();
 
-      // Phân tích tiêu đề và nội dung các bài viết mới nhất
-      $('article, .item-news, .news-item, .box-item').slice(0, 10).each((i, el) => {
-        const title = $(el).find('h2, h3, .title, a').first().text().trim();
-        const link = $(el).find('a').first().attr('href') || '';
-        const summary = $(el).find('p, .sapo, .lead').first().text().trim();
+      // Bóc tách bài viết mới nhất từ VOV Giao thông (link dạng -dNNN.html)
+      $('a[href*="-d"]').each((i, el) => {
+        if (articles.length >= 10) return;
+        const link = $(el).attr('href') || '';
+        const title = $(el).text().trim().replace(/\s+/g, ' ');
 
-        if (title && title.length > 10) {
-          // Trích xuất địa điểm ùn tắc bằng bộ từ điển
-          let detectedStreet = null;
-          const fullText = (title + ' ' + summary).toLowerCase();
+        if (!title || title.length < 15 || seenLinks.has(link)) return;
+        seenLinks.add(link);
 
-          for (const street of STREET_GEO_DICTIONARY) {
-            const keywords = street.name.toLowerCase().split(' - ');
-            if (keywords.some(k => fullText.includes(k.trim()))) {
-              detectedStreet = street;
-              break;
-            }
+        // Lấy đoạn mô tả nếu có
+        const container = $(el).closest('div, article');
+        const summary = container.find('p, .sapo, .desc, .lead').first().text().trim() || title;
+
+        // Trích xuất địa điểm ùn tắc bằng bộ từ điển
+        let detectedStreet = null;
+        const fullText = (title + ' ' + summary).toLowerCase();
+
+        for (const street of STREET_GEO_DICTIONARY) {
+          const keywords = street.name.toLowerCase().split(' - ');
+          if (keywords.some(k => fullText.includes(k.trim()))) {
+            detectedStreet = street;
+            break;
           }
-
-          articles.push({
-            id: `vov-${i + 1}`,
-            title,
-            summary: summary || title,
-            link: link.startsWith('http') ? link : `https://vovgiaothong.vn${link}`,
-            source: 'VOV Giao Thông',
-            time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-            detectedLocation: detectedStreet
-          });
         }
+
+        articles.push({
+          id: `vov-${articles.length + 1}`,
+          title,
+          summary: summary || title,
+          link: link.startsWith('http') ? link : `https://vovgiaothong.vn${link}`,
+          source: 'VOV Giao Thông',
+          time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+          detectedLocation: detectedStreet
+        });
       });
 
       if (articles.length > 0) {
         this.cachedData.vovTrafficNews = articles;
-        console.log(`[Bot] ✓ Đã bóc tách ${articles.length} bản tin từ VOV Giao thông`);
+        console.log(`[Bot] ✓ Đã bóc tách ${articles.length} bản tin thực tế từ VOV Giao thông`);
+      } else {
+        throw new Error('Không tìm thấy bài viết hợp lệ từ VOV HTML');
       }
     } catch (err) {
       console.warn('[Bot] Không thể cào VOV Giao thông trực tiếp:', err.message);
@@ -500,21 +526,37 @@ class LocalUrbanBot extends EventEmitter {
         throw new Error('Chưa bóc tách được tin mưa dông từ NCHMF HTML');
       }
     } catch (err) {
-      console.warn('[Bot] Sử dụng cảnh báo KTTV chuẩn dự phòng:', err.message);
-      this.cachedData.weatherAlerts = [
-        {
-          id: 'nchmf-fb-1',
-          content: 'Cảnh báo mưa dông, lốc sét và mưa lớn cục bộ khu vực nội thành Hà Nội. Nguy cơ ngập úng các tuyến phố trũng thấp.',
-          source: 'Trung tâm Dự báo KTTV Quốc gia (nchmf.gov.vn)',
-          level: 'danger'
-        },
-        {
-          id: 'nchmf-fb-2',
-          content: 'Bản tin cảnh báo triều cường khu vực hạ lưu sông Sài Gòn - Đồng Nai vượt mức báo động 2, gây ngập úng đường ven sông.',
-          source: 'Đài Khí tượng Thủy văn Nam Bộ',
-          level: 'warning'
-        }
+      // Phân tích cảnh báo thời tiết thực tế dựa trên dữ liệu trạm quan trắc (tránh cảnh báo giả lúc tạnh ráo)
+      const weatherStations = this.cachedData.weatherStations || {};
+      const allStations = [
+        ...(weatherStations.hanoi || []),
+        ...(weatherStations.hcm || []),
+        ...(weatherStations.danang || [])
       ];
+      const maxRain = allStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+
+      if (maxRain >= 25) {
+        this.cachedData.weatherAlerts = [
+          {
+            id: 'nchmf-real-1',
+            content: `Cảnh báo mưa dông, lốc sét và mưa lớn cục bộ (đỉnh mưa ~${maxRain} mm/h). Nguy cơ ngập úng các tuyến phố trũng thấp.`,
+            source: 'Radar thời tiết MoveSafe (Tổng hợp từ trạm quan trắc)',
+            level: 'danger'
+          }
+        ];
+      } else if (maxRain >= 10) {
+        this.cachedData.weatherAlerts = [
+          {
+            id: 'nchmf-real-2',
+            content: `Cảnh báo mưa vừa rải rác một số khu vực đô thị (~${maxRain} mm/h). Phương tiện chú ý giảm tốc độ qua đoạn trũng.`,
+            source: 'Radar thời tiết MoveSafe (Tổng hợp từ trạm quan trắc)',
+            level: 'warning'
+          }
+        ];
+      } else {
+        // Tạnh ráo, không tạo cảnh báo giả!
+        this.cachedData.weatherAlerts = [];
+      }
     }
   }
 
@@ -767,7 +809,17 @@ class LocalUrbanBot extends EventEmitter {
       const lngs = stations.map(s => s.lng).join(',');
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
 
-      const response = await axios.get(url, { timeout: 8000 });
+      // Cơ chế thử lại tối đa 2 lần kèm timeout 15 giây
+      let response = null;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          response = await axios.get(url, { timeout: 15000 });
+          break;
+        } catch (retryErr) {
+          if (attempt === 2) throw retryErr;
+          await new Promise(r => setTimeout(r, 1200));
+        }
+      }
       const data = response.data;
       const resultsArray = Array.isArray(data) ? data : [data];
 
@@ -834,11 +886,17 @@ class LocalUrbanBot extends EventEmitter {
   // Tính toán mực nước thực tế cho các trạm quan trắc đô thị dựa trên lượng mưa & triều dâng
   computeRealtimeFloodPoints(activeCrowdsourced = []) {
     const weatherStations = this.cachedData.weatherStations || {};
+    const isDemoFlood = process.env.DEMO_FLOOD === 'true';
 
     const realtimePoints = LOCAL_FLOOD_STATIONS.map(st => {
       const cityStations = weatherStations[st.city] || [];
       // Tìm lượng mưa lớn nhất tại các trạm thuộc thành phố đó
-      const maxCityRain = cityStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+      let maxCityRain = cityStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+
+      // Nếu đang bật chế độ Demo ngập (cho thuyết trình), giả lập mưa lớn tại Hà Nội
+      if (isDemoFlood && st.city === 'hanoi') {
+        maxCityRain = Math.max(maxCityRain, 35);
+      }
 
       // Kiểm tra triều cường đối với các tuyến trũng ven sông tại TP.HCM (udi-01: Huỳnh Tấn Phát, udi-03: Trần Xuân Soạn)
       const isTidalStation = st.id === 'udi-01' || st.id === 'udi-03';

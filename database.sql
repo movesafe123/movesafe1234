@@ -3,19 +3,18 @@
 -- Copy toàn bộ nội dung file này và paste vào SQL Editor trên Supabase để chạy.
 -- ====================================================================================
 
--- Bật tính năng Bản đồ (PostGIS)
+-- Bật tính năng Bản đồ (PostGIS) và UUID
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- ------------------------------------------------------------------------------------
--- 1. BẢNG TRẠM SẠC XE ĐIỆN (EV STATIONS)
 -- ------------------------------------------------------------------------------------
 -- 1. BẢNG TRẠM SẠC XE ĐIỆN (EV STATIONS)
 -- ------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS ev_stations CASCADE;
 CREATE TABLE ev_stations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
-    provider VARCHAR(100), -- Ví dụ: VinFast, ChargeAlong, EVOne
+    provider VARCHAR(100), -- Ví dụ: VinFast, ChargeAlong, EVOne, Selex
     address TEXT,
     lat DOUBLE PRECISION NOT NULL,
     lng DOUBLE PRECISION NOT NULL,
@@ -37,16 +36,24 @@ CREATE TRIGGER trigger_update_ev_location
 BEFORE INSERT OR UPDATE ON ev_stations
 FOR EACH ROW EXECUTE FUNCTION update_ev_location();
 
--- Thêm một vài dữ liệu mẫu ở Hà Nội để test Giao diện
-INSERT INTO ev_stations (name, provider, address, lat, lng) VALUES
-('Trạm sạc Vincom Metropolis', 'VinFast', '29 Liễu Giai, Ba Đình', 21.0319, 105.8115),
-('Trạm sạc Vincom Trần Duy Hưng', 'VinFast', '119 Trần Duy Hưng, Cầu Giấy', 21.0069, 105.7951),
-('Trạm sạc Royal City', 'VinFast', '72A Nguyễn Trãi, Thanh Xuân', 21.0028, 105.8155),
-('Tủ thay pin Selex Motors', 'Selex', 'Đại học Bách Khoa Hà Nội', 21.0041, 105.8437);
+-- Dữ liệu mẫu tại Hà Nội, TP.HCM và Đà Nẵng
+INSERT INTO ev_stations (name, provider, address, lat, lng, capacity) VALUES
+-- Hà Nội
+('Trạm sạc Vincom Metropolis', 'VinFast', '29 Liễu Giai, Ba Đình, Hà Nội', 21.0319, 105.8115, 8),
+('Trạm sạc Vincom Trần Duy Hưng', 'VinFast', '119 Trần Duy Hưng, Cầu Giấy, Hà Nội', 21.0069, 105.7951, 6),
+('Trạm sạc Royal City', 'VinFast', '72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0028, 105.8155, 12),
+('Tủ thay pin Selex Motors Bách Khoa', 'Selex Motors', 'Đại học Bách Khoa Hà Nội, Hai Bà Trưng', 21.0041, 105.8437, 4),
+('Trạm sạc EVOne Lotte Center', 'EVOne', '54 Liễu Giai, Ba Đình, Hà Nội', 21.0330, 105.8123, 4),
+-- TP. Hồ Chí Minh
+('Trạm sạc Landmark 81', 'VinFast', '720A Điện Biên Phủ, Bình Thạnh, TP.HCM', 10.7952, 106.7218, 16),
+('Trạm sạc Vincom Center Đồng Khởi', 'VinFast', '72 Lê Thánh Tôn, Quận 1, TP.HCM', 10.7778, 106.7019, 8),
+('Trạm sạc Gigamall Thủ Đức', 'EVOne', '240-242 Phạm Văn Đồng, TP. Thủ Đức, TP.HCM', 10.8277, 106.7214, 6),
+('Tủ đổi pin Selex Điện Biên Phủ', 'Selex Motors', '279 Điện Biên Phủ, Quận 3, TP.HCM', 10.7791, 106.6892, 4),
+-- Đà Nẵng
+('Trạm sạc Vincom Plaza Ngô Quyền', 'VinFast', '910A Ngô Quyền, Sơn Trà, Đà Nẵng', 16.0718, 108.2325, 8),
+('Trạm sạc Sân bay Quốc tế Đà Nẵng', 'VinFast', 'Hòa Thuận Tây, Hải Châu, Đà Nẵng', 16.0538, 108.2022, 6);
 
 
--- ------------------------------------------------------------------------------------
--- 2. BẢNG LƯU TRỮ LỊCH SỬ GIAO THÔNG (Lưu 7 ngày)
 -- ------------------------------------------------------------------------------------
 -- 2. BẢNG LƯU TRỮ LỊCH SỬ GIAO THÔNG (Lưu 7 ngày)
 -- ------------------------------------------------------------------------------------
@@ -67,8 +74,6 @@ CREATE INDEX idx_traffic_history_time ON traffic_history(recorded_at);
 -- ------------------------------------------------------------------------------------
 -- 3. BẢNG DỮ LIỆU DỰ BÁO TƯƠNG LAI (AI XGBOOST GHI VÀO ĐÂY)
 -- ------------------------------------------------------------------------------------
--- 3. BẢNG DỮ LIỆU DỰ BÁO TƯƠNG LAI (AI XGBOOST GHI VÀO ĐÂY)
--- ------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS traffic_predictions CASCADE;
 CREATE TABLE traffic_predictions (
     segment_id VARCHAR(100) NOT NULL,
@@ -79,23 +84,13 @@ CREATE TABLE traffic_predictions (
     PRIMARY KEY (segment_id, target_hour)
 );
 
--- ====================================================================================
--- RLS (Row Level Security) - Bảo mật Database
--- ====================================================================================
--- Cho phép mọi người (Client/Frontend) đọc dữ liệu trạm sạc và dự báo (để vẽ bản đồ)
-ALTER TABLE ev_stations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Read EV Stations" ON ev_stations FOR SELECT USING (true);
 
-ALTER TABLE traffic_predictions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Read Predictions" ON traffic_predictions FOR SELECT USING (true);
-
--- Backend (AI Bot) sẽ dùng Service Key có toàn quyền để ghi dữ liệu lịch sử vào.
 -- ------------------------------------------------------------------------------------
 -- 4. BẢNG DỮ LIỆU DỰ BÁO NGẬP LỤT (AI DỰ ĐOÁN)
 -- ------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS flood_predictions CASCADE;
 CREATE TABLE flood_predictions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location_name VARCHAR(255) NOT NULL,
     lat DOUBLE PRECISION NOT NULL,
     lng DOUBLE PRECISION NOT NULL,
@@ -104,3 +99,62 @@ CREATE TABLE flood_predictions (
     confidence DOUBLE PRECISION,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- ------------------------------------------------------------------------------------
+-- 5. BẢNG LƯU TRỮ LỊCH SỬ NGẬP LỤT ĐÔ THỊ (Lưu 7 ngày)
+-- ------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS flood_history CASCADE;
+CREATE TABLE flood_history (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    station_id VARCHAR(100) NOT NULL,
+    station_name VARCHAR(255) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    depth_cm INT NOT NULL,
+    danger_level VARCHAR(50) NOT NULL,
+    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+CREATE INDEX idx_flood_history_time ON flood_history(recorded_at);
+
+-- ------------------------------------------------------------------------------------
+-- 6. HÀM TỰ ĐỘNG DỌN DẸP LỊCH SỬ CŨ HƠN 7 NGÀY (Cơ chế Cửa sổ trượt - Chống đầy 500MB)
+-- ------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION clean_old_urban_history()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM traffic_history WHERE recorded_at < NOW() - INTERVAL '7 days';
+    DELETE FROM flood_history WHERE recorded_at < NOW() - INTERVAL '7 days';
+END;
+$$ LANGUAGE plpgsql;
+
+-- ====================================================================================
+-- RLS (Row Level Security) - Bảo mật Database & Phân quyền
+-- ====================================================================================
+-- 1. Cho phép đọc công khai (Client / Frontend / Trực quan hóa)
+ALTER TABLE ev_stations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read EV Stations" ON ev_stations;
+CREATE POLICY "Public Read EV Stations" ON ev_stations FOR SELECT USING (true);
+
+ALTER TABLE traffic_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Traffic History" ON traffic_history;
+CREATE POLICY "Public Read Traffic History" ON traffic_history FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Traffic History" ON traffic_history;
+CREATE POLICY "Public Insert Traffic History" ON traffic_history FOR INSERT WITH CHECK (true);
+
+ALTER TABLE flood_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Flood History" ON flood_history;
+CREATE POLICY "Public Read Flood History" ON flood_history FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Flood History" ON flood_history;
+CREATE POLICY "Public Insert Flood History" ON flood_history FOR INSERT WITH CHECK (true);
+
+ALTER TABLE traffic_predictions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Predictions" ON traffic_predictions;
+CREATE POLICY "Public Read Predictions" ON traffic_predictions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Write Predictions" ON traffic_predictions;
+CREATE POLICY "Public Write Predictions" ON traffic_predictions FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE flood_predictions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Flood Predictions" ON flood_predictions;
+CREATE POLICY "Public Read Flood Predictions" ON flood_predictions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Write Flood Predictions" ON flood_predictions;
+CREATE POLICY "Public Write Flood Predictions" ON flood_predictions FOR ALL USING (true) WITH CHECK (true);
+

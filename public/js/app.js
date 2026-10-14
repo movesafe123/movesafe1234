@@ -3,6 +3,160 @@
  * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi, điều hướng né ngập & Vòng lặp cập nhật 24/24 trên Cloud
  */
 
+// Bộ rốn ngập mô phỏng chuẩn xác dành cho Chế độ Giả lập (Simulation Mode)
+const SIMULATED_FLOOD_HOTSPOTS = {
+  hanoi: [
+    {
+      id: 'sim-hn-01',
+      name: 'Phố Nguyễn Khuyến (Khu vực trước cổng trường Lý Thường Kiệt)',
+      city: 'hanoi',
+      lat: 21.0280,
+      lng: 105.8340,
+      depth_cm: 35,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa lớn (Rốn ngập HSDC)',
+      pump_status: 'Mô phỏng: 2 máy bơm dã chiến đang xả',
+      advice: 'Kịch bản giả lập: Ngập sâu 35cm. Xe máy và ô tô gầm thấp nguy cơ chết máy.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-hn-02',
+      name: 'Ngã tư Phan Bội Châu - Lý Thường Kiệt',
+      city: 'hanoi',
+      lat: 21.0245,
+      lng: 105.8450,
+      depth_cm: 35,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa lớn (Rốn ngập HSDC)',
+      pump_status: 'Mô phỏng: Trạm bơm Yên Sở đang vận hành',
+      advice: 'Kịch bản giả lập: Ngập sâu rốn trũng giao lộ, rẽ vòng tránh ngập.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-hn-03',
+      name: 'Ngã tư Thái Hà - Chùa Bộc',
+      city: 'hanoi',
+      lat: 21.0075,
+      lng: 105.8245,
+      depth_cm: 40,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa lớn',
+      pump_status: 'Mô phỏng: Đang điều tiết thoát nước',
+      advice: 'Kịch bản giả lập: Điểm trũng Chùa Bộc ngập sâu 40cm.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-hn-04',
+      name: 'Phố Thụy Khuê (Đoạn dốc La Pho - Tam Đa)',
+      city: 'hanoi',
+      lat: 21.0435,
+      lng: 105.8260,
+      depth_cm: 30,
+      danger_level: 'medium',
+      passable_motorbike: false,
+      passable_car: true,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa lớn',
+      pump_status: 'Mô phỏng: Trạm bơm Thụy Khuê đang bơm',
+      advice: 'Kịch bản giả lập: Ngập cục bộ 30cm mép hồ.',
+      updated_at: new Date().toISOString()
+    }
+  ],
+  hcm: [
+    {
+      id: 'sim-hcm-01',
+      name: 'Đường Huỳnh Tấn Phát (Quận 7)',
+      city: 'hcm',
+      lat: 10.7412,
+      lng: 106.7389,
+      depth_cm: 45,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Triều cường (UDi Maps)',
+      pump_status: 'Mô phỏng: Trạm bơm Phú Xuân đang xả',
+      advice: 'Kịch bản giả lập: Mực nước triều dâng cao 45cm, ngập lút bánh xe.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-hcm-02',
+      name: 'Đường Quốc Hương - Thảo Điền (TP. Thủ Đức)',
+      city: 'hcm',
+      lat: 10.8052,
+      lng: 106.7351,
+      depth_cm: 35,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa dông Thảo Điền',
+      pump_status: 'Mô phỏng: Máy bơm dã chiến công suất lớn',
+      advice: 'Kịch bản giả lập: Ngập kéo dài Thảo Điền, tránh tuyệt đối.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-hcm-03',
+      name: 'Đường Nguyễn Văn Quá (Quận 12)',
+      city: 'hcm',
+      lat: 10.8421,
+      lng: 106.6289,
+      depth_cm: 25,
+      danger_level: 'medium',
+      passable_motorbike: false,
+      passable_car: true,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa lớn Q12',
+      pump_status: 'Mô phỏng: Cống hộp đang xả',
+      advice: 'Kịch bản giả lập: Nước đọng 25cm, xe máy hạn chế đi vào.',
+      updated_at: new Date().toISOString()
+    }
+  ],
+  danang: [
+    {
+      id: 'sim-dn-01',
+      name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)',
+      city: 'danang',
+      lat: 16.0615,
+      lng: 108.2140,
+      depth_cm: 35,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa ngập Đà Nẵng',
+      pump_status: 'Mô phỏng: Trạm bơm Hồ Thạc Gián xả nước',
+      advice: 'Kịch bản giả lập: Ngập giao lộ Hàm Nghi 35cm, các xe rẽ sang Lê Duẩn.',
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'sim-dn-02',
+      name: 'Đường Mẹ Suốt (Liên Chiểu)',
+      city: 'danang',
+      lat: 16.0592,
+      lng: 108.1583,
+      depth_cm: 40,
+      danger_level: 'critical',
+      passable_motorbike: false,
+      passable_car: false,
+      isSimulated: true,
+      source: 'Kịch bản Giả lập Mưa ngập Đà Nẵng',
+      pump_status: 'Mô phỏng: Đang cảnh báo vùng trũng',
+      advice: 'Kịch bản giả lập: Vùng trũng Mẹ Suốt ngập sâu 40cm, không di chuyển qua.',
+      updated_at: new Date().toISOString()
+    }
+  ]
+};
+
 class GoogleMapsApp {
   constructor() {
     this.currentCity = 'hanoi';
@@ -17,9 +171,11 @@ class GoogleMapsApp {
       vovTrafficNews: [],
       weatherAlerts: []
     };
+    // Chế độ Giả lập / Dữ liệu thật: Mặc định luôn là FALSE (Dữ liệu thật 100%)
+    this.isSimulationMode = false;
+
     this.currentVehicle = 'motorbike';
     this.currentAvoidLevel = 1; // Mức độ tránh né mặc định: An toàn tuyệt đối
-    this.currentForecastTime = 0; // 0 = Hiện tại, 1 = +1h, 2 = +2h, 3 = +3h
     this.isDirectionsOpen = false;
     this.activeFilter = 'all';
 
@@ -43,6 +199,10 @@ class GoogleMapsApp {
     this.countdownTimer = null;
     this.lastWeatherSync = 0;
     this.lastSyncTime = Date.now();
+
+    // AI Prediction State
+    this.currentPredictionOffset = 0;
+    this.predictionOverlay = { floodPoints: [], trafficIncidents: [] };
   }
 
   async init() {
@@ -119,13 +279,70 @@ class GoogleMapsApp {
     }
   }
 
-  renderAllData() {
-    const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
-    const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+  // Lấy toàn bộ rốn ngập hiện tại (bao gồm kịch bản mô phỏng nếu đang bật Chế độ Giả lập)
+  getCurrentFloods() {
+    let floods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
+    if (this.isSimulationMode) {
+      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      floods = [...simFloods, ...floods];
+    }
+    return floods;
+  }
 
-    // Vẽ lên bản đồ
-    window.mapEngine.renderFloodPoints(cityFloods);
-    window.mapEngine.renderTrafficIncidents(cityTraffics);
+  // Chuyển đổi trạng thái Chế độ Giả lập / Dữ liệu thật
+  setSimulationMode(enabled, showToast = true) {
+    this.isSimulationMode = !!enabled;
+
+    // 1. Cập nhật các phần tử giao diện
+    const chkMode = document.getElementById('chk-simulation-mode');
+    const chkLayer = document.getElementById('chk-layer-simulation');
+    const container = document.getElementById('mode-toggle-container');
+    const badge = document.getElementById('mode-status-badge');
+    const banner = document.getElementById('gm-simulation-banner');
+
+    if (chkMode) chkMode.checked = this.isSimulationMode;
+    if (chkLayer) chkLayer.checked = this.isSimulationMode;
+
+    if (container) {
+      container.classList.toggle('sim-active', this.isSimulationMode);
+    }
+
+    if (badge) {
+      const modeText = badge.querySelector('.mode-text');
+      if (modeText) {
+        modeText.textContent = this.isSimulationMode ? '🧪 Giả lập ngập' : '🟢 Dữ liệu thật';
+      }
+    }
+
+    if (banner) {
+      banner.style.display = this.isSimulationMode ? 'flex' : 'none';
+    }
+
+    // 2. Vẽ lại toàn bộ dữ liệu trên bản đồ
+    this.renderAllData();
+
+    // 3. Nếu bảng chỉ đường đang mở, tự động tính toán lại lộ trình né ngập
+    if (this.isDirectionsOpen) {
+      this.calculateSmartRoute();
+    }
+
+    // 4. Thông báo Toast chuyên nghiệp
+    if (showToast) {
+      if (this.isSimulationMode) {
+        this.showToast('🧪 Đã bật Chế độ Giả lập: Mô phỏng mưa ngập 30-45cm tại các rốn ngập trọng điểm để thử nghiệm thuật toán né ngập!', 'warning', 4500);
+      } else {
+        this.showToast('🟢 Đã chuyển về Dữ liệu thật: 100% dữ liệu thời gian thực từ TomTom và trạm khí tượng.', 'info', 4000);
+      }
+    }
+  }
+
+  updateStatsCounters() {
+    let cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
+    if (this.isSimulationMode) {
+      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      cityFloods = [...simFloods, ...cityFloods];
+    }
+    const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
 
     // Cập nhật số lượng trên các chip: Chỉ đếm các điểm ngập đang hoạt động (depth > 0 và danger_level !== 'safe')
     const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
@@ -133,8 +350,13 @@ class GoogleMapsApp {
     const trafficChip = document.getElementById('chip-traffic-count');
     if (floodChip) {
       if (activeFloods.length > 0) {
-        floodChip.className = 'gm-chip gm-chip-danger';
-        floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length})`;
+        if (this.isSimulationMode) {
+          floodChip.className = 'gm-chip gm-chip-warning active';
+          floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length} - Giả lập)`;
+        } else {
+          floodChip.className = 'gm-chip gm-chip-danger';
+          floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length})`;
+        }
       } else {
         floodChip.className = 'gm-chip gm-chip-safe';
         floodChip.textContent = `🌊 Rốn ngập (0 - Khô ráo)`;
@@ -155,6 +377,33 @@ class GoogleMapsApp {
         trafficChip.textContent = `🚗 Ùn tắc (0 - Thông thoáng)`;
       }
     }
+  }
+
+  renderAllData() {
+    let cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
+    let cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+
+    // Bổ sung các điểm ngập mô phỏng nếu đang bật Chế độ Giả lập
+    if (this.isSimulationMode) {
+      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      cityFloods = [...simFloods, ...cityFloods];
+    }
+
+    // Nếu đang áp dụng dự báo tương lai (+1h/+2h/+3h), giữ lại lớp dự báo AI trên bản đồ
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      if (this.predictionOverlay.floodPoints.length > 0) {
+        cityFloods = [...this.predictionOverlay.floodPoints, ...cityFloods];
+      }
+      if (this.predictionOverlay.trafficIncidents.length > 0) {
+        cityTraffics = [...this.predictionOverlay.trafficIncidents, ...cityTraffics];
+      }
+    }
+
+    // Vẽ lên bản đồ
+    window.mapEngine.renderFloodPoints(cityFloods);
+    window.mapEngine.renderTrafficIncidents(cityTraffics);
+
+    this.updateStatsCounters();
   }
 
   // Cập nhật widget thời tiết trung tâm (góc dưới trái)
@@ -260,20 +509,33 @@ class GoogleMapsApp {
     if (!window.EventSource) return;
     try {
       const sse = new EventSource('/api/live-stream');
+      let isInitialConnect = true;
+
+      sse.onopen = () => {
+        isInitialConnect = false;
+      };
+
       sse.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
           if (payload && payload.data) {
-            console.log('[SSE 24/7] Nhận dữ liệu phát trực tiếp từ Cloud Server!');
             this.liveData = payload.data;
             this.renderAllData();
-            this.showToast('⚡ Cập nhật dữ liệu thời gian thực từ Cloud Server!', 'info');
+            // Reset đếm ngược 30s khi nhận cập nhật realtime
+            this.remainingSeconds = this.syncIntervalSeconds;
+            // Chỉ hiển thị toast khi có gói update mới, không hiện với gói init
+            if (payload.type === 'update') {
+              this.showToast('⚡ Cập nhật dữ liệu thời gian thực từ Cloud Server!', 'info', 3000);
+            }
           }
         } catch (e) {}
       };
+
       sse.onerror = () => {
-        // Trên GitHub Pages tĩnh hoặc khi mất kết nối, tự động đóng SSE và dùng Smart Polling 30s
-        sse.close();
+        // Trên GitHub Pages tĩnh (không có backend Node), đóng SSE sau lần đầu thất bại
+        if (isInitialConnect) {
+          sse.close();
+        }
       };
     } catch (e) {}
   }
@@ -369,14 +631,14 @@ class GoogleMapsApp {
     });
 
     document.getElementById('chip-flood-count')?.addEventListener('click', () => {
-      const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
-      const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
+      const activeFloods = this.getCurrentFloods().filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
 
       if (activeFloods.length > 0) {
-        // Có ngập thực tế: Bay camera đến điểm ngập sâu nhất
+        // Có ngập: Bay camera đến điểm ngập sâu nhất
         const worst = [...activeFloods].sort((a, b) => (b.depth_cm || 0) - (a.depth_cm || 0))[0];
         window.mapEngine.map.flyTo([worst.lat, worst.lng], 16);
-        this.showToast(`⚠️ Đang theo dõi rốn ngập sâu: ${worst.name} (${worst.depth_cm}cm)`, 'danger');
+        const prefix = this.isSimulationMode ? '🧪 [Kịch bản Giả lập]' : '⚠️';
+        this.showToast(`${prefix} Đang theo dõi rốn ngập sâu: ${worst.name} (${worst.depth_cm}cm)`, 'danger');
       } else {
         // Khô ráo, nước đã rút
         this.showToast('✅ Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
@@ -424,15 +686,54 @@ class GoogleMapsApp {
       this.calculateSmartRoute();
     });
 
-    // Chuyển phương tiện (Xe máy / Ô tô)
+    // Chuyển phương tiện (Xe máy / Ô tô / Xe điện)
     document.querySelectorAll('.gm-mode-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.gm-mode-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         this.currentVehicle = tab.getAttribute('data-mode');
+        
+        // Tự động bật layer Trạm sạc nếu chọn xe điện
+        const evLayerItem = document.getElementById('layer-item-ev');
+        if (this.currentVehicle === 'ebike' || this.currentVehicle === 'ecar') {
+          if (evLayerItem) evLayerItem.style.display = 'flex';
+          const chkEv = document.getElementById('chk-layer-ev');
+          if (chkEv) chkEv.checked = true;
+          if (window.mapEngine.toggleEV) {
+            window.mapEngine.toggleEV(true);
+            this.showToast('⚡ Đã kích hoạt lớp bản đồ Trạm sạc xe điện', 'info', 2500);
+          }
+        } else {
+          if (evLayerItem) evLayerItem.style.display = 'none';
+          const chkEv = document.getElementById('chk-layer-ev');
+          if (chkEv && chkEv.checked) {
+             chkEv.checked = false;
+             if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(false);
+          }
+        }
+        
         this.calculateSmartRoute();
       });
     });
+
+    // Lắng nghe thanh trượt dự báo giao thông
+    const predictionSlider = document.getElementById('traffic-prediction-slider');
+    if (predictionSlider) {
+      predictionSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const labels = ['Hiện tại', '+1 Giờ tới', '+2 Giờ tới', '+3 Giờ tới'];
+        const labelEl = document.getElementById('prediction-time-label');
+        if (labelEl) labelEl.textContent = labels[val];
+        this.currentPredictionOffset = val;
+      });
+      predictionSlider.addEventListener('change', async (e) => {
+        const val = parseInt(e.target.value, 10);
+        await this.applyPredictionOffset(val);
+        if (this.isDirectionsOpen) {
+          this.calculateSmartRoute();
+        }
+      });
+    }
 
     // 5b. Bộ chọn 3 mức độ tránh né
     document.querySelectorAll('.gm-avoidance-option').forEach(option => {
@@ -455,34 +756,6 @@ class GoogleMapsApp {
       });
     });
 
-    // 5c. Thanh trượt dự báo giao thông
-    const forecastSlider = document.getElementById('gm-forecast-slider');
-    const forecastValueText = document.getElementById('gm-forecast-value-text');
-    if (forecastSlider && forecastValueText) {
-      forecastSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        this.currentForecastTime = val;
-        
-        if (val === 0) {
-          forecastValueText.textContent = 'Hiện tại';
-          forecastValueText.style.color = 'var(--gm-text-main)';
-        } else {
-          forecastValueText.textContent = `+${val} Giờ tới`;
-          forecastValueText.style.color = 'var(--gm-blue)';
-        }
-      });
-      forecastSlider.addEventListener('change', (e) => {
-        const val = parseInt(e.target.value);
-        if (val > 0) {
-          this.showToast(`🤖 AI: Áp dụng dự báo kẹt xe cho +${val}h tới để tìm đường.`, 'info');
-        }
-        // Tự động tính lại đường nếu panel đang mở
-        if (this.isDirectionsOpen) {
-          this.calculateSmartRoute();
-        }
-      });
-    }
-
     // 6. Cụm nút điều khiển góc dưới bên phải
     document.getElementById('btn-gm-zoom-in')?.addEventListener('click', () => window.mapEngine.zoomIn());
     document.getElementById('btn-gm-zoom-out')?.addEventListener('click', () => window.mapEngine.zoomOut());
@@ -500,15 +773,24 @@ class GoogleMapsApp {
     // Nút làm mới dữ liệu từ Bot
     document.getElementById('btn-gm-bot-refresh')?.addEventListener('click', async () => {
       const btn = document.getElementById('btn-gm-bot-refresh');
+      btn.style.transition = 'transform 0.6s ease';
       btn.style.transform = 'rotate(360deg)';
       try {
-        await this.syncFromCloud(true);
-        // Nếu có backend Node.js, gọi thêm endpoint bot refresh
+        this.showToast('🔄 Đang kích hoạt Bot quét dữ liệu mới từ các nguồn...', 'info', 2500);
+        // Gọi server crawl trước
         try {
-          await fetch('/api/bot/refresh', { method: 'POST' });
+          const resp = await fetch('/api/bot/refresh', { method: 'POST' });
+          if (resp.status === 429) {
+            const data = await resp.json().catch(() => ({}));
+            this.showToast(`⏱️ ${data.message || 'Vui lòng đợi thêm giây lát trước khi quét lại.'}`, 'warning', 4000);
+            return;
+          }
         } catch (e) {}
+
+        // Sau đó sync dữ liệu mới về giao diện
+        await this.syncFromCloud(true);
       } finally {
-        setTimeout(() => { btn.style.transform = 'none'; }, 500);
+        setTimeout(() => { btn.style.transform = 'none'; }, 600);
       }
     });
 
@@ -529,6 +811,30 @@ class GoogleMapsApp {
     });
     document.getElementById('chk-layer-satellite')?.addEventListener('change', (e) => {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
+    });
+    document.getElementById('chk-layer-ev')?.addEventListener('change', (e) => {
+      if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(e.target.checked);
+    });
+
+    // 6b. Nút gạt Chế độ Giả lập (Simulation Mode) ở góc trên bên phải
+    document.getElementById('chk-simulation-mode')?.addEventListener('change', (e) => {
+      this.setSimulationMode(e.target.checked, true);
+    });
+
+    // Toggle Giả lập trong menu Lớp Bản Đồ
+    document.getElementById('chk-layer-simulation')?.addEventListener('change', (e) => {
+      this.setSimulationMode(e.target.checked, true);
+    });
+
+    // Bấm vào card chứa nút gạt ở góc phải trên để toggle
+    document.getElementById('mode-toggle-container')?.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.classList.contains('gm-slider')) return;
+      this.setSimulationMode(!this.isSimulationMode, true);
+    });
+
+    // Nút [Tắt giả lập ✕] trên Floating Banner
+    document.getElementById('btn-exit-simulation')?.addEventListener('click', () => {
+      this.setSimulationMode(false, true);
     });
 
     // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến (hoặc hiện POI)
@@ -611,23 +917,70 @@ class GoogleMapsApp {
 
     document.getElementById('form-report')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('report-location-name')?.value || 'Điểm ngập';
-      const depth = document.getElementById('report-depth')?.value || 30;
-      const type = document.getElementById('report-type')?.value || 'flood';
-      const center = window.mapEngine.map.getCenter();
+      const submitBtn = document.querySelector('#form-report button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Đang gửi...';
+      }
 
-      const res = await window.crowdsourceService.submitReport({
-        locationName: name,
-        city: this.currentCity,
-        lat: center.lat + (Math.random() - 0.5) * 0.005,
-        lng: center.lng + (Math.random() - 0.5) * 0.005,
-        type,
-        depth_cm: depth
-      });
+      try {
+        const name = (document.getElementById('report-location-name')?.value || '').trim() || 'Điểm ngập';
+        const depth = parseInt(document.getElementById('report-depth')?.value, 10) || 30;
+        const type = document.getElementById('report-type')?.value || 'flood';
 
-      if (res.success) {
-        reportModal?.classList.remove('open');
-        this.showToast('✓ Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
+        let targetLat = null;
+        let targetLng = null;
+
+        // Định vị tọa độ chính xác bằng tên đường trong thành phố hiện tại
+        if (window.geocodingService && name.length >= 2) {
+          try {
+            const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+            const geoMatches = await window.geocodingService.searchAddresses(name, {
+              city: this.currentCity,
+              center: cityCenter,
+              limit: 1
+            });
+            if (geoMatches && geoMatches.length > 0) {
+              targetLat = geoMatches[0].lat;
+              targetLng = geoMatches[0].lng;
+            }
+          } catch (geoErr) {
+            console.warn('Không thể geocode tên địa điểm báo cáo:', geoErr);
+          }
+        }
+
+        // Nếu không tìm thấy qua geocoding, dùng tâm bản đồ hiện tại (không dùng jitter ngẫu nhiên)
+        if (targetLat === null || targetLng === null) {
+          const center = window.mapEngine.map.getCenter();
+          targetLat = center.lat;
+          targetLng = center.lng;
+        }
+
+        const res = await window.crowdsourceService.submitReport({
+          locationName: name,
+          city: this.currentCity,
+          lat: targetLat,
+          lng: targetLng,
+          type,
+          depth_cm: depth
+        });
+
+        if (res && res.success) {
+          reportModal?.classList.remove('open');
+          const form = document.getElementById('form-report');
+          if (form) form.reset();
+          this.showToast('✓ Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
+        } else {
+          this.showToast('⚠️ Không thể gửi báo cáo: ' + (res?.message || 'Lỗi không xác định'), 'warning');
+        }
+      } catch (err) {
+        console.error('Lỗi khi gửi báo cáo sự cố:', err);
+        this.showToast('❌ Có lỗi xảy ra khi gửi báo cáo: ' + err.message, 'danger');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Gửi Báo Cáo';
+        }
       }
     });
 
@@ -1573,6 +1926,66 @@ class GoogleMapsApp {
     await this.calculateSmartRoute();
   }
 
+  // Áp dụng độ lệch dự báo AI tương lai (+1h, +2h, +3h) lên bản đồ
+  async applyPredictionOffset(offset) {
+    this.currentPredictionOffset = offset;
+    if (offset > 0 && window.supabaseService) {
+      try {
+        const [predictions, floodPreds] = await Promise.all([
+          window.supabaseService.getTrafficPrediction(offset, this.currentCity),
+          window.supabaseService.getFloodPredictions(offset, this.currentCity)
+        ]);
+
+        const aiFloods = (floodPreds || []).map(f => ({
+          id: `ai-flood-${f.id || f.location_name}`,
+          lat: f.lat,
+          lng: f.lng,
+          city: this.currentCity,
+          depth_cm: f.predicted_depth_cm || 25,
+          danger_level: (f.predicted_depth_cm || 25) > 30 ? 'critical' : 'medium',
+          passable_motorbike: (f.predicted_depth_cm || 25) < 20,
+          passable_car: (f.predicted_depth_cm || 25) < 35,
+          name: `[AI DỰ BÁO +${offset}h] ${f.location_name}`,
+          source: 'Mô hình AI dự báo ngập lụt',
+          advice: `Nguy cơ ngập úng trong ${offset}h tới. Cân nhắc chọn lộ trình thay thế.`,
+          updated_at: new Date().toISOString()
+        }));
+
+        const aiTraffics = (predictions || []).map((p, idx) => ({
+          id: `ai-traffic-${idx}`,
+          lat: p.lat,
+          lng: p.lng,
+          city: this.currentCity,
+          type: 'traffic_jam',
+          categoryName: `AI Dự báo kẹt xe +${offset}h`,
+          icon: '🚗',
+          isJam: true,
+          speedKmh: p.level >= 4 ? 8 : 15,
+          delaySeconds: p.level >= 4 ? 600 : 300,
+          description: p.description || `AI dự báo ùn tắc mức ${p.level}/5 sau +${offset}h`,
+          source: 'Mô hình AI XGBoost',
+          updated_at: new Date().toISOString()
+        }));
+
+        this.predictionOverlay = { floodPoints: aiFloods, trafficIncidents: aiTraffics };
+        this.renderAllData();
+
+        if (aiFloods.length > 0) {
+          this.showToast(`🌊 AI: Phát hiện ${aiFloods.length} điểm có nguy cơ ngập lụt sau +${offset}h tới!`, 'warning', 4500);
+        }
+        if (aiTraffics.length > 0) {
+          this.showToast(`🤖 AI: Áp dụng ${aiTraffics.length} điểm dự báo kẹt xe cho +${offset}h tới.`, 'info', 4000);
+        }
+      } catch (err) {
+        console.warn('Lỗi khi nạp dữ liệu dự báo AI:', err);
+      }
+    } else {
+      this.predictionOverlay = { floodPoints: [], trafficIncidents: [] };
+      this.renderAllData();
+      this.showToast('✓ Đã khôi phục dữ liệu thời gian thực hiện tại', 'info', 2500);
+    }
+  }
+
   // Tính toán lộ trình thông minh kết hợp Geocoding ngõ ngách & OSRM
   async calculateSmartRoute() {
     const resultsContainer = document.getElementById('gm-route-results');
@@ -1581,16 +1994,11 @@ class GoogleMapsApp {
     // Hiển thị loading
     if (resultsContainer) {
       const levelConfig = window.routingService.avoidanceLevels[this.currentAvoidLevel];
-      const forecastText = this.currentForecastTime > 0 
-        ? `<div style="margin-top: 6px; color: #1a73e8; font-weight: 500; font-size: 12px;">⏳ AI đang mô phỏng mật độ giao thông +${this.currentForecastTime}h tới...</div>` 
-        : '';
-      
       resultsContainer.innerHTML = `
-        <div style="padding: 20px 16px; text-align: center; animation: fadeIn 0.3s ease;">
-          <div style="font-size: 24px; margin-bottom: 8px;">🔍</div>
-          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách...</div>
-          ${forecastText}
-          <div style="font-size: 11px; color: #70757a; margin-top: 6px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
+        <div style="padding: 16px; text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px; animation: pulse-ring 1.6s infinite;">🔍</div>
+          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách né ngập...</div>
+          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
         </div>
       `;
     }
@@ -1670,49 +2078,57 @@ class GoogleMapsApp {
     this.updateRouteMarker('origin', origin.lat, origin.lng, origin.title || originText);
     this.updateRouteMarker('dest', dest.lat, dest.lng, dest.title || destText);
 
-    const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
-    let cityTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+    let effectiveFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
+    let effectiveTraffic = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
 
-    // MÔ PHỎNG DỰ BÁO: Tăng mức độ kẹt xe dựa trên mốc thời gian dự báo
-    if (this.currentForecastTime > 0) {
-      cityTraffic = cityTraffic.map(t => {
-        if (t.isJam) {
-          // 1h = +5p, 2h = +12p, 3h = +25p kẹt xe thêm
-          const penaltyMultiplier = this.currentForecastTime === 1 ? 300 : (this.currentForecastTime === 2 ? 720 : 1500);
-          return {
-            ...t,
-            delaySeconds: (t.delaySeconds || 120) + penaltyMultiplier,
-            speedKmh: Math.max(2, (t.speedKmh || 15) - (this.currentForecastTime * 5))
-          };
-        }
-        return t;
-      });
+    // [CHẾ ĐỘ GIẢ LẬP]: Bổ sung các điểm ngập mô phỏng vào phân tích lộ trình nếu đang bật Giả lập
+    if (this.isSimulationMode) {
+      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      effectiveFloods = [...simFloods, ...effectiveFloods];
     }
 
-    // Hiển thị kẹt xe dự báo trực quan lên bản đồ
-    if (window.mapEngine && typeof window.mapEngine.renderTrafficIncidents === 'function') {
-      window.mapEngine.renderTrafficIncidents(cityTraffic);
-    }
-
-    // Thủ thuật UX: Tạo delay nhân tạo 400ms để người dùng kịp nhìn thấy hiệu ứng loading của AI
-    // Nếu không có delay, API trả về quá nhanh khiến màn hình bị giật nháy
-    if (this.currentForecastTime > 0) {
-      await new Promise(r => setTimeout(r, 400));
+    // [DỰ BÁO TƯƠNG LAI]: Kết hợp các điểm ngập và kẹt xe dự đoán vào thuật toán tìm đường
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      if (this.predictionOverlay.floodPoints.length > 0) {
+        effectiveFloods = [...this.predictionOverlay.floodPoints, ...effectiveFloods];
+      }
+      if (this.predictionOverlay.trafficIncidents.length > 0) {
+        effectiveTraffic = [...this.predictionOverlay.trafficIncidents, ...effectiveTraffic];
+      }
     }
 
     try {
       const result = await window.routingService.calculateMultiRoutes({
         origin: { lat: origin.lat, lng: origin.lng },
         destination: { lat: dest.lat, lng: dest.lng },
-        floodPoints: cityFloods,
-        trafficIncidents: cityTraffic,
+        floodPoints: effectiveFloods,
+        trafficIncidents: effectiveTraffic,
         vehicleType: this.currentVehicle,
         avoidLevel: this.currentAvoidLevel
       });
 
       this.lastRouteResult = result;
 
-      // Vẽ tuyến đường lên bản đồ
+      // Xử lý khi KHÔNG CÓ TUYẾN ĐƯỜNG ĐI ĐƯỢC CHO PHƯƠNG TIỆN
+      if (result.noPassableRoute) {
+        this.clearRouteLayers();
+
+        if (summaryContainer) {
+          this.renderRouteSummary(summaryContainer, result);
+        }
+
+        if (resultsContainer) {
+          this.renderNoPassableCard(resultsContainer, result);
+        }
+
+        const box = document.getElementById('gm-ai-suggestion');
+        if (box) box.style.display = 'none';
+
+        this.showToast(`⛔ Không có đường đi được cho ${result.vehicleSpecs ? result.vehicleSpecs.name : 'xe'} do ngập sâu!`, 'danger', 5000);
+        return;
+      }
+
+      // Vẽ các tuyến đường hợp lệ lên bản đồ
       this.displayMultiRoutes(result);
 
       // Render summary bar
@@ -1766,12 +2182,16 @@ class GoogleMapsApp {
     const dayName = dayNames[vnDay];
     const dateStr = `${vnNow.getDate()}/${vnNow.getMonth()+1}/${vnNow.getFullYear()}`;
 
-    const vehicle = this.currentVehicle; // 'motorbike', 'car', 'emotorbike', 'ecar'
-    let vehicleName = 'Phương tiện';
-    if (vehicle === 'motorbike') vehicleName = 'Xe máy';
-    if (vehicle === 'car') vehicleName = 'Ô tô';
-    if (vehicle === 'emotorbike') vehicleName = 'Xe máy điện';
-    if (vehicle === 'ecar') vehicleName = 'Ô tô điện';
+    const vehicle = this.currentVehicle; // 'motorbike', 'car', 'ebike', 'ecar'
+    const vehicleNames = {
+      motorbike: 'Xe máy',
+      car: 'Ô tô',
+      ebike: 'Xe máy điện',
+      ecar: 'Ô tô điện'
+    };
+    const vehicleName = vehicleNames[vehicle] || 'Xe máy';
+    const isTwoWheeler = (vehicle === 'motorbike' || vehicle === 'ebike');
+
     const routes = result.routes || [];
     const recommended = routes.find(r => r.isRecommended) || routes[0];
     if (!recommended) { box.style.display = 'none'; return; }
@@ -1802,9 +2222,7 @@ class GoogleMapsApp {
     const isStormRain = maxRain >= 25;
     const hasRouteFlood = routeFloods.length > 0;
     const hasRouteJam = routeTraffics.filter(t => t.isJam).length > 0;
-    const isMotorbikeType = (vehicle === 'motorbike' || vehicle === 'emotorbike');
-    const isElectric = (vehicle === 'emotorbike' || vehicle === 'ecar');
-    const hasDeepFlood = routeFloods.some(f => f.depth_cm >= (isMotorbikeType ? 20 : 35));
+    const hasDeepFlood = routeFloods.some(f => f.depth_cm >= (isTwoWheeler ? 20 : 35));
     const distKm = parseFloat(recommended.distanceKm) || 5;
     const isLongTrip = distKm > 12;
 
@@ -1812,38 +2230,20 @@ class GoogleMapsApp {
     let mainAdvice = '';
     const details = [];
 
-    // 0. Nếu có áp dụng Dự báo giao thông
-    if (this.currentForecastTime === 1) {
-      details.push({ 
-        icon: '🔮', 
-        text: `<strong>Dự báo +1h tới:</strong> Mật độ giao thông bắt đầu có dấu hiệu đông dần lên tại các chốt giao thông chính.` 
-      });
-    } else if (this.currentForecastTime === 2) {
-      details.push({ 
-        icon: '🔮', 
-        text: `<strong>Dự báo +2h tới (Ùn ứ nặng):</strong> AI cảnh báo lưu lượng xe sẽ tăng đột biến, tốc độ di chuyển cực chậm.` 
-      });
-    } else if (this.currentForecastTime === 3) {
-      details.push({ 
-        icon: '🔮', 
-        text: `<strong>Dự báo +3h tới (Đỉnh điểm kẹt xe):</strong> Cảnh báo đỏ! Toàn bộ các trục đường trung tâm dự báo kẹt cứng cục bộ. Nên cân nhắc dời lịch trình nếu có thể.` 
-      });
-    }
-
     // 1. Thời điểm trong ngày
     if (isPeakMorning) {
       mainAdvice = `⏰ Đang là giờ cao điểm sáng (${timeStr}) — Lưu lượng xe rất đông trên các trục chính.`;
-      if (isMotorbikeType) {
-        details.push({ icon: '🛵', text: `${vehicleName} nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
+      if (vehicle === 'motorbike') {
+        details.push({ icon: '🛵', text: `Xe máy nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `${vehicleName} nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
+        details.push({ icon: '🚗', text: `Ô tô nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
       }
     } else if (isPeakEvening) {
       mainAdvice = `⏰ Đang là giờ cao điểm chiều (${timeStr}) — Mật độ phương tiện tan tầm rất lớn.`;
-      if (isMotorbikeType) {
-        details.push({ icon: '🛵', text: `${vehicleName} nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
+      if (vehicle === 'motorbike') {
+        details.push({ icon: '🛵', text: `Xe máy nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `${vehicleName} nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
+        details.push({ icon: '🚗', text: `Ô tô nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
       }
     } else if (isLateNight) {
       mainAdvice = `🌙 Ban đêm (${timeStr}) — Đường phố rất vắng, di chuyển thuận lợi.`;
@@ -1865,42 +2265,52 @@ class GoogleMapsApp {
 
     // 2. Thời tiết & Mưa ngập
     if (isStormRain) {
-      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${isMotorbikeType ? 'Xe 2 bánh cực kỳ dễ chết máy!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
+      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${vehicle === 'motorbike' ? 'Xe máy cực kỳ dễ chết máy bugi!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
     } else if (isHeavyRain) {
-      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${isMotorbikeType ? 'Xe 2 bánh nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
+      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${vehicle === 'motorbike' ? 'Xe máy nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
     } else if (isRaining) {
       details.push({ icon: '🌦️', text: `Mưa nhẹ rải rác (${maxRain} mm/h). Đường hơi trơn, bật đèn và giảm tốc độ.` });
     }
     if (avgTemp >= 37) {
-      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${(!isMotorbikeType && !isElectric) ? 'Kiểm tra nước làm mát ô tô.' : ''} ${isElectric ? 'Lưu ý nhiệt độ pin xe điện có thể tăng nhanh khi trời nắng nóng.' : ''}` });
+      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${vehicle === 'car' ? 'Kiểm tra nước làm mát ô tô.' : ''}` });
     }
 
     // 3. Ngập trên tuyến
     if (hasDeepFlood) {
       const worstFlood = routeFloods.sort((a,b) => b.depth_cm - a.depth_cm)[0];
-      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${isElectric ? 'TUYỆT ĐỐI TRÁNH ĐỂ BẢO VỆ PIN XE ĐIỆN!' : (isMotorbikeType ? 'Xe 2 bánh KHÔNG THỂ QUA!' : 'Ô tô gầm thấp nguy cơ thủy kích!')} Hệ thống đã ưu tiên Tuyến An toàn.` });
+      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${vehicle === 'motorbike' ? 'Xe máy KHÔNG THỂ QUA — hệ thống đã tự động bẻ hướng sang đường cao ráo!' : 'Ô tô gầm thấp nguy cơ thủy kích, chọn Tuyến An toàn!'}` });
     } else if (hasRouteFlood) {
-      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. ${isElectric ? 'Cẩn thận nước văng vào gầm xe bảo vệ pin.' : 'Giảm tốc khi qua vùng nước đọng.'}` });
+      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. Giảm tốc khi qua vùng nước đọng.` });
     }
 
     // 4. Kẹt xe trên tuyến
     if (hasRouteJam) {
       const worstJam = routeTraffics.filter(t => t.isJam).sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0))[0];
       const delayMin = worstJam ? Math.round((worstJam.delaySeconds || 300) / 60) : 5;
-      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${isMotorbikeType ? 'Xe 2 bánh có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
+      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${vehicle === 'motorbike' ? 'Xe máy có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
     }
 
     // 5. Phương tiện cụ thể
-    if (isMotorbikeType) {
+    if (vehicle === 'ebike') {
+      details.push({ icon: '⚡', text: `Xe máy điện: Động cơ bánh sau và khoang pin sàn rất nhạy cảm với nước. Tuyệt đối không qua rốn ngập sâu >15cm.` });
       if (isLongTrip) {
-        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho ${vehicleName}. Ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️). ${isElectric ? 'Chú ý dung lượng pin khả dụng.' : ''}` });
+        details.push({ icon: '🔋', text: `Quãng đường ~${distKm}km: Lưu ý kiểm tra dung lượng pin còn lại trước khi xuất phát.` });
+      }
+    } else if (vehicle === 'ecar') {
+      details.push({ icon: '🚙', text: `Ô tô điện: Bộ pin gầm xe chống nước IP67 nhưng vẫn cần tránh rốn ngập sâu trên 30cm để đảm bảo an toàn cảm biến.` });
+      if (isPeakHour) {
+        details.push({ icon: '🅿️', text: `Giờ cao điểm: Ưu tiên điểm đỗ có sẵn trạm sạc nếu cần bổ sung năng lượng.` });
+      }
+    } else if (vehicle === 'motorbike') {
+      if (isLongTrip) {
+        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho xe máy. Nếu chở đồ cồng kềnh / nặng, ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️).` });
       }
       if (isRaining || isHeavyRain) {
         details.push({ icon: '🧥', text: `Chuẩn bị áo mưa bộ. Tránh đỗ xe ở tầng hầm khu vực trũng.` });
       }
     } else {
       if (isLongTrip) {
-        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. ${vehicleName} nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu. ${isElectric ? 'Cân nhắc trạm sạc trên lộ trình nếu pin thấp.' : ''}` });
+        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. Ô tô nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu.` });
       }
       if (isPeakHour) {
         details.push({ icon: '🅿️', text: `Giờ cao điểm — Cân nhắc bãi đỗ xe tại điểm đến trước khi xuất phát.` });
@@ -1914,7 +2324,7 @@ class GoogleMapsApp {
     // ====== RENDER HTML ======
     const contextTags = [
       { icon: '🕐', text: `${timeStr} ${dayName}` },
-      { icon: vehicle === 'motorbike' ? '🛵' : '🚗', text: vehicleName },
+      { icon: vehicle === 'ebike' ? '⚡' : (vehicle === 'ecar' ? '🚙' : (vehicle === 'motorbike' ? '🛵' : '🚗')), text: vehicleName },
       { icon: maxRain >= 1 ? '🌧️' : '☀️', text: maxRain >= 1 ? `Mưa ${maxRain}mm` : `${avgTemp}°C Khô ráo` },
       { icon: '🌊', text: `${cityFloods.length} rốn ngập` },
       { icon: '🚦', text: `${cityJams.length} điểm tắc` }
@@ -1942,20 +2352,85 @@ class GoogleMapsApp {
     box.style.display = 'block';
   }
 
-  // Vẽ đa tuyến đường lên bản đồ (với màu sắc & highlight theo từng chế độ)
-  displayMultiRoutes(result) {
+  // Xóa sạch các layer route trên bản đồ
+  clearRouteLayers() {
     const mapEng = window.mapEngine;
-    
-    // Xóa các layer route cũ
-    if (mapEng.layers.routeSafeOutline) mapEng.map.removeLayer(mapEng.layers.routeSafeOutline);
-    if (mapEng.layers.routeSafe) mapEng.map.removeLayer(mapEng.layers.routeSafe);
-    if (mapEng.layers.routeDanger) mapEng.map.removeLayer(mapEng.layers.routeDanger);
-    
-    // Xóa thêm các layer phụ nếu có
+    if (!mapEng || !mapEng.map) return;
+    if (mapEng.layers.routeSafeOutline) {
+      mapEng.map.removeLayer(mapEng.layers.routeSafeOutline);
+      mapEng.layers.routeSafeOutline = null;
+    }
+    if (mapEng.layers.routeSafe) {
+      mapEng.map.removeLayer(mapEng.layers.routeSafe);
+      mapEng.layers.routeSafe = null;
+    }
+    if (mapEng.layers.routeDanger) {
+      mapEng.map.removeLayer(mapEng.layers.routeDanger);
+      mapEng.layers.routeDanger = null;
+    }
     if (mapEng._extraRouteLayers) {
       mapEng._extraRouteLayers.forEach(l => mapEng.map.removeLayer(l));
     }
     mapEng._extraRouteLayers = [];
+  }
+
+  // Render thẻ cảnh báo khi KHÔNG CÓ ĐƯỜNG ĐI ĐƯỢC
+  renderNoPassableCard(container, result) {
+    const specs = result.vehicleSpecs || { name: 'Phương tiện của bạn', maxPassableDepth: 20, hazardRisk: 'Ngập nước chết máy' };
+    const blockedFloods = result.blockedFloods || [];
+
+    const spotsListHtml = blockedFloods.map(f => `
+      <li style="margin-bottom: 6px;">
+        🌊 <strong>${f.name}:</strong> Ngập sâu <strong style="color: #d93025;">${f.depth_cm}cm</strong>
+        <span style="color: #70757a; font-size: 11px;"> (vượt quá giới hạn lội nước ${specs.maxPassableDepth}cm của ${specs.name})</span>
+      </li>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="gm-impassable-card" style="margin: 12px; padding: 16px; background: #fff5f5; border: 1.5px solid #ea4335; border-radius: 10px;">
+        <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+          <span style="font-size: 26px; line-height: 1;">⛔</span>
+          <div>
+            <div style="color: #d93025; font-size: 14px; font-weight: 700; text-transform: uppercase;">
+              Không có tuyến đường đi được cho ${specs.name}
+            </div>
+            <div style="color: #5f6368; font-size: 12px; margin-top: 2px;">
+              Đặc tính kỹ thuật: Giới hạn lội nước tối đa <strong>${specs.maxPassableDepth} cm</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: #3c4043; line-height: 1.5; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #fad2cf;">
+          ⚠️ <strong>MoveSafe bảo vệ xe của bạn:</strong> Hệ thống không chỉ đường liều lĩnh qua các rốn ngập sâu vì nguy cơ cốt tử: 
+          <strong style="color: #d93025;">${specs.hazardRisk}</strong>.
+        </div>
+
+        ${blockedFloods.length > 0 ? `
+          <div style="font-size: 12px; font-weight: 600; color: #202124; margin-bottom: 6px;">
+            Các điểm ngập sâu đang cô lập hành lang đến đích:
+          </div>
+          <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #3c4043;">
+            ${spotsListHtml}
+          </ul>
+        ` : ''}
+
+        <div style="margin-top: 12px; padding: 8px 10px; background: #e8f0fe; border-radius: 6px; font-size: 11px; color: #1a73e8; line-height: 1.4;">
+          💡 <strong>Khuyến nghị:</strong> Bạn nên tạm hoãn di chuyển 30-45 phút chờ các trạm bơm tiêu thoát nước, hoặc chuyển sang phương tiện gầm cao (SUV / bán tải) hoặc tuyến metro trên cao.
+        </div>
+      </div>
+    `;
+  }
+
+  // Vẽ đa tuyến đường lên bản đồ (với màu sắc & highlight theo từng chế độ)
+  displayMultiRoutes(result) {
+    const mapEng = window.mapEngine;
+    
+    // Xóa sạch các layer route cũ
+    this.clearRouteLayers();
+
+    if (!result || result.noPassableRoute || !result.routes || result.routes.length === 0) {
+      return;
+    }
 
     const routes = result.routes;
     const recommended = routes.find(r => r.isRecommended) || routes[0];
@@ -2025,25 +2500,74 @@ class GoogleMapsApp {
 
   // Render summary bar
   renderRouteSummary(container, result) {
-    const { routes } = result;
+    if (result.noPassableRoute) {
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; width: 100%; gap: 8px;">
+          <span class="gm-summary-badge" style="background: #d93025; color: #fff;">
+            ⛔ Không thể đi
+          </span>
+          <span class="gm-summary-text" style="color: #d93025; font-weight: 600;">
+            ${result.message}
+          </span>
+        </div>
+      `;
+      container.style.display = 'flex';
+      return;
+    }
+
+    const { routes, vehicleSpecs, blockedRoutes } = result;
     const recommended = routes.find(r => r.isRecommended) || routes[0];
+    const fastestRoute = routes.find(r => r.avoidLevel === 3) || routes[0];
     
     let badgeClass = 'badge-safe';
     if (recommended.avoidLevel === 2) badgeClass = 'badge-warning';
     if (recommended.avoidLevel === 3) badgeClass = 'badge-safe';
 
+    let diffHtml = '';
+    if (recommended.avoidLevel !== 3 && recommended.durationMin > fastestRoute.durationMin) {
+      const diff = Math.round(recommended.durationMin - fastestRoute.durationMin);
+      diffHtml = `
+        <div style="font-size: 12px; color: #1e8e3e; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 15px;">💡</span> Lộ trình này chậm hơn ${diff} phút nhưng đảm bảo an toàn kỹ thuật cho ${vehicleSpecs ? vehicleSpecs.name : 'xe'}.
+        </div>
+      `;
+    }
+
+    let avoidedNotice = '';
+    if (blockedRoutes && blockedRoutes.length > 0) {
+      const b = blockedRoutes[0];
+      avoidedNotice = `
+        <div style="font-size: 11px; color: #137333; margin-top: 6px; padding: 5px 8px; background: #e6f4ea; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+          <span>🛡️</span> <strong>Đã tự động né ngập:</strong> Trục ngắn nhất (${b.distanceKm} km) bị loại bỏ vì ${b.reason}.
+        </div>
+      `;
+    }
+
     container.innerHTML = `
-      <span class="gm-summary-badge ${badgeClass}" style="background: ${recommended.color}; color: #fff;">
-        Mức ${recommended.avoidLevel}: ${recommended.label}
-      </span>
-      <span class="gm-summary-text">${recommended.trafficDesc}</span>
+      <div style="display: flex; flex-direction: column; width: 100%;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="gm-summary-badge ${badgeClass}" style="background: ${recommended.color}; color: #fff;">
+              Mức ${recommended.avoidLevel}: ${recommended.label}
+            </span>
+            <span class="gm-summary-text">${recommended.trafficDesc}</span>
+          </div>
+          ${vehicleSpecs ? `
+            <span style="font-size: 11px; padding: 2px 8px; background: #f1f3f4; border-radius: 12px; color: #3c4043; font-weight: 600;" title="Ngưỡng an toàn kỹ thuật của ${vehicleSpecs.name}">
+              ${vehicleSpecs.icon} ${vehicleSpecs.name} (Ngưỡng lội: ${vehicleSpecs.maxPassableDepth}cm)
+            </span>
+          ` : ''}
+        </div>
+        ${avoidedNotice}
+        ${diffHtml}
+      </div>
     `;
     container.style.display = 'flex';
   }
 
   // Render route cards phong cách Google Maps kèm thanh phân loại tắc đường trực quan & ngõ ngách
   renderRouteCards(container, result) {
-    const { routes } = result;
+    const { routes, vehicleSpecs, blockedRoutes } = result;
     let html = '';
 
     routes.forEach((route, index) => {
@@ -2071,7 +2595,7 @@ class GoogleMapsApp {
         const warningItems = route.warnings.slice(0, 3).map(w => {
           const dotClass = w.hazardType === 'flood' ? 'dot-flood' : 'dot-traffic';
           const label = w.hazardType === 'flood' 
-            ? `🌊 Ngập ${w.depth_cm}cm - ${w.name}`
+            ? `💧 Nước nông ${w.depth_cm}cm - ${w.name} (Đi an toàn)`
             : `🚗 ${w.description || w.categoryName || 'Ùn tắc'}`;
           return `<div class="gm-warning-item"><span class="warn-dot ${dotClass}"></span> ${label}</div>`;
         }).join('');
@@ -2080,7 +2604,7 @@ class GoogleMapsApp {
         warningsHtml = `
           <div class="gm-route-warnings">
             ${warningItems}
-            ${moreCount > 0 ? `<div class="gm-warning-item" style="color: #70757a;">+ ${moreCount} cảnh báo khác</div>` : ''}
+            ${moreCount > 0 ? `<div class="gm-warning-item" style="color: #70757a;">+ ${moreCount} điểm khác</div>` : ''}
           </div>
         `;
       }
@@ -2133,6 +2657,11 @@ class GoogleMapsApp {
             <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
           </div>
           <div class="gm-route-meta" style="font-size: 12px; color: #3c4043; margin-top: 2px;">${route.trafficDesc}</div>
+
+          <!-- Huy hiệu kiểm định kỹ thuật phương tiện -->
+          <div style="font-size: 11px; color: #137333; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+            <span>✓</span> Tuyến xe ĐI ĐƯỢC an toàn (${vehicleSpecs ? vehicleSpecs.name : 'Phương tiện'})
+          </div>
           
           <!-- Phân loại mức độ tắc đường trực quan (Traffic Congestion Mini-Bar) -->
           <div class="gm-traffic-bar-container">
@@ -2160,6 +2689,30 @@ class GoogleMapsApp {
         </div>
       `;
     });
+
+    // Phần hiển thị các trục đường đã được MoveSafe chủ động né tránh để bảo vệ xe
+    if (blockedRoutes && blockedRoutes.length > 0) {
+      html += `
+        <div style="margin: 12px 0 6px 0; padding: 10px 12px; background: #fff8e1; border: 1px dashed #f9ab00; border-radius: 8px;">
+          <div style="font-size: 12px; font-weight: 700; color: #b06000; display: flex; align-items: center; justify-content: space-between; cursor: pointer;"
+               onclick="const d = this.nextElementSibling; d.style.display = d.style.display === 'none' ? 'block' : 'none';">
+            <span>🛡️ MoveSafe đã chủ động loại bỏ ${blockedRoutes.length} trục đường ngập sâu</span>
+            <span style="font-size: 11px;">Chi tiết ▾</span>
+          </div>
+          <div style="display: none; margin-top: 8px; font-size: 11px; color: #5f6368; line-height: 1.4;">
+            <p style="margin: 0 0 6px 0;">Hệ thống không chỉ đường qua các trục này do vượt quá ngưỡng an toàn kỹ thuật của ${vehicleSpecs ? vehicleSpecs.name : 'xe'}:</p>
+            <ul style="margin: 0; padding-left: 16px;">
+              ${blockedRoutes.map(b => `
+                <li style="margin-bottom: 4px;">
+                  <strong>Tuyến ${b.distanceKm} km:</strong> ${b.reason} — 
+                  <span style="color: #d93025; font-weight: 600;">${vehicleSpecs ? vehicleSpecs.hazardRisk : 'Nguy hiểm'}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
 
     container.innerHTML = html;
   }

@@ -6,3 +6,22 @@ yarn-error.log*
 Thumbs.db
 .env
 .env.local
+
+# Office & Temporary files
+~$*
+*.tmp
+*.temp
+preview_page_*.png
+baocao_preview.pdf
+baocaobaithi_preview.pdf
+baocaobaithi_backup_tables.docx
+doc1_text.txt
+doc2_text.txt
+
+# Python cache & Scratch
+__pycache__/
+*.pyc
+scratch/
+convert.js
+generate_full_doc.js
+

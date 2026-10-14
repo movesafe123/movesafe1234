@@ -24,7 +24,9 @@ module.exports = {
   API_KEYS: {
     OPENWEATHER: process.env.OPENWEATHER_KEY || '1e050d36d170249efaf439dcdb324228',
     TOMTOM: process.env.TOMTOM_KEY || 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF',
-    GEMINI: process.env.GEMINI_KEY || ''
+    GEMINI: process.env.GEMINI_KEY || '',
+    SUPABASE_URL: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://cuvleafsohxtchhgbdbk.supabase.co',
+    SUPABASE_KEY: process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_IL2L6IKBOYusIzdEGkK6PQ_QTD5OE4e'
   },
 
   // Tọa độ trung tâm các đô thị trọng điểm

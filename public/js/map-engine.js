@@ -16,7 +16,8 @@ class MapEngine {
       weatherMarkers: null,
       routeSafeOutline: null,
       routeSafe: null,
-      routeDanger: null
+      routeDanger: null,
+      evLayer: null
     };
     this.currentBase = 'standard';
     this.weatherVisible = true;
@@ -56,6 +57,7 @@ class MapEngine {
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
     this.layers.trafficMarkers = L.layerGroup().addTo(this.map);
     this.layers.weatherMarkers = L.layerGroup().addTo(this.map);
+    this.layers.evLayer = L.layerGroup(); // Không addTo(this.map) ngay từ đầu
 
     // Tự động kiểm soát hiển thị theo mức Zoom (LOD - Level of Detail)
     this.map.on('zoom zoomend', () => {
@@ -482,9 +484,6 @@ class MapEngine {
 
       marker.bindPopup(popupHtml);
       this.layers.trafficMarkers.addLayer(marker);
-
-      marker.bindPopup(popupHtml);
-      this.layers.trafficMarkers.addLayer(marker);
     });
 
     this.handleZoomLevel();
@@ -514,55 +513,11 @@ class MapEngine {
         opacity: 0.95
       }).addTo(this.map);
 
-      this.layers.routeSafe = L.featureGroup().addTo(this.map);
-      
-      const poly = recommendedRoute.polyline;
-      const traffics = recommendedRoute.matchedTraffics || [];
-      const sortedTraffics = [...traffics].sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0));
-
-      let currentSegmentColor = null;
-      let currentSegmentPoints = [];
-      
-      const flushSegment = () => {
-          if (currentSegmentPoints.length > 1) {
-              L.polyline(currentSegmentPoints, {
-                  color: currentSegmentColor,
-                  weight: 6,
-                  opacity: 1
-              }).addTo(this.layers.routeSafe);
-          }
-      };
-
-      for(let i = 0; i < poly.length; i++) {
-         const p = poly[i];
-         let pointColor = '#1e8e3e'; // Mặc định xanh lá
-         
-         for (const t of sortedTraffics) {
-             const dist = this.map.distance(p, [t.lat, t.lng]);
-             const delayMins = Math.round((t.delaySeconds || 0) / 60);
-             // Lan truyền độ dài kẹt xe trên tuyến đường dựa vào số phút trễ
-             const radius = Math.min(1500, 100 + (delayMins * 30)); 
-             
-             if (dist < radius) {
-                 pointColor = delayMins > 20 ? '#8b0000' : (delayMins > 5 ? '#d93025' : '#f29900');
-                 break;
-             }
-         }
-         
-         if (pointColor !== currentSegmentColor) {
-             if (currentSegmentPoints.length > 0) {
-                 currentSegmentPoints.push(p); // Nối mượt nét vẽ
-                 flushSegment();
-                 currentSegmentPoints = [p];
-             } else {
-                 currentSegmentPoints = [p];
-             }
-             currentSegmentColor = pointColor;
-         } else {
-             currentSegmentPoints.push(p);
-         }
-      }
-      flushSegment();
+      this.layers.routeSafe = L.polyline(recommendedRoute.polyline, {
+        color: '#1e8e3e',
+        weight: 6,
+        opacity: 1
+      }).addTo(this.map);
 
       this.map.fitBounds(this.layers.routeSafe.getBounds(), { padding: [60, 60] });
     }
@@ -603,6 +558,47 @@ class MapEngine {
       this.map.removeLayer(this.layers.baseSatellite);
       this.layers.baseStandard.addTo(this.map);
       this.currentBase = 'standard';
+    }
+  }
+
+  async toggleEV(show) {
+    if (!this.map) return;
+    if (show) {
+      if (!this.map.hasLayer(this.layers.evLayer)) {
+        this.layers.evLayer.addTo(this.map);
+      }
+      // Nạp dữ liệu trạm sạc nếu layer đang rỗng và không đang trong tiến trình tải
+      if (this.layers.evLayer.getLayers().length === 0 && !this._evLoading && window.supabaseService) {
+        this._evLoading = true;
+        try {
+          const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
+          const stations = await window.supabaseService.getEVStations(currentCity);
+          if (Array.isArray(stations)) {
+            stations.forEach(st => {
+              const marker = L.circleMarker([st.lat, st.lng], {
+                radius: 8,
+                fillColor: "#1e8e3e",
+                color: "#ffffff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9
+              });
+              const safeName = String(st.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              const safeProvider = String(st.provider || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              marker.bindPopup(`<b>⚡ ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
+              this.layers.evLayer.addLayer(marker);
+            });
+          }
+        } catch (err) {
+          console.warn('[MapEngine] Lỗi nạp trạm sạc EV:', err);
+        } finally {
+          this._evLoading = false;
+        }
+      }
+    } else {
+      if (this.map.hasLayer(this.layers.evLayer)) {
+        this.map.removeLayer(this.layers.evLayer);
+      }
     }
   }
 

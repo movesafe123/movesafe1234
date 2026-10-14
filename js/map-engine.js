@@ -567,21 +567,33 @@ class MapEngine {
       if (!this.map.hasLayer(this.layers.evLayer)) {
         this.layers.evLayer.addTo(this.map);
       }
-      // Nạp dữ liệu từ Supabase nếu layer đang rỗng
-      if (this.layers.evLayer.getLayers().length === 0 && window.supabaseService) {
-        const stations = await window.supabaseService.getEVStations();
-        stations.forEach(st => {
-          const marker = L.circleMarker([st.lat, st.lng], {
-            radius: 8,
-            fillColor: "#1e8e3e",
-            color: "#ffffff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-          });
-          marker.bindPopup(`<b>⚡ ${st.name}</b><br>Nhà cung cấp: ${st.provider}<br>Số cổng sạc: ${st.capacity}`);
-          this.layers.evLayer.addLayer(marker);
-        });
+      // Nạp dữ liệu trạm sạc nếu layer đang rỗng và không đang trong tiến trình tải
+      if (this.layers.evLayer.getLayers().length === 0 && !this._evLoading && window.supabaseService) {
+        this._evLoading = true;
+        try {
+          const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
+          const stations = await window.supabaseService.getEVStations(currentCity);
+          if (Array.isArray(stations)) {
+            stations.forEach(st => {
+              const marker = L.circleMarker([st.lat, st.lng], {
+                radius: 8,
+                fillColor: "#1e8e3e",
+                color: "#ffffff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9
+              });
+              const safeName = String(st.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              const safeProvider = String(st.provider || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              marker.bindPopup(`<b>⚡ ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
+              this.layers.evLayer.addLayer(marker);
+            });
+          }
+        } catch (err) {
+          console.warn('[MapEngine] Lỗi nạp trạm sạc EV:', err);
+        } finally {
+          this._evLoading = false;
+        }
       }
     } else {
       if (this.map.hasLayer(this.layers.evLayer)) {

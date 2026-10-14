@@ -4,13 +4,99 @@ const path = require('path');
 const config = require('./config');
 const botService = require('./bot-service');
 const aiService = require('./ai-service');
+const historyService = require('./history-service');
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.json({ limit: '25kb' }));
+
+// 1. Phục vụ file tĩnh theo danh sách cho phép (Whitelist), từ chối dotfiles
+const rootDir = path.join(__dirname, '..');
+const staticOptions = {
+  dotfiles: 'deny',
+  maxAge: '1h'
+};
+
+app.use('/css', express.static(path.join(rootDir, 'css'), staticOptions));
+app.use('/js', express.static(path.join(rootDir, 'js'), staticOptions));
+app.use('/screenshots', express.static(path.join(rootDir, 'public', 'screenshots'), staticOptions));
+
+// Phục vụ cache dữ liệu cho client fallback
+app.get('/data/live_urban_cache.json', (req, res) => {
+  res.sendFile(path.join(rootDir, 'data', 'live_urban_cache.json'));
+});
+
+// Phục vụ trang chủ
+app.get(['/', '/index.html'], (req, res) => {
+  res.sendFile(path.join(rootDir, 'index.html'));
+});
+
+// Rate Limiter trong bộ nhớ (Zero dependency)
+const rateLimitMap = new Map();
+function createRateLimiter({ windowMs, maxRequests, message }) {
+  return (req, res, next) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const key = `${ip}:${req.baseUrl || ''}${req.path}`;
+    const now = Date.now();
+    let record = rateLimitMap.get(key);
+
+    if (!record || now - record.startTime > windowMs) {
+      record = { startTime: now, count: 1 };
+    } else {
+      record.count++;
+    }
+    rateLimitMap.set(key, record);
+
+    if (record.count > maxRequests) {
+      const retryAfterSec = Math.ceil((record.startTime + windowMs - now) / 1000);
+      res.setHeader('Retry-After', retryAfterSec);
+      return res.status(429).json({
+        status: 'error',
+        message: message || `Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ${retryAfterSec} giây.`
+      });
+    }
+    next();
+  };
+}
+
+const aiChatLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 20,
+  message: 'Bạn đã gửi nhiều câu hỏi trong thời gian ngắn. Vui lòng đợi 1 phút.'
+});
+
+const reportLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 6,
+  message: 'Bạn đã gửi nhiều báo cáo sự cố trong 1 phút. Vui lòng thử lại sau.'
+});
+
+let lastBotRefreshTime = 0;
+function botRefreshLimiter(req, res, next) {
+  const now = Date.now();
+  const COOLDOWN_MS = 60 * 1000; // 60 giây
+  if (now - lastBotRefreshTime < COOLDOWN_MS) {
+    const remainSec = Math.ceil((lastBotRefreshTime + COOLDOWN_MS - now) / 1000);
+    res.setHeader('Retry-After', remainSec);
+    return res.status(429).json({
+      status: 'error',
+      message: `Hệ thống vừa cập nhật dữ liệu. Vui lòng đợi ${remainSec} giây trước khi quét lại.`
+    });
+  }
+  lastBotRefreshTime = now;
+  next();
+}
+
+// 0. API Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
+});
 
 // 1. API Cấu hình công khai cho Frontend
 app.get('/api/config', (req, res) => {
@@ -35,8 +121,16 @@ app.get('/api/live-data', (req, res) => {
   });
 });
 
+// 2b. API Lấy dữ liệu lịch sử quan trắc 7 ngày qua (Rolling Time-Series)
+app.get('/api/history', (req, res) => {
+  const city = req.query.city || 'hanoi';
+  const days = parseInt(req.query.days) || 7;
+  const history = historyService.getHistory(city, days);
+  res.json(history);
+});
+
 // 3. API Kích hoạt Bot cào dữ liệu ngay lập tức
-app.post('/api/bot/refresh', async (req, res) => {
+app.post('/api/bot/refresh', botRefreshLimiter, async (req, res) => {
   try {
     const updated = await botService.crawlAll();
     res.json({
@@ -50,14 +144,26 @@ app.post('/api/bot/refresh', async (req, res) => {
 });
 
 // 4. API Gửi báo cáo cộng đồng (Crowdsourcing)
-app.post('/api/crowdsource/report', (req, res) => {
+app.post('/api/crowdsource/report', reportLimiter, (req, res) => {
   try {
     const report = req.body;
-    if (!report || !report.lat || !report.lng) {
-      return res.status(400).json({ status: 'error', message: 'Thiếu tọa độ sự cố' });
+    const lat = Number(report?.lat);
+    const lng = Number(report?.lng);
+
+    if (!report || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({ status: 'error', message: 'Thiếu tọa độ sự cố hợp lệ' });
     }
 
-    const saved = botService.addCrowdsourceReport(report);
+    if (report.locationName && typeof report.locationName === 'string') {
+      report.locationName = report.locationName.slice(0, 150);
+    }
+
+    const saved = botService.addCrowdsourceReport({
+      ...report,
+      lat,
+      lng
+    });
+
     res.json({
       status: 'success',
       message: 'Báo cáo sự cố đã được xác thực và ghim lên bản đồ!',
@@ -69,7 +175,7 @@ app.post('/api/crowdsource/report', (req, res) => {
 });
 
 // 5. API Trợ lý AI Thông Minh
-app.post('/api/ai/chat', async (req, res) => {
+app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
   try {
     const { query, city, apiKey } = req.body;
     if (!query) {
@@ -134,9 +240,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Fallback route cho Single Page Application
+// Fallback route cho Single Page Application (chỉ xử lý các route không chứa đuôi file)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  if (req.path.includes('.')) {
+    return res.status(404).send('Not Found');
+  }
+  res.sendFile(path.join(rootDir, 'index.html'));
 });
 
 // Khởi động server có cơ chế tự động chuyển cổng nếu cổng 3000 bị bận

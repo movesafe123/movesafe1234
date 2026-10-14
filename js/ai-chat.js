@@ -203,7 +203,9 @@ class AIChat {
 
     // 3. Fallback sang Bộ não AI cục bộ dựa trên dữ liệu trạm đo thực tế
     this.messages.pop();
-    const floods = window.appState ? window.appState.liveData.floodPoints.filter(f => f.city === currentCity) : [];
+    const floods = (window.appState && typeof window.appState.getCurrentFloods === 'function') 
+      ? window.appState.getCurrentFloods() 
+      : (window.appState ? window.appState.liveData.floodPoints.filter(f => f.city === currentCity) : []);
     const traffics = window.appState ? window.appState.liveData.trafficIncidents.filter(t => t.city === currentCity) : [];
     const lower = query.toLowerCase();
 
@@ -305,7 +307,9 @@ class AIChat {
   async callDirectGemini(query, currentCity, apiKey) {
     const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const liveData = window.appState ? window.appState.liveData : { floodPoints: [], trafficIncidents: [], weatherAlerts: [] };
-    const floods = (liveData.floodPoints || []).filter(f => f.city === currentCity);
+    const floods = (window.appState && typeof window.appState.getCurrentFloods === 'function')
+      ? window.appState.getCurrentFloods()
+      : ((liveData.floodPoints || []).filter(f => f.city === currentCity));
     const traffics = (liveData.trafficIncidents || []).filter(t => t.city === currentCity);
     const alerts = liveData.weatherAlerts || [];
 
