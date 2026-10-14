@@ -3,156 +3,201 @@
  * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi, điều hướng né ngập & Vòng lặp cập nhật 24/24 trên Cloud
  */
 
-// Bộ rốn ngập mô phỏng chuẩn xác dành cho Chế độ Giả lập (Simulation Mode)
-const SIMULATED_FLOOD_HOTSPOTS = {
+// Kho dữ liệu các rốn ngập trọng điểm đô thị phục vụ Chế độ Giả lập ngẫu nhiên (Simulation Pool)
+const SIMULATION_FLOOD_POOLS = {
   hanoi: [
     {
-      id: 'sim-hn-01',
-      name: 'Phố Nguyễn Khuyến (Khu vực trước cổng trường Lý Thường Kiệt)',
-      city: 'hanoi',
+      name: 'Phố Nguyễn Khuyến (Khu vực trước THCS Lý Thường Kiệt)',
       lat: 21.0280,
       lng: 105.8340,
-      depth_cm: 35,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa lớn (Rốn ngập HSDC)',
-      pump_status: 'Mô phỏng: 2 máy bơm dã chiến đang xả',
-      advice: 'Kịch bản giả lập: Ngập sâu 35cm. Xe máy và ô tô gầm thấp nguy cơ chết máy.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn ngập HSDC Văn Miếu',
+      pump_status: 'Trạm bơm dã chiến đang xả'
     },
     {
-      id: 'sim-hn-02',
       name: 'Ngã tư Phan Bội Châu - Lý Thường Kiệt',
-      city: 'hanoi',
       lat: 21.0245,
       lng: 105.8450,
-      depth_cm: 35,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa lớn (Rốn ngập HSDC)',
-      pump_status: 'Mô phỏng: Trạm bơm Yên Sở đang vận hành',
-      advice: 'Kịch bản giả lập: Ngập sâu rốn trũng giao lộ, rẽ vòng tránh ngập.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn ngập HSDC Hoàn Kiếm',
+      pump_status: 'Trạm bơm Yên Sở đang vận hành'
     },
     {
-      id: 'sim-hn-03',
       name: 'Ngã tư Thái Hà - Chùa Bộc',
-      city: 'hanoi',
       lat: 21.0075,
       lng: 105.8245,
-      depth_cm: 40,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa lớn',
-      pump_status: 'Mô phỏng: Đang điều tiết thoát nước',
-      advice: 'Kịch bản giả lập: Điểm trũng Chùa Bộc ngập sâu 40cm.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn trũng ngập Đống Đa',
+      pump_status: 'Đang điều tiết thoát nước mương Chùa Bộc'
     },
     {
-      id: 'sim-hn-04',
       name: 'Phố Thụy Khuê (Đoạn dốc La Pho - Tam Đa)',
-      city: 'hanoi',
       lat: 21.0435,
       lng: 105.8260,
-      depth_cm: 30,
-      danger_level: 'medium',
-      passable_motorbike: false,
-      passable_car: true,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa lớn',
-      pump_status: 'Mô phỏng: Trạm bơm Thụy Khuê đang bơm',
-      advice: 'Kịch bản giả lập: Ngập cục bộ 30cm mép hồ.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn ngập ven Hồ Tây',
+      pump_status: 'Trạm bơm Thụy Khuê đang vận hành'
+    },
+    {
+      name: 'Hầm chui Đại lộ Thăng Long (Số 3 & Km9+656)',
+      lat: 20.9965,
+      lng: 105.7485,
+      source: 'Hầm chui ngập sâu Nam Từ Liêm',
+      pump_status: 'Máy bơm công suất lớn hầm chui đang xả'
+    },
+    {
+      name: 'Phố Hoa Bằng (Đoạn qua ngõ 99)',
+      lat: 21.0261,
+      lng: 105.7947,
+      source: 'Vùng trũng Cầu Giấy',
+      pump_status: 'Đang khơi thông dòng chảy'
+    },
+    {
+      name: 'Đường Cầu Giấy (Đoạn trước Đại học GTVT)',
+      lat: 21.0312,
+      lng: 105.8015,
+      source: 'Điểm trũng giao thông Cầu Giấy',
+      pump_status: 'Cống hộp đang xả'
+    },
+    {
+      name: 'Phố Minh Khai (Chân cầu Vĩnh Tuy)',
+      lat: 20.9992,
+      lng: 105.8678,
+      source: 'Trục giao thông Hai Bà Trưng',
+      pump_status: 'Máy bơm đang hoạt động'
+    },
+    {
+      name: 'Phố Vương Thừa Vũ - Hoàng Văn Thái',
+      lat: 20.9995,
+      lng: 105.8235,
+      source: 'Vùng trũng Thanh Xuân',
+      pump_status: 'Đang bơm xả ra sông Tô Lịch'
+    },
+    {
+      name: 'Ngã tư Lê Văn Lương - Hoàng Đạo Thúy',
+      lat: 21.0052,
+      lng: 105.8028,
+      source: 'Nút giao ngập Thanh Xuân',
+      pump_status: 'Cửa van hồ điều hòa đang mở'
+    },
+    {
+      name: 'Phố Trần Bình (Sau Bến xe Mỹ Đình)',
+      lat: 21.0335,
+      lng: 105.7760,
+      source: 'Rốn ngập Nam Từ Liêm',
+      pump_status: 'Trạm bơm dã chiến đang ép nước'
+    },
+    {
+      name: 'Đường Phạm Hùng (Trước tòa nhà Keangnam)',
+      lat: 21.0175,
+      lng: 105.7842,
+      source: 'Trục Vành Đai 3',
+      pump_status: 'Đang vận hành trạm bơm Cầu Bươu'
+    },
+    {
+      name: 'Đường Tố Hữu (Đoạn Lương Thế Vinh - Trung Văn)',
+      lat: 20.9942,
+      lng: 105.7892,
+      source: 'Trục hướng tâm Nam Từ Liêm',
+      pump_status: 'Cửa cống thoát nước đang xả'
+    },
+    {
+      name: 'Đường Giải Phóng (Trước cổng Bến xe Giáp Bát)',
+      lat: 20.9832,
+      lng: 105.8425,
+      source: 'Cửa ngõ phía Nam Hoàng Mai',
+      pump_status: 'Trạm bơm Yên Sở đang xả hết công suất'
     }
   ],
   hcm: [
     {
-      id: 'sim-hcm-01',
-      name: 'Đường Huỳnh Tấn Phát (Quận 7)',
-      city: 'hcm',
+      name: 'Đường Huỳnh Tấn Phát (Quận 7 - Gần cầu Phú Mỹ)',
       lat: 10.7412,
       lng: 106.7389,
-      depth_cm: 45,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Triều cường (UDi Maps)',
-      pump_status: 'Mô phỏng: Trạm bơm Phú Xuân đang xả',
-      advice: 'Kịch bản giả lập: Mực nước triều dâng cao 45cm, ngập lút bánh xe.',
-      updated_at: new Date().toISOString()
+      source: 'Vùng trũng triều cường Quận 7',
+      pump_status: 'Trạm bơm Phú Xuân đang xả'
     },
     {
-      id: 'sim-hcm-02',
       name: 'Đường Quốc Hương - Thảo Điền (TP. Thủ Đức)',
-      city: 'hcm',
       lat: 10.8052,
       lng: 106.7351,
-      depth_cm: 35,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa dông Thảo Điền',
-      pump_status: 'Mô phỏng: Máy bơm dã chiến công suất lớn',
-      advice: 'Kịch bản giả lập: Ngập kéo dài Thảo Điền, tránh tuyệt đối.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn ngập bán đảo Thảo Điền',
+      pump_status: 'Máy bơm dã chiến công suất lớn đang hút'
     },
     {
-      id: 'sim-hcm-03',
       name: 'Đường Nguyễn Văn Quá (Quận 12)',
-      city: 'hcm',
       lat: 10.8421,
       lng: 106.6289,
-      depth_cm: 25,
-      danger_level: 'medium',
-      passable_motorbike: false,
-      passable_car: true,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa lớn Q12',
-      pump_status: 'Mô phỏng: Cống hộp đang xả',
-      advice: 'Kịch bản giả lập: Nước đọng 25cm, xe máy hạn chế đi vào.',
-      updated_at: new Date().toISOString()
+      source: 'Vùng trũng Quận 12',
+      pump_status: 'Cống hộp đang xả tối đa'
+    },
+    {
+      name: 'Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)',
+      lat: 10.7558,
+      lng: 106.7082,
+      source: 'Điểm tràn bờ kênh Tẻ',
+      pump_status: 'Van ngăn triều đang đóng'
+    },
+    {
+      name: 'Đường Ung Văn Khiêm (Bình Thạnh - Gần Bến xe Miền Đông)',
+      lat: 10.8068,
+      lng: 106.7198,
+      source: 'Rốn ngập Bình Thạnh',
+      pump_status: 'Trạm bơm Thanh Đa đang vận hành'
+    },
+    {
+      name: 'Đường Lê Đức Thọ (Gò Vấp)',
+      lat: 10.8415,
+      lng: 106.6712,
+      source: 'Vùng trũng Gò Vấp',
+      pump_status: 'Đang mở cửa xả rạch Tham Lương'
+    },
+    {
+      name: 'Đường Võ Văn Ngân (TP. Thủ Đức)',
+      lat: 10.8505,
+      lng: 106.7625,
+      source: 'Dốc ngập nước xiết Thủ Đức',
+      pump_status: 'Cống thoát dốc đang dẫn nước'
+    },
+    {
+      name: 'Vòng xoay An Lạc (Bình Tân)',
+      lat: 10.7242,
+      lng: 106.6115,
+      source: 'Cửa ngõ miền Tây',
+      pump_status: 'Đang mở van tiêu thoát nước'
     }
   ],
   danang: [
     {
-      id: 'sim-dn-01',
       name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)',
-      city: 'danang',
       lat: 16.0615,
       lng: 108.2140,
-      depth_cm: 35,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa ngập Đà Nẵng',
-      pump_status: 'Mô phỏng: Trạm bơm Hồ Thạc Gián xả nước',
-      advice: 'Kịch bản giả lập: Ngập giao lộ Hàm Nghi 35cm, các xe rẽ sang Lê Duẩn.',
-      updated_at: new Date().toISOString()
+      source: 'Rốn trũng trung tâm Đà Nẵng',
+      pump_status: 'Trạm bơm Hồ Thạc Gián xả nước'
     },
     {
-      id: 'sim-dn-02',
       name: 'Đường Mẹ Suốt (Liên Chiểu)',
-      city: 'danang',
       lat: 16.0592,
       lng: 108.1583,
-      depth_cm: 40,
-      danger_level: 'critical',
-      passable_motorbike: false,
-      passable_car: false,
-      isSimulated: true,
-      source: 'Kịch bản Giả lập Mưa ngập Đà Nẵng',
-      pump_status: 'Mô phỏng: Đang cảnh báo vùng trũng',
-      advice: 'Kịch bản giả lập: Vùng trũng Mẹ Suốt ngập sâu 40cm, không di chuyển qua.',
-      updated_at: new Date().toISOString()
+      source: 'Vùng trũng chân đồi Mẹ Suốt',
+      pump_status: 'Lực lượng chức năng đang chốt chặn cảnh báo'
+    },
+    {
+      name: 'Đường Nguyễn Văn Thoại (Ngũ Hành Sơn - Gần biển)',
+      lat: 16.0528,
+      lng: 108.2435,
+      source: 'Trục ven biển Ngũ Hành Sơn',
+      pump_status: 'Cửa xả biển đang mở'
+    },
+    {
+      name: 'Nút giao Lê Duẩn - Chi Lăng (Hải Châu)',
+      lat: 16.0695,
+      lng: 108.2185,
+      source: 'Khu vực trung tâm Hải Châu',
+      pump_status: 'Cống ngầm đang điều tiết'
+    },
+    {
+      name: 'Đường Trưng Nữ Vương (Hải Châu)',
+      lat: 16.0535,
+      lng: 108.2192,
+      source: 'Trục nội thành Hải Châu',
+      pump_status: 'Trạm bơm đang dẫn dòng'
     }
   ]
 };
@@ -173,6 +218,8 @@ class GoogleMapsApp {
     };
     // Chế độ Giả lập / Dữ liệu thật: Mặc định luôn là FALSE (Dữ liệu thật 100%)
     this.isSimulationMode = false;
+    this.simulatedFloods = []; // Danh sách các rốn ngập ngẫu nhiên đang được mô phỏng
+    this.simulatedCity = null;
 
     this.currentVehicle = 'motorbike';
     this.currentAvoidLevel = 1; // Mức độ tránh né mặc định: An toàn tuyệt đối
@@ -279,11 +326,101 @@ class GoogleMapsApp {
     }
   }
 
+  // Sinh kịch bản giả lập ngập ngẫu nhiên: Vị trí ngẫu nhiên + Mức ngập ngẫu nhiên
+  generateRandomSimulatedFloods(city = this.currentCity) {
+    const pool = SIMULATION_FLOOD_POOLS[city] || SIMULATION_FLOOD_POOLS.hanoi;
+    // Xáo trộn ngẫu nhiên thứ tự các rốn ngập trong hồ dữ liệu
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    
+    // Chọn ngẫu nhiên từ 3 đến 6 điểm ngập
+    const maxCount = Math.min(pool.length, 6);
+    const minCount = Math.min(pool.length, 3);
+    const count = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+    const selected = shuffled.slice(0, count);
+
+    // Dải độ sâu ngập ngẫu nhiên: 15cm đến 50cm (mức ngập đô thị thực tế)
+    const depths = [15, 20, 25, 30, 35, 40, 45, 50];
+
+    const generated = selected.map((item, idx) => {
+      // Random độ sâu ngập
+      const depth_cm = depths[Math.floor(Math.random() * depths.length)];
+      
+      let danger_level = 'medium';
+      let passable_motorbike = false;
+      let passable_car = false;
+      let advice = '';
+
+      if (depth_cm < 20) {
+        danger_level = 'low';
+        passable_motorbike = true;
+        passable_car = true;
+        advice = `Kịch bản giả lập ngẫu nhiên: Ngập nhẹ ~${depth_cm}cm mép đường. Phương tiện đi chậm quan sát.`;
+      } else if (depth_cm <= 30) {
+        danger_level = 'medium';
+        passable_motorbike = false;
+        passable_car = true;
+        advice = `Kịch bản giả lập ngẫu nhiên: Ngập ~${depth_cm}cm (nửa bánh xe). Xe máy nguy cơ chết máy, ô tô gầm cao đi được.`;
+      } else {
+        danger_level = 'critical';
+        passable_motorbike = false;
+        passable_car = false;
+        advice = `Kịch bản giả lập ngẫu nhiên: Ngập sâu ${depth_cm}cm vượt gầm xe! Nguy cơ thủy kích ô tô xăng. Tuyệt đối rẽ vòng né ngập!`;
+      }
+
+      return {
+        id: `sim-${city}-${Date.now()}-${idx + 1}`,
+        name: item.name,
+        city,
+        lat: item.lat,
+        lng: item.lng,
+        depth_cm,
+        danger_level,
+        passable_motorbike,
+        passable_car,
+        isSimulated: true,
+        source: `Kịch bản Giả lập Ngẫu nhiên (${item.source})`,
+        pump_status: item.pump_status,
+        advice,
+        updated_at: new Date().toISOString()
+      };
+    });
+
+    this.simulatedFloods = generated;
+    this.simulatedCity = city;
+    return generated;
+  }
+
+  // Lấy danh sách điểm ngập mô phỏng ngẫu nhiên
+  getSimulatedFloods(city = this.currentCity) {
+    if (!this.simulatedFloods || this.simulatedFloods.length === 0 || this.simulatedCity !== city) {
+      this.generateRandomSimulatedFloods(city);
+    }
+    return this.simulatedFloods;
+  }
+
+  // Đổi kịch bản ngẫu nhiên: Xáo trộn vị trí điểm ngập và mức ngập mới tức thì
+  rerollSimulation() {
+    if (!this.isSimulationMode) {
+      this.setSimulationMode(true);
+      return;
+    }
+    const newFloods = this.generateRandomSimulatedFloods(this.currentCity);
+    this.renderAllData();
+    if (this.isDirectionsOpen) {
+      this.calculateSmartRoute();
+    }
+    const depths = newFloods.map(f => f.depth_cm);
+    const minD = Math.min(...depths);
+    const maxD = Math.max(...depths);
+    const cityName = this.citiesConfig[this.currentCity] ? this.citiesConfig[this.currentCity].name : this.currentCity;
+    this.showToast(`🎲 Đã đổi kịch bản ngẫu nhiên: ${newFloods.length} rốn ngập (${minD}cm - ${maxD}cm) tại ${cityName}!`, 'warning', 4500);
+  }
+
   // Lấy toàn bộ rốn ngập hiện tại (bao gồm kịch bản mô phỏng nếu đang bật Chế độ Giả lập)
   getCurrentFloods() {
     let floods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
     if (this.isSimulationMode) {
-      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      const simFloods = this.getSimulatedFloods(this.currentCity);
       floods = [...simFloods, ...floods];
     }
     return floods;
@@ -292,6 +429,11 @@ class GoogleMapsApp {
   // Chuyển đổi trạng thái Chế độ Giả lập / Dữ liệu thật
   setSimulationMode(enabled, showToast = true) {
     this.isSimulationMode = !!enabled;
+
+    if (this.isSimulationMode) {
+      // Tạo kịch bản ngẫu nhiên mới mỗi lần bật
+      this.generateRandomSimulatedFloods(this.currentCity);
+    }
 
     // 1. Cập nhật các phần tử giao diện
     const chkMode = document.getElementById('chk-simulation-mode');
@@ -310,12 +452,19 @@ class GoogleMapsApp {
     if (badge) {
       const modeText = badge.querySelector('.mode-text');
       if (modeText) {
-        modeText.textContent = this.isSimulationMode ? '🧪 Giả lập ngập' : '🟢 Dữ liệu thật';
+        modeText.textContent = this.isSimulationMode ? '🧪 Giả lập ngẫu nhiên' : '🟢 Dữ liệu thật';
       }
     }
 
     if (banner) {
       banner.style.display = this.isSimulationMode ? 'flex' : 'none';
+      const bannerText = document.getElementById('gm-sim-banner-text');
+      if (bannerText && this.isSimulationMode && this.simulatedFloods.length > 0) {
+        const depths = this.simulatedFloods.map(f => f.depth_cm);
+        const minD = Math.min(...depths);
+        const maxD = Math.max(...depths);
+        bannerText.innerHTML = `<strong>Chế độ Giả lập ngẫu nhiên:</strong> Đang mô phỏng ${this.simulatedFloods.length} rốn ngập (${minD}cm - ${maxD}cm) ngẫu nhiên để thử nghiệm thuật toán né ngập.`;
+      }
     }
 
     // 2. Vẽ lại toàn bộ dữ liệu trên bản đồ
@@ -329,7 +478,10 @@ class GoogleMapsApp {
     // 4. Thông báo Toast chuyên nghiệp
     if (showToast) {
       if (this.isSimulationMode) {
-        this.showToast('🧪 Đã bật Chế độ Giả lập: Mô phỏng mưa ngập 30-45cm tại các rốn ngập trọng điểm để thử nghiệm thuật toán né ngập!', 'warning', 4500);
+        const depths = this.simulatedFloods.map(f => f.depth_cm);
+        const minD = Math.min(...depths);
+        const maxD = Math.max(...depths);
+        this.showToast(`🧪 Đã bật Chế độ Giả lập ngẫu nhiên: ${this.simulatedFloods.length} rốn ngập (${minD}cm - ${maxD}cm) để thử nghiệm thuật toán né ngập!`, 'warning', 4500);
       } else {
         this.showToast('🟢 Đã chuyển về Dữ liệu thật: 100% dữ liệu thời gian thực từ TomTom và trạm khí tượng.', 'info', 4000);
       }
@@ -339,7 +491,7 @@ class GoogleMapsApp {
   updateStatsCounters() {
     let cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
     if (this.isSimulationMode) {
-      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      const simFloods = this.getSimulatedFloods(this.currentCity);
       cityFloods = [...simFloods, ...cityFloods];
     }
     const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
@@ -385,7 +537,7 @@ class GoogleMapsApp {
 
     // Bổ sung các điểm ngập mô phỏng nếu đang bật Chế độ Giả lập
     if (this.isSimulationMode) {
-      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      const simFloods = this.getSimulatedFloods(this.currentCity);
       cityFloods = [...simFloods, ...cityFloods];
     }
 
@@ -670,6 +822,9 @@ class GoogleMapsApp {
     // 4. Chọn thành phố -> Cập nhật lại bản đồ, thời tiết trung tâm và thời tiết trạm các quận
     document.getElementById('city-select-gm')?.addEventListener('change', async (e) => {
       this.currentCity = e.target.value;
+      if (this.isSimulationMode) {
+        this.generateRandomSimulatedFloods(this.currentCity);
+      }
       const city = this.citiesConfig[this.currentCity];
       window.mapEngine.flyToCity(city);
       this.resetCityRouteDefaults();
@@ -830,6 +985,11 @@ class GoogleMapsApp {
     document.getElementById('mode-toggle-container')?.addEventListener('click', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.classList.contains('gm-slider')) return;
       this.setSimulationMode(!this.isSimulationMode, true);
+    });
+
+    // Nút [🎲 Đổi kịch bản] trên Floating Banner
+    document.getElementById('btn-reroll-simulation')?.addEventListener('click', () => {
+      this.rerollSimulation();
     });
 
     // Nút [Tắt giả lập ✕] trên Floating Banner
@@ -2083,7 +2243,7 @@ class GoogleMapsApp {
 
     // [CHẾ ĐỘ GIẢ LẬP]: Bổ sung các điểm ngập mô phỏng vào phân tích lộ trình nếu đang bật Giả lập
     if (this.isSimulationMode) {
-      const simFloods = SIMULATED_FLOOD_HOTSPOTS[this.currentCity] || [];
+      const simFloods = this.getSimulatedFloods(this.currentCity);
       effectiveFloods = [...simFloods, ...effectiveFloods];
     }
 

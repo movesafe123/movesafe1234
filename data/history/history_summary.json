@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 170,
+  "totalSnapshots": 171,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-14T10:58:59.811Z",
+  "updatedAt": "2026-10-14T11:21:45.768Z",
   "snapshots": [
     {
       "timestamp": "2026-10-07T17:00:00.000Z",
@@ -4058,6 +4058,38 @@
       },
       "danang": {
         "avgSpeedKmh": 9,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-14T11:21:45.768Z",
+      "date": "2026-10-14",
+      "hour": 18,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "name": "Đường Huỳnh Tấn Phát (Quận 7 - Đoạn gần cầu Phú Mỹ)",
+            "depth_cm": 25
+          },
+          {
+            "name": "Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)",
+            "depth_cm": 25
+          }
+        ]
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
         "congestionIndex": 5,
         "maxRainMm": 0,
         "activeFloodSpots": []

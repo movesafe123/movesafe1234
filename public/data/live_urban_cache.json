@@ -258,24 +258,6 @@
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
       "updated_at": "2026-10-14T11:00:53.888Z"
-    },
-    {
-      "id": "crowd-1791970664428",
-      "name": "Điểm do cộng đồng báo cáo",
-      "city": "hanoi",
-      "lat": 21.0285,
-      "lng": 105.8542,
-      "type": "flood",
-      "depth_cm": 20,
-      "danger_level": "low",
-      "passable_motorbike": false,
-      "passable_car": false,
-      "source": "Cộng đồng MoveSafe (Xác thực)",
-      "pump_status": "Người dân đang hỗ trợ cảnh báo",
-      "advice": "Chú ý giảm tốc độ khi di chuyển qua đây.",
-      "user_name": "Tài xế ẩn danh",
-      "photo_url": "",
-      "updated_at": "2026-10-14T09:37:44.428Z"
     }
   ],
   "trafficIncidents": [
@@ -2441,7 +2423,7 @@
     }
   ],
   "stats": {
-    "totalFloods": 3,
+    "totalFloods": 11,
     "criticalFloods": 0,
     "trafficJams": 79,
     "roadworks": 56,
