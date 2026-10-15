@@ -15,6 +15,7 @@ CREATE TABLE ev_stations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     provider VARCHAR(100), -- Ví dụ: VinFast, ChargeAlong, EVOne, Selex
+    city VARCHAR(50) NOT NULL DEFAULT 'hanoi', -- hanoi, hcm, danang
     address TEXT,
     lat DOUBLE PRECISION NOT NULL,
     lng DOUBLE PRECISION NOT NULL,
@@ -22,6 +23,7 @@ CREATE TABLE ev_stations (
     is_active BOOLEAN DEFAULT true,
     location GEOGRAPHY(Point, 4326) -- Tọa độ chuẩn hệ quy chiếu toàn cầu
 );
+CREATE INDEX idx_ev_stations_city ON ev_stations(city);
 
 -- Tự động tính toán cột 'location' dựa vào 'lat' và 'lng'
 CREATE OR REPLACE FUNCTION update_ev_location()
@@ -37,21 +39,21 @@ BEFORE INSERT OR UPDATE ON ev_stations
 FOR EACH ROW EXECUTE FUNCTION update_ev_location();
 
 -- Dữ liệu mẫu tại Hà Nội, TP.HCM và Đà Nẵng
-INSERT INTO ev_stations (name, provider, address, lat, lng, capacity) VALUES
+INSERT INTO ev_stations (name, provider, city, address, lat, lng, capacity) VALUES
 -- Hà Nội
-('Trạm sạc Vincom Metropolis', 'VinFast', '29 Liễu Giai, Ba Đình, Hà Nội', 21.0319, 105.8115, 8),
-('Trạm sạc Vincom Trần Duy Hưng', 'VinFast', '119 Trần Duy Hưng, Cầu Giấy, Hà Nội', 21.0069, 105.7951, 6),
-('Trạm sạc Royal City', 'VinFast', '72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0028, 105.8155, 12),
-('Tủ thay pin Selex Motors Bách Khoa', 'Selex Motors', 'Đại học Bách Khoa Hà Nội, Hai Bà Trưng', 21.0041, 105.8437, 4),
-('Trạm sạc EVOne Lotte Center', 'EVOne', '54 Liễu Giai, Ba Đình, Hà Nội', 21.0330, 105.8123, 4),
+('Trạm sạc Vincom Metropolis', 'VinFast', 'hanoi', '29 Liễu Giai, Ba Đình, Hà Nội', 21.0319, 105.8115, 8),
+('Trạm sạc Vincom Trần Duy Hưng', 'VinFast', 'hanoi', '119 Trần Duy Hưng, Cầu Giấy, Hà Nội', 21.0069, 105.7951, 6),
+('Trạm sạc Royal City', 'VinFast', 'hanoi', '72A Nguyễn Trãi, Thanh Xuân, Hà Nội', 21.0028, 105.8155, 12),
+('Tủ thay pin Selex Motors Bách Khoa', 'Selex Motors', 'hanoi', 'Đại học Bách Khoa Hà Nội, Hai Bà Trưng', 21.0041, 105.8437, 4),
+('Trạm sạc EVOne Lotte Center', 'EVOne', 'hanoi', '54 Liễu Giai, Ba Đình, Hà Nội', 21.0330, 105.8123, 4),
 -- TP. Hồ Chí Minh
-('Trạm sạc Landmark 81', 'VinFast', '720A Điện Biên Phủ, Bình Thạnh, TP.HCM', 10.7952, 106.7218, 16),
-('Trạm sạc Vincom Center Đồng Khởi', 'VinFast', '72 Lê Thánh Tôn, Quận 1, TP.HCM', 10.7778, 106.7019, 8),
-('Trạm sạc Gigamall Thủ Đức', 'EVOne', '240-242 Phạm Văn Đồng, TP. Thủ Đức, TP.HCM', 10.8277, 106.7214, 6),
-('Tủ đổi pin Selex Điện Biên Phủ', 'Selex Motors', '279 Điện Biên Phủ, Quận 3, TP.HCM', 10.7791, 106.6892, 4),
+('Trạm sạc Landmark 81', 'VinFast', 'hcm', '720A Điện Biên Phủ, Bình Thạnh, TP.HCM', 10.7952, 106.7218, 16),
+('Trạm sạc Vincom Center Đồng Khởi', 'VinFast', 'hcm', '72 Lê Thánh Tôn, Quận 1, TP.HCM', 10.7778, 106.7019, 8),
+('Trạm sạc Gigamall Thủ Đức', 'EVOne', 'hcm', '240-242 Phạm Văn Đồng, TP. Thủ Đức, TP.HCM', 10.8277, 106.7214, 6),
+('Tủ đổi pin Selex Điện Biên Phủ', 'Selex Motors', 'hcm', '279 Điện Biên Phủ, Quận 3, TP.HCM', 10.7791, 106.6892, 4),
 -- Đà Nẵng
-('Trạm sạc Vincom Plaza Ngô Quyền', 'VinFast', '910A Ngô Quyền, Sơn Trà, Đà Nẵng', 16.0718, 108.2325, 8),
-('Trạm sạc Sân bay Quốc tế Đà Nẵng', 'VinFast', 'Hòa Thuận Tây, Hải Châu, Đà Nẵng', 16.0538, 108.2022, 6);
+('Trạm sạc Vincom Plaza Ngô Quyền', 'VinFast', 'danang', '910A Ngô Quyền, Sơn Trà, Đà Nẵng', 16.0718, 108.2325, 8),
+('Trạm sạc Sân bay Quốc tế Đà Nẵng', 'VinFast', 'danang', 'Hòa Thuận Tây, Hải Châu, Đà Nẵng', 16.0538, 108.2022, 6);
 
 
 -- ------------------------------------------------------------------------------------
@@ -92,6 +94,7 @@ DROP TABLE IF EXISTS flood_predictions CASCADE;
 CREATE TABLE flood_predictions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location_name VARCHAR(255) NOT NULL,
+    city VARCHAR(50) NOT NULL DEFAULT 'hanoi',
     lat DOUBLE PRECISION NOT NULL,
     lng DOUBLE PRECISION NOT NULL,
     target_hour INT NOT NULL,
@@ -99,6 +102,7 @@ CREATE TABLE flood_predictions (
     confidence DOUBLE PRECISION,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+CREATE INDEX idx_flood_predictions_city_hour ON flood_predictions(city, target_hour);
 
 -- ------------------------------------------------------------------------------------
 -- 5. BẢNG LƯU TRỮ LỊCH SỬ NGẬP LỤT ĐÔ THỊ (Lưu 7 ngày)
@@ -157,4 +161,3 @@ DROP POLICY IF EXISTS "Public Read Flood Predictions" ON flood_predictions;
 CREATE POLICY "Public Read Flood Predictions" ON flood_predictions FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Public Write Flood Predictions" ON flood_predictions;
 CREATE POLICY "Public Write Flood Predictions" ON flood_predictions FOR ALL USING (true) WITH CHECK (true);
-

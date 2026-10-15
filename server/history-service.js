@@ -10,13 +10,21 @@ if (!fs.existsSync(HISTORY_DIR)) {
   fs.mkdirSync(HISTORY_DIR, { recursive: true });
 }
 
+// Helper lấy ngày (YYYY-MM-DD) và giờ (0-23) chuẩn múi giờ Việt Nam (UTC+7)
+function getVietnamDateParts(dateObj = new Date()) {
+  const vnTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
+  const dateStr = vnTime.toISOString().split('T')[0];
+  const hour = vnTime.getUTCHours();
+  return { dateStr, hour };
+}
+
 class HistoryService {
   constructor() {
     this.retentionDays = 7; // Cửa sổ trượt 7 ngày (Rolling 7 days)
     this.historySummaryFile = path.join(HISTORY_DIR, 'history_summary.json');
     this.lastRecordTime = 0;
     this.recordIntervalMs = 15 * 60 * 1000; // Lưu 1 snapshot mỗi 15 phút
-    
+
     // Khởi tạo hoặc nạp sẵn dữ liệu 7 ngày qua nếu chưa có
     this.ensureHistoricalData();
   }
@@ -34,13 +42,12 @@ class HistoryService {
     const now = new Date();
     const records = [];
 
-    // Tạo dữ liệu cho 7 ngày qua (mỗi ngày 24 mốc giờ)
+    // Tạo dữ liệu cho 7 ngày qua (mỗi ngày 24 mốc giờ theo chuẩn UTC+7)
     for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
       const targetDate = new Date(now.getTime() - dayOffset * 24 * 60 * 60 * 1000);
-      const dateStr = targetDate.toISOString().split('T')[0];
-      const dayOfWeek = targetDate.getDay(); // 0 = CN, 6 = T7
+      const { dateStr } = getVietnamDateParts(targetDate);
 
-      // Ngày 3 ngày trước (giả định có trận mưa dông ngập lớn tại Hà Nội & HCM)
+      // Ngày 2 và 4 ngày trước (giả định có trận mưa dông ngập lớn tại Hà Nội & HCM)
       const isHeavyRainDay = (dayOffset === 2 || dayOffset === 4);
 
       for (let hour = 0; hour < 24; hour++) {
@@ -53,9 +60,9 @@ class HistoryService {
         const isPeak = isMorningPeak || isEveningPeak;
 
         // Vận tốc trung bình đô thị (km/h)
-        let avgSpeedHanoi = isPeak ? (isHeavyRainDay ? 12 : 16) : (hour >= 23 || hour <= 5 ? 45 : 32);
-        let avgSpeedHcm = isPeak ? (isHeavyRainDay ? 11 : 15) : (hour >= 23 || hour <= 5 ? 42 : 30);
-        let avgSpeedDanang = isPeak ? 24 : 38;
+        const avgSpeedHanoi = isPeak ? (isHeavyRainDay ? 12 : 16) : (hour >= 23 || hour <= 5 ? 45 : 32);
+        const avgSpeedHcm = isPeak ? (isHeavyRainDay ? 11 : 15) : (hour >= 23 || hour <= 5 ? 42 : 30);
+        const avgSpeedDanang = isPeak ? 24 : 38;
 
         // Mưa & Ngập
         let maxRainHanoi = 0;
@@ -92,8 +99,10 @@ class HistoryService {
           danang: {
             avgSpeedKmh: avgSpeedDanang,
             congestionIndex: isPeak ? 2.5 : 1.1,
-            maxRainMm: 0,
-            activeFloodSpots: []
+            maxRainMm: (isHeavyRainDay && hour === 17) ? 18 : 0,
+            activeFloodSpots: (isHeavyRainDay && hour === 17) ? [
+              { name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh', depth_cm: 22 }
+            ] : []
           }
         });
       }
@@ -112,8 +121,8 @@ class HistoryService {
     console.log(`[HistoryService] ✓ Đã tạo thành công ${records.length} mốc lịch sử 7 ngày qua.`);
   }
 
-  // Tự động ghi 1 snapshot mới mỗi 15 phút (Rolling Window)
-  recordSnapshot(liveData) {
+  // Tự động ghi 1 snapshot mới mỗi 15 phút (Rolling Window, ghi bất đồng bộ không chặn Event Loop)
+  async recordSnapshot(liveData) {
     const now = Date.now();
     if (now - this.lastRecordTime < this.recordIntervalMs) {
       return; // Chưa đến chu kỳ 15 phút
@@ -123,21 +132,22 @@ class HistoryService {
     try {
       let payload = { snapshots: [] };
       if (fs.existsSync(this.historySummaryFile)) {
-        payload = JSON.parse(fs.readFileSync(this.historySummaryFile, 'utf-8'));
+        const raw = await fs.promises.readFile(this.historySummaryFile, 'utf-8');
+        payload = JSON.parse(raw);
       }
 
-      const isoNow = new Date().toISOString();
-      const dateStr = isoNow.split('T')[0];
-      const hour = new Date().getHours();
+      const nowDate = new Date();
+      const isoNow = nowDate.toISOString();
+      const { dateStr, hour } = getVietnamDateParts(nowDate);
 
       // Trích xuất thống kê từ liveData hiện tại
       const floodPoints = liveData.floodPoints || [];
       const trafficIncidents = liveData.trafficIncidents || [];
       const weatherStations = liveData.weatherStations || {};
 
-      const hanoiFloods = floodPoints.filter(f => f.city === 'hanoi' && f.depth_cm > 0);
-      const hcmFloods = floodPoints.filter(f => f.city === 'hcm' && f.depth_cm > 0);
-      const danangFloods = floodPoints.filter(f => f.city === 'danang' && f.depth_cm > 0);
+      const hanoiFloods = floodPoints.filter(f => f.city === 'hanoi' && f.depth_cm > 0 && f.danger_level !== 'safe');
+      const hcmFloods = floodPoints.filter(f => f.city === 'hcm' && f.depth_cm > 0 && f.danger_level !== 'safe');
+      const danangFloods = floodPoints.filter(f => f.city === 'danang' && f.depth_cm > 0 && f.danger_level !== 'safe');
 
       const newSnapshot = {
         timestamp: isoNow,
@@ -147,19 +157,19 @@ class HistoryService {
           avgSpeedKmh: this.calcAvgSpeed(trafficIncidents.filter(t => t.city === 'hanoi')),
           congestionIndex: this.calcCongestionIndex(trafficIncidents.filter(t => t.city === 'hanoi')),
           maxRainMm: this.calcMaxRain(weatherStations.hanoi || []),
-          activeFloodSpots: hanoiFloods.map(f => ({ name: f.name, depth_cm: f.depth_cm }))
+          activeFloodSpots: hanoiFloods.map(f => ({ id: f.id, name: f.name, depth_cm: f.depth_cm, danger_level: f.danger_level }))
         },
         hcm: {
           avgSpeedKmh: this.calcAvgSpeed(trafficIncidents.filter(t => t.city === 'hcm')),
           congestionIndex: this.calcCongestionIndex(trafficIncidents.filter(t => t.city === 'hcm')),
           maxRainMm: this.calcMaxRain(weatherStations.hcm || []),
-          activeFloodSpots: hcmFloods.map(f => ({ name: f.name, depth_cm: f.depth_cm }))
+          activeFloodSpots: hcmFloods.map(f => ({ id: f.id, name: f.name, depth_cm: f.depth_cm, danger_level: f.danger_level }))
         },
         danang: {
           avgSpeedKmh: this.calcAvgSpeed(trafficIncidents.filter(t => t.city === 'danang')),
           congestionIndex: this.calcCongestionIndex(trafficIncidents.filter(t => t.city === 'danang')),
           maxRainMm: this.calcMaxRain(weatherStations.danang || []),
-          activeFloodSpots: danangFloods.map(f => ({ name: f.name, depth_cm: f.depth_cm }))
+          activeFloodSpots: danangFloods.map(f => ({ id: f.id, name: f.name, depth_cm: f.depth_cm, danger_level: f.danger_level }))
         }
       };
 
@@ -172,7 +182,7 @@ class HistoryService {
       payload.totalSnapshots = payload.snapshots.length;
       payload.updatedAt = isoNow;
 
-      fs.writeFileSync(this.historySummaryFile, JSON.stringify(payload, null, 2), 'utf-8');
+      await fs.promises.writeFile(this.historySummaryFile, JSON.stringify(payload, null, 2), 'utf-8');
       console.log(`[HistoryService] 💾 Đã lưu snapshot lịch sử lúc ${new Date().toLocaleTimeString()} (Tổng số mốc: ${payload.snapshots.length})`);
 
       // Đẩy nhẹ lên Supabase Cloud (chế độ nền, không chặn tiến trình)
@@ -182,34 +192,36 @@ class HistoryService {
     }
   }
 
-  // Đẩy snapshot lên Supabase (Fire-and-forget)
+  // Đẩy snapshot giao thông và ngập lụt lên Supabase (Fire-and-forget)
   async pushSnapshotToSupabase(newSnapshot) {
     const url = config.API_KEYS.SUPABASE_URL;
     const key = config.API_KEYS.SUPABASE_KEY;
     if (!url || !key) return;
 
     try {
+      const getWeatherTag = (rainMm) => rainMm > 20 ? 'heavy_rain' : (rainMm > 0 ? 'light_rain' : 'clear');
+
       const trafficRows = [
         {
           segment_id: 'HN_CITY_AVG',
           recorded_at: newSnapshot.timestamp,
           speed_kmh: newSnapshot.hanoi.avgSpeedKmh,
           congestion_level: Math.round(newSnapshot.hanoi.congestionIndex),
-          weather_condition: newSnapshot.hanoi.maxRainMm > 20 ? 'heavy_rain' : (newSnapshot.hanoi.maxRainMm > 0 ? 'light_rain' : 'clear')
+          weather_condition: getWeatherTag(newSnapshot.hanoi.maxRainMm)
         },
         {
           segment_id: 'HCM_CITY_AVG',
           recorded_at: newSnapshot.timestamp,
           speed_kmh: newSnapshot.hcm.avgSpeedKmh,
           congestion_level: Math.round(newSnapshot.hcm.congestionIndex),
-          weather_condition: newSnapshot.hcm.maxRainMm > 20 ? 'heavy_rain' : (newSnapshot.hcm.maxRainMm > 0 ? 'light_rain' : 'clear')
+          weather_condition: getWeatherTag(newSnapshot.hcm.maxRainMm)
         },
         {
           segment_id: 'DN_CITY_AVG',
           recorded_at: newSnapshot.timestamp,
           speed_kmh: newSnapshot.danang.avgSpeedKmh,
           congestion_level: Math.round(newSnapshot.danang.congestionIndex),
-          weather_condition: 'clear'
+          weather_condition: getWeatherTag(newSnapshot.danang.maxRainMm)
         }
       ];
 
@@ -223,6 +235,35 @@ class HistoryService {
         },
         body: JSON.stringify(trafficRows)
       }).catch(() => {});
+
+      // Ghi đồng thời các điểm đang ngập thực tế vào bảng flood_history
+      const floodRows = [];
+      ['hanoi', 'hcm', 'danang'].forEach(cityKey => {
+        const spots = newSnapshot[cityKey]?.activeFloodSpots || [];
+        spots.forEach(spot => {
+          floodRows.push({
+            station_id: spot.id || `${cityKey.toUpperCase()}_${spot.name.slice(0, 20).replace(/\s+/g, '_')}`,
+            station_name: spot.name,
+            city: cityKey,
+            depth_cm: spot.depth_cm,
+            danger_level: spot.danger_level || (spot.depth_cm >= 30 ? 'critical' : 'medium'),
+            recorded_at: newSnapshot.timestamp
+          });
+        });
+      });
+
+      if (floodRows.length > 0) {
+        fetch(`${url}/rest/v1/flood_history`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(floodRows)
+        }).catch(() => {});
+      }
     } catch (err) {}
   }
 
@@ -281,6 +322,9 @@ class HistoryService {
         }
       });
 
+      const speeds = timeSeries.map(t => t.avgSpeedKmh || 30);
+      const rains = timeSeries.map(t => t.maxRainMm || 0);
+
       return {
         status: 'success',
         city,
@@ -289,9 +333,9 @@ class HistoryService {
         timeSeries,
         peakFloods: peakFloods.sort((a, b) => b.depth_cm - a.depth_cm).slice(0, 5),
         summary: {
-          minSpeedKmh: Math.min(...timeSeries.map(t => t.avgSpeedKmh || 30)),
-          maxSpeedKmh: Math.max(...timeSeries.map(t => t.avgSpeedKmh || 40)),
-          maxRainMm: Math.max(...timeSeries.map(t => t.maxRainMm || 0)),
+          minSpeedKmh: speeds.length > 0 ? Math.min(...speeds) : 30,
+          maxSpeedKmh: speeds.length > 0 ? Math.max(...speeds) : 40,
+          maxRainMm: rains.length > 0 ? Math.max(...rains) : 0,
           floodEventsCount: peakFloods.length
         }
       };

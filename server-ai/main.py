@@ -1,10 +1,12 @@
 import os
+import json
+import datetime
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import xgboost as xgb
 from fastapi import FastAPI, BackgroundTasks
 from supabase import create_client, Client
-import datetime
 
 app = FastAPI(title="MoveSafe AI Prediction Engine")
 
@@ -13,7 +15,7 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://cuvleafsohxtchhgbdbk.supa
 SUPABASE_KEY = (
     os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
     or os.environ.get("SUPABASE_SERVICE_KEY")
-    or os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1dmxlYWZzb2h4dGNoaGdiZGJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5Nzk4MDIsImV4cCI6MjEwNjU1NTgwMn0.r7qAMKdo3-oKhPXAVDYGILkuh32ckpELHMJAZ0tX9yk")
+    or os.environ.get("SUPABASE_KEY", "")
 )
 
 supabase: Client = None
@@ -33,127 +35,171 @@ latest_predictions = {
     "updated_at": None
 }
 
+CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "live_urban_cache.json"
+
+
+def get_realtime_city_weather():
+    """Đọc dữ liệu lượng mưa thực tế từ cache của Bot Node.js nếu có"""
+    city_weather = {"hanoi": 0, "hcm": 0, "danang": 0}
+    try:
+        if CACHE_PATH.exists():
+            with open(CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            stations = data.get("weatherStations", {})
+            for city_key in ["hanoi", "hcm", "danang"]:
+                st_list = stations.get(city_key, [])
+                max_rain = max((s.get("rain1h", 0) or 0 for s in st_list), default=0)
+                if max_rain >= 25:
+                    city_weather[city_key] = 2  # Mưa lớn / Ngập
+                elif max_rain >= 2:
+                    city_weather[city_key] = 1  # Mưa vừa / Mưa nhỏ
+                else:
+                    city_weather[city_key] = 0  # Khô ráo
+    except Exception:
+        pass
+    return city_weather
+
+
 def generate_synthetic_data():
-    """ 
-    Tạo dữ liệu giả lập để huấn luyện mô hình XGBoost.
-    Trong thực tế, bạn sẽ SELECT * FROM traffic_history để lấy data thật.
     """
-    print("Đang tổng hợp dữ liệu lịch sử...")
-    np.random.seed(42)
-    # Giả lập 2000 dòng dữ liệu: Giờ (0-23) và Thời tiết (0: Nắng, 1: Mưa, 2: Ngập)
-    hours = np.random.randint(0, 24, 2000)
-    weather = np.random.choice([0, 1, 2], 2000, p=[0.7, 0.2, 0.1])
-    
+    Tạo dữ liệu lịch sử đa thành phố để huấn luyện mô hình XGBoost.
+    Đặc trưng: hour (0-23), weather (0: Nắng, 1: Mưa, 2: Mưa rất to/Ngập), city_code (0: HN, 1: HCM, 2: ĐN)
+    """
+    print("Đang tổng hợp dữ liệu lịch sử huấn luyện...")
+    rng = np.random.default_rng(42)
+    n_samples = 2400
+    hours = rng.integers(0, 24, n_samples)
+    weather = rng.choice([0, 1, 2], n_samples, p=[0.7, 0.2, 0.1])
+    city_codes = rng.choice([0, 1, 2], n_samples, p=[0.4, 0.4, 0.2])
+
     labels = []
-    for h, w in zip(hours, weather):
-        if w == 2: # Ngập lụt -> Chắc chắn tắc đường nghiêm trọng
-            labels.append(np.random.randint(4, 6)) # Mức 4-5
-        elif h in [7, 8, 17, 18, 19]: # Giờ cao điểm
-            labels.append(np.random.randint(3, 5)) # Mức 3-4
-        elif w == 1: # Mưa nhẹ
-            labels.append(np.random.randint(2, 4)) # Mức 2-3
+    for h, w, c in zip(hours, weather, city_codes):
+        base = 0.0 if c == 2 else (0.5 if c == 0 else 0.6)  # Đà Nẵng thoáng hơn HN & HCM
+        if w == 2:
+            lvl = 4.2 + base
+        elif h in [7, 8, 17, 18, 19]:
+            lvl = 3.2 + base + (0.6 if w == 1 else 0.0)
+        elif w == 1:
+            lvl = 2.2 + base
+        elif h in [23, 0, 1, 2, 3, 4, 5]:
+            lvl = 1.0
         else:
-            labels.append(np.random.randint(0, 2)) # Mức 0-1 (Thông thoáng)
-            
-    return pd.DataFrame({'hour': hours, 'weather': weather, 'congestion_level': labels})
+            lvl = 1.6 + (base * 0.5)
+        labels.append(min(5.0, max(1.0, lvl)))
+
+    return pd.DataFrame({
+        "hour": hours,
+        "weather": weather,
+        "city_code": city_codes,
+        "congestion_level": labels
+    })
+
 
 @app.post("/train")
 def train_model():
-    """ Khởi tạo và huấn luyện mô hình AI """
+    """Khởi tạo và huấn luyện mô hình AI XGBoost"""
     global model
     df = generate_synthetic_data()
-    X = df[['hour', 'weather']]
-    y = df['congestion_level']
-    
+    X = df[["hour", "weather", "city_code"]]
+    y = df["congestion_level"]
+
     print("🤖 Đang huấn luyện AI (XGBoost)...")
-    # Khởi tạo thuật toán XGBoost (Cây quyết định siêu tốc)
-    model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, max_depth=5)
+    model = xgb.XGBRegressor(objective="reg:squarederror", n_estimators=100, max_depth=5, random_state=42)
     model.fit(X, y)
-    
+
     return {"status": "success", "message": "Đã huấn luyện xong mô hình XGBoost."}
 
+
 def run_predictions_task():
-    """ AI suy luận tương lai và ghi vào Database / In-memory """
+    """AI suy luận tương lai và ghi vào Database / In-memory"""
     global model, latest_predictions
     if model is None:
         train_model()
-        
+
     print("🔮 Đang tính toán dự báo tương lai...")
-    current_hour = datetime.datetime.now().hour
-    current_weather = 0 # Giả định thời tiết hiện tại đang nắng
-    
+    vn_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=7)))
+    current_hour = vn_now.hour
+    city_weather = get_realtime_city_weather()
+
     cities = [
-        {"segment_id": "HANOI_CORE", "city": "hanoi"},
-        {"segment_id": "HCMC_CORE", "city": "hcm"},
-        {"segment_id": "DANANG_CORE", "city": "danang"}
+        {"segment_id": "HANOI_CORE", "city": "hanoi", "city_code": 0},
+        {"segment_id": "HCMC_CORE", "city": "hcm", "city_code": 1},
+        {"segment_id": "DANANG_CORE", "city": "danang", "city_code": 2}
     ]
-    
+
     predictions = []
-    # Suy luận cho 1h, 2h, 3h tới
     for offset in [1, 2, 3]:
         target_hour = (current_hour + offset) % 24
-        
-        # Nhét dữ liệu (Giờ, Thời tiết) vào cho AI đoán
-        input_data = pd.DataFrame({'hour': [target_hour], 'weather': [current_weather]})
-        pred_val = model.predict(input_data)[0]
-        
-        # Làm tròn kết quả về thang điểm 0-5
-        level = int(round(max(0, min(5, float(pred_val))))) 
-        
         for c in cities:
+            w_code = city_weather.get(c["city"], 0)
+            input_data = pd.DataFrame({
+                "hour": [target_hour],
+                "weather": [w_code],
+                "city_code": [c["city_code"]]
+            })
+            pred_val = float(model.predict(input_data)[0])
+            level = int(round(max(1, min(5, pred_val))))
             predictions.append({
                 "segment_id": c["segment_id"],
                 "target_hour": offset,
                 "predicted_level": level,
-                "confidence": 0.89
+                "confidence": round(0.92 - (offset - 1) * 0.04, 2)
             })
-        
-    # ===== AI DỰ BÁO NGẬP LỤT ĐA THÀNH PHỐ =====
+
+    # ===== AI DỰ BÁO NGẬP LỤT ĐA THÀNH PHỐ (Tất định theo rủi ro địa hình & lượng mưa) =====
     flood_prone_areas = [
         # Hà Nội
-        {"name": "Ngã tư Thái Hà - Chùa Bộc (HN)", "lat": 21.0075, "lng": 105.8245, "base_risk": 0.8},
-        {"name": "Đường Nguyễn Khuyến (HN)", "lat": 21.0280, "lng": 105.8340, "base_risk": 0.9},
-        {"name": "Đường Vũ Trọng Phụng (HN)", "lat": 20.9950, "lng": 105.8060, "base_risk": 0.75},
+        {"name": "Ngã tư Thái Hà - Chùa Bộc (HN)", "city": "hanoi", "lat": 21.0075, "lng": 105.8245, "base_depth": 28, "base_risk": 0.86},
+        {"name": "Đường Nguyễn Khuyến (HN)", "city": "hanoi", "lat": 21.0268, "lng": 105.8409, "base_depth": 35, "base_risk": 0.92},
+        {"name": "Đường Vũ Trọng Phụng (HN)", "city": "hanoi", "lat": 20.9950, "lng": 105.8060, "base_depth": 24, "base_risk": 0.80},
         # TP. Hồ Chí Minh
-        {"name": "Đường Nguyễn Văn Quá (Q12, HCM)", "lat": 10.8423, "lng": 106.6212, "base_risk": 0.85},
-        {"name": "Đường Quốc Hương (Thảo Điền, HCM)", "lat": 10.8045, "lng": 106.7321, "base_risk": 0.8},
-        {"name": "Đường Huỳnh Tấn Phát (Q7, HCM)", "lat": 10.7412, "lng": 106.7389, "base_risk": 0.75},
+        {"name": "Đường Nguyễn Văn Quá (Q12, HCM)", "city": "hcm", "lat": 10.8421, "lng": 106.6289, "base_depth": 26, "base_risk": 0.85},
+        {"name": "Đường Quốc Hương (Thảo Điền, HCM)", "city": "hcm", "lat": 10.8052, "lng": 106.7351, "base_depth": 35, "base_risk": 0.90},
+        {"name": "Đường Huỳnh Tấn Phát (Q7, HCM)", "city": "hcm", "lat": 10.7412, "lng": 106.7325, "base_depth": 40, "base_risk": 0.88},
         # Đà Nẵng
-        {"name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (ĐN)", "lat": 16.0615, "lng": 108.2140, "base_risk": 0.8},
-        {"name": "Đường Mẹ Suốt (Liên Chiểu, ĐN)", "lat": 16.0592, "lng": 108.1583, "base_risk": 0.85}
+        {"name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (ĐN)", "city": "danang", "lat": 16.0615, "lng": 108.2140, "base_depth": 28, "base_risk": 0.84},
+        {"name": "Đường Mẹ Suốt (Liên Chiểu, ĐN)", "city": "danang", "lat": 16.0592, "lng": 108.1583, "base_depth": 36, "base_risk": 0.89}
     ]
-    
+
     flood_predictions = []
     for offset in [1, 2, 3]:
+        # Dự báo mức nước rút dần hoặc dâng theo kịch bản mưa
+        decay_factor = 1.0 if offset == 1 else (0.82 if offset == 2 else 0.65)
         for area in flood_prone_areas:
-            # Dự báo độ sâu theo mức ngập tăng dần theo offset
-            depth_factor = 1.0 + (offset - 1) * 0.25
-            predicted_depth = int(round(np.random.randint(20, 45) * depth_factor))
+            w_code = city_weather.get(area["city"], 0)
+            rain_boost = 1.2 if w_code == 2 else (1.0 if w_code == 1 else 0.85)
+            predicted_depth = int(round(area["base_depth"] * decay_factor * rain_boost))
             flood_predictions.append({
                 "location_name": area["name"],
+                "city": area["city"],
                 "lat": area["lat"],
                 "lng": area["lng"],
                 "target_hour": offset,
                 "predicted_depth_cm": predicted_depth,
-                "confidence": round(float(area["base_risk"] * np.random.uniform(0.85, 0.98)), 2)
+                "confidence": round(float(area["base_risk"] - (offset - 1) * 0.03), 2)
             })
-            
+
     latest_predictions = {
         "traffic": predictions,
         "floods": flood_predictions,
-        "updated_at": datetime.datetime.now().isoformat()
+        "updated_at": vn_now.isoformat()
     }
 
     # Đẩy lên Supabase nếu có kết nối
     if supabase:
         try:
-            # Xóa các dự báo cũ
             supabase.table("traffic_predictions").delete().neq("segment_id", "0").execute()
             supabase.table("traffic_predictions").insert(predictions).execute()
-            
-            # Ghi dự báo ngập lụt
-            supabase.table("flood_predictions").delete().neq("location_name", "0").execute()
-            supabase.table("flood_predictions").insert(flood_predictions).execute()
+
+            # Bảng flood_predictions trên Supabase có thể chưa có cột city ở bản cũ -> thử gửi đầy đủ, fallback bỏ cột city
+            try:
+                supabase.table("flood_predictions").delete().neq("location_name", "0").execute()
+                supabase.table("flood_predictions").insert(flood_predictions).execute()
+            except Exception:
+                legacy_rows = [{k: v for k, v in row.items() if k != "city"} for row in flood_predictions]
+                supabase.table("flood_predictions").delete().neq("location_name", "0").execute()
+                supabase.table("flood_predictions").insert(legacy_rows).execute()
+
             print("✅ Đã cập nhật kết quả kẹt xe và ngập lụt lên Cloud Supabase!")
         except Exception as e:
             print(f"⚠️ Ghi Supabase thất bại ({e}). Đã lưu kết quả vào bộ nhớ in-memory.")
@@ -162,19 +208,30 @@ def run_predictions_task():
 
     return latest_predictions
 
+
 @app.post("/predict")
 def trigger_prediction(background_tasks: BackgroundTasks):
-    """ Bấm vào API này để kích hoạt AI chạy ngầm """
+    """Kích hoạt AI chạy ngầm"""
     background_tasks.add_task(run_predictions_task)
     return {"status": "success", "message": "Đã kích hoạt AI chạy dự báo ngầm."}
 
+
 @app.get("/predictions")
-def get_predictions():
-    """ Đọc kết quả dự báo mới nhất trực tiếp từ AI engine """
+def get_predictions(city: str = None):
+    """Đọc kết quả dự báo mới nhất trực tiếp từ AI engine"""
     global latest_predictions
     if not latest_predictions["traffic"]:
         run_predictions_task()
+    if city:
+        city_lower = city.lower()
+        seg_prefix = "HANOI" if city_lower == "hanoi" else ("HCMC" if city_lower == "hcm" else "DANANG")
+        return {
+            "traffic": [t for t in latest_predictions["traffic"] if t["segment_id"].startswith(seg_prefix)],
+            "floods": [f for f in latest_predictions["floods"] if f.get("city") == city_lower],
+            "updated_at": latest_predictions["updated_at"]
+        }
     return latest_predictions
+
 
 @app.get("/")
 def read_root():
@@ -185,7 +242,7 @@ def read_root():
         "has_supabase": supabase is not None
     }
 
+
 if __name__ == "__main__":
     import uvicorn
-    # Khởi chạy server tại http://localhost:8000
     uvicorn.run(app, host="0.0.0.0", port=8000)

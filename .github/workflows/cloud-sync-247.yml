@@ -41,8 +41,8 @@ jobs:
           git config --global user.email "bot@movesafe.vn"
           
           # Kiểm tra xem file cache có sự thay đổi không
-          if [[ -n $(git status -s data/live_urban_cache.json) ]]; then
-            git add data/live_urban_cache.json
+          if [[ -n $(git status -s data/live_urban_cache.json public/data/live_urban_cache.json) ]]; then
+            git add data/live_urban_cache.json public/data/live_urban_cache.json
             git commit -m "chore(cloud-sync): Tự động cập nhật rốn ngập & thời tiết 24/7 [skip ci]"
             git push origin main
             echo "✓ Đã cập nhật và đẩy dữ liệu cache mới nhất lên GitHub Cloud!"

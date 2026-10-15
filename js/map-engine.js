@@ -23,6 +23,7 @@ class MapEngine {
     this.weatherVisible = true;
     this.trafficVisible = true;
     this.floodVisible = true;
+    this._loadedEvCity = null;
   }
 
   init(containerId = 'map-container', initialCoords = [21.0285, 105.8542], zoom = 13) {
@@ -101,8 +102,6 @@ class MapEngine {
   }
 
   // Cập nhật marker theo mức zoom: Ẩn bớt để tránh chật bản đồ
-  // - Nếu có tuyến đường: Chỉ hiện thời tiết ở các phường tuyến đường đi qua.
-  // - Nếu không có tuyến đường: Zoom < 14 ẩn hết, Zoom 14 hiện trung tâm, Zoom >= 15 hiện tất cả.
   updateWeatherMarkersByZoom(currentZoom) {
     if (!this.layers.weatherMarkers || !this.allWeatherStations) return;
 
@@ -111,49 +110,45 @@ class MapEngine {
     let activePolyline = null;
 
     if (window.appState && window.appState.lastRouteResult && window.appState.lastRouteResult.routes) {
-        const recommended = window.appState.lastRouteResult.routes.find(r => r.isRecommended) || window.appState.lastRouteResult.routes[0];
-        if (recommended && recommended.polyline) {
-            hasActiveRoute = true;
-            activePolyline = recommended.polyline;
-        }
+      const recommended = window.appState.lastRouteResult.routes.find(r => r.isRecommended) || window.appState.lastRouteResult.routes[0];
+      if (recommended && recommended.polyline) {
+        hasActiveRoute = true;
+        activePolyline = recommended.polyline;
+      }
     }
 
     if (hasActiveRoute && currentZoom < 14) {
-        // Nếu đang vẽ tuyến đường và zoom out, CHỈ hiện thời tiết các phường mà tuyến đường đi qua (< 1km)
-        targetStations = this.allWeatherStations.filter(station => {
-            const sampleStep = Math.max(1, Math.floor(activePolyline.length / 20)); // Lấy ~20 điểm mẫu
-            return activePolyline.some((pt, idx) => {
-                if (idx % sampleStep !== 0) return false;
-                const dLat = (station.lat - pt[0]) * 111000;
-                const dLng = (station.lng - pt[1]) * 111000;
-                return (dLat * dLat + dLng * dLng) < (1200 * 1200); // Bán kính ~1.2km
-            });
+      targetStations = this.allWeatherStations.filter(station => {
+        const sampleStep = Math.max(1, Math.floor(activePolyline.length / 20));
+        return activePolyline.some((pt, idx) => {
+          if (idx % sampleStep !== 0) return false;
+          const dLat = (station.lat - pt[0]) * 111000;
+          const dLng = (station.lng - pt[1]) * 111000;
+          return (dLat * dLat + dLng * dLng) < (1200 * 1200);
         });
+      });
     } else if (currentZoom < 14) {
-        // Zoom out và không có tuyến đường -> Ẩn toàn bộ
-        if (this.map.hasLayer(this.layers.weatherMarkers)) {
-            this.map.removeLayer(this.layers.weatherMarkers);
-        }
-        return;
+      if (this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      return;
     } else {
-        // Zoom gần (>= 14): Hiện bình thường
-        targetStations = (currentZoom === 14 && this.allWeatherStations.length > 25)
-          ? this.allWeatherStations.filter(s => s.isHub !== false)
-          : this.allWeatherStations;
+      targetStations = (currentZoom === 14 && this.allWeatherStations.length > 25)
+        ? this.allWeatherStations.filter(s => s.isHub !== false)
+        : this.allWeatherStations;
     }
 
     if (targetStations.length > 0) {
-        if (!this.map.hasLayer(this.layers.weatherMarkers)) {
-            this.map.addLayer(this.layers.weatherMarkers);
-        }
+      if (!this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.addLayer(this.layers.weatherMarkers);
+      }
     } else {
-        if (this.map.hasLayer(this.layers.weatherMarkers)) {
-            this.map.removeLayer(this.layers.weatherMarkers);
-        }
-        return;
+      if (this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      return;
     }
 
-    // Tránh render lại nếu số lượng không đổi
     if (this._lastRenderedStationCount === targetStations.length && this.layers.weatherMarkers.getLayers().length > 0) {
       return;
     }
@@ -167,11 +162,15 @@ class MapEngine {
     if (key && key.trim()) {
       this.tomtomKey = key.trim();
       if (this.layers.tomtomTraffic && this.map) {
+        const wasOnMap = this.map.hasLayer(this.layers.tomtomTraffic);
         this.map.removeLayer(this.layers.tomtomTraffic);
         this.layers.tomtomTraffic = L.tileLayer(
           `https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=${this.tomtomKey}`,
           { maxZoom: 19, opacity: 0.82 }
-        ).addTo(this.map);
+        );
+        if (wasOnMap) {
+          this.layers.tomtomTraffic.addTo(this.map);
+        }
       }
     }
   }
@@ -217,7 +216,6 @@ class MapEngine {
 
       const marker = L.marker([st.lat, st.lng], { icon: customIcon });
 
-      // Tạo HTML danh sách các trục đường lớn
       let streetsHtml = '';
       if (st.mainStreets && st.mainStreets.length > 0) {
         streetsHtml = `
@@ -242,7 +240,6 @@ class MapEngine {
         `;
       }
 
-      // Điểm giao cắt / Rủi ro
       let extraInfoHtml = '';
       if (st.trafficHotspots && st.trafficHotspots.length > 0) {
         extraInfoHtml += `
@@ -276,10 +273,8 @@ class MapEngine {
             Trạng thái: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
           </div>
 
-          <!-- Danh sách các trục đường lớn thuộc phường -->
           ${streetsHtml}
 
-          <!-- Các chỉ số khí tượng -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 6px 8px; font-size: 11px; margin-bottom: 8px;">
             <div>🌧️ <strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
             <div>💧 <strong>Độ ẩm:</strong> ${st.humidity}%</div>
@@ -296,7 +291,7 @@ class MapEngine {
           <div style="display: flex; gap: 6px; margin-top: 6px;">
             <button 
               style="flex: 1; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
-              onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và các tuyến đường lớn tại ${st.name} thế nào?')">
+              onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và các tuyến đường lớn tại ${st.name.replace(/'/g, "\\'")} thế nào?')">
               🤖 Hỏi AI Về Phường & Đường
             </button>
             <button 
@@ -331,16 +326,12 @@ class MapEngine {
     if (!this.layers.floodMarkers) return;
     this.layers.floodMarkers.clearLayers();
 
-    // Chỉ hiển thị các điểm ngập đang hoạt động thực tế (depth > 0 và chưa rút)
     const activePoints = floodPoints.filter(point => point.depth_cm > 0 && point.danger_level !== 'safe');
-
-    // Nếu thời tiết tạnh ráo / nước đã rút hết: Giữ bản đồ sạch sẽ, khô ráo, không cắm ghim rác
     if (activePoints.length === 0) {
       return;
     }
 
     activePoints.forEach(point => {
-      // Đang có ngập thực tế (depth > 0)
       const isCritical = point.danger_level === 'critical';
       const depthText = point.depth_cm ? `${point.depth_cm}cm` : 'Ngập';
       const badgeClass = isCritical ? '' : 'badge-medium';
@@ -419,7 +410,6 @@ class MapEngine {
       const isAccident = inc.type === 'accident';
       const isRealJam = inc.isJam === true;
 
-      // Icon và màu sắc chuẩn theo bản chất sự cố
       let pinIcon = '🚗';
       let pinBg = '#f29900';
       let headerText = '⚠️ Cảnh báo đường bộ';
@@ -477,7 +467,7 @@ class MapEngine {
             ${speedText} ${inc.delaySeconds > 0 ? `• Độ trễ: <strong>+${Math.round(inc.delaySeconds / 60)} phút</strong>` : ''}
           </div>
           <div style="font-size: 11px; color: #70757a; border-top: 1px solid #eee; padding-top: 4px; margin-top: 6px;">
-            🛰️ Vệ tinh TomTom Traffic v5 thời gian thực
+            🛰️ ${inc.source || 'Vệ tinh TomTom Traffic v5 thời gian thực'}
           </div>
         </div>
       `;
@@ -495,7 +485,6 @@ class MapEngine {
     if (this.layers.routeSafe) this.map.removeLayer(this.layers.routeSafe);
     if (this.layers.routeDanger) this.map.removeLayer(this.layers.routeDanger);
 
-    // Tuyến cũ nguy hiểm (nét đứt đỏ)
     if (hasHazard && dangerRoute) {
       this.layers.routeDanger = L.polyline(dangerRoute.polyline, {
         color: '#d93025',
@@ -505,7 +494,6 @@ class MapEngine {
       }).addTo(this.map);
     }
 
-    // Tuyến né ngập an toàn (viền trắng + ruột xanh lá đậm)
     if (recommendedRoute) {
       this.layers.routeSafeOutline = L.polyline(recommendedRoute.polyline, {
         color: '#ffffff',
@@ -561,17 +549,19 @@ class MapEngine {
     }
   }
 
-  async toggleEV(show) {
+  async toggleEV(show, forceReload = false) {
     if (!this.map) return;
     if (show) {
       if (!this.map.hasLayer(this.layers.evLayer)) {
         this.layers.evLayer.addTo(this.map);
       }
-      // Nạp dữ liệu trạm sạc nếu layer đang rỗng và không đang trong tiến trình tải
-      if (this.layers.evLayer.getLayers().length === 0 && !this._evLoading && window.supabaseService) {
+      const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
+      const needsLoad = forceReload || this._loadedEvCity !== currentCity || this.layers.evLayer.getLayers().length === 0;
+
+      if (needsLoad && !this._evLoading && window.supabaseService) {
         this._evLoading = true;
         try {
-          const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
+          this.layers.evLayer.clearLayers();
           const stations = await window.supabaseService.getEVStations(currentCity);
           if (Array.isArray(stations)) {
             stations.forEach(st => {
@@ -588,6 +578,7 @@ class MapEngine {
               marker.bindPopup(`<b>⚡ ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
               this.layers.evLayer.addLayer(marker);
             });
+            this._loadedEvCity = currentCity;
           }
         } catch (err) {
           console.warn('[MapEngine] Lỗi nạp trạm sạc EV:', err);

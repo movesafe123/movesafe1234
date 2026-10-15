@@ -92,7 +92,6 @@ class WeatherService {
       const data = await res.json();
       const current = data.current;
       let rain = current.precipitation || current.rain || 0;
-      // Lọc bỏ sai số đo sương đêm / ẩm < 0.5mm
       if (rain < 0.5) rain = 0;
       else rain = Math.round(rain * 10) / 10;
 
@@ -133,10 +132,20 @@ class WeatherService {
     }
   }
 
-  // 2. Lấy dữ liệu thời tiết cho tất cả trạm/quận huyện trên bản đồ (Batch Fetch 100% Cloud API)
+  // 2. Lấy dữ liệu thời tiết cho tất cả trạm/quận huyện trên bản đồ (Ưu tiên tái sử dụng cache từ Server để tránh gọi trùng 76 tọa độ)
   async getMultiStationWeather(cityKey = 'hanoi') {
     const stations = this.stationPresets[cityKey] || this.stationPresets.hanoi;
     if (!stations || stations.length === 0) return [];
+
+    // Ưu tiên 1: Nếu liveData từ Server/SSE đã có sẵn dữ liệu trạm thời tiết mới (< 5 phút), dùng ngay để tiết kiệm băng thông
+    const serverStations = window.appState?.liveData?.weatherStations?.[cityKey];
+    if (Array.isArray(serverStations) && serverStations.length >= stations.length) {
+      const sampleTime = serverStations[0]?.updated_at ? new Date(serverStations[0].updated_at).getTime() : 0;
+      if (sampleTime > 0 && (Date.now() - sampleTime) < 5 * 60 * 1000) {
+        this.stationCache[cityKey] = serverStations;
+        return serverStations;
+      }
+    }
 
     try {
       const lats = stations.map(s => s.lat).join(',');
@@ -153,7 +162,6 @@ class WeatherService {
         const item = resultsArray[idx] || {};
         const curr = item.current || {};
         let rain = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
-        // Lọc bỏ sai số sương / ẩm ban đêm < 0.5mm
         if (rain < 0.5) rain = 0;
         else rain = Math.round(rain * 10) / 10;
 
@@ -202,31 +210,32 @@ class WeatherService {
       if (this.stationCache[cityKey] && this.stationCache[cityKey].length > 0) {
         return this.stationCache[cityKey];
       }
+      if (Array.isArray(serverStations) && serverStations.length > 0) {
+        return serverStations;
+      }
 
-      return stations.map((st, idx) => {
-        return {
-          id: st.id,
-          name: st.name,
-          ward: st.ward || '',
-          district: st.district || '',
-          city: cityKey,
-          lat: st.lat,
-          lng: st.lng,
-          isHub: st.isHub !== false,
-          mainStreets: st.mainStreets || [],
-          trafficHotspots: st.trafficHotspots || [],
-          floodVulnerability: st.floodVulnerability || '',
-          temp: 26,
-          feelsLike: 29,
-          rain1h: 0,
-          humidity: 80,
-          windSpeed: 10,
-          floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' },
-          description: 'Trời tạnh ráo, không mưa',
-          icon: '☀️',
-          updated_at: new Date().toISOString()
-        };
-      });
+      return stations.map((st) => ({
+        id: st.id,
+        name: st.name,
+        ward: st.ward || '',
+        district: st.district || '',
+        city: cityKey,
+        lat: st.lat,
+        lng: st.lng,
+        isHub: st.isHub !== false,
+        mainStreets: st.mainStreets || [],
+        trafficHotspots: st.trafficHotspots || [],
+        floodVulnerability: st.floodVulnerability || '',
+        temp: 26,
+        feelsLike: 29,
+        rain1h: 0,
+        humidity: 80,
+        windSpeed: 10,
+        floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' },
+        description: 'Trời tạnh ráo, không mưa',
+        icon: '☀️',
+        updated_at: new Date().toISOString()
+      }));
     }
   }
 

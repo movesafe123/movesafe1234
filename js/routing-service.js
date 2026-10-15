@@ -7,9 +7,9 @@
  * 2. Xét ĐẶC TÍNH KỸ THUẬT & NGƯỠNG AN TOÀN của từng phương tiện (Xe máy xăng, Xe máy điện, Ô tô xăng, Ô tô điện).
  * 3. Điểm ngập vượt ngưỡng kỹ thuật = VẬT CẢN BẤT KHẢ DỤNG -> Tự động tính toán tuyến đường vòng (Bypass Detour).
  * 4. Cả 3 chế độ (An toàn, Cân bằng, Nhanh nhất) PHẢI LÀ CÁC TUYẾN ĐI ĐƯỢC:
- *    - Tuyến 1 (🛡️ An toàn tuyệt đối): 100% Khô ráo (0cm ngập) & né kẹt xe tối đa.
- *    - Tuyến 2 (⚖️ Cân bằng thông minh): Cho phép đi qua nước nông an toàn (dưới gầm xe), cự ly tối ưu.
- *    - Tuyến 3 (⚡ Nhanh nhất): Tuyến ngắn nhất / nhanh nhất TRONG SỐ CÁC TUYẾN XE ĐI ĐƯỢC HỢP LỆ.
+ *    - Tuyến 1 (🛡️ An toàn tuyệt đối): Ưu tiên 100% Khô ráo (0cm ngập) & né kẹt xe tối đa.
+ *    - Tuyến 2 (⚖️ Cân bằng thông minh): Tối ưu hài hòa giữa thời gian di chuyển và mức độ an toàn.
+ *    - Tuyến 3 (⚡ Nhanh nhất): Tuyến có thời gian di chuyển ngắn nhất TRONG SỐ CÁC TUYẾN XE ĐI ĐƯỢC HỢP LỆ.
  */
 
 class RoutingService {
@@ -110,7 +110,7 @@ class RoutingService {
   async fetchOsrmRoute(waypoints) {
     const coordsStr = waypoints.map(w => `${w[0]},${w[1]}`).join(';');
     const url = `${this.osrmBaseUrl}/${coordsStr}?overview=full&geometries=geojson&steps=true&alternatives=true`;
-    
+
     const res = await fetch(url);
     if (!res.ok) throw new Error('Không thể kết nối máy chủ định tuyến OSRM');
     const data = await res.json();
@@ -160,20 +160,20 @@ class RoutingService {
     const directDist = this.getDistanceMeters(originLat, originLng, destLat, destLng);
     if (directDist < 1000) return false;
 
-    const sampleStep = Math.max(1, Math.floor(polyline.length / 50)); 
+    const sampleStep = Math.max(1, Math.floor(polyline.length / 50));
     let minDistSoFar = Infinity;
-    const backtrackThreshold = Math.max(1500, directDist * 0.25); 
+    const backtrackThreshold = Math.max(1500, directDist * 0.25);
 
     for (let i = 0; i < polyline.length; i += sampleStep) {
       const pt = polyline[i];
       const currentDist = this.getDistanceMeters(pt[0], pt[1], destLat, destLng);
-      
+
       if (currentDist < minDistSoFar) {
         minDistSoFar = currentDist;
       }
-      
+
       if (currentDist > minDistSoFar + backtrackThreshold) {
-        return true; 
+        return true;
       }
     }
     return false;
@@ -195,22 +195,22 @@ class RoutingService {
     const specs = this.vehicleSpecs[vehicleType] || this.vehicleSpecs.motorbike;
 
     // Rốn ngập vượt quá giới hạn an toàn kỹ thuật -> VẬT CẢN BẤT KHẢ DỤNG (BLOCKED)
-    const blockedFloods = floodPoints.filter(f => 
+    const blockedFloods = floodPoints.filter(f =>
       f.depth_cm >= specs.maxPassableDepth && f.danger_level !== 'safe'
     );
 
     // Rốn ngập trong vùng cảnh báo (nước tương đối sâu nhưng dưới ngưỡng tử thần)
-    const cautionFloods = floodPoints.filter(f => 
+    const cautionFloods = floodPoints.filter(f =>
       f.depth_cm > specs.safeDepth && f.depth_cm < specs.maxPassableDepth && f.danger_level !== 'safe'
     );
 
     // Vũng nước nông an toàn (dưới nửa bánh xe / gầm xe)
-    const safeFloods = floodPoints.filter(f => 
-      f.depth_cm > 0 && f.depth_cm <= specs.safeDepth
+    const safeFloods = floodPoints.filter(f =>
+      f.depth_cm > 0 && f.depth_cm <= specs.safeDepth && f.danger_level !== 'safe'
     );
 
-    // Điểm đóng đường do thi công hoặc kẹt cứng bất động > 30 phút
-    const blockedTraffics = trafficIncidents.filter(t => 
+    // Điểm đóng đường do thi công hoặc kẹt cứng bất động >= 30 phút
+    const blockedTraffics = trafficIncidents.filter(t =>
       t.type === 'road_closure' || (t.isJam && t.delaySeconds >= 1800)
     );
 
@@ -219,38 +219,48 @@ class RoutingService {
 
   /**
    * Kiểm tra xem tuyến đường có cắt qua bất kỳ điểm ngập BẤT KHẢ DỤNG nào không
+   * Tối ưu hóa bằng Bounding Box pre-filter để giảm 95% phép tính lượng giác Haversine
    */
   checkRoutePassability(polyline, blockedFloods, blockedTraffics, corridorBuffer) {
     const blockedBy = [];
+    if (blockedFloods.length === 0 && blockedTraffics.length === 0) {
+      return { isPassable: true, blockedBy };
+    }
 
-    polyline.forEach(pt => {
-      blockedFloods.forEach(f => {
-        const d = this.getDistanceMeters(pt[0], pt[1], f.lat, f.lng);
+    const degMargin = 0.004; // ~440m
+
+    for (let i = 0; i < polyline.length; i++) {
+      const pt = polyline[i];
+      const pLat = pt[0];
+      const pLng = pt[1];
+
+      for (let j = 0; j < blockedFloods.length; j++) {
+        const f = blockedFloods[j];
+        if (Math.abs(pLat - f.lat) > degMargin || Math.abs(pLng - f.lng) > degMargin) continue;
+        const d = this.getDistanceMeters(pLat, pLng, f.lat, f.lng);
         const radius = f.radius || corridorBuffer;
-        if (d <= radius) {
-          if (!blockedBy.some(b => b.id === f.id)) {
-            blockedBy.push({
-              ...f,
-              hazardType: 'blocked_flood',
-              distanceToRoute: Math.round(d)
-            });
-          }
+        if (d <= radius && !blockedBy.some(b => b.id === f.id)) {
+          blockedBy.push({
+            ...f,
+            hazardType: 'blocked_flood',
+            distanceToRoute: Math.round(d)
+          });
         }
-      });
+      }
 
-      blockedTraffics.forEach(t => {
-        const d = this.getDistanceMeters(pt[0], pt[1], t.lat, t.lng);
-        if (d <= 150) {
-          if (!blockedBy.some(b => b.id === t.id)) {
-            blockedBy.push({
-              ...t,
-              hazardType: 'blocked_traffic',
-              distanceToRoute: Math.round(d)
-            });
-          }
+      for (let k = 0; k < blockedTraffics.length; k++) {
+        const t = blockedTraffics[k];
+        if (Math.abs(pLat - t.lat) > 0.002 || Math.abs(pLng - t.lng) > 0.002) continue;
+        const d = this.getDistanceMeters(pLat, pLng, t.lat, t.lng);
+        if (d <= 150 && !blockedBy.some(b => b.id === t.id)) {
+          blockedBy.push({
+            ...t,
+            hazardType: 'blocked_traffic',
+            distanceToRoute: Math.round(d)
+          });
         }
-      });
-    });
+      }
+    }
 
     return {
       isPassable: blockedBy.length === 0,
@@ -261,7 +271,7 @@ class RoutingService {
   /**
    * Sinh các tọa độ Waypoint né ngập động xung quanh các chướng ngại vật bị chặn
    */
-  generateDetourWaypoints(origin, destination, blockedFloods, specs) {
+  generateDetourWaypoints(origin, destination, hazardsToAvoid, specs) {
     const dLat = destination.lat - origin.lat;
     const dLng = destination.lng - origin.lng;
     const len = Math.hypot(dLat, dLng);
@@ -273,8 +283,8 @@ class RoutingService {
 
     const waypoints = [];
 
-    // 1. Waypoint né hai bên của từng rốn ngập bị chặn
-    blockedFloods.forEach(bf => {
+    // 1. Waypoint né hai bên của từng rốn ngập cần tránh
+    hazardsToAvoid.forEach(bf => {
       specs.detourOffsets.forEach(offM => {
         const offDeg = offM / 111000;
         waypoints.push({ lat: bf.lat + perpLat * offDeg, lng: bf.lng + perpLng * offDeg });
@@ -308,26 +318,26 @@ class RoutingService {
     const polyline = route.polyline;
     const totalPoints = polyline.length;
     let affectedPoints = 0;
-    let severePoints = 0;
-    let moderatePoints = 0;
 
     const matchedFloods = [];
     const matchedTraffics = [];
+    const allShallowFloods = [...cautionFloods, ...safeFloods];
+    const degLimit = 0.0035; // ~380m
 
-    polyline.forEach(pt => {
+    for (let i = 0; i < totalPoints; i++) {
+      const pt = polyline[i];
+      const pLat = pt[0];
+      const pLng = pt[1];
       let isPointCongested = false;
 
-      // Kẹt xe
-      for (const inc of trafficIncidents) {
-        const dist = this.getDistanceMeters(pt[0], pt[1], inc.lat, inc.lng);
+      // Kẹt xe / sự cố
+      for (let j = 0; j < trafficIncidents.length; j++) {
+        const inc = trafficIncidents[j];
+        if (Math.abs(pLat - inc.lat) > degLimit || Math.abs(pLng - inc.lng) > degLimit) continue;
+        const dist = this.getDistanceMeters(pLat, pLng, inc.lat, inc.lng);
         if (dist <= 250) {
-          isPointCongested = true;
           if (inc.isJam) {
-            if ((inc.speedKmh && inc.speedKmh < 12) || (inc.delaySeconds && inc.delaySeconds >= 600)) {
-              severePoints++;
-            } else {
-              moderatePoints++;
-            }
+            isPointCongested = true;
           }
           if (!matchedTraffics.some(t => t.id === inc.id)) {
             matchedTraffics.push({
@@ -341,9 +351,10 @@ class RoutingService {
       }
 
       // Ngập nhẹ / nước nông
-      const allShallowFloods = [...cautionFloods, ...safeFloods];
-      for (const fl of allShallowFloods) {
-        const dist = this.getDistanceMeters(pt[0], pt[1], fl.lat, fl.lng);
+      for (let k = 0; k < allShallowFloods.length; k++) {
+        const fl = allShallowFloods[k];
+        if (Math.abs(pLat - fl.lat) > degLimit || Math.abs(pLng - fl.lng) > degLimit) continue;
+        const dist = this.getDistanceMeters(pLat, pLng, fl.lat, fl.lng);
         if (dist <= (fl.radius || specs.corridorBuffer)) {
           if (!matchedFloods.some(f => f.id === fl.id)) {
             matchedFloods.push({
@@ -358,7 +369,7 @@ class RoutingService {
       }
 
       if (isPointCongested) affectedPoints++;
-    });
+    }
 
     const jamPercent = totalPoints > 0 ? Math.round((affectedPoints / totalPoints) * 100) : 0;
     const severeCount = matchedTraffics.filter(t => t.isJam && (t.speedKmh < 12 || t.delaySeconds >= 600)).length;
@@ -367,11 +378,15 @@ class RoutingService {
     // Tính điểm bất lợi: ngập nhẹ trong tầm an toàn bị phạt điểm nhẹ, kẹt xe phạt điểm nặng
     const congestionScore = (severeCount * 50) + (moderateCount * 20) + (matchedFloods.length * 25) + (jamPercent * 1.5);
 
-    // Thời gian ước tính thực tế theo phương tiện
+    // Thời gian ước tính thực tế theo phương tiện (chỉ cộng độ trễ từ các điểm có delaySeconds > 0 thực sự)
     let realDurationMin = Math.round(route.durationSeconds / 60);
     matchedTraffics.forEach(t => {
-      const delayMin = Math.round((t.delaySeconds || 180) / 60);
-      realDurationMin += Math.min(delayMin, 10);
+      if (t.isJam || t.type === 'accident' || t.type === 'roadwork' || t.type === 'road_closure') {
+        const delayMin = Math.round((t.delaySeconds || 0) / 60);
+        if (delayMin > 0) {
+          realDurationMin += Math.min(delayMin, 10);
+        }
+      }
     });
     realDurationMin = Math.max(3, Math.round(realDurationMin / specs.speedFactor));
 
@@ -397,30 +412,33 @@ class RoutingService {
       throw new Error(`Không có tuyến đường khả dụng cho ${specs.name}`);
     }
 
-    // Tuyến 3: Nhanh nhất = Tuyến có cự ly ngắn nhất TRONG CÁC TUYẾN ĐI ĐƯỢC
-    const sortedByDistance = [...passableCandidates].sort((a, b) => a.distanceMeters - b.distanceMeters);
-    const fastestRoute = sortedByDistance[0];
+    // Tuyến 3: Nhanh nhất = Tuyến có thời gian di chuyển ngắn nhất (ưu tiên durationMin, sau đó đến distanceMeters)
+    const sortedByFastest = [...passableCandidates].sort((a, b) => {
+      if (a.durationMin !== b.durationMin) return a.durationMin - b.durationMin;
+      return a.distanceMeters - b.distanceMeters;
+    });
+    const fastestRoute = sortedByFastest[0];
 
-    // Tuyến 1: An toàn tuyệt đối = Tuyến ít rủi ro nhất (ưu tiên 0cm ngập, sau đó đến ít tắc nhất)
+    // Tuyến 1: An toàn tuyệt đối = Tuyến ít rủi ro nhất (ưu tiên 0 điểm ngập, sau đó đến ít tắc nhất)
     const sortedBySafety = [...passableCandidates].sort((a, b) => {
-      // Ưu tiên tuyến 0 điểm ngập
       const floodDiff = a.matchedFloods.length - b.matchedFloods.length;
       if (floodDiff !== 0) return floodDiff;
-      return a.congestionScore - b.congestionScore;
+      if (a.congestionScore !== b.congestionScore) return a.congestionScore - b.congestionScore;
+      return a.durationMin - b.durationMin;
     });
     const safeRoute = sortedBySafety[0];
 
-    // Tuyến 2: Cân bằng thông minh = Tuyến tối ưu giữa cự ly và độ an toàn
-    let balancedRoute = passableCandidates.find(r => r !== fastestRoute && r !== safeRoute);
+    // Tuyến 2: Cân bằng thông minh = Tối ưu hàm mục tiêu kết hợp thời gian + độ an toàn
+    const sortedByBalanced = [...passableCandidates].sort((a, b) => {
+      const scoreA = a.durationMin * 2.0 + a.matchedFloods.length * 15 + a.congestionScore * 0.35;
+      const scoreB = b.durationMin * 2.0 + b.matchedFloods.length * 15 + b.congestionScore * 0.35;
+      return scoreA - scoreB;
+    });
+    let balancedRoute = sortedByBalanced.find(r => r !== fastestRoute && r !== safeRoute);
     if (!balancedRoute) {
-      balancedRoute = passableCandidates.length > 1 
-        ? (safeRoute === fastestRoute ? passableCandidates[1] : fastestRoute) 
-        : fastestRoute;
+      balancedRoute = sortedByBalanced.find(r => r !== safeRoute) || sortedByBalanced[0];
     }
 
-    const isIdenticalSafeAndFast = (safeRoute === fastestRoute);
-
-    // Gắn nhãn chi tiết cho từng tuyến
     const safeJam = safeRoute.jamPercent;
     const safeFree = 100 - safeJam;
     const balJam = balancedRoute.jamPercent;
@@ -428,8 +446,8 @@ class RoutingService {
     const fastJam = fastestRoute.jamPercent;
     const fastFree = 100 - fastJam;
 
-    const safeFloodText = safeRoute.matchedFloods.length === 0 
-      ? '100% Khô ráo' 
+    const safeFloodText = safeRoute.matchedFloods.length === 0
+      ? '100% Khô ráo'
       : `${safeRoute.matchedFloods.length} đoạn nước nông`;
 
     const routeSafe = {
@@ -472,10 +490,10 @@ class RoutingService {
       ...fastestRoute,
       routeType: 'fastest',
       label: 'Nhanh nhất (Tuyến đi được)',
-      sublabel: `⚡ Tuyến ngắn nhất (${fastestRoute.distanceKm} km) an toàn cho xe`,
-      tagText: `⚡ Ngắn nhất (${fastestRoute.distanceKm} km) • Đảm bảo an toàn`,
+      sublabel: `⚡ Tuyến nhanh nhất (~${fastestRoute.durationMin} phút • ${fastestRoute.distanceKm} km)`,
+      tagText: `⚡ Nhanh nhất (${fastestRoute.distanceKm} km) • Đảm bảo an toàn`,
       tagClass: 'gm-tag-fastest',
-      trafficDesc: 'Tuyến ngắn nhất và nhanh nhất trong số các hành lang xe có thể đi qua an toàn',
+      trafficDesc: 'Tuyến nhanh nhất trong số các hành lang xe có thể đi qua an toàn',
       jamPercent: fastJam,
       freeFlowPercent: fastFree,
       moderatePercent: Math.round(fastJam * 0.6),
@@ -509,16 +527,16 @@ class RoutingService {
    * Tìm kiếm lộ trình xét Đặc tính Kỹ thuật & Nguy cơ của Phương tiện
    */
   async calculateMultiRoutes({ origin, destination, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1 }) {
-    const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } = 
+    const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } =
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
 
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
 
     // 1. Kiểm tra nếu điểm xuất phát hoặc điểm đến nằm ngay trong tâm rốn ngập sâu
-    const originInDeepFlood = blockedFloods.find(f => 
+    const originInDeepFlood = blockedFloods.find(f =>
       this.getDistanceMeters(origin.lat, origin.lng, f.lat, f.lng) <= (f.radius || specs.corridorBuffer)
     );
-    const destInDeepFlood = blockedFloods.find(f => 
+    const destInDeepFlood = blockedFloods.find(f =>
       this.getDistanceMeters(destination.lat, destination.lng, f.lat, f.lng) <= (f.radius || specs.corridorBuffer)
     );
 
@@ -542,11 +560,12 @@ class RoutingService {
       [destination.lng, destination.lat]
     ]).catch(() => []);
 
-    // 3. Sinh các tuyến vòng (Bypass Detours) né các chướng ngại vật bị chặn
-    const detourWaypoints = this.generateDetourWaypoints(origin, destination, blockedFloods, specs);
-    
+    // 3. Sinh các tuyến vòng (Bypass Detours) né cả các điểm ngập sâu lẫn ngập cảnh báo
+    const hazardsForDetours = [...blockedFloods, ...cautionFloods];
+    const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs);
+
     // Gọi OSRM song song cho các waypoints vòng
-    const detourPromises = detourWaypoints.slice(0, 8).map(wp => 
+    const detourPromises = detourWaypoints.slice(0, 8).map(wp =>
       this.fetchOsrmRoute([
         [origin.lng, origin.lat],
         [wp.lng, wp.lat],
@@ -568,10 +587,10 @@ class RoutingService {
 
     // 4. Bộ lọc chất lượng hình học (Trùng lặp, Quay đầu, Vòng quá mức)
     let goodCandidates = this.filterDistinctRoutes(allRawCandidates);
-    goodCandidates = goodCandidates.filter(route => 
+    goodCandidates = goodCandidates.filter(route =>
       !this.detectBacktracking(route.polyline, origin.lat, origin.lng, destination.lat, destination.lng)
     );
-    goodCandidates = goodCandidates.filter(route => 
+    goodCandidates = goodCandidates.filter(route =>
       !this.isExcessiveDetour(route, directDistMeters)
     );
 
@@ -587,16 +606,23 @@ class RoutingService {
       if (isPassable) {
         passableCandidates.push(route);
       } else {
+        const firstHazard = blockedBy[0];
+        const reasonText = firstHazard.hazardType === 'blocked_flood'
+          ? `Ngập ${firstHazard.depth_cm}cm tại ${firstHazard.name} (vượt ngưỡng ${specs.maxPassableDepth}cm của ${specs.name})`
+          : `Đóng đường / kẹt cứng tại ${firstHazard.description || firstHazard.name || 'trục chính'}`;
         blockedRoutes.push({
           ...route,
           blockedBy,
-          reason: `Ngập ${blockedBy[0].depth_cm}cm tại ${blockedBy[0].name} (vượt ngưỡng ${specs.maxPassableDepth}cm của ${specs.name})`
+          reason: reasonText
         });
       }
     });
 
     // 6. Xử lý trường hợp KHÔNG CÓ ĐƯỜNG ĐI ĐƯỢC
     if (passableCandidates.length === 0) {
+      const depths = blockedFloods.map(f => f.depth_cm);
+      const minD = depths.length > 0 ? Math.min(...depths) : specs.maxPassableDepth;
+      const maxD = depths.length > 0 ? Math.max(...depths) : specs.maxPassableDepth;
       return {
         noPassableRoute: true,
         vehicleSpecs: specs,
@@ -605,13 +631,13 @@ class RoutingService {
         blockedFloods,
         blockedRoutes,
         message: `Không có tuyến đường khả dụng cho ${specs.name} lúc này!`,
-        advice: `Tất cả các ngả đường tiếp cận đều đang ngập sâu từ ${Math.min(...blockedFloods.map(f => f.depth_cm))}cm - ${Math.max(...blockedFloods.map(f => f.depth_cm))}cm (vượt quá giới hạn an toàn ${specs.maxPassableDepth}cm). Nguy cơ cao ${specs.hazardRisk.toLowerCase()}.`,
+        advice: `Tất cả các ngả đường tiếp cận đều đang ngập sâu từ ${minD}cm - ${maxD}cm (vượt quá giới hạn an toàn ${specs.maxPassableDepth}cm). Nguy cơ cao ${specs.hazardRisk.toLowerCase()}.`,
         routes: []
       };
     }
 
     // 7. Đánh giá chi tiết lưu thông & nước nông trên các tuyến ĐI ĐƯỢC
-    const analyzedPassableRoutes = passableCandidates.map(route => 
+    const analyzedPassableRoutes = passableCandidates.map(route =>
       this.evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs)
     );
 

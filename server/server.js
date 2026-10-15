@@ -33,8 +33,20 @@ app.get(['/', '/index.html'], (req, res) => {
   res.sendFile(path.join(rootDir, 'index.html'));
 });
 
-// Rate Limiter trong bộ nhớ (Zero dependency)
+// Rate Limiter trong bộ nhớ kèm cơ chế tự động dọn dẹp chống rò rỉ RAM (Zero dependency)
 const rateLimitMap = new Map();
+const RATE_LIMIT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+const MAX_RATE_LIMIT_KEYS = 5000;
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of rateLimitMap.entries()) {
+    if (now - record.startTime > (record.windowMs || 60000)) {
+      rateLimitMap.delete(key);
+    }
+  }
+}, RATE_LIMIT_CLEANUP_INTERVAL_MS).unref();
+
 function createRateLimiter({ windowMs, maxRequests, message }) {
   return (req, res, next) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
@@ -43,7 +55,11 @@ function createRateLimiter({ windowMs, maxRequests, message }) {
     let record = rateLimitMap.get(key);
 
     if (!record || now - record.startTime > windowMs) {
-      record = { startTime: now, count: 1 };
+      if (rateLimitMap.size >= MAX_RATE_LIMIT_KEYS && !rateLimitMap.has(key)) {
+        const oldestKey = rateLimitMap.keys().next().value;
+        if (oldestKey) rateLimitMap.delete(oldestKey);
+      }
+      record = { startTime: now, count: 1, windowMs };
     } else {
       record.count++;
     }
@@ -89,15 +105,6 @@ function botRefreshLimiter(req, res, next) {
   next();
 }
 
-// 0. API Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    uptime: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString()
-  });
-});
-
 // 1. API Cấu hình công khai cho Frontend
 app.get('/api/config', (req, res) => {
   res.json({
@@ -124,7 +131,7 @@ app.get('/api/live-data', (req, res) => {
 // 2b. API Lấy dữ liệu lịch sử quan trắc 7 ngày qua (Rolling Time-Series)
 app.get('/api/history', (req, res) => {
   const city = req.query.city || 'hanoi';
-  const days = parseInt(req.query.days) || 7;
+  const days = parseInt(req.query.days, 10) || 7;
   const history = historyService.getHistory(city, days);
   res.json(history);
 });
@@ -139,6 +146,7 @@ app.post('/api/bot/refresh', botRefreshLimiter, async (req, res) => {
       data: updated
     });
   } catch (err) {
+    lastBotRefreshTime = 0; // Cho phép thử lại nếu lần cào gặp lỗi
     res.status(500).json({ status: 'error', message: err.message });
   }
 });
@@ -226,13 +234,16 @@ app.get('/api/live-stream', (req, res) => {
   });
 });
 
-// 7. API Kiểm tra sức khỏe hệ thống 24/7 (Health Check)
+// 7. API Kiểm tra sức khỏe hệ thống 24/7 (Health Check hợp nhất)
 app.get('/api/health', (req, res) => {
   const data = botService.getData();
+  const uptimeSec = Math.round(process.uptime());
   res.json({
-    status: 'healthy',
+    status: 'ok',
+    health: 'healthy',
     mode: 'cloud-24-7',
-    uptimeSeconds: Math.round(process.uptime()),
+    uptime: uptimeSec,
+    uptimeSeconds: uptimeSec,
     memoryUsageMB: Math.round(process.memoryUsage().rss / 1024 / 1024),
     lastCrawl: data.lastUpdated,
     stats: data.stats,
@@ -269,4 +280,8 @@ function startServer(port) {
   });
 }
 
-startServer(Number(config.PORT) || 3000);
+if (require.main === module) {
+  startServer(Number(config.PORT) || 3000);
+}
+
+module.exports = app;

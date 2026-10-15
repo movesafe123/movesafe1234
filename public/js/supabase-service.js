@@ -7,9 +7,27 @@ class SupabaseService {
   constructor() {
     this.SUPABASE_URL = 'https://cuvleafsohxtchhgbdbk.supabase.co';
     this.SUPABASE_KEY = 'sb_publishable_IL2L6IKBOYusIzdEGkK6PQ_QTD5OE4e';
-    
+
     this.supabase = null;
     this.isOnline = true; // Cờ kiểm tra kết nối Supabase
+
+    // Các nút giao trọng điểm theo từng thành phố phục vụ dự báo kẹt xe AI
+    this.trafficHotspots = {
+      hanoi: [
+        { name: 'Nút giao Cầu Giấy', lat: 21.0365, lng: 105.7925, baseLevel: 4 },
+        { name: 'Ngã Tư Sở', lat: 21.0028, lng: 105.8197, baseLevel: 4 },
+        { name: 'Khuất Duy Tiến - Nguyễn Trãi', lat: 20.9984, lng: 105.8002, baseLevel: 3 }
+      ],
+      hcm: [
+        { name: 'Vòng xoay Hàng Xanh', lat: 10.8012, lng: 106.7118, baseLevel: 4 },
+        { name: 'Cầu Kênh Tẻ', lat: 10.7533, lng: 106.7027, baseLevel: 3 },
+        { name: 'Ngã tư Cộng Hòa - Hoàng Hoa Thám', lat: 10.8034, lng: 106.6521, baseLevel: 4 }
+      ],
+      danang: [
+        { name: 'Nút giao Cầu Rồng', lat: 16.0610, lng: 108.2230, baseLevel: 2 },
+        { name: 'Ngã ba Huế - Điện Biên Phủ', lat: 16.0680, lng: 108.1880, baseLevel: 3 }
+      ]
+    };
 
     if (window.supabase && this.SUPABASE_URL && !this.SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
       try {
@@ -23,6 +41,14 @@ class SupabaseService {
     } else {
       this.isOnline = false;
     }
+  }
+
+  // Nhận diện thành phố dựa vào tọa độ (hỗ trợ tương thích ngược khi bảng Supabase chưa có cột city)
+  inferCityFromCoords(lat, lng) {
+    if (lat >= 19.5 && lat <= 22.0) return 'hanoi';
+    if (lat >= 10.0 && lat <= 11.5) return 'hcm';
+    if (lat >= 15.5 && lat <= 16.5) return 'danang';
+    return 'hanoi';
   }
 
   // Helper thực hiện truy vấn an toàn kèm timeout (chống treo giao diện khi lỗi DNS/mạng)
@@ -40,21 +66,24 @@ class SupabaseService {
       return res;
     } catch (err) {
       clearTimeout(timeoutId);
-      // Ghi nhớ trạng thái offline tạm thời để không spam request hỏng
       this.isOnline = false;
       console.warn('[Supabase] Đám mây không phản hồi, tự động dùng dữ liệu dự phòng cục bộ:', err.message);
       return null;
     }
   }
 
-  // 1. Lấy danh sách trạm sạc xe điện
+  // 1. Lấy danh sách trạm sạc xe điện theo đúng thành phố
   async getEVStations(city = 'hanoi') {
     if (this.isOnline && this.supabase) {
       const res = await this.safeQuery(
         this.supabase.from('ev_stations').select('*').eq('is_active', true)
       );
       if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
-        return res.data;
+        const filtered = res.data.filter(st => {
+          const stCity = st.city || this.inferCityFromCoords(st.lat, st.lng);
+          return !city || stCity === city;
+        });
+        if (filtered.length > 0) return filtered;
       }
     }
 
@@ -79,41 +108,35 @@ class SupabaseService {
     return mockStations.filter(s => s.city === city || !city);
   }
 
-  // 2. Lấy dự báo kẹt xe từ AI (+1h, +2h, +3h)
+  // 2. Lấy dự báo kẹt xe từ AI (+1h, +2h, +3h) theo đúng tọa độ thành phố
   async getTrafficPrediction(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return null;
+
+    const citySpots = this.trafficHotspots[city] || this.trafficHotspots.hanoi;
+    const expectedPrefix = city === 'hcm' ? 'HCM' : (city === 'danang' ? 'DANANG' : 'HANOI');
 
     if (this.isOnline && this.supabase) {
       const res = await this.safeQuery(
         this.supabase.from('traffic_predictions').select('*').eq('target_hour', offsetHours)
       );
       if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
-        return res.data.map((pred, i) => ({
-          lat: 21.033 + (i * 0.01),
-          lng: 105.800 + (i * 0.01),
-          level: pred.predicted_level || 3,
-          description: `AI Dự báo kẹt xe mức ${pred.predicted_level}/5 sau ${offsetHours}h (Độ tin cậy: ${Math.round((pred.confidence || 0.85) * 100)}%)`
-        }));
+        const matchedRow = res.data.find(r => String(r.segment_id || '').toUpperCase().includes(expectedPrefix)) || res.data[0];
+        const basePredLevel = matchedRow.predicted_level || 3;
+        const confPct = Math.round((matchedRow.confidence || 0.88) * 100);
+
+        return citySpots.map((spot, idx) => {
+          const level = Math.min(5, Math.max(1, idx === 0 ? basePredLevel : basePredLevel - (idx % 2)));
+          return {
+            lat: spot.lat,
+            lng: spot.lng,
+            level,
+            description: `AI Dự báo kẹt xe mức ${level}/5 tại ${spot.name} sau +${offsetHours}h (Độ tin cậy: ${confPct}%)`
+          };
+        });
       }
     }
 
-    // Dự báo tất định (không dùng random) theo các nút giao trọng điểm
-    const hotspots = {
-      hanoi: [
-        { name: 'Nút giao Cầu Giấy', lat: 21.0365, lng: 105.7925, baseLevel: 4 },
-        { name: 'Ngã Tư Sở', lat: 21.0028, lng: 105.8197, baseLevel: 4 },
-        { name: 'Khuất Duy Tiến - Nguyễn Trãi', lat: 20.9984, lng: 105.8002, baseLevel: 3 }
-      ],
-      hcm: [
-        { name: 'Vòng xoay Hàng Xanh', lat: 10.8012, lng: 106.7118, baseLevel: 4 },
-        { name: 'Cầu Kênh Tẻ', lat: 10.7533, lng: 106.7027, baseLevel: 3 }
-      ],
-      danang: [
-        { name: 'Nút giao Cầu Rồng', lat: 16.0610, lng: 108.2230, baseLevel: 2 }
-      ]
-    };
-
-    const citySpots = hotspots[city] || hotspots.hanoi;
+    // Dự báo tất định theo các nút giao trọng điểm của từng thành phố
     return citySpots.map(s => {
       const level = Math.min(5, Math.max(1, s.baseLevel + (offsetHours === 1 ? 0 : (offsetHours === 2 ? -1 : -2))));
       return {
@@ -125,7 +148,7 @@ class SupabaseService {
     });
   }
 
-  // 3. Lấy dự báo ngập lụt từ AI (+1h, +2h, +3h)
+  // 3. Lấy dự báo ngập lụt từ AI (+1h, +2h, +3h) hỗ trợ cả 3 thành phố
   async getFloodPredictions(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return [];
 
@@ -134,36 +157,42 @@ class SupabaseService {
         this.supabase.from('flood_predictions').select('*').eq('target_hour', offsetHours)
       );
       if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
-        return res.data;
+        const cityFiltered = res.data.filter(row => {
+          const rowCity = row.city || this.inferCityFromCoords(row.lat, row.lng);
+          return rowCity === city;
+        });
+        if (cityFiltered.length > 0) return cityFiltered;
       }
     }
 
-    // Dự báo ngập tất định cho các rốn ngập kinh niên
-    if (city === 'hanoi') {
-      const depthMultiplier = offsetHours === 1 ? 1.0 : (offsetHours === 2 ? 0.75 : 0.5);
-      return [
-        {
-          id: 'pred-nk',
-          location_name: 'Đường Nguyễn Khuyến',
-          lat: 21.0268,
-          lng: 105.8409,
-          target_hour: offsetHours,
-          predicted_depth_cm: Math.round(35 * depthMultiplier),
-          confidence: 0.92
-        },
-        {
-          id: 'pred-th',
-          location_name: 'Ngã tư Thái Hà - Chùa Bộc',
-          lat: 21.0075,
-          lng: 105.8245,
-          target_hour: offsetHours,
-          predicted_depth_cm: Math.round(25 * depthMultiplier),
-          confidence: 0.86
-        }
-      ];
-    }
+    // Dự báo ngập tất định cho các rốn ngập kinh niên tại cả 3 đô thị
+    const depthMultiplier = offsetHours === 1 ? 1.0 : (offsetHours === 2 ? 0.8 : 0.6);
+    const cityPresets = {
+      hanoi: [
+        { id: 'pred-hn-nk', location_name: 'Đường Nguyễn Khuyến', lat: 21.0268, lng: 105.8409, baseDepth: 35, confidence: 0.92 },
+        { id: 'pred-hn-th', location_name: 'Ngã tư Thái Hà - Chùa Bộc', lat: 21.0075, lng: 105.8245, baseDepth: 25, confidence: 0.86 }
+      ],
+      hcm: [
+        { id: 'pred-hcm-qh', location_name: 'Đường Quốc Hương (Thảo Điền)', lat: 10.8052, lng: 106.7351, baseDepth: 35, confidence: 0.90 },
+        { id: 'pred-hcm-htp', location_name: 'Đường Huỳnh Tấn Phát (Quận 7)', lat: 10.7412, lng: 106.7325, baseDepth: 38, confidence: 0.88 }
+      ],
+      danang: [
+        { id: 'pred-dn-hn', location_name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh', lat: 16.0615, lng: 108.2140, baseDepth: 28, confidence: 0.85 },
+        { id: 'pred-dn-ms', location_name: 'Đường Mẹ Suốt (Liên Chiểu)', lat: 16.0592, lng: 108.1583, baseDepth: 34, confidence: 0.89 }
+      ]
+    };
 
-    return [];
+    const selected = cityPresets[city] || cityPresets.hanoi;
+    return selected.map(item => ({
+      id: item.id,
+      city,
+      location_name: item.location_name,
+      lat: item.lat,
+      lng: item.lng,
+      target_hour: offsetHours,
+      predicted_depth_cm: Math.round(item.baseDepth * depthMultiplier),
+      confidence: item.confidence
+    }));
   }
 
   // 4. Lấy dữ liệu lịch sử quan trắc 7 ngày qua (Tự động kết hợp Supabase & Local History API)
@@ -183,9 +212,11 @@ class SupabaseService {
     if (this.isOnline && this.supabase) {
       try {
         const cutoff = new Date(Date.now() - (days * 24 * 60 * 60 * 1000)).toISOString();
+        const segId = city === 'hcm' ? 'HCM_CITY_AVG' : (city === 'danang' ? 'DN_CITY_AVG' : 'HN_CITY_AVG');
         const res = await this.safeQuery(
           this.supabase.from('traffic_history')
             .select('*')
+            .eq('segment_id', segId)
             .gte('recorded_at', cutoff)
             .order('recorded_at', { ascending: true })
         );

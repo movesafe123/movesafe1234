@@ -71,18 +71,30 @@ class CrowdsourceService {
       }
     } catch (networkErr) {
       console.warn('Lỗi kết nối server, chuyển sang lưu báo cáo cục bộ:', networkErr.message);
-      // Giả lập lưu cục bộ nếu server không phản hồi
+      const rType = formData.type || 'flood';
+      const depthVal = parseInt(formData.depth_cm, 10) || 25;
+      const locName = formData.locationName || 'Điểm do bạn vừa báo cáo';
+      const isJam = rType === 'traffic_jam';
+
       reportData = {
         id: `local-${Date.now()}`,
-        name: formData.locationName || 'Điểm do bạn vừa báo cáo',
+        name: locName,
         city: formData.city || 'hanoi',
         lat: parseFloat(formData.lat),
         lng: parseFloat(formData.lng),
-        type: formData.type || 'flood',
-        depth_cm: parseInt(formData.depth_cm, 10) || 25,
-        danger_level: parseInt(formData.depth_cm, 10) > 30 ? 'critical' : 'medium',
-        passable_motorbike: parseInt(formData.depth_cm, 10) < 20,
-        passable_car: parseInt(formData.depth_cm, 10) < 35,
+        type: rType,
+        depth_cm: rType === 'flood' ? depthVal : 0,
+        danger_level: depthVal > 30 ? 'critical' : 'medium',
+        passable_motorbike: depthVal < 20,
+        passable_car: depthVal < 35,
+        isJam,
+        categoryName: isJam ? 'Báo cáo ùn tắc cộng đồng' : (rType === 'hazard' ? 'Cảnh báo vật cản' : 'Điểm ngập cộng đồng'),
+        icon: rType === 'flood' ? '🌊' : (isJam ? '🚗' : '⚠️'),
+        description: isJam
+          ? `🚗 Cộng đồng báo kẹt xe tại ${locName}`
+          : (rType === 'hazard' ? `⚠️ Sự cố/vật cản tại ${locName}` : `🌊 Ngập ${depthVal}cm tại ${locName}`),
+        delaySeconds: isJam ? 450 : 180,
+        speedKmh: isJam ? 10 : 25,
         source: 'Báo cáo trực tiếp từ bạn',
         pump_status: 'Vừa ghi nhận',
         advice: 'Cần chú ý giảm tốc độ.',

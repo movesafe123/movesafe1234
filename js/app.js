@@ -280,13 +280,18 @@ class GoogleMapsApp {
   }
 
   async fetchServerConfig() {
+    const savedTomTom = localStorage.getItem('movesafe_tomtom_key');
+    const savedOwm = localStorage.getItem('movesafe_owm_key');
+
     try {
       const res = await fetch('/api/config');
       if (res.ok) {
         const data = await res.json();
         if (data.status === 'success') {
-          if (data.apiKeys.tomtom) window.mapEngine.setTomTomKey(data.apiKeys.tomtom);
-          if (data.apiKeys.openweather) window.weatherService.setApiKey(data.apiKeys.openweather);
+          const tomtomKey = savedTomTom || data.apiKeys.tomtom;
+          const owmKey = savedOwm || data.apiKeys.openweather;
+          if (tomtomKey) window.mapEngine.setTomTomKey(tomtomKey);
+          if (owmKey) window.weatherService.setApiKey(owmKey);
           if (data.cities) this.citiesConfig = data.cities;
           return;
         }
@@ -294,8 +299,9 @@ class GoogleMapsApp {
     } catch (e) {
       console.warn('Chạy chế độ Static Web (GitHub Pages):', e.message);
     }
-    // Khóa TomTom dự phòng khi chạy tĩnh trên GitHub Pages
-    window.mapEngine.setTomTomKey('dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF');
+    // Khóa dự phòng khi chạy tĩnh trên GitHub Pages
+    window.mapEngine.setTomTomKey(savedTomTom || 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF');
+    if (savedOwm) window.weatherService.setApiKey(savedOwm);
   }
 
   async fetchLiveData() {
@@ -830,7 +836,16 @@ class GoogleMapsApp {
       this.resetCityRouteDefaults();
       await this.updateWeather();
       await this.updateWeatherStations();
-      this.renderAllData();
+
+      const chkEv = document.getElementById('chk-layer-ev');
+      if (chkEv && chkEv.checked && window.mapEngine.toggleEV) {
+        await window.mapEngine.toggleEV(true, true);
+      }
+      if (this.currentPredictionOffset > 0) {
+        await this.applyPredictionOffset(this.currentPredictionOffset);
+      } else {
+        this.renderAllData();
+      }
       if (this.isDirectionsOpen) {
         this.calculateSmartRoute();
       }
@@ -1147,9 +1162,11 @@ class GoogleMapsApp {
     const settingsModal = document.getElementById('modal-settings');
     document.getElementById('btn-gm-open-settings')?.addEventListener('click', () => {
       const geminiInput = document.getElementById('setting-gemini-key');
-      if (geminiInput) {
-        geminiInput.value = localStorage.getItem('movesafe_gemini_key') || '';
-      }
+      const tomtomInput = document.getElementById('setting-tomtom-key');
+      const owmInput = document.getElementById('setting-owm-key');
+      if (geminiInput) geminiInput.value = localStorage.getItem('movesafe_gemini_key') || '';
+      if (tomtomInput) tomtomInput.value = localStorage.getItem('movesafe_tomtom_key') || '';
+      if (owmInput) owmInput.value = localStorage.getItem('movesafe_owm_key') || '';
       settingsModal?.classList.add('open');
     });
     document.getElementById('btn-close-settings')?.addEventListener('click', () => settingsModal?.classList.remove('open'));
@@ -1159,9 +1176,18 @@ class GoogleMapsApp {
       const tomtom = document.getElementById('setting-tomtom-key')?.value;
       const owm = document.getElementById('setting-owm-key')?.value;
 
-      if (gemini) localStorage.setItem('movesafe_gemini_key', gemini.trim());
-      if (tomtom) window.mapEngine.setTomTomKey(tomtom.trim());
-      if (owm) window.weatherService.setApiKey(owm.trim());
+      if (gemini !== undefined) {
+        if (gemini.trim()) localStorage.setItem('movesafe_gemini_key', gemini.trim());
+        else localStorage.removeItem('movesafe_gemini_key');
+      }
+      if (tomtom && tomtom.trim()) {
+        localStorage.setItem('movesafe_tomtom_key', tomtom.trim());
+        window.mapEngine.setTomTomKey(tomtom.trim());
+      }
+      if (owm && owm.trim()) {
+        localStorage.setItem('movesafe_owm_key', owm.trim());
+        window.weatherService.setApiKey(owm.trim());
+      }
 
       settingsModal?.classList.remove('open');
       this.showToast('✓ Đã lưu cấu hình API thành công!', 'info');
@@ -1444,8 +1470,9 @@ class GoogleMapsApp {
       // Nút Xóa (Clear)
       clearBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
+        const stateKey = type === 'dest' ? 'destination' : type;
         input.value = '';
-        this.routeLocations[type] = null;
+        this.routeLocations[stateKey] = null;
         if (this.routeMarkers[type]) {
           window.mapEngine.map.removeLayer(this.routeMarkers[type]);
           this.routeMarkers[type] = null;
@@ -1696,11 +1723,14 @@ class GoogleMapsApp {
     const map = window.mapEngine.map;
     if (!map) return;
 
-    if (this.routeMarkers[type]) {
-      map.removeLayer(this.routeMarkers[type]);
+    const markerKey = (type === 'destination' || type === 'dest') ? 'dest' : 'origin';
+    const stateKey = markerKey === 'dest' ? 'destination' : 'origin';
+
+    if (this.routeMarkers[markerKey]) {
+      map.removeLayer(this.routeMarkers[markerKey]);
     }
 
-    const isOrigin = type === 'origin';
+    const isOrigin = markerKey === 'origin';
     const letter = isOrigin ? 'A' : 'B';
     const pinClass = isOrigin ? 'pin-origin' : 'pin-dest';
     const label = isOrigin ? 'Điểm xuất phát (A)' : 'Điểm đến (B)';
@@ -1730,11 +1760,11 @@ class GoogleMapsApp {
     marker.on('dragend', async () => {
       const pos = marker.getLatLng();
       const addrInfo = await window.geocodingService.reverseGeocode(pos.lat, pos.lng);
-      
-      const input = document.getElementById(`gm-route-${type}`);
+
+      const input = document.getElementById(`gm-route-${markerKey}`);
       if (input) input.value = addrInfo.fullAddress || addrInfo.title;
 
-      this.routeLocations[type] = {
+      this.routeLocations[stateKey] = {
         lat: pos.lat,
         lng: pos.lng,
         title: addrInfo.title,
@@ -1751,7 +1781,7 @@ class GoogleMapsApp {
       this.calculateSmartRoute();
     });
 
-    this.routeMarkers[type] = marker;
+    this.routeMarkers[markerKey] = marker;
   }
 
   // Bắt đầu chế độ click chọn trên bản đồ
@@ -1920,11 +1950,45 @@ class GoogleMapsApp {
     if (!query) return;
     const lower = query.toLowerCase();
 
-    // 1. Tìm kiếm rốn ngập trong dữ liệu đã có
-    const matchedFlood = this.liveData.floodPoints.find(f => lower.includes(f.name.toLowerCase().slice(0, 8)));
+    // 0. Nếu hỏi lộ trình rõ ràng "từ A đến B" (hoặc "chỉ đường từ A về B") -> ưu tiên xử lý ngay
+    const routeMatch = query.match(/^(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới)\s+(.+)$/i);
+    if (routeMatch && routeMatch[1] && routeMatch[2]) {
+      this.toggleDirectionsPanel(true);
+      const rawOrigin = routeMatch[1].trim();
+      const rawDest = routeMatch[2].replace(/(\?|!|\.|né ngập|tránh tắc|không ngập)$/i, '').trim();
+
+      const originInput = document.getElementById('gm-route-origin');
+      const destInput = document.getElementById('gm-route-dest');
+      if (originInput) originInput.value = rawOrigin;
+      if (destInput) destInput.value = rawDest;
+
+      this.showToast('🔍 Đang tìm kiếm địa chỉ và phân tích lộ trình...', 'info');
+
+      const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+      const [origMatches, destMatches] = await Promise.all([
+        window.geocodingService.searchAddresses(rawOrigin, { city: this.currentCity, center: cityCenter, limit: 1 }),
+        window.geocodingService.searchAddresses(rawDest, { city: this.currentCity, center: cityCenter, limit: 1 })
+      ]);
+
+      if (origMatches && origMatches.length > 0) this.routeLocations.origin = origMatches[0];
+      if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
+
+      this.calculateSmartRoute();
+      return;
+    }
+
+    // 1. Tìm kiếm rốn ngập trong dữ liệu hiện hành (chỉ khớp tên đường cụ thể, không cắt 8 ký tự đầu gây khớp nhầm)
+    const matchedFlood = this.getCurrentFloods().find(f => {
+      const baseName = f.name.split('(')[0].toLowerCase().replace(/^(phố|đường|ngã tư|nút giao|kđt)\s+/i, '').trim();
+      return baseName.length >= 4 && lower.includes(baseName);
+    });
     if (matchedFlood) {
       window.mapEngine.map.flyTo([matchedFlood.lat, matchedFlood.lng], 16);
-      this.showToast(`🌊 Rốn ngập: ${matchedFlood.name} (${matchedFlood.depth_cm}cm)`, 'danger');
+      if (matchedFlood.depth_cm > 0 && matchedFlood.danger_level !== 'safe') {
+        this.showToast(`🌊 Rốn ngập: ${matchedFlood.name} (${matchedFlood.depth_cm}cm)`, 'danger');
+      } else {
+        this.showToast(`✅ Trạm đo ${matchedFlood.name}: Hiện tại khô ráo (0cm ngập)`, 'info');
+      }
       return;
     }
 
@@ -1972,33 +2036,7 @@ class GoogleMapsApp {
       }
     }
 
-    // 2. Nếu hỏi lộ trình "từ A đến B" (hoặc "từ A về B", "từ A sang B")
-    if (lower.includes('từ') && (lower.includes('đến') || lower.includes('về') || lower.includes('sang'))) {
-      this.toggleDirectionsPanel(true);
-      const parts = query.split(/đến|về|sang/i);
-      const rawOrigin = parts[0].replace(/từ/i, '').trim();
-      const rawDest = parts[1] ? parts[1].trim() : '';
 
-      const originInput = document.getElementById('gm-route-origin');
-      const destInput = document.getElementById('gm-route-dest');
-      if (originInput) originInput.value = rawOrigin;
-      if (destInput) destInput.value = rawDest;
-
-      this.showToast('🔍 Đang tìm kiếm địa chỉ và phân tích lộ trình...', 'info');
-
-      // Tự động Geocode cả 2 điểm
-      const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
-      const [origMatches, destMatches] = await Promise.all([
-        window.geocodingService.searchAddresses(rawOrigin, { city: this.currentCity, center: cityCenter, limit: 1 }),
-        window.geocodingService.searchAddresses(rawDest, { city: this.currentCity, center: cityCenter, limit: 1 })
-      ]);
-
-      if (origMatches && origMatches.length > 0) this.routeLocations.origin = origMatches[0];
-      if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
-
-      this.calculateSmartRoute();
-      return;
-    }
 
     // 3. Nếu là tìm kiếm địa chỉ, ngõ ngách, địa danh cụ thể (ví dụ: "Ngõ 168 Hào Nam", "Chợ Bến Thành", "Vincom")
     try {
