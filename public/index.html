@@ -2,7 +2,12 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a73e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MoveSafe VN">
+  <link rel="manifest" href="manifest.json">
   <title>MoveSafe VN - Bản Đồ Giao Thông Thông Minh, Cảnh Báo Ngập Lụt & Kẹt Xe</title>
   <meta name="description" content="Hệ thống bản đồ kiểu Google Maps tích hợp cảnh báo rốn ngập HSDC/UDi, lưu lượng kẹt xe TomTom và Trợ lý AI né ngập thời gian thực.">
 
@@ -13,7 +18,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- Google Maps Style CSS -->
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <link rel="stylesheet" href="css/style.css?v=3.2">
 </head>
 <body>
 
@@ -47,8 +52,13 @@
       </button>
     </div>
 
-    <!-- Bảng chỉ đường Google Maps (Directions Panel) - Nâng cấp 3 mức độ -->
+    <!-- Bảng chỉ đường Google Maps (Directions Panel) - Nâng cấp 3 mức độ & Mobile Bottom Sheet -->
     <div class="gm-directions-panel" id="gm-directions-panel">
+      <!-- Thanh kéo vuốt cho điện thoại (Mobile Sheet Handle) -->
+      <div class="mobile-sheet-handle-bar" id="directions-sheet-handle" title="Chạm để thu gọn / mở rộng">
+        <div class="mobile-sheet-pill"></div>
+      </div>
+
       <div class="gm-directions-header">
         <div class="gm-travel-modes">
           <button class="gm-mode-tab active" data-mode="motorbike" title="Xe máy xăng: Chịu ngập tối đa 20cm (tránh ngập ống pô & bugi)">🛵 Xe máy</button>
@@ -541,6 +551,30 @@
     </div>
   </div>
 
+  <!-- ==================== 9. THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (MOBILE BOTTOM TAB BAR) ==================== -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Điều hướng di động">
+    <button class="mobile-nav-item active" id="mnav-explore" data-tab="explore">
+      <span class="mnav-icon">🗺️</span>
+      <span class="mnav-label">Bản đồ</span>
+    </button>
+    <button class="mobile-nav-item" id="mnav-route" data-tab="route">
+      <span class="mnav-icon">🔀</span>
+      <span class="mnav-label">Chỉ đường</span>
+    </button>
+    <button class="mobile-nav-item mnav-report-fab" id="mnav-report" data-tab="report">
+      <div class="mnav-fab-circle">📢</div>
+      <span class="mnav-label">Báo ngập</span>
+    </button>
+    <button class="mobile-nav-item" id="mnav-ai" data-tab="ai">
+      <span class="mnav-icon">🤖</span>
+      <span class="mnav-label">Trợ lý AI</span>
+    </button>
+    <button class="mobile-nav-item" id="mnav-insights" data-tab="insights">
+      <span class="mnav-icon">📊</span>
+      <span class="mnav-label">VOV & Xu hướng</span>
+    </button>
+  </nav>
+
   <!-- Toast Notification Container 24/7 Alerts -->
   <div class="gm-toast-container" id="gm-toast-container"></div>
 
@@ -552,14 +586,14 @@
 
   <!-- Client-side Scripts -->
   <script src="js/supabase-service.js"></script>
-  <script src="js/hanoi-wards-streets.js?v=3.1"></script>
-  <script src="js/geocoding-service.js?v=3.1"></script>
-  <script src="js/weather-service.js?v=3.1"></script>
-  <script src="js/routing-service.js?v=3.1"></script>
-  <script src="js/map-engine.js?v=3.1"></script>
-  <script src="js/crowdsource.js?v=3.1"></script>
-  <script src="js/ai-chat.js?v=3.1"></script>
-  <script src="js/app.js?v=3.1"></script>
+  <script src="js/hanoi-wards-streets.js?v=3.2"></script>
+  <script src="js/geocoding-service.js?v=3.2"></script>
+  <script src="js/weather-service.js?v=3.2"></script>
+  <script src="js/routing-service.js?v=3.2"></script>
+  <script src="js/map-engine.js?v=3.2"></script>
+  <script src="js/crowdsource.js?v=3.2"></script>
+  <script src="js/ai-chat.js?v=3.2"></script>
+  <script src="js/app.js?v=3.2"></script>
 
 </body>
 </html>

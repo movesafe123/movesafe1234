@@ -756,21 +756,38 @@ class GoogleMapsApp {
     }, durationMs);
   }
 
+  setMobileActiveTab(tabName) {
+    document.querySelectorAll('.mobile-nav-item').forEach(btn => {
+      if (btn.getAttribute('data-tab') === tabName) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
   toggleDirectionsPanel(forceState) {
     const panel = document.getElementById('gm-directions-panel');
     const searchBox = document.getElementById('gm-search-box');
     const chips = document.getElementById('gm-chips-scroll');
+    const isMobile = window.innerWidth <= 768;
 
     this.isDirectionsOpen = forceState !== undefined ? forceState : !this.isDirectionsOpen;
 
     if (this.isDirectionsOpen) {
       panel.classList.add('open');
-      searchBox.style.display = 'none';
-      chips.style.display = 'none';
+      panel.classList.remove('sheet-minimized');
+      if (!isMobile) {
+        searchBox.style.display = 'none';
+        chips.style.display = 'none';
+      }
+      this.setMobileActiveTab('route');
     } else {
       panel.classList.remove('open');
+      panel.classList.remove('sheet-minimized');
       searchBox.style.display = 'flex';
       chips.style.display = 'flex';
+      this.setMobileActiveTab('explore');
     }
   }
 
@@ -783,6 +800,72 @@ class GoogleMapsApp {
 
     document.getElementById('btn-close-directions')?.addEventListener('click', () => {
       this.toggleDirectionsPanel(false);
+    });
+
+    // 1b. Thanh kéo thu gọn/mở rộng Bottom Sheet trên điện thoại
+    const sheetHandle = document.getElementById('directions-sheet-handle');
+    if (sheetHandle) {
+      sheetHandle.addEventListener('click', () => {
+        const panel = document.getElementById('gm-directions-panel');
+        if (panel) panel.classList.toggle('sheet-minimized');
+      });
+
+      let touchStartY = 0;
+      sheetHandle.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      sheetHandle.addEventListener('touchend', (e) => {
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        const panel = document.getElementById('gm-directions-panel');
+        if (!panel) return;
+        if (deltaY > 35) {
+          // Vuốt xuống -> thu gọn
+          panel.classList.add('sheet-minimized');
+        } else if (deltaY < -35) {
+          // Vuốt lên -> mở rộng
+          panel.classList.remove('sheet-minimized');
+        }
+      }, { passive: true });
+    }
+
+    // 1c. Thanh điều hướng dưới cùng cho Điện thoại (Mobile Bottom Navigation Bar)
+    document.getElementById('mnav-explore')?.addEventListener('click', () => {
+      this.toggleDirectionsPanel(false);
+      window.aiChat?.close();
+      document.getElementById('modal-report')?.classList.remove('open');
+      document.getElementById('modal-urban-insights')?.classList.remove('open');
+      this.setMobileActiveTab('explore');
+    });
+
+    document.getElementById('mnav-route')?.addEventListener('click', () => {
+      window.aiChat?.close();
+      document.getElementById('modal-report')?.classList.remove('open');
+      document.getElementById('modal-urban-insights')?.classList.remove('open');
+      this.toggleDirectionsPanel(true);
+      this.calculateSmartRoute();
+    });
+
+    document.getElementById('mnav-report')?.addEventListener('click', () => {
+      document.getElementById('modal-report')?.classList.add('open');
+    });
+
+    document.getElementById('mnav-ai')?.addEventListener('click', () => {
+      this.toggleDirectionsPanel(false);
+      document.getElementById('modal-report')?.classList.remove('open');
+      document.getElementById('modal-urban-insights')?.classList.remove('open');
+      window.aiChat?.toggle();
+      if (window.aiChat?.isOpen) {
+        this.setMobileActiveTab('ai');
+      } else {
+        this.setMobileActiveTab('explore');
+      }
+    });
+
+    document.getElementById('mnav-insights')?.addEventListener('click', () => {
+      window.aiChat?.close();
+      this.openUrbanInsightsModal();
+      this.setMobileActiveTab('insights');
     });
 
     // 2. Ô tìm kiếm chính
