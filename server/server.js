@@ -7,6 +7,7 @@ const aiService = require('./ai-service');
 const historyService = require('./history-service');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors());
@@ -26,6 +27,11 @@ app.use('/screenshots', express.static(path.join(rootDir, 'public', 'screenshots
 // Phục vụ cache dữ liệu cho client fallback
 app.get('/data/live_urban_cache.json', (req, res) => {
   res.sendFile(path.join(rootDir, 'data', 'live_urban_cache.json'));
+});
+
+// Phục vụ PWA Manifest
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(rootDir, 'manifest.json'));
 });
 
 // Phục vụ trang chủ
@@ -49,7 +55,8 @@ setInterval(() => {
 
 function createRateLimiter({ windowMs, maxRequests, message }) {
   return (req, res, next) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') || req.ip || req.socket.remoteAddress || 'unknown';
     const key = `${ip}:${req.baseUrl || ''}${req.path}`;
     const now = Date.now();
     let record = rateLimitMap.get(key);
@@ -111,7 +118,7 @@ app.get('/api/config', (req, res) => {
     status: 'success',
     apiKeys: {
       tomtom: config.API_KEYS.TOMTOM,
-      openweather: config.API_KEYS.OPENWEATHER,
+      hasOpenWeather: !!config.API_KEYS.OPENWEATHER,
       hasGemini: !!config.API_KEYS.GEMINI
     },
     cities: config.CITIES,
@@ -134,6 +141,17 @@ app.get('/api/history', (req, res) => {
   const days = parseInt(req.query.days, 10) || 7;
   const history = historyService.getHistory(city, days);
   res.json(history);
+});
+
+// 2c. API Lấy dữ liệu dự báo tương lai thực tế (+1h, +2h, +3h)
+app.get('/api/predictions', (req, res) => {
+  const city = req.query.city || 'hanoi';
+  const offset = Math.min(3, Math.max(1, parseInt(req.query.offset, 10) || 1));
+  const predictions = botService.getFuturePredictions(city, offset);
+  res.json({
+    status: 'success',
+    ...predictions
+  });
 });
 
 // 3. API Kích hoạt Bot cào dữ liệu ngay lập tức
@@ -177,6 +195,23 @@ app.post('/api/crowdsource/report', reportLimiter, (req, res) => {
       message: 'Báo cáo sự cố đã được xác thực và ghim lên bản đồ!',
       report: saved
     });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
+// 4b. API Bình chọn xác thực báo cáo cộng đồng (Confirm / Clear)
+app.post('/api/crowdsource/vote', reportLimiter, (req, res) => {
+  try {
+    const { id, voteType } = req.body || {};
+    if (!id || !['confirm', 'clear'].includes(voteType)) {
+      return res.status(400).json({ status: 'error', message: 'Tham số bình chọn không hợp lệ' });
+    }
+    const result = botService.voteCrowdsourceReport(String(id), voteType);
+    if (!result) {
+      return res.status(404).json({ status: 'error', message: 'Không tìm thấy báo cáo sự cố hoặc đã hết hiệu lực' });
+    }
+    res.json({ status: 'success', report: result });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });
   }

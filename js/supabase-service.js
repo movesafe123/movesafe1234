@@ -53,7 +53,14 @@ class SupabaseService {
 
   // Helper thực hiện truy vấn an toàn kèm timeout (chống treo giao diện khi lỗi DNS/mạng)
   async safeQuery(queryPromise, timeoutMs = 3500) {
-    if (!this.supabase || !this.isOnline) return null;
+    if (!this.supabase) return null;
+    if (!this.isOnline) {
+      // Cooldown 60s trước khi thử lại
+      if (Date.now() - (this._lastFailTime || 0) < 60000) {
+        return null;
+      }
+      this.isOnline = true;
+    }
 
     let timeoutId;
     const timeoutPromise = new Promise((_, reject) => {
@@ -67,7 +74,8 @@ class SupabaseService {
     } catch (err) {
       clearTimeout(timeoutId);
       this.isOnline = false;
-      console.warn('[Supabase] Đám mây không phản hồi, tự động dùng dữ liệu dự phòng cục bộ:', err.message);
+      this._lastFailTime = Date.now();
+      console.warn('[Supabase] Đám mây không phản hồi (tự động thử lại sau 60s):', err.message);
       return null;
     }
   }
@@ -112,6 +120,17 @@ class SupabaseService {
   async getTrafficPrediction(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return null;
 
+    // 1. Thử gọi API backend Node.js
+    try {
+      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.trafficPredictions && json.trafficPredictions.length > 0) {
+          return json.trafficPredictions;
+        }
+      }
+    } catch (e) {}
+
     const citySpots = this.trafficHotspots[city] || this.trafficHotspots.hanoi;
     const expectedPrefix = city === 'hcm' ? 'HCM' : (city === 'danang' ? 'DANANG' : 'HANOI');
 
@@ -152,6 +171,17 @@ class SupabaseService {
   async getFloodPredictions(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return [];
 
+    // 1. Thử gọi API backend Node.js
+    try {
+      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.floodPredictions) {
+          return json.floodPredictions;
+        }
+      }
+    } catch (e) {}
+
     if (this.isOnline && this.supabase) {
       const res = await this.safeQuery(
         this.supabase.from('flood_predictions').select('*').eq('target_hour', offsetHours)
@@ -165,7 +195,17 @@ class SupabaseService {
       }
     }
 
-    // Dự báo ngập tất định cho các rốn ngập kinh niên tại cả 3 đô thị
+    // Kiểm tra xem hiện tại có mưa hoặc chế độ mô phỏng đang bật không
+    const isSimulating = Boolean(window.appState?.simulationMode);
+    const hasRain = (window.appState?.currentWeather?.rain1h || 0) > 0 ||
+      (window.appState?.liveData?.floodPoints && window.appState.liveData.floodPoints.length > 0);
+
+    if (!isSimulating && !hasRain) {
+      // Trời tạnh ráo hoàn toàn và không có dữ liệu ngập => không tạo điểm ngập giả định
+      return [];
+    }
+
+    // Dự báo ngập tất định cho các rốn ngập kinh niên tại cả 3 đô thị khi có mưa/mô phỏng
     const depthMultiplier = offsetHours === 1 ? 1.0 : (offsetHours === 2 ? 0.8 : 0.6);
     const cityPresets = {
       hanoi: [

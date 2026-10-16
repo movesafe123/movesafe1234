@@ -1,0 +1,16 @@
+{
+  "name": "MoveSafe VN - Hệ Thống Điều Phối & Tránh Ngập Đô Thị Thông Minh",
+  "short_name": "MoveSafe VN",
+  "description": "Bản đồ giao thông thời gian thực, điều phối né ngập lụt & ùn tắc 24/7",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a73e8",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

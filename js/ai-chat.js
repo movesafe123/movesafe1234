@@ -103,15 +103,57 @@ class AIChat {
     this.renderMessages();
   }
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  speakText(text) {
+    if (!('speechSynthesis' in window)) {
+      alert('Trình duyệt của bạn không hỗ trợ Text-to-Speech.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[*_#`[\]()]/g, ' ').replace(/\s+/g, ' ').trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'vi-VN';
+    utterance.rate = 1.05;
+    window.speechSynthesis.speak(utterance);
+  }
+
   renderMessages() {
     const body = document.getElementById('ai-chat-body');
     if (!body) return;
 
-    body.innerHTML = this.messages.map(m => `
-      <div class="gm-chat-bubble ${m.sender === 'user' ? 'gm-bubble-user' : 'gm-bubble-bot'}">
-        ${m.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
-      </div>
-    `).join('');
+    body.innerHTML = this.messages.map((m, idx) => {
+      const isUser = m.sender === 'user';
+      let safeHtml = this.escapeHtml(m.text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+
+      const ttsButton = !isUser ? `
+        <div style="margin-top: 6px; text-align: right;">
+          <button style="background: none; border: none; font-size: 13px; cursor: pointer; opacity: 0.7; color: inherit;"
+                  onclick="window.aiChat && window.aiChat.speakText(decodeURIComponent('${encodeURIComponent(m.text)}'))"
+                  title="Đọc to bằng giọng nói tiếng Việt">
+            🔊 Nghe
+          </button>
+        </div>
+      ` : '';
+
+      return `
+        <div class="gm-chat-bubble ${isUser ? 'gm-bubble-user' : 'gm-bubble-bot'}">
+          <div>${safeHtml}</div>
+          ${ttsButton}
+        </div>
+      `;
+    }).join('');
 
     body.scrollTop = body.scrollHeight;
   }

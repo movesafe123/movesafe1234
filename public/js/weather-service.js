@@ -87,7 +87,7 @@ class WeatherService {
 
     // Fallback sang Open-Meteo Cloud Radar (Miễn phí 100%, chuẩn xác từng mm mưa)
     try {
-      const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
+      const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
       const res = await fetch(omUrl);
       const data = await res.json();
       const current = data.current;
@@ -95,12 +95,9 @@ class WeatherService {
       if (rain < 0.5) rain = 0;
       else rain = Math.round(rain * 10) / 10;
 
-      let desc = this.getWmoDescription(current.weather_code);
-      let icon = this.getWmoIcon(current.weather_code);
-      if (rain === 0) {
-        desc = 'Trời tạnh ráo, không mưa';
-        icon = '☀️';
-      }
+      const isDay = current.is_day !== undefined ? (current.is_day === 1) : (new Date().getHours() >= 6 && new Date().getHours() < 18);
+      let desc = this.getWmoDescription(current.weather_code, isDay);
+      let icon = this.getWmoIcon(current.weather_code, isDay);
 
       return {
         source: 'Open-Meteo Cloud Radar 24/7',
@@ -117,6 +114,7 @@ class WeatherService {
       };
     } catch (err) {
       console.error('Không thể lấy dữ liệu thời tiết:', err);
+      const isDay = (new Date().getHours() >= 6 && new Date().getHours() < 18);
       return {
         source: 'Cảm biến đô thị MoveSafe',
         cityName: cityName,
@@ -124,8 +122,8 @@ class WeatherService {
         feelsLike: 29,
         humidity: 80,
         windSpeed: 10,
-        description: 'Tạnh ráo, không mưa',
-        icon: '☀️',
+        description: isDay ? 'Tạnh ráo, quang đãng' : 'Trời tối, tạnh ráo',
+        icon: isDay ? '☀️' : '🌙',
         rain1h: 0,
         floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' }
       };
@@ -150,7 +148,7 @@ class WeatherService {
     try {
       const lats = stations.map(s => s.lat).join(',');
       const lngs = stations.map(s => s.lng).join(',');
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
@@ -171,13 +169,10 @@ class WeatherService {
         const windSpeed = typeof curr.wind_speed_10m === 'number' ? Math.round(curr.wind_speed_10m) : 10;
         const wCode = curr.weather_code || 0;
         const floodRisk = this.calculateFloodRisk(rain);
+        const isDay = curr.is_day !== undefined ? (curr.is_day === 1) : (new Date().getHours() >= 6 && new Date().getHours() < 18);
 
-        let desc = this.getWmoDescription(wCode);
-        let icon = this.getWmoIcon(wCode);
-        if (rain === 0) {
-          desc = 'Trời tạnh ráo, không mưa';
-          icon = '☀️';
-        }
+        let desc = this.getWmoDescription(wCode, isDay);
+        let icon = this.getWmoIcon(wCode, isDay);
 
         return {
           id: st.id,
@@ -214,6 +209,7 @@ class WeatherService {
         return serverStations;
       }
 
+      const defaultIsDay = (new Date().getHours() >= 6 && new Date().getHours() < 18);
       return stations.map((st) => ({
         id: st.id,
         name: st.name,
@@ -232,8 +228,8 @@ class WeatherService {
         humidity: 80,
         windSpeed: 10,
         floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' },
-        description: 'Trời tạnh ráo, không mưa',
-        icon: '☀️',
+        description: defaultIsDay ? 'Trời tạnh ráo, không mưa' : 'Trời tối, tạnh ráo',
+        icon: defaultIsDay ? '☀️' : '🌙',
         updated_at: new Date().toISOString()
       }));
     }
@@ -275,19 +271,19 @@ class WeatherService {
     };
   }
 
-  mapWeatherIcon(iconCode) {
+  mapWeatherIcon(iconCode, isDay = true) {
     if (iconCode.includes('11')) return '⛈️';
     if (iconCode.includes('09') || iconCode.includes('10')) return '🌧️';
     if (iconCode.includes('13')) return '❄️';
     if (iconCode.includes('50')) return '🌫️';
-    if (iconCode.includes('01')) return '☀️';
-    if (iconCode.includes('02')) return '⛅';
+    if (iconCode.includes('01')) return isDay ? '☀️' : '🌙';
+    if (iconCode.includes('02')) return isDay ? '⛅' : '☁️';
     return '☁️';
   }
 
-  getWmoDescription(code) {
-    if (code === 0) return 'Trời quang đãng, nắng nhẹ';
-    if (code <= 3) return 'Có mây rải rác';
+  getWmoDescription(code, isDay = true) {
+    if (code === 0) return isDay ? 'Trời quang đãng, nắng nhẹ' : 'Trời quang mây, tạnh ráo';
+    if (code <= 3) return isDay ? 'Có mây rải rác' : 'Nhiều mây về đêm';
     if (code <= 48) return 'Sương mù ẩm ướt';
     if (code <= 55) return 'Mưa phùn hạt nhỏ';
     if (code <= 65) return 'Mưa rào từ nhẹ đến vừa';
@@ -296,13 +292,13 @@ class WeatherService {
     return 'Tạnh ráo, nhiều mây';
   }
 
-  getWmoIcon(code) {
-    if (code === 0) return '☀️';
-    if (code <= 3) return '⛅';
+  getWmoIcon(code, isDay = true) {
+    if (code === 0) return isDay ? '☀️' : '🌙';
+    if (code <= 3) return isDay ? '⛅' : '☁️';
     if (code <= 55) return '🌦️';
     if (code <= 65) return '🌧️';
     if (code >= 80) return '⛈️';
-    return '⛅';
+    return isDay ? '⛅' : '☁️';
   }
 }
 

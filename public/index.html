@@ -200,6 +200,9 @@
       <button class="gm-chip" id="chip-hanoi-streets" title="Xem danh sách các tuyến đường lớn theo từng phường ở Hà Nội">
         🛣️ Tuyến đường lớn Hà Nội
       </button>
+      <button class="gm-chip" id="chip-urban-insights" title="Xem xu hướng giao thông 7 ngày & Tin nhanh VOV Giao thông">
+        📊 Xu hướng & VOV
+      </button>
       <button class="gm-chip gm-chip-safe" id="chip-flood-count">
         🌊 Rốn ngập (0 - Khô ráo)
       </button>
@@ -388,10 +391,18 @@
 
           <div class="form-group">
             <label class="form-label">Tên tuyến đường / Nút giao</label>
-            <input type="text" class="form-control" id="report-location-name" placeholder="Ví dụ: Phố Nguyễn Khuyến" required>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" class="form-control" id="report-location-name" placeholder="Ví dụ: Phố Nguyễn Khuyến" required style="flex: 1;">
+              <button type="button" class="btn-gm-cancel" id="btn-report-current-gps" title="Lấy vị trí GPS hiện tại" style="padding: 6px 10px; font-size: 13px;">
+                📍 GPS
+              </button>
+            </div>
+            <input type="hidden" id="report-lat">
+            <input type="hidden" id="report-lng">
+            <div id="report-coord-display" style="font-size: 11px; color: #1e8e3e; margin-top: 4px; display: none;"></div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="group-report-depth">
             <label class="form-label">Mực nước ngập</label>
             <select class="form-control" id="report-depth">
               <option value="15">~15 cm (Mắt cá chân)</option>
@@ -406,6 +417,33 @@
           <button type="submit" class="btn-gm-primary" style="background: #d93025;">Gửi Báo Cáo</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==================== 7a. MODAL: XU HƯỚNG ĐÔ THỊ & TIN VOV GIAO THÔNG ==================== -->
+  <div class="modal-overlay" id="modal-urban-insights">
+    <div class="modal-card" style="max-width: 650px; width: 92%;">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 700;">📊 Phân Tích Đô Thị & Tin Nhanh VOV</h3>
+        <button class="gm-btn-icon" id="btn-close-urban-insights">✕</button>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <div style="margin-bottom: 16px;">
+          <h4 style="font-size: 14px; font-weight: 700; color: #1a73e8; margin-bottom: 8px;">📻 Kênh VOV Giao Thông Trực Tiếp</h4>
+          <div id="vov-news-list" style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 10px; font-size: 12px; max-height: 180px; overflow-y: auto;">
+            Đang tải bản tin phát thanh mới nhất...
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size: 14px; font-weight: 700; color: #1e8e3e; margin-bottom: 8px;">📈 Biểu Đồ Chỉ Số Tắc Nghẽn 7 Ngày Qua</h4>
+          <div id="historical-trends-chart" style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; min-height: 160px; font-size: 12px;">
+            Đang nạp dữ liệu quan trắc Supabase...
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-gm-primary" onclick="document.getElementById('modal-urban-insights').classList.remove('open')">Đóng</button>
+      </div>
     </div>
   </div>
 

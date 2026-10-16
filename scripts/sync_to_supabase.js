@@ -77,8 +77,20 @@ async function syncToSupabase() {
         recorded_at: s.timestamp,
         speed_kmh: Math.round(s.danang.avgSpeedKmh || 35),
         congestion_level: Math.min(5, Math.max(1, Math.round(s.danang.congestionIndex || 1))),
-        weather_condition: 'clear'
+        weather_condition: s.danang.maxRainMm > 20 ? 'heavy_rain' : (s.danang.maxRainMm > 0 ? 'light_rain' : 'clear')
       });
+      if (s.danang.activeFloodSpots && s.danang.activeFloodSpots.length > 0) {
+        s.danang.activeFloodSpots.forEach(f => {
+          floodRows.push({
+            station_id: 'DN_' + f.name.replace(/\s+/g, '_').toUpperCase(),
+            station_name: f.name,
+            city: 'danang',
+            depth_cm: f.depth_cm,
+            danger_level: f.depth_cm >= 30 ? 'CRITICAL' : 'WARNING',
+            recorded_at: s.timestamp
+          });
+        });
+      }
     }
   });
 

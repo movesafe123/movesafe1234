@@ -330,6 +330,7 @@ class LocalUrbanBot extends EventEmitter {
     };
     this.crawlPromise = null;
     this.portalFloodOverrides = new Map();
+    this.floodMemory = new Map(); // Lưu { depth_cm, updatedMs } cho từng trạm để tính toán rút nước
     this.init();
   }
 
@@ -408,9 +409,35 @@ class LocalUrbanBot extends EventEmitter {
         const crowdFloods = activeCrowdsourced.filter(c => !c.type || c.type === 'flood');
         const crowdTraffics = activeCrowdsourced.filter(c => c.type && c.type !== 'flood');
 
-        // Gộp các báo cáo giao thông cộng đồng còn hiệu lực vào danh sách sự cố giao thông
-        const baseTraffics = this.cachedData.trafficIncidents.filter(t => !String(t.id || '').startsWith('crowd-'));
-        this.cachedData.trafficIncidents = [...crowdTraffics, ...baseTraffics];
+        // Gộp tin VOV có địa điểm thành sự cố trên bản đồ
+        const vovIncidents = [];
+        (this.cachedData.vovTrafficNews || []).forEach(news => {
+          if (news.detectedLocation && news.detectedLocation.lat) {
+            const loc = news.detectedLocation;
+            const titleLower = (news.title + ' ' + (news.summary || '')).toLowerCase();
+            const isJam = titleLower.includes('ùn') || titleLower.includes('tắc') || titleLower.includes('kẹt') || titleLower.includes('chậm') || titleLower.includes('đông') || titleLower.includes('va chạm');
+            vovIncidents.push({
+              id: 'vov-inc-' + news.id,
+              city: loc.city || 'hanoi',
+              lat: loc.lat,
+              lng: loc.lng,
+              type: isJam ? 'traffic_jam' : 'slow_traffic',
+              categoryName: isJam ? 'Ùn ứ phương tiện (VOV Giao Thông)' : 'Lưu lượng đông (VOV Giao Thông)',
+              icon: '🚗',
+              isJam: isJam,
+              description: `📻 ${news.title}`,
+              rawDescription: news.summary,
+              delaySeconds: isJam ? 450 : 180,
+              speedKmh: isJam ? 10 : 25,
+              source: 'VOV Giao Thông Trực Tiếp',
+              updated_at: new Date().toISOString()
+            });
+          }
+        });
+
+        // Gộp các báo cáo giao thông cộng đồng và tin VOV vào danh sách sự cố giao thông
+        const baseTraffics = this.cachedData.trafficIncidents.filter(t => !String(t.id || '').startsWith('crowd-') && !String(t.id || '').startsWith('vov-inc-'));
+        this.cachedData.trafficIncidents = [...crowdTraffics, ...vovIncidents, ...baseTraffics];
 
         // Tính toán trạng thái ngập thực tế dựa trên lượng mưa trạm gần nhất & triều cường
         const allFloodPoints = this.computeRealtimeFloodPoints(crowdFloods);
@@ -878,8 +905,9 @@ class LocalUrbanBot extends EventEmitter {
     }
 
     const rType = report.type || 'flood';
-    const depthVal = parseInt(report.depth_cm, 10) || 20;
-    const locName = report.locationName || 'Điểm do cộng đồng báo cáo';
+    const depthVal = rType === 'flood' ? (parseInt(report.depth_cm, 10) || 20) : 0;
+    const rawLocName = report.locationName || 'Điểm do cộng đồng báo cáo';
+    const locName = String(rawLocName).replace(/[<>]/g, '').slice(0, 150);
     const isJamReport = rType === 'traffic_jam';
 
     const newReport = {
@@ -889,11 +917,14 @@ class LocalUrbanBot extends EventEmitter {
       lat: parseFloat(report.lat),
       lng: parseFloat(report.lng),
       type: rType,
-      depth_cm: rType === 'flood' ? depthVal : 0,
-      danger_level: depthVal > 30 ? 'critical' : (depthVal > 15 ? 'medium' : 'low'),
-      passable_motorbike: depthVal < 20,
-      passable_car: depthVal < 35,
+      depth_cm: depthVal,
+      danger_level: rType === 'flood' ? (depthVal > 30 ? 'critical' : (depthVal > 15 ? 'medium' : 'low')) : 'medium',
+      passable_motorbike: rType === 'flood' ? (depthVal < 20) : true,
+      passable_car: rType === 'flood' ? (depthVal < 35) : (rType !== 'road_closure'),
       isJam: isJamReport,
+      confirmations: 1,
+      clearVotes: 0,
+      isVerified: false,
       categoryName: isJamReport ? 'Báo cáo ùn tắc cộng đồng' : (rType === 'hazard' ? 'Cảnh báo vật cản cộng đồng' : 'Điểm ngập cộng đồng'),
       icon: rType === 'flood' ? '🌊' : (isJamReport ? '🚗' : '⚠️'),
       description: isJamReport
@@ -901,10 +932,10 @@ class LocalUrbanBot extends EventEmitter {
         : (rType === 'hazard' ? `⚠️ Cộng đồng báo sự cố/vật cản tại ${locName}` : `🌊 Cộng đồng báo ngập ${depthVal}cm tại ${locName}`),
       delaySeconds: isJamReport ? 450 : 180,
       speedKmh: isJamReport ? 10 : 25,
-      source: 'Cộng đồng MoveSafe (Xác thực)',
-      pump_status: report.note || 'Người dân đang hỗ trợ cảnh báo',
-      advice: report.advice || 'Chú ý giảm tốc độ khi di chuyển qua đây.',
-      user_name: report.userName || 'Tài xế ẩn danh',
+      source: 'Cộng đồng MoveSafe',
+      pump_status: String(report.note || 'Người dân đang hỗ trợ cảnh báo').replace(/[<>]/g, ''),
+      advice: String(report.advice || 'Chú ý giảm tốc độ khi di chuyển qua đây.').replace(/[<>]/g, ''),
+      user_name: String(report.userName || 'Tài xế ẩn danh').replace(/[<>]/g, '').slice(0, 50),
       photo_url: report.photoUrl || '',
       updated_at: new Date().toISOString()
     };
@@ -912,7 +943,6 @@ class LocalUrbanBot extends EventEmitter {
     reports.unshift(newReport);
     fs.promises.writeFile(CROWDSOURCE_FILE, JSON.stringify(reports, null, 2), 'utf-8').catch(() => {});
 
-    // Cập nhật lại cache hiện tại đúng theo loại báo cáo và tính lại bộ đếm chính xác
     if (newReport.type === 'flood') {
       this.cachedData.floodPoints.unshift(newReport);
     } else {
@@ -936,7 +966,53 @@ class LocalUrbanBot extends EventEmitter {
     return newReport;
   }
 
-  // Cào thời tiết trạm các quận từ Open-Meteo Cloud Radar
+  // Bình chọn xác nhận / thông báo đã thông thoáng cho báo cáo cộng đồng
+  voteCrowdsourceReport(id, voteType) {
+    let reports = [];
+    if (fs.existsSync(CROWDSOURCE_FILE)) {
+      try {
+        reports = JSON.parse(fs.readFileSync(CROWDSOURCE_FILE, 'utf-8')) || [];
+      } catch (e) {}
+    }
+
+    const report = reports.find(r => String(r.id) === String(id));
+    if (!report) return null;
+
+    if (voteType === 'confirm') {
+      report.confirmations = (report.confirmations || 1) + 1;
+      if (report.confirmations >= 2) report.isVerified = true;
+    } else if (voteType === 'clear') {
+      report.clearVotes = (report.clearVotes || 0) + 1;
+    }
+
+    // Nếu có từ 2 vote thông báo đã rút/thoáng trở lên và áp đảo lượt xác nhận -> gỡ báo cáo
+    if ((report.clearVotes || 0) >= 2 && (report.clearVotes || 0) >= (report.confirmations || 1)) {
+      reports = reports.filter(r => String(r.id) !== String(id));
+      this.cachedData.floodPoints = this.cachedData.floodPoints.filter(f => String(f.id) !== String(id));
+      this.cachedData.trafficIncidents = this.cachedData.trafficIncidents.filter(t => String(t.id) !== String(id));
+    } else {
+      // Cập nhật lại trong mảng in-memory
+      const inFlood = this.cachedData.floodPoints.find(f => String(f.id) === String(id));
+      if (inFlood) {
+        inFlood.confirmations = report.confirmations;
+        inFlood.clearVotes = report.clearVotes;
+        inFlood.isVerified = report.isVerified;
+      }
+      const inTraffic = this.cachedData.trafficIncidents.find(t => String(t.id) === String(id));
+      if (inTraffic) {
+        inTraffic.confirmations = report.confirmations;
+        inTraffic.clearVotes = report.clearVotes;
+        inTraffic.isVerified = report.isVerified;
+      }
+    }
+
+    fs.promises.writeFile(CROWDSOURCE_FILE, JSON.stringify(reports, null, 2), 'utf-8').catch(() => {});
+    this.saveCacheFiles(this.cachedData).catch(() => {});
+    this.emit('data:updated', this.cachedData);
+    return report;
+  }
+
+  // Cào thời tiết trạm các quận từ Open-Meteo Cloud Radar (Bao gồm is_day và dự báo mưa 3 giờ tới)
   async crawlWeatherStations(cityKey = 'hanoi') {
     const stations = WEATHER_STATION_PRESETS[cityKey];
     if (!stations) return;
@@ -944,9 +1020,8 @@ class LocalUrbanBot extends EventEmitter {
     try {
       const lats = stations.map(s => s.lat).join(',');
       const lngs = stations.map(s => s.lng).join(',');
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&hourly=precipitation,rain&forecast_hours=6&timezone=Asia%2FBangkok`;
 
-      // Cơ chế thử lại tối đa 2 lần kèm timeout 15 giây
       let response = null;
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
@@ -964,18 +1039,26 @@ class LocalUrbanBot extends EventEmitter {
         const item = resultsArray[idx] || {};
         const curr = item.current || {};
         let rain = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
-        // Lọc bỏ triệt để sai số sương đêm / độ ẩm < 0.5mm
         if (rain < 0.5) rain = 0;
         else rain = Math.round(rain * 10) / 10;
 
+        const hourlyRain = item.hourly?.precipitation || item.hourly?.rain || [];
+        const forecastRain = [
+          Math.round((hourlyRain[1] || 0) * 10) / 10,
+          Math.round((hourlyRain[2] || 0) * 10) / 10,
+          Math.round((hourlyRain[3] || 0) * 10) / 10
+        ];
+
+        const isDay = curr.is_day !== 0;
         const temp = typeof curr.temperature_2m === 'number' ? Math.round(curr.temperature_2m) : 26;
         const feelsLike = typeof curr.apparent_temperature === 'number' ? Math.round(curr.apparent_temperature) : temp;
+        const wCode = curr.weather_code || 0;
 
         let riskLevel = 'safe';
         let riskText = 'Khô ráo';
         let riskColor = '#1e8e3e';
-        let icon = '☀️';
-        let description = 'Trời tạnh ráo, không mưa';
+        let icon = isDay ? '☀️' : '🌙';
+        let description = isDay ? 'Trời tạnh ráo, không mưa' : 'Đêm tạnh ráo, mát mẻ';
 
         if (rain >= 25) {
           riskLevel = 'danger'; riskText = 'Nguy cơ ngập sâu'; riskColor = '#d93025';
@@ -986,6 +1069,10 @@ class LocalUrbanBot extends EventEmitter {
         } else if (rain >= 1.0) {
           riskLevel = 'caution'; riskText = 'Mưa nhỏ rải rác'; riskColor = '#1a73e8';
           icon = '🌦️'; description = 'Mưa nhỏ hạt';
+        } else if (wCode >= 45 && wCode <= 48) {
+          icon = '🌫️'; description = 'Sương mù ẩm, tầm nhìn giảm';
+        } else if (wCode >= 2 && wCode <= 3) {
+          icon = isDay ? '⛅' : '☁️'; description = 'Trời nhiều mây, tạnh ráo';
         }
 
         return {
@@ -1003,6 +1090,8 @@ class LocalUrbanBot extends EventEmitter {
           temp,
           feelsLike,
           rain1h: rain,
+          forecastRain,
+          isDay,
           humidity: curr.relative_humidity_2m || 75,
           windSpeed: typeof curr.wind_speed_10m === 'number' ? Math.round(curr.wind_speed_10m) : 10,
           floodRisk: { level: riskLevel, text: riskText, color: riskColor },
@@ -1020,15 +1109,14 @@ class LocalUrbanBot extends EventEmitter {
     }
   }
 
-  // Tính toán mực nước thực tế cho các trạm quan trắc đô thị dựa trên lượng mưa trạm gần nhất & triều dâng
+  // Tính toán mực nước thực tế theo Mô hình Tích lũy Mưa & Tiêu Thoát Nước (Drainage Decay)
   computeRealtimeFloodPoints(activeCrowdsourcedFloods = []) {
     const weatherStations = this.cachedData.weatherStations || {};
     const isDemoFlood = process.env.DEMO_FLOOD === 'true';
+    const nowMs = Date.now();
 
     const realtimePoints = LOCAL_FLOOD_STATIONS.map(st => {
       const cityStations = weatherStations[st.city] || [];
-
-      // Tìm lượng mưa tại các trạm quan trắc gần điểm ngập nhất (bán kính ~4km) thay vì lấy max toàn thành phố
       let localRain = 0;
       if (cityStations.length > 0) {
         const sortedByDist = [...cityStations].sort((a, b) => {
@@ -1040,10 +1128,10 @@ class LocalUrbanBot extends EventEmitter {
         localRain = nearestThree.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
       }
 
-      // Nếu cổng HSDC/UDi có trả về số đo trực tiếp thì ưu tiên
       if (this.portalFloodOverrides && this.portalFloodOverrides.has(st.id)) {
         const portalDepth = this.portalFloodOverrides.get(st.id);
         if (portalDepth > 0) {
+          this.floodMemory.set(st.id, { depth_cm: portalDepth, updatedMs: nowMs });
           return {
             ...st,
             depth_cm: portalDepth,
@@ -1055,57 +1143,60 @@ class LocalUrbanBot extends EventEmitter {
         }
       }
 
-      // Nếu đang bật chế độ Demo ngập (cho thuyết trình), giữ nguyên độ sâu mẫu thiết kế của từng rốn ngập
       if (isDemoFlood) {
-        return {
-          ...st,
-          updated_at: new Date().toISOString()
-        };
+        return { ...st, updated_at: new Date().toISOString() };
       }
 
-      // Kiểm tra triều cường đối với các tuyến trũng ven sông tại TP.HCM (udi-01: Huỳnh Tấn Phát, udi-03: Trần Xuân Soạn)
-      const isTidalStation = st.id === 'udi-01' || st.id === 'udi-03';
-      const now = new Date();
-      const vnHour = (now.getUTCHours() + 7) % 24;
-      const isPeakTide = (vnHour >= 17 && vnHour <= 19) || (vnHour >= 5 && vnHour <= 7);
+      const prev = this.floodMemory.get(st.id) || { depth_cm: 0, updatedMs: nowMs };
+      const elapsedHours = Math.max(0, (nowMs - prev.updatedMs) / 3600000);
+      const DRAINAGE_RATE_CM_PER_HOUR = 12; // Rút 12cm nước mỗi giờ khi ngớt mưa
 
+      // Tính mức ngập mục tiêu dựa trên lượng mưa
+      let targetDepth = 0;
       if (localRain >= 25) {
-        const computedDepth = Math.max(30, Math.min(50, Math.round(st.depth_cm * (localRain / 30))));
+        targetDepth = Math.max(30, Math.min(55, Math.round(st.depth_cm * (localRain / 30))));
+      } else if (localRain >= 10) {
+        targetDepth = Math.max(15, Math.min(28, Math.round(st.depth_cm * 0.65)));
+      } else if (localRain >= 2.5) {
+        targetDepth = Math.max(10, Math.round(st.depth_cm * 0.35));
+      }
+
+      // Kiểm tra triều cường TP.HCM
+      const isTidalStation = st.id === 'udi-01' || st.id === 'udi-03';
+      const vnHour = (new Date().getUTCHours() + 7) % 24;
+      const isPeakTide = (vnHour >= 17 && vnHour <= 19) || (vnHour >= 5 && vnHour <= 7);
+      if (isTidalStation && isPeakTide && localRain >= 2) {
+        targetDepth = Math.max(targetDepth, 25);
+      }
+
+      // Áp dụng độ trễ tiêu thoát: nước không thể biến mất ngay lập tức khi tạnh mưa
+      const decayedDepth = Math.max(0, Math.round(prev.depth_cm - (DRAINAGE_RATE_CM_PER_HOUR * elapsedHours)));
+      const finalDepth = Math.max(targetDepth, decayedDepth);
+      this.floodMemory.set(st.id, { depth_cm: finalDepth >= 5 ? finalDepth : 0, updatedMs: nowMs });
+
+      if (finalDepth >= 30) {
         return {
           ...st,
-          depth_cm: computedDepth,
-          danger_level: computedDepth >= 30 ? 'critical' : 'medium',
+          depth_cm: finalDepth,
+          danger_level: 'critical',
           passable_motorbike: false,
-          passable_car: computedDepth < 30,
-          advice: `Mưa lớn xối xả (${localRain}mm/h), nước chưa kịp thoát, ngập sâu ~${computedDepth}cm. Tuyệt đối không đi qua.`,
+          passable_car: false,
+          advice: `Ngập sâu ~${finalDepth}cm do mưa lớn tích lũy. Nước đang rút dần, tuyệt đối tránh qua.`,
           pump_status: 'Trạm bơm dã chiến đang xả tối đa công suất',
           updated_at: new Date().toISOString()
         };
-      } else if (localRain >= 10) {
-        const computedDepth = Math.max(15, Math.min(28, Math.round(st.depth_cm * 0.65)));
+      } else if (finalDepth >= 10) {
         return {
           ...st,
-          depth_cm: computedDepth,
+          depth_cm: finalDepth,
           danger_level: 'medium',
-          passable_motorbike: computedDepth < 20,
+          passable_motorbike: finalDepth < 20,
           passable_car: true,
-          advice: `Mưa đọng cục bộ ~${computedDepth}cm (${localRain}mm/h), xe máy chú ý rẽ vòng tránh chết máy bugi.`,
+          advice: `Nước đọng ~${finalDepth}cm, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.`,
           pump_status: 'Cống ngầm đang điều tiết thoát nước',
           updated_at: new Date().toISOString()
         };
-      } else if (isTidalStation && isPeakTide && localRain >= 2) {
-        return {
-          ...st,
-          depth_cm: 25,
-          danger_level: 'medium',
-          passable_motorbike: false,
-          passable_car: true,
-          advice: 'Đỉnh triều dâng kết hợp mưa, mép đường ngập tràn, xe máy hạn chế đi sát kênh.',
-          pump_status: 'Đang vận hành van ngăn triều',
-          updated_at: new Date().toISOString()
-        };
       } else {
-        // Trời tạnh ráo / Nước đã rút hoàn toàn
         return {
           ...st,
           depth_cm: 0,
@@ -1120,6 +1211,71 @@ class LocalUrbanBot extends EventEmitter {
     });
 
     return [...realtimePoints, ...activeCrowdsourcedFloods];
+  }
+
+  // Dự báo ngập lụt và kẹt xe tương lai (+1h, +2h, +3h) dựa trên lượng mưa dự báo thực tế
+  getFuturePredictions(cityKey = 'hanoi', offsetHours = 1) {
+    const stations = (this.cachedData.weatherStations || {})[cityKey] || [];
+    const maxForecastRain = stations.reduce((max, s) => {
+      const rains = s.forecastRain || [0, 0, 0];
+      return Math.max(max, rains[offsetHours - 1] || 0);
+    }, 0);
+
+    const vnHour = (new Date().getUTCHours() + 7 + offsetHours) % 24;
+    const isPeakHour = (vnHour >= 7 && vnHour <= 9) || (vnHour >= 17 && vnHour <= 19);
+    const isNightTime = (vnHour >= 22 || vnHour <= 5);
+
+    // 1. Dự báo ngập
+    const predictedFloods = [];
+    const currentCityFloods = (this.cachedData.floodPoints || []).filter(f => f.city === cityKey && f.depth_cm > 0);
+
+    if (maxForecastRain >= 15 || currentCityFloods.length > 0) {
+      const candidateStations = LOCAL_FLOOD_STATIONS.filter(s => s.city === cityKey);
+      candidateStations.forEach(st => {
+        const currMemory = this.floodMemory.get(st.id) || { depth_cm: 0 };
+        const rainBoost = maxForecastRain >= 25 ? 1.2 : (maxForecastRain >= 10 ? 0.8 : 0);
+        const projectedRainDepth = Math.round(st.depth_cm * rainBoost);
+        const residualDepth = Math.max(0, currMemory.depth_cm - (12 * offsetHours));
+        const finalDepth = Math.max(projectedRainDepth, residualDepth);
+
+        if (finalDepth >= 10) {
+          predictedFloods.push({
+            id: `ai-pred-${st.id}`,
+            location_name: st.name,
+            city: cityKey,
+            lat: st.lat,
+            lng: st.lng,
+            target_hour: offsetHours,
+            predicted_depth_cm: finalDepth,
+            confidence: Math.round((0.90 - offsetHours * 0.04) * 100) / 100
+          });
+        }
+      });
+    }
+
+    // 2. Dự báo kẹt xe theo khung giờ thực tế
+    const candidateIntersections = CORE_INTERSECTIONS_GEO.filter(s => s.city === cityKey);
+    const baseLevel = isNightTime ? 1 : (isPeakHour ? 4 : (maxForecastRain >= 10 ? 4 : 2));
+
+    const predictedTraffic = candidateIntersections.slice(0, 3).map((item, idx) => {
+      const level = Math.min(5, Math.max(1, baseLevel - (idx % 2)));
+      return {
+        lat: item.lat,
+        lng: item.lng,
+        level,
+        description: `Dự báo giao thông lúc ${String(vnHour).padStart(2, '0')}:00 tại ${item.name}: Mức ${level}/5 (${level >= 4 ? 'Ùn ứ cao' : 'Lưu thông ổn định'})`
+      };
+    });
+
+    return {
+      city: cityKey,
+      targetHour: offsetHours,
+      clockHour: vnHour,
+      maxForecastRain,
+      floods: predictedFloods,
+      traffic: predictedTraffic,
+      updated_at: new Date().toISOString()
+    };
   }
 
   getData() {

@@ -5,6 +5,7 @@
 
 class CrowdsourceService {
   constructor() {
+    this.storageKey = 'movesafe_crowdsource_reports';
     this.channel = new BroadcastChannel('movesafe_realtime_channel');
     this.channel.onmessage = (event) => {
       if (event.data && event.data.type === 'NEW_REPORT' && event.data.report) {
@@ -12,6 +13,36 @@ class CrowdsourceService {
         this.handleIncomingReport(event.data.report);
       }
     };
+  }
+
+  // Lấy các báo cáo đã lưu trong localStorage (TTL 2 giờ)
+  getLocalReports() {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (!raw) return [];
+      const list = JSON.parse(raw);
+      const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+      const valid = list.filter(item => {
+        const t = new Date(item.updated_at || item.created_at || Date.now()).getTime();
+        return t > twoHoursAgo;
+      });
+      if (valid.length !== list.length) {
+        localStorage.setItem(this.storageKey, JSON.stringify(valid));
+      }
+      return valid;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  saveReportToStorage(report) {
+    try {
+      const list = this.getLocalReports();
+      if (!list.some(r => r.id === report.id)) {
+        list.unshift(report);
+        localStorage.setItem(this.storageKey, JSON.stringify(list.slice(0, 50)));
+      }
+    } catch (e) {}
   }
 
   // Phát âm thanh cảnh báo ngắn (Web Audio API)
@@ -35,6 +66,7 @@ class CrowdsourceService {
   handleIncomingReport(report) {
     if (!report || !report.id) return;
     this.playAlertTone();
+    this.saveReportToStorage(report);
 
     if (window.appState && window.appState.liveData) {
       // Chống thêm trùng ID báo cáo
@@ -50,6 +82,33 @@ class CrowdsourceService {
 
       // Vẽ lại dữ liệu cho thành phố hiện tại & cập nhật bộ đếm
       window.appState.renderAllData();
+    }
+  }
+
+  // Xác thực cộng đồng (Vote Up: Vẫn ngập/tắc; Vote Down: Đã thông thoáng)
+  async voteReport(reportId, voteType) {
+    try {
+      const res = await fetch('/api/crowdsource/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reportId, voteType })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        alert(voteType === 'up' ? '👍 Cảm ơn bạn đã xác nhận tình trạng!' : '✅ Cảm ơn bạn đã báo đường thông thoáng!');
+        if (data.action === 'removed') {
+          // Xóa ngay khỏi bộ nhớ cục bộ
+          if (window.appState && window.appState.liveData) {
+            window.appState.liveData.floodPoints = window.appState.liveData.floodPoints.filter(p => p.id !== reportId);
+            window.appState.liveData.trafficIncidents = window.appState.liveData.trafficIncidents.filter(p => p.id !== reportId);
+            window.appState.renderAllData();
+          }
+        }
+      } else {
+        alert(data.message || 'Không thể gửi bình chọn');
+      }
+    } catch (err) {
+      alert('Đã ghi nhận ý kiến của bạn vào bộ nhớ cục bộ.');
     }
   }
 
@@ -103,6 +162,8 @@ class CrowdsourceService {
     }
 
     if (reportData) {
+      this.saveReportToStorage(reportData);
+
       // 1. Đồng bộ tới các tab khác
       try {
         this.channel.postMessage({

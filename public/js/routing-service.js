@@ -24,8 +24,8 @@ class RoutingService {
         icon: '🛵',
         maxPassableDepth: 20, // cm - Quá 20cm là ngập ống pô, ướt bugi gây chết máy giữa dòng
         safeDepth: 10,        // cm - Nước nông dưới mép lốp, hoàn toàn an toàn
-        corridorBuffer: 200,  // m - Bán kính ảnh hưởng rốn ngập
-        detourOffsets: [650, 950, 1350], // Các mức cự ly lệch tìm đường tránh (m)
+        corridorBuffer: 110,  // m - Bán kính ảnh hưởng rốn ngập (chuẩn đường phố đô thị VN)
+        detourOffsets: [450, 750, 1100], // Các mức cự ly lệch tìm đường tránh (m)
         hazardRisk: 'Chết máy do nước vào ống xả và ướt bugi',
         allowAlleys: true,
         speedFactor: 1.15
@@ -36,8 +36,8 @@ class RoutingService {
         icon: '⚡',
         maxPassableDepth: 20, // cm - Khoang pin sàn & controller IC ngập nước gây chập hoặc ngắt an toàn
         safeDepth: 10,        // cm
-        corridorBuffer: 200,
-        detourOffsets: [650, 950, 1350],
+        corridorBuffer: 110,
+        detourOffsets: [450, 750, 1100],
         hazardRisk: 'Chập mạch IC điều khiển & ngắt an toàn pin xe điện',
         allowAlleys: true,
         speedFactor: 1.1
@@ -48,8 +48,8 @@ class RoutingService {
         icon: '🚗',
         maxPassableDepth: 25, // cm - Mép hút gió sedan/hatchback, nguy cơ THỦY KÍCH phá hủy tay biên & vỡ lốc máy
         safeDepth: 15,        // cm - Nước dưới nửa bánh xe, an toàn cho gầm sedan
-        corridorBuffer: 250,
-        detourOffsets: [850, 1300, 1600],
+        corridorBuffer: 130,
+        detourOffsets: [650, 1000, 1400],
         hazardRisk: 'Nguy cơ THỦY KÍCH phá hủy tay biên & vỡ lốc máy',
         allowAlleys: false,
         speedFactor: 0.95
@@ -60,8 +60,8 @@ class RoutingService {
         icon: '🚙',
         maxPassableDepth: 30, // cm - Khối pin IP67 nhưng ngập sâu > 30cm sinh lực đẩy bồng bềnh mất lái & ngắt rơ-le cao áp
         safeDepth: 15,        // cm
-        corridorBuffer: 250,
-        detourOffsets: [850, 1300, 1600],
+        corridorBuffer: 130,
+        detourOffsets: [650, 1000, 1400],
         hazardRisk: 'Mất lái trôi xe do bồng bềnh & ngắt an toàn pin cao áp',
         allowAlleys: false,
         speedFactor: 0.95
@@ -89,6 +89,9 @@ class RoutingService {
         color: '#1a73e8'
       }
     };
+
+    // Bộ nhớ đệm Route Cache (TTL 3 phút) giảm tải OSRM
+    this.routeCache = new Map();
   }
 
   // Tính khoảng cách giữa 2 tọa độ (Haversine formula - mét)
@@ -106,9 +109,53 @@ class RoutingService {
     return R * c;
   }
 
-  // Gọi OSRM lấy tọa độ đường đi
+  // Kiểm tra quy định giao thông đường bộ Việt Nam theo loại phương tiện
+  checkVehicleRoadRestrictions(route, vehicleType) {
+    if (!route.steps || route.steps.length === 0) return { allowed: true };
+
+    const isTwoWheeler = (vehicleType === 'motorbike' || vehicleType === 'ebike');
+    const isFourWheeler = (vehicleType === 'car' || vehicleType === 'ecar');
+
+    // Các tuyến cao tốc cấm hoàn toàn xe 2 bánh tại VN
+    const expresswayKeywords = [
+      'vành đai 3 trên cao', 'vanh dai 3 tren cao',
+      'đại lộ thăng long (làn cao tốc)', 'cao tốc', 'expressway',
+      'cầu vượt thanh trì', 'long thành - dầu giây', 'trung lương'
+    ];
+
+    for (const step of route.steps) {
+      const stepName = (step.name || '').toLowerCase();
+      if (isTwoWheeler) {
+        for (const kw of expresswayKeywords) {
+          if (stepName.includes(kw)) {
+            return {
+              allowed: false,
+              violation: `Đoạn "${step.name}" là đường cao tốc cấm xe 2 bánh`
+            };
+          }
+        }
+      }
+      if (isFourWheeler) {
+        // Cảnh báo nếu ô tô vào ngõ/ngách quá nhỏ
+        if (stepName.includes('ngõ ') || stepName.includes('ngách ') || stepName.includes('hẻm ')) {
+          route.alleyWarning = true;
+        }
+      }
+    }
+
+    return { allowed: true };
+  }
+
+  // Gọi OSRM lấy tọa độ đường đi (có cache)
   async fetchOsrmRoute(waypoints) {
-    const coordsStr = waypoints.map(w => `${w[0]},${w[1]}`).join(';');
+    const coordsStr = waypoints.map(w => `${w[0].toFixed(5)},${w[1].toFixed(5)}`).join(';');
+    const cacheKey = coordsStr;
+
+    const cached = this.routeCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < 180000)) {
+      return cached.data;
+    }
+
     const url = `${this.osrmBaseUrl}/${coordsStr}?overview=full&geometries=geojson&steps=true&alternatives=true`;
 
     const res = await fetch(url);
@@ -116,7 +163,7 @@ class RoutingService {
     const data = await res.json();
     if (!data.routes || data.routes.length === 0) throw new Error('Không tìm thấy đường đi');
 
-    return data.routes.map(route => ({
+    const mapped = data.routes.map(route => ({
       distanceKm: (route.distance / 1000).toFixed(1),
       distanceMeters: route.distance,
       durationMin: Math.round(route.duration / 60),
@@ -128,6 +175,9 @@ class RoutingService {
         name: s.name || ''
       })) : []
     }));
+
+    this.routeCache.set(cacheKey, { timestamp: Date.now(), data: mapped });
+    return mapped;
   }
 
   // Lọc loại bỏ các tuyến đường bị trùng lặp hình học
@@ -554,32 +604,40 @@ class RoutingService {
       };
     }
 
-    // 2. Lấy tuyến trực tiếp từ OSRM
+    // 2. Lấy tuyến trực tiếp từ OSRM (đã bao gồm các alternative routes)
     const directRoutes = await this.fetchOsrmRoute([
       [origin.lng, origin.lat],
       [destination.lng, destination.lat]
     ]).catch(() => []);
 
-    // 3. Sinh các tuyến vòng (Bypass Detours) né cả các điểm ngập sâu lẫn ngập cảnh báo
-    const hazardsForDetours = [...blockedFloods, ...cautionFloods];
-    const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs);
-
-    // Gọi OSRM song song cho các waypoints vòng
-    const detourPromises = detourWaypoints.slice(0, 8).map(wp =>
-      this.fetchOsrmRoute([
-        [origin.lng, origin.lat],
-        [wp.lng, wp.lat],
-        [destination.lng, destination.lat]
-      ]).catch(() => [])
-    );
-
-    const detourResults = await Promise.all(detourPromises);
-
-    // Tập hợp toàn bộ ứng viên tuyến đường
-    const allRawCandidates = [...directRoutes];
-    detourResults.forEach(res => {
-      if (res && res.length > 0) allRawCandidates.push(res[0]);
+    // Kiểm tra sơ bộ các tuyến trực tiếp xem có tuyến nào đi được an toàn không
+    let directPassableCount = 0;
+    directRoutes.forEach(r => {
+      const p = this.checkRoutePassability(r.polyline, blockedFloods, blockedTraffics, specs.corridorBuffer);
+      const v = this.checkVehicleRoadRestrictions(r, vehicleType);
+      if (p.isPassable && v.allowed) directPassableCount++;
     });
+
+    const allRawCandidates = [...directRoutes];
+
+    // 3. Chỉ sinh các tuyến vòng (Bypass Detours) khi chưa đủ tuyến an toàn hoặc có chướng ngại vật cần né
+    const hazardsForDetours = [...blockedFloods, ...cautionFloods];
+    if (directPassableCount < 2 && hazardsForDetours.length > 0) {
+      const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs);
+      // Giới hạn tối đa 4 detour song song để chống nghẽn HTTP 429
+      const detourPromises = detourWaypoints.slice(0, 4).map(wp =>
+        this.fetchOsrmRoute([
+          [origin.lng, origin.lat],
+          [wp.lng, wp.lat],
+          [destination.lng, destination.lat]
+        ]).catch(() => [])
+      );
+
+      const detourResults = await Promise.all(detourPromises);
+      detourResults.forEach(res => {
+        if (res && res.length > 0) allRawCandidates.push(res[0]);
+      });
+    }
 
     if (allRawCandidates.length === 0) {
       throw new Error('Không thể kết nối đến máy chủ định tuyến OSRM');
@@ -594,7 +652,7 @@ class RoutingService {
       !this.isExcessiveDetour(route, directDistMeters)
     );
 
-    // 5. BỘ LỌC CỐT TỬ: ĐÁNH GIÁ TÍNH KHẢ DỤNG (PASSABILITY) CHO PHƯƠNG TIỆN
+    // 5. BỘ LỌC CỐT TỬ: ĐÁNH GIÁ TÍNH KHẢ DỤNG (PASSABILITY) & QUY ĐỊNH GIAO THÔNG CHO PHƯƠNG TIỆN
     const passableCandidates = [];
     const blockedRoutes = [];
 
@@ -603,13 +661,24 @@ class RoutingService {
         route.polyline, blockedFloods, blockedTraffics, specs.corridorBuffer
       );
 
-      if (isPassable) {
+      const roadRule = this.checkVehicleRoadRestrictions(route, vehicleType);
+
+      if (isPassable && roadRule.allowed) {
         passableCandidates.push(route);
       } else {
-        const firstHazard = blockedBy[0];
-        const reasonText = firstHazard.hazardType === 'blocked_flood'
-          ? `Ngập ${firstHazard.depth_cm}cm tại ${firstHazard.name} (vượt ngưỡng ${specs.maxPassableDepth}cm của ${specs.name})`
-          : `Đóng đường / kẹt cứng tại ${firstHazard.description || firstHazard.name || 'trục chính'}`;
+        let reasonText = '';
+        if (!roadRule.allowed) {
+          reasonText = roadRule.violation;
+          blockedBy.push({
+            hazardType: 'vehicle_restriction',
+            description: roadRule.violation
+          });
+        } else if (blockedBy.length > 0) {
+          const firstHazard = blockedBy[0];
+          reasonText = firstHazard.hazardType === 'blocked_flood'
+            ? `Ngập ${firstHazard.depth_cm}cm tại ${firstHazard.name} (vượt ngưỡng ${specs.maxPassableDepth}cm của ${specs.name})`
+            : `Đóng đường / kẹt cứng tại ${firstHazard.description || firstHazard.name || 'trục chính'}`;
+        }
         blockedRoutes.push({
           ...route,
           blockedBy,

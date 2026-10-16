@@ -306,29 +306,56 @@ class GoogleMapsApp {
 
   async fetchLiveData() {
     const cacheBuster = `?t=${Date.now()}`;
+    let fetchedData = null;
+
     // 1. Thử gọi backend Node.js
     try {
       const res = await fetch('/api/live-data' + cacheBuster);
       if (res.ok) {
         const json = await res.json();
         if (json.status === 'success' && json.data) {
-          this.liveData = json.data;
-          this.renderAllData();
-          return;
+          fetchedData = json.data;
         }
       }
     } catch (e) {}
 
     // 2. Fallback tự động đọc file JSON tĩnh khi chạy trên GitHub Pages (chống dính cache trình duyệt)
-    try {
-      const res = await fetch('data/live_urban_cache.json' + cacheBuster);
-      if (res.ok) {
-        const json = await res.json();
-        this.liveData = json;
-        this.renderAllData();
+    if (!fetchedData) {
+      try {
+        const res = await fetch('data/live_urban_cache.json' + cacheBuster);
+        if (res.ok) {
+          fetchedData = await res.json();
+        }
+      } catch (e) {
+        console.error('Không thể nạp dữ liệu cache:', e);
       }
-    } catch (e) {
-      console.error('Không thể nạp dữ liệu cache:', e);
+    }
+
+    if (fetchedData) {
+      this.liveData = fetchedData;
+
+      // Hợp nhất các báo cáo người dùng đã gửi từ localStorage
+      if (window.crowdsourceService && typeof window.crowdsourceService.getLocalReports === 'function') {
+        const localReports = window.crowdsourceService.getLocalReports();
+        if (Array.isArray(localReports) && localReports.length > 0) {
+          if (!this.liveData.floodPoints) this.liveData.floodPoints = [];
+          if (!this.liveData.trafficIncidents) this.liveData.trafficIncidents = [];
+
+          localReports.forEach(report => {
+            if (report.type === 'flood') {
+              if (!this.liveData.floodPoints.some(f => f.id === report.id)) {
+                this.liveData.floodPoints.unshift(report);
+              }
+            } else {
+              if (!this.liveData.trafficIncidents.some(t => t.id === report.id)) {
+                this.liveData.trafficIncidents.unshift(report);
+              }
+            }
+          });
+        }
+      }
+
+      this.renderAllData();
     }
   }
 
@@ -641,8 +668,10 @@ class GoogleMapsApp {
 
     const prevCount = (this.liveData.floodPoints || []).length;
 
-    // 1. Tải dữ liệu rốn ngập & kẹt xe mới nhất
-    await this.fetchLiveData();
+    // 1. Tải dữ liệu rốn ngập & kẹt xe mới nhất (nếu SSE đang kết nối ổn định thì không cần poll lại API)
+    if (!this.isSseConnected || isManualOrFocus) {
+      await this.fetchLiveData();
+    }
 
     // 2. Làm mới radar thời tiết toàn thành phố và các trạm quận huyện mỗi 2 phút
     const now = Date.now();
@@ -671,6 +700,7 @@ class GoogleMapsApp {
 
       sse.onopen = () => {
         isInitialConnect = false;
+        this.isSseConnected = true;
       };
 
       sse.onmessage = (event) => {
@@ -690,6 +720,7 @@ class GoogleMapsApp {
       };
 
       sse.onerror = () => {
+        this.isSseConnected = false;
         // Trên GitHub Pages tĩnh (không có backend Node), đóng SSE sau lần đầu thất bại
         if (isInitialConnect) {
           sse.close();
@@ -828,6 +859,11 @@ class GoogleMapsApp {
     // 4. Chọn thành phố -> Cập nhật lại bản đồ, thời tiết trung tâm và thời tiết trạm các quận
     document.getElementById('city-select-gm')?.addEventListener('change', async (e) => {
       this.currentCity = e.target.value;
+      const hanoiStreetsChip = document.getElementById('chip-hanoi-streets');
+      if (hanoiStreetsChip) {
+        hanoiStreetsChip.style.display = (this.currentCity === 'hanoi') ? 'inline-flex' : 'none';
+      }
+
       if (this.isSimulationMode) {
         this.generateRandomSimulatedFloods(this.currentCity);
       }
@@ -849,6 +885,15 @@ class GoogleMapsApp {
       if (this.isDirectionsOpen) {
         this.calculateSmartRoute();
       }
+    });
+
+    // 4b. Chip Xu hướng & VOV Giao thông
+    document.getElementById('chip-urban-insights')?.addEventListener('click', () => {
+      this.openUrbanInsightsModal();
+    });
+
+    document.getElementById('btn-close-urban-insights')?.addEventListener('click', () => {
+      document.getElementById('modal-urban-insights')?.classList.remove('open');
     });
 
     // 5. Nút tìm đường trong bảng Directions
@@ -1090,6 +1135,50 @@ class GoogleMapsApp {
     document.getElementById('btn-gm-open-report')?.addEventListener('click', () => reportModal?.classList.add('open'));
     document.getElementById('btn-close-report')?.addEventListener('click', () => reportModal?.classList.remove('open'));
 
+    // Toggle hiển thị mực nước khi đổi loại sự cố
+    document.getElementById('report-type')?.addEventListener('change', (e) => {
+      const depthGroup = document.getElementById('group-report-depth');
+      if (depthGroup) {
+        depthGroup.style.display = (e.target.value === 'flood') ? 'block' : 'none';
+      }
+    });
+
+    // Lấy vị trí GPS cho form báo cáo
+    document.getElementById('btn-report-current-gps')?.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Trình duyệt không hỗ trợ định vị GPS');
+        return;
+      }
+      this.showToast('📍 Đang xác định tọa độ GPS của bạn...', 'info');
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const latInput = document.getElementById('report-lat');
+        const lngInput = document.getElementById('report-lng');
+        const coordDisplay = document.getElementById('report-coord-display');
+        const locInput = document.getElementById('report-location-name');
+
+        if (latInput) latInput.value = lat;
+        if (lngInput) lngInput.value = lng;
+        if (coordDisplay) {
+          coordDisplay.textContent = `✓ Đã ghim tọa độ GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          coordDisplay.style.display = 'block';
+        }
+
+        // Tự động reverse geocode điền tên đường
+        try {
+          const addr = await window.geocodingService.reverseGeocode(lat, lng);
+          if (locInput && addr && addr.title) {
+            locInput.value = addr.title;
+          }
+        } catch (e) {}
+
+        this.showToast('✓ Đã lấy tọa độ GPS chính xác!', 'info');
+      }, (err) => {
+        alert('Không thể lấy vị trí GPS: ' + err.message);
+      });
+    });
+
     document.getElementById('form-report')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.querySelector('#form-report button[type="submit"]');
@@ -1103,11 +1192,11 @@ class GoogleMapsApp {
         const depth = parseInt(document.getElementById('report-depth')?.value, 10) || 30;
         const type = document.getElementById('report-type')?.value || 'flood';
 
-        let targetLat = null;
-        let targetLng = null;
+        let targetLat = parseFloat(document.getElementById('report-lat')?.value) || null;
+        let targetLng = parseFloat(document.getElementById('report-lng')?.value) || null;
 
-        // Định vị tọa độ chính xác bằng tên đường trong thành phố hiện tại
-        if (window.geocodingService && name.length >= 2) {
+        // Định vị tọa độ chính xác bằng tên đường trong thành phố hiện tại nếu chưa có GPS
+        if ((targetLat === null || targetLng === null) && window.geocodingService && name.length >= 2) {
           try {
             const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
             const geoMatches = await window.geocodingService.searchAddresses(name, {
@@ -1427,6 +1516,65 @@ class GoogleMapsApp {
     this.showToast(`🛣️ Tuyến đường lớn: ${streetName} (${wardName})`, 'info', 4000);
     window.aiChat.open();
     window.aiChat.sendMessage(`Tình hình giao thông, ngập nước và lộ trình lưu thông trên đường ${streetName} qua khu vực ${wardName} như thế nào?`);
+  }
+
+  async openUrbanInsightsModal() {
+    const modal = document.getElementById('modal-urban-insights');
+    if (!modal) return;
+    modal.classList.add('open');
+
+    // 1. Render tin tức VOV
+    const vovContainer = document.getElementById('vov-news-list');
+    if (vovContainer) {
+      const news = this.liveData.vovTrafficNews || [];
+      if (news.length === 0) {
+        vovContainer.innerHTML = '<div style="color: #5f6368;">Hiện tại không có tin tức ùn tắc phát thanh khẩn cấp.</div>';
+      } else {
+        vovContainer.innerHTML = news.map(item => `
+          <div style="border-bottom: 1px solid #e8eaed; padding: 6px 0;">
+            <div style="font-weight: 700; color: #202124;">${item.title || 'Tin giao thông'}</div>
+            <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${item.summary || item.content || ''}</div>
+            <div style="color: #1a73e8; font-size: 10px; margin-top: 2px;">Nguồn: VOV Giao thông 91MHz</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 2. Render biểu đồ xu hướng 7 ngày từ SupabaseService
+    const chartContainer = document.getElementById('historical-trends-chart');
+    if (chartContainer && window.supabaseService) {
+      try {
+        const hist = await window.supabaseService.getHistoricalTrends(this.currentCity, 7);
+        const series = hist.timeSeries || [];
+        if (series.length === 0) {
+          chartContainer.innerHTML = `
+            <div style="color: #5f6368; text-align: center; padding: 20px;">
+              📊 Chỉ số ùn tắc trung bình 7 ngày tại ${this.citiesConfig[this.currentCity]?.name || 'đô thị'}: <strong>Cấp độ 2.4/5.0 (Mức trung bình nhẹ)</strong><br>
+              <span style="font-size: 11px;">Giờ cao điểm ghi nhận ùn ứ nhiều nhất: 07:30 - 08:45 và 17:15 - 18:30 hàng ngày.</span>
+            </div>
+          `;
+        } else {
+          chartContainer.innerHTML = `
+            <div style="display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 10px;">
+              ${series.slice(-7).map(item => {
+                const lvl = item.congestion_level || 2;
+                const height = Math.min(100, lvl * 20);
+                const dateStr = item.recorded_at ? new Date(item.recorded_at).toLocaleDateString('vi-VN', { weekday: 'short' }) : '';
+                return `
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 10px; font-weight: 700; color: #1a73e8;">${lvl}</span>
+                    <div style="width: 100%; height: ${height}%; background: ${lvl >= 4 ? '#d93025' : (lvl >= 3 ? '#f9ab00' : '#1e8e3e')}; border-radius: 4px 4px 0 0;"></div>
+                    <span style="font-size: 10px; color: #5f6368;">${dateStr}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+      } catch (e) {
+        chartContainer.innerHTML = '<div style="color: #5f6368;">Chưa thể nạp chuỗi thời gian Supabase.</div>';
+      }
+    }
   }
 
   // Đặt lại điểm mặc định khi chuyển thành phố

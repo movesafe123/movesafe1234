@@ -321,46 +321,60 @@ class MapEngine {
     });
   }
 
-  // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin
-  renderFloodPoints(floodPoints) {
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin (Giữ nguyên Marker nếu đã tồn tại để tránh đóng Popup)
+  renderFloodPoints(floodPoints = []) {
     if (!this.layers.floodMarkers) return;
-    this.layers.floodMarkers.clearLayers();
+    if (!this._floodMarkerMap) this._floodMarkerMap = new Map();
 
     const activePoints = floodPoints.filter(point => point.depth_cm > 0 && point.danger_level !== 'safe');
-    if (activePoints.length === 0) {
-      return;
+    const newIds = new Set(activePoints.map(p => String(p.id)));
+
+    // Xóa những marker không còn xuất hiện
+    for (const [id, item] of this._floodMarkerMap.entries()) {
+      if (!newIds.has(id)) {
+        this.layers.floodMarkers.removeLayer(item.marker);
+        if (item.circle) this.layers.floodMarkers.removeLayer(item.circle);
+        this._floodMarkerMap.delete(id);
+      }
     }
 
     activePoints.forEach(point => {
+      const pId = String(point.id);
       const isCritical = point.danger_level === 'critical';
       const depthText = point.depth_cm ? `${point.depth_cm}cm` : 'Ngập';
       const badgeClass = isCritical ? '' : 'badge-medium';
       const pointClass = isCritical ? '' : 'point-medium';
       const color = isCritical ? '#d93025' : '#f9ab00';
 
-      const customIcon = L.divIcon({
-        className: 'gm-flood-pin-container',
-        html: `
-          <div class="gm-flood-pin">
-            <div class="gm-flood-badge ${badgeClass}">
-              <span>🌊</span> ${depthText}
-            </div>
-            <div class="gm-pin-point ${pointClass}"></div>
-          </div>
-        `,
-        iconSize: [60, 32],
-        iconAnchor: [30, 32]
-      });
+      const safeName = this.escapeHtml(point.name || 'Điểm ngập');
+      const safeSource = this.escapeHtml(point.source || 'Cộng đồng');
+      const safeAdvice = this.escapeHtml(point.advice || 'Khuyến nghị vòng tránh qua tuyến khác.');
+      const safePump = this.escapeHtml(point.pump_status || 'Đang vận hành');
 
-      const marker = L.marker([point.lat, point.lng], { icon: customIcon });
-
-      const circle = L.circle([point.lat, point.lng], {
-        radius: isCritical ? 240 : 150,
-        color: color,
-        weight: 1.5,
-        fillColor: color,
-        fillOpacity: 0.12
-      });
+      // Nút xác thực cộng đồng cho tin báo
+      const isCrowdsource = String(point.source || '').toLowerCase().includes('cộng đồng') || String(point.id || '').includes('cs-');
+      const verifyButtons = isCrowdsource ? `
+        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e8eaed; padding-top: 6px;">
+          <button style="flex: 1; background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                  onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${pId}', 'up')">
+            👍 Vẫn ngập
+          </button>
+          <button style="flex: 1; background: #e6f4ea; color: #137333; border: 1px solid #ceead6; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                  onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${pId}', 'down')">
+            ✅ Đã rút nước
+          </button>
+        </div>
+      ` : '';
 
       const popupHtml = `
         <div style="font-family: Roboto, sans-serif; min-width: 250px;">
@@ -373,38 +387,83 @@ class MapEngine {
             </span>
           </div>
           <h3 style="font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
-            ${point.name}
+            ${safeName}
           </h3>
           <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
-            Nguồn trạm đo: <strong>${point.source}</strong>
+            Nguồn trạm đo: <strong>${safeSource}</strong>
           </div>
           <div style="background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px;">
             <div>🛵 <strong>Xe máy:</strong> ${point.passable_motorbike ? '✅ Có thể qua' : '❌ Nguy cơ chết máy bugi'}</div>
             <div>🚗 <strong>Ô tô:</strong> ${point.passable_car ? '✅ Xe gầm cao đi được' : '❌ Nguy cơ thủy kích'}</div>
           </div>
           <div style="font-size: 12px; color: #c5221f; font-weight: 500; margin-bottom: 6px;">
-            💡 ${point.advice || 'Khuyến nghị vòng tránh qua tuyến khác.'}
+            💡 ${safeAdvice}
           </div>
           <div style="font-size: 11px; color: #70757a;">
-            Trạm bơm: ${point.pump_status || 'Đang vận hành'}
+            Trạm bơm: ${safePump}
           </div>
+          ${verifyButtons}
         </div>
       `;
 
-      marker.bindPopup(popupHtml);
-      this.layers.floodMarkers.addLayer(marker);
-      this.layers.floodMarkers.addLayer(circle);
+      if (this._floodMarkerMap.has(pId)) {
+        // Cập nhật popup mà không xóa marker (giúp giữ Popup nếu người dùng đang đọc)
+        const existing = this._floodMarkerMap.get(pId);
+        existing.marker.setPopupContent(popupHtml);
+        existing.marker.setLatLng([point.lat, point.lng]);
+        if (existing.circle) existing.circle.setLatLng([point.lat, point.lng]);
+      } else {
+        const customIcon = L.divIcon({
+          className: 'gm-flood-pin-container',
+          html: `
+            <div class="gm-flood-pin">
+              <div class="gm-flood-badge ${badgeClass}">
+                <span>🌊</span> ${depthText}
+              </div>
+              <div class="gm-pin-point ${pointClass}"></div>
+            </div>
+          `,
+          iconSize: [60, 32],
+          iconAnchor: [30, 32]
+        });
+
+        const marker = L.marker([point.lat, point.lng], { icon: customIcon });
+        const circle = L.circle([point.lat, point.lng], {
+          radius: isCritical ? 240 : 150,
+          color: color,
+          weight: 1.5,
+          fillColor: color,
+          fillOpacity: 0.12
+        });
+
+        marker.bindPopup(popupHtml);
+        this.layers.floodMarkers.addLayer(marker);
+        this.layers.floodMarkers.addLayer(circle);
+
+        this._floodMarkerMap.set(pId, { marker, circle });
+      }
     });
 
     this.handleZoomLevel();
   }
 
-  // 3. Vẽ các ghim sự cố giao thông TomTom / VOV theo đúng phân loại
-  renderTrafficIncidents(incidents) {
+  // 3. Vẽ các ghim sự cố giao thông TomTom / VOV theo đúng phân loại (Giữ nguyên Marker không làm rớt Popup)
+  renderTrafficIncidents(incidents = []) {
     if (!this.layers.trafficMarkers) return;
-    this.layers.trafficMarkers.clearLayers();
+    if (!this._trafficMarkerMap) this._trafficMarkerMap = new Map();
+
+    const newIds = new Set(incidents.map(i => String(i.id)));
+
+    // Xóa các marker cũ không còn tồn tại
+    for (const [id, marker] of this._trafficMarkerMap.entries()) {
+      if (!newIds.has(id)) {
+        this.layers.trafficMarkers.removeLayer(marker);
+        this._trafficMarkerMap.delete(id);
+      }
+    }
 
     incidents.forEach(inc => {
+      const incId = String(inc.id);
       const isRoadwork = inc.type === 'roadwork';
       const isClosure = inc.type === 'road_closure';
       const isAccident = inc.type === 'accident';
@@ -442,18 +501,26 @@ class MapEngine {
         headerColor = '#1e8e3e';
       }
 
-      const customIcon = L.divIcon({
-        className: 'gm-traffic-pin-container',
-        html: `<div class="gm-traffic-pin" style="background: ${pinBg}; display: flex; align-items: center; justify-content: center; font-size: 14px;">${pinIcon}</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
-      });
-
-      const marker = L.marker([inc.lat, inc.lng], { icon: customIcon });
-
       const speedText = isClosure
         ? 'Tạm cấm lưu thông một chiều phục vụ thi công'
         : (isRealJam ? `Vận tốc ùn ứ: ~${inc.speedKmh || 8} km/h` : `Vận tốc lưu thông: ~${inc.speedKmh || 40} km/h`);
+
+      const safeDesc = this.escapeHtml(inc.description || inc.categoryName || 'Sự cố trên tuyến đường');
+      const safeSource = this.escapeHtml(inc.source || 'Vệ tinh TomTom Traffic v5');
+
+      const isCrowdsource = String(inc.source || '').toLowerCase().includes('cộng đồng') || incId.includes('cs-');
+      const verifyButtons = isCrowdsource ? `
+        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e8eaed; padding-top: 6px;">
+          <button style="flex: 1; background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                  onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${incId}', 'up')">
+            👍 Vẫn tắc
+          </button>
+          <button style="flex: 1; background: #e6f4ea; color: #137333; border: 1px solid #ceead6; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                  onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${incId}', 'down')">
+            ✅ Đã thông thoáng
+          </button>
+        </div>
+      ` : '';
 
       const popupHtml = `
         <div style="font-family: Roboto, sans-serif; min-width: 240px;">
@@ -461,19 +528,35 @@ class MapEngine {
             ${headerText}
           </div>
           <h4 style="font-size: 13px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
-            ${inc.description || inc.categoryName || 'Sự cố trên tuyến đường'}
+            ${safeDesc}
           </h4>
           <div style="font-size: 12px; color: #5f6368; margin-bottom: 4px;">
             ${speedText} ${inc.delaySeconds > 0 ? `• Độ trễ: <strong>+${Math.round(inc.delaySeconds / 60)} phút</strong>` : ''}
           </div>
           <div style="font-size: 11px; color: #70757a; border-top: 1px solid #eee; padding-top: 4px; margin-top: 6px;">
-            🛰️ ${inc.source || 'Vệ tinh TomTom Traffic v5 thời gian thực'}
+            🛰️ ${safeSource}
           </div>
+          ${verifyButtons}
         </div>
       `;
 
-      marker.bindPopup(popupHtml);
-      this.layers.trafficMarkers.addLayer(marker);
+      if (this._trafficMarkerMap.has(incId)) {
+        const marker = this._trafficMarkerMap.get(incId);
+        marker.setPopupContent(popupHtml);
+        marker.setLatLng([inc.lat, inc.lng]);
+      } else {
+        const customIcon = L.divIcon({
+          className: 'gm-traffic-pin-container',
+          html: `<div class="gm-traffic-pin" style="background: ${pinBg}; display: flex; align-items: center; justify-content: center; font-size: 14px;">${pinIcon}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker([inc.lat, inc.lng], { icon: customIcon });
+        marker.bindPopup(popupHtml);
+        this.layers.trafficMarkers.addLayer(marker);
+        this._trafficMarkerMap.set(incId, marker);
+      }
     });
 
     this.handleZoomLevel();

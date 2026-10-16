@@ -10,6 +10,24 @@ from supabase import create_client, Client
 
 app = FastAPI(title="MoveSafe AI Prediction Engine")
 
+# Đọc file .env nếu có
+env_path = Path(__file__).resolve().parent.parent / ".env"
+if not env_path.exists():
+    env_path = Path(__file__).resolve().parent / ".env"
+if env_path.exists():
+    try:
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip("'\"")
+                    if k and v and k not in os.environ:
+                        os.environ[k] = v
+    except Exception:
+        pass
+
 # 1. Kết nối Supabase Cloud (Ưu tiên Service Role Key để ghi dữ liệu)
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://cuvleafsohxtchhgbdbk.supabase.co")
 SUPABASE_KEY = (
@@ -167,8 +185,13 @@ def run_predictions_task():
         decay_factor = 1.0 if offset == 1 else (0.82 if offset == 2 else 0.65)
         for area in flood_prone_areas:
             w_code = city_weather.get(area["city"], 0)
-            rain_boost = 1.2 if w_code == 2 else (1.0 if w_code == 1 else 0.85)
-            predicted_depth = int(round(area["base_depth"] * decay_factor * rain_boost))
+            if w_code == 0:
+                # Trời hoàn toàn tạnh ráo -> Không dự báo ngập nước sâu
+                predicted_depth = 0
+            else:
+                rain_boost = 1.2 if w_code == 2 else 1.0
+                predicted_depth = int(round(area["base_depth"] * decay_factor * rain_boost))
+
             flood_predictions.append({
                 "location_name": area["name"],
                 "city": area["city"],
