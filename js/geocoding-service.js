@@ -29,40 +29,32 @@ class GeocodingService {
   getCategoryIcon(item) {
     const text = ((item.name || '') + ' ' + (item.street || '') + ' ' + (item.type || '')).toLowerCase();
     
-    // Ngõ, ngách, hẻm, kiệt
     if (text.includes('ngõ') || text.includes('ngách') || text.includes('hẻm') || text.includes('kiệt')) {
-      return { icon: '🛣️', type: 'alley', typeName: 'Ngõ/Ngách' };
+      return { icon: '', type: 'alley', typeName: 'Ngõ/Ngách' };
     }
-    // Bệnh viện, y tế
     if (text.includes('bệnh viện') || text.includes('phòng khám') || item.osm_value === 'hospital' || item.osm_value === 'clinic') {
-      return { icon: '🏥', type: 'hospital', typeName: 'Cơ sở y tế' };
+      return { icon: '', type: 'hospital', typeName: 'Cơ sở y tế' };
     }
-    // Trường học, đại học
     if (text.includes('trường') || text.includes('đại học') || text.includes('học viện') || item.osm_value === 'university' || item.osm_value === 'school') {
-      return { icon: '🎓', type: 'education', typeName: 'Giáo dục' };
+      return { icon: '', type: 'education', typeName: 'Giáo dục' };
     }
-    // Chợ, siêu thị, trung tâm thương mại
     if (text.includes('chợ') || text.includes('vincom') || text.includes('siêu thị') || text.includes('aeon') || item.osm_value === 'mall' || item.osm_value === 'supermarket') {
-      return { icon: '🛍️', type: 'shopping', typeName: 'Mua sắm/Chợ' };
+      return { icon: '', type: 'shopping', typeName: 'Mua sắm/Chợ' };
     }
-    // Công viên, hồ nước
     if (text.includes('hồ') || text.includes('công viên') || item.osm_value === 'park' || item.osm_value === 'lake') {
-      return { icon: '🌳', type: 'park', typeName: 'Công viên/Hồ' };
+      return { icon: '', type: 'park', typeName: 'Công viên/Hồ' };
     }
-    // Cầu, hầm, nút giao
     if (text.includes('cầu') || text.includes('nút giao') || text.includes('bùng binh')) {
-      return { icon: '🌉', type: 'bridge', typeName: 'Cầu/Nút giao' };
+      return { icon: '', type: 'bridge', typeName: 'Cầu/Nút giao' };
     }
-    // Phố, đường lớn
     if (text.includes('đường') || text.includes('phố') || text.includes('đại lộ') || item.osm_key === 'highway') {
-      return { icon: '🚗', type: 'street', typeName: 'Đường phố' };
+      return { icon: '', type: 'street', typeName: 'Đường phố' };
     }
-    // Tòa nhà, chung cư
     if (text.includes('tòa') || text.includes('chung cư') || text.includes('building') || item.osm_value === 'apartments') {
-      return { icon: '🏢', type: 'building', typeName: 'Tòa nhà' };
+      return { icon: '', type: 'building', typeName: 'Tòa nhà' };
     }
     
-    return { icon: '📍', type: 'place', typeName: 'Địa điểm' };
+    return { icon: '', type: 'place', typeName: 'Địa điểm' };
   }
 
   /**
@@ -185,7 +177,7 @@ class GeocodingService {
             fullAddress: d.display_name,
             lat: parseFloat(d.lat),
             lng: parseFloat(d.lon),
-            icon: '📍',
+            icon: '',
             type: 'place',
             typeName: 'Địa điểm'
           };

@@ -74,7 +74,7 @@ class WeatherService {
             humidity: data.main.humidity,
             windSpeed: Math.round(data.wind.speed * 3.6),
             description: rain1h === 0 ? 'Tạnh ráo, không mưa' : data.weather[0].description,
-            icon: rain1h === 0 ? '☀️' : this.mapWeatherIcon(data.weather[0].icon),
+            icon: '',
             rain1h: rain1h,
             floodRisk: this.calculateFloodRisk(rain1h),
             raw: data
@@ -123,7 +123,7 @@ class WeatherService {
         humidity: 80,
         windSpeed: 10,
         description: isDay ? 'Tạnh ráo, quang đãng' : 'Trời tối, tạnh ráo',
-        icon: isDay ? '☀️' : '🌙',
+        icon: '',
         rain1h: 0,
         floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' }
       };
@@ -229,7 +229,7 @@ class WeatherService {
         windSpeed: 10,
         floodRisk: { level: 'safe', text: 'Tạnh ráo - Khô ráo', badgeClass: 'badge-safe', color: '#1e8e3e' },
         description: defaultIsDay ? 'Trời tạnh ráo, không mưa' : 'Trời tối, tạnh ráo',
-        icon: defaultIsDay ? '☀️' : '🌙',
+        icon: '',
         updated_at: new Date().toISOString()
       }));
     }
@@ -271,14 +271,8 @@ class WeatherService {
     };
   }
 
-  mapWeatherIcon(iconCode, isDay = true) {
-    if (iconCode.includes('11')) return '⛈️';
-    if (iconCode.includes('09') || iconCode.includes('10')) return '🌧️';
-    if (iconCode.includes('13')) return '❄️';
-    if (iconCode.includes('50')) return '🌫️';
-    if (iconCode.includes('01')) return isDay ? '☀️' : '🌙';
-    if (iconCode.includes('02')) return isDay ? '⛅' : '☁️';
-    return '☁️';
+  mapWeatherIcon() {
+    return '';
   }
 
   getWmoDescription(code, isDay = true) {
@@ -292,13 +286,8 @@ class WeatherService {
     return 'Tạnh ráo, nhiều mây';
   }
 
-  getWmoIcon(code, isDay = true) {
-    if (code === 0) return isDay ? '☀️' : '🌙';
-    if (code <= 3) return isDay ? '⛅' : '☁️';
-    if (code <= 55) return '🌦️';
-    if (code <= 65) return '🌧️';
-    if (code >= 80) return '⛈️';
-    return isDay ? '⛅' : '☁️';
+  getWmoIcon() {
+    return '';
   }
 }
 

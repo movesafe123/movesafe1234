@@ -205,13 +205,12 @@ class MapEngine {
         html: `
           <div class="gm-weather-pin ${riskClass}" title="${st.name}: ${st.temp}°C, ${st.description}">
             <span class="gm-wp-name">${wardName}</span>
-            <span class="gm-wp-icon">${st.icon || '☀️'}</span>
             <span class="gm-wp-temp">${st.temp}°</span>
             <span class="gm-wp-rain">${rainText}</span>
           </div>
         `,
-        iconSize: [120, 28],
-        iconAnchor: [60, 14]
+        iconSize: [115, 26],
+        iconAnchor: [58, 13]
       });
 
       const marker = L.marker([st.lat, st.lng], { icon: customIcon });
@@ -219,19 +218,19 @@ class MapEngine {
       let streetsHtml = '';
       if (st.mainStreets && st.mainStreets.length > 0) {
         streetsHtml = `
-          <div style="background: #f1f8ff; border: 1px solid #c2e7ff; border-radius: 6px; padding: 7px 9px; margin-bottom: 8px;">
-            <div style="font-size: 11px; font-weight: 700; color: #005ac1; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
-              <span>🛣️ CÁC TRỤC ĐƯỜNG LỚN (${st.mainStreets.length} tuyến):</span>
-              <span style="font-size: 10px; color: #5f6368; font-weight: 400;">Bấm vào để kiểm tra</span>
+          <div style="background: #f8fafc; border: 1px solid #dbeafe; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #1d4ed8; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+              <span>CÁC TRỤC ĐƯỜNG LỚN (${st.mainStreets.length} tuyến):</span>
+              <span style="font-size: 10px; color: #64748b; font-weight: 400;">Nhấn để kiểm tra</span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 4px;">
               ${st.mainStreets.map(street => `
                 <span class="gm-street-badge" 
-                      style="display: inline-block; background: #ffffff; border: 1px solid #c2e7ff; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 500; color: #1a73e8; cursor: pointer; transition: all 0.15s ease;"
-                      onmouseover="this.style.background='#1a73e8'; this.style.color='#fff';"
-                      onmouseout="this.style.background='#fff'; this.style.color='#1a73e8';"
+                      style="display: inline-block; background: #ffffff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 500; color: #1d4ed8; cursor: pointer; transition: all 0.15s ease;"
+                      onmouseover="this.style.background='#1d4ed8'; this.style.color='#fff';"
+                      onmouseout="this.style.background='#fff'; this.style.color='#1d4ed8';"
                       onclick="window.appState && window.appState.searchStreetFromWard('${street.replace(/'/g, "\\'")}', '${st.name.replace(/'/g, "\\'")}')"
-                      title="Bấm để kiểm tra và phân tích lưu thông trên ${street}">
+                      title="Nhấn để kiểm tra lưu thông trên ${street}">
                   ${street}
                 </span>
               `).join('')}
@@ -243,61 +242,61 @@ class MapEngine {
       let extraInfoHtml = '';
       if (st.trafficHotspots && st.trafficHotspots.length > 0) {
         extraInfoHtml += `
-          <div style="font-size: 11px; color: #5f6368; margin-bottom: 6px;">
-            🚦 <strong>Giao cắt trọng điểm:</strong> ${st.trafficHotspots.join(' • ')}
+          <div style="font-size: 11.5px; color: #475569; margin-bottom: 6px;">
+            <strong>Giao cắt trọng điểm:</strong> ${st.trafficHotspots.join(' • ')}
           </div>
         `;
       }
       if (st.floodVulnerability) {
         extraInfoHtml += `
-          <div style="font-size: 11px; color: #d93025; margin-bottom: 6px;">
-            🌊 <strong>Lưu ý ngập úng:</strong> ${st.floodVulnerability}
+          <div style="font-size: 11.5px; color: #dc2626; margin-bottom: 6px;">
+            <strong>Lưu ý ngập úng:</strong> ${st.floodVulnerability}
           </div>
         `;
       }
 
       const popupHtml = `
-        <div style="font-family: Roboto, sans-serif; min-width: 290px; max-width: 330px;">
+        <div style="font-family: var(--font-family); min-width: 280px; max-width: 320px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: ${risk.color || '#1e8e3e'}; text-transform: uppercase;">
-              ${st.icon} ${risk.text}
+              ${risk.text}
             </span>
             <span style="background: ${risk.color || '#1e8e3e'}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px;">
               ${st.temp}°C
             </span>
           </div>
-          <h3 style="font-size: 15px; font-weight: 700; color: #202124; margin-bottom: 4px; line-height: 1.3;">
-            🏛️ ${st.name}
+          <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; line-height: 1.3;">
+            ${st.name}
           </h3>
-          <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
+          <div style="font-size: 12px; color: #475569; margin-bottom: 8px;">
             Trạng thái: <strong>${st.description}</strong> (Cảm giác như: ${st.feelsLike}°C)
           </div>
 
           ${streetsHtml}
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 6px 8px; font-size: 11px; margin-bottom: 8px;">
-            <div>🌧️ <strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
-            <div>💧 <strong>Độ ẩm:</strong> ${st.humidity}%</div>
-            <div>💨 <strong>Tốc độ gió:</strong> ${st.windSpeed} km/h</div>
-            <div>⚡ <strong>Cập nhật:</strong> 24/7 Live Radar</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 9px; font-size: 11px; margin-bottom: 8px; color: #334155;">
+            <div><strong>Lượng mưa 1h:</strong> ${st.rain1h} mm</div>
+            <div><strong>Độ ẩm:</strong> ${st.humidity}%</div>
+            <div><strong>Tốc độ gió:</strong> ${st.windSpeed} km/h</div>
+            <div><strong>Cập nhật:</strong> Trực tuyến 24/7</div>
           </div>
 
           ${extraInfoHtml}
 
           <div style="font-size: 12px; color: ${risk.color || '#1e8e3e'}; font-weight: 500; margin-bottom: 8px;">
-            💡 Đánh giá: ${st.rain1h >= 20 ? 'Nguy cơ ngập dồn các tuyến đường trũng xung quanh.' : (st.rain1h > 0 ? 'Mặt đường ướt trơn trượt, giảm tốc độ.' : 'Thời tiết thuận lợi cho việc lưu thông trên các trục đường.')}
+            Đánh giá: ${st.rain1h >= 20 ? 'Nguy cơ ngập dồn các tuyến đường trũng xung quanh.' : (st.rain1h > 0 ? 'Mặt đường ướt trơn trượt, giảm tốc độ.' : 'Thời tiết thuận lợi cho việc lưu thông trên các trục đường.')}
           </div>
 
-          <div style="display: flex; gap: 6px; margin-top: 6px;">
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
             <button 
-              style="flex: 1; background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
+              style="flex: 1; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer;"
               onclick="window.aiChat.open(); window.aiChat.sendMessage('Tình hình thời tiết và các tuyến đường lớn tại ${st.name.replace(/'/g, "\\'")} thế nào?')">
-              🤖 Hỏi AI Về Phường & Đường
+              Hỏi trợ lý AI
             </button>
             <button 
-              style="background: #e8f0fe; color: #1a73e8; border: 1px solid #c2e7ff; border-radius: 4px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
+              style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer;"
               onclick="window.appState && window.appState.routeToLocation(${st.lat}, ${st.lng}, '${st.name.replace(/'/g, "\\'")}')">
-              🔀 Đến Đây
+              Chỉ đường đến đây
             </button>
           </div>
         </div>
@@ -331,7 +330,7 @@ class MapEngine {
       .replace(/'/g, '&#39;');
   }
 
-  // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin (Giữ nguyên Marker nếu đã tồn tại để tránh đóng Popup)
+  // 2. Vẽ các ghim ngập nước chuẩn phong cách Google Maps Pin
   renderFloodPoints(floodPoints = []) {
     if (!this.layers.floodMarkers) return;
     if (!this._floodMarkerMap) this._floodMarkerMap = new Map();
@@ -339,7 +338,6 @@ class MapEngine {
     const activePoints = floodPoints.filter(point => point.depth_cm > 0 && point.danger_level !== 'safe');
     const newIds = new Set(activePoints.map(p => String(p.id)));
 
-    // Xóa những marker không còn xuất hiện
     for (const [id, item] of this._floodMarkerMap.entries()) {
       if (!newIds.has(id)) {
         this.layers.floodMarkers.removeLayer(item.marker);
@@ -351,7 +349,7 @@ class MapEngine {
     activePoints.forEach(point => {
       const pId = String(point.id);
       const isCritical = point.danger_level === 'critical';
-      const depthText = point.depth_cm ? `${point.depth_cm}cm` : 'Ngập';
+      const depthText = point.depth_cm ? `Ngập ${point.depth_cm}cm` : 'Điểm ngập';
       const badgeClass = isCritical ? '' : 'badge-medium';
       const pointClass = isCritical ? '' : 'point-medium';
       const color = isCritical ? '#d93025' : '#f9ab00';
@@ -361,45 +359,44 @@ class MapEngine {
       const safeAdvice = this.escapeHtml(point.advice || 'Khuyến nghị vòng tránh qua tuyến khác.');
       const safePump = this.escapeHtml(point.pump_status || 'Đang vận hành');
 
-      // Nút xác thực cộng đồng cho tin báo
       const isCrowdsource = String(point.source || '').toLowerCase().includes('cộng đồng') || String(point.id || '').includes('cs-');
       const verifyButtons = isCrowdsource ? `
-        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e8eaed; padding-top: 6px;">
-          <button style="flex: 1; background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+          <button style="flex: 1; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
                   onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${pId}', 'up')">
-            👍 Vẫn ngập
+            Xác nhận vẫn ngập
           </button>
-          <button style="flex: 1; background: #e6f4ea; color: #137333; border: 1px solid #ceead6; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+          <button style="flex: 1; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
                   onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${pId}', 'down')">
-            ✅ Đã rút nước
+            Đã rút nước
           </button>
         </div>
       ` : '';
 
       const popupHtml = `
-        <div style="font-family: Roboto, sans-serif; min-width: 250px;">
+        <div style="font-family: var(--font-family); min-width: 250px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: ${color}; text-transform: uppercase;">
-              ${isCritical ? '🔴 Rốn ngập sâu nguy hiểm' : '🟡 Điểm ngập cục bộ'}
+              ${isCritical ? 'Rốn ngập sâu nguy hiểm' : 'Điểm ngập cục bộ'}
             </span>
-            <span style="background: ${color}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px;">
-              ${depthText}
+            <span style="background: ${color}; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px;">
+              ${point.depth_cm}cm
             </span>
           </div>
-          <h3 style="font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
+          <h3 style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px; line-height: 1.3;">
             ${safeName}
           </h3>
-          <div style="font-size: 12px; color: #5f6368; margin-bottom: 8px;">
+          <div style="font-size: 12px; color: #475569; margin-bottom: 8px;">
             Nguồn trạm đo: <strong>${safeSource}</strong>
           </div>
-          <div style="background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px;">
-            <div>🛵 <strong>Xe máy:</strong> ${point.passable_motorbike ? '✅ Có thể qua' : '❌ Nguy cơ chết máy bugi'}</div>
-            <div>🚗 <strong>Ô tô:</strong> ${point.passable_car ? '✅ Xe gầm cao đi được' : '❌ Nguy cơ thủy kích'}</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 8px; line-height: 1.5;">
+            <div><strong>Xe máy:</strong> ${point.passable_motorbike ? 'Có thể đi qua chậm' : 'Không nên đi (nguy cơ chết máy)'}</div>
+            <div><strong>Ô tô:</strong> ${point.passable_car ? 'Xe gầm cao đi được' : 'Cảnh báo nguy cơ thủy kích'}</div>
           </div>
-          <div style="font-size: 12px; color: #c5221f; font-weight: 500; margin-bottom: 6px;">
-            💡 ${safeAdvice}
+          <div style="font-size: 12px; color: #b91c1c; font-weight: 500; margin-bottom: 6px;">
+            ${safeAdvice}
           </div>
-          <div style="font-size: 11px; color: #70757a;">
+          <div style="font-size: 11px; color: #64748b;">
             Trạm bơm: ${safePump}
           </div>
           ${verifyButtons}
@@ -407,7 +404,6 @@ class MapEngine {
       `;
 
       if (this._floodMarkerMap.has(pId)) {
-        // Cập nhật popup mà không xóa marker (giúp giữ Popup nếu người dùng đang đọc)
         const existing = this._floodMarkerMap.get(pId);
         existing.marker.setPopupContent(popupHtml);
         existing.marker.setLatLng([point.lat, point.lng]);
@@ -418,13 +414,13 @@ class MapEngine {
           html: `
             <div class="gm-flood-pin">
               <div class="gm-flood-badge ${badgeClass}">
-                <span>🌊</span> ${depthText}
+                ${depthText}
               </div>
               <div class="gm-pin-point ${pointClass}"></div>
             </div>
           `,
-          iconSize: [60, 32],
-          iconAnchor: [30, 32]
+          iconSize: [72, 32],
+          iconAnchor: [36, 32]
         });
 
         const marker = L.marker([point.lat, point.lng], { icon: customIcon });
@@ -447,14 +443,13 @@ class MapEngine {
     this.handleZoomLevel();
   }
 
-  // 3. Vẽ các ghim sự cố giao thông TomTom / VOV theo đúng phân loại (Giữ nguyên Marker không làm rớt Popup)
+  // 3. Vẽ các ghim sự cố giao thông TomTom / VOV
   renderTrafficIncidents(incidents = []) {
     if (!this.layers.trafficMarkers) return;
     if (!this._trafficMarkerMap) this._trafficMarkerMap = new Map();
 
     const newIds = new Set(incidents.map(i => String(i.id)));
 
-    // Xóa các marker cũ không còn tồn tại
     for (const [id, marker] of this._trafficMarkerMap.entries()) {
       if (!newIds.has(id)) {
         this.layers.trafficMarkers.removeLayer(marker);
@@ -469,35 +464,35 @@ class MapEngine {
       const isAccident = inc.type === 'accident';
       const isRealJam = inc.isJam === true;
 
-      let pinIcon = '🚗';
+      let pinText = 'Tắc';
       let pinBg = '#f29900';
-      let headerText = '⚠️ Cảnh báo đường bộ';
+      let headerText = 'Cảnh báo đường bộ';
       let headerColor = '#b06000';
 
       if (isRoadwork) {
-        pinIcon = '🚧';
+        pinText = 'Thi công';
         pinBg = '#e37400';
-        headerText = '🚧 Công trường thi công bảo trì';
+        headerText = 'Công trường thi công bảo trì';
         headerColor = '#b06000';
       } else if (isClosure) {
-        pinIcon = '⛔';
+        pinText = 'Cấm đường';
         pinBg = '#d93025';
-        headerText = '⛔ Đoạn đường tạm cấm / Rào chắn';
+        headerText = 'Đoạn đường tạm cấm / Rào chắn';
         headerColor = '#d93025';
       } else if (isAccident) {
-        pinIcon = '⚠️';
+        pinText = 'Sự cố';
         pinBg = '#ea4335';
-        headerText = '⚠️ Sự cố va chạm phương tiện';
+        headerText = 'Sự cố va chạm phương tiện';
         headerColor = '#ea4335';
       } else if (isRealJam) {
-        pinIcon = '🚗';
+        pinText = 'Ùn tắc';
         pinBg = '#d93025';
-        headerText = '🔴 Ùn tắc phương tiện cao điểm';
+        headerText = 'Ùn tắc phương tiện cao điểm';
         headerColor = '#d93025';
       } else {
-        pinIcon = '🚗';
+        pinText = 'Lưu thông';
         pinBg = '#1e8e3e';
-        headerText = '🟢 Lưu thông bình thường';
+        headerText = 'Lưu thông bình thường';
         headerColor = '#1e8e3e';
       }
 
@@ -505,36 +500,39 @@ class MapEngine {
         ? 'Tạm cấm lưu thông một chiều phục vụ thi công'
         : (isRealJam ? `Vận tốc ùn ứ: ~${inc.speedKmh || 8} km/h` : `Vận tốc lưu thông: ~${inc.speedKmh || 40} km/h`);
 
-      const safeDesc = this.escapeHtml(inc.description || inc.categoryName || 'Sự cố trên tuyến đường');
-      const safeSource = this.escapeHtml(inc.source || 'Vệ tinh TomTom Traffic v5');
+      const cleanDesc = String(inc.description || inc.categoryName || 'Sự cố trên tuyến đường')
+        .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu, '')
+        .trim();
+      const safeDesc = this.escapeHtml(cleanDesc);
+      const safeSource = this.escapeHtml(inc.source || 'TomTom Traffic v5');
 
       const isCrowdsource = String(inc.source || '').toLowerCase().includes('cộng đồng') || incId.includes('cs-');
       const verifyButtons = isCrowdsource ? `
-        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e8eaed; padding-top: 6px;">
-          <button style="flex: 1; background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+        <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+          <button style="flex: 1; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
                   onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${incId}', 'up')">
-            👍 Vẫn tắc
+            Xác nhận vẫn tắc
           </button>
-          <button style="flex: 1; background: #e6f4ea; color: #137333; border: 1px solid #ceead6; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+          <button style="flex: 1; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
                   onclick="window.crowdsourceService && window.crowdsourceService.voteReport('${incId}', 'down')">
-            ✅ Đã thông thoáng
+            Đã thông thoáng
           </button>
         </div>
       ` : '';
 
       const popupHtml = `
-        <div style="font-family: Roboto, sans-serif; min-width: 240px;">
+        <div style="font-family: var(--font-family); min-width: 240px;">
           <div style="font-size: 11px; font-weight: 700; color: ${headerColor}; text-transform: uppercase; margin-bottom: 4px;">
             ${headerText}
           </div>
-          <h4 style="font-size: 13px; font-weight: 700; color: #202124; margin-bottom: 6px; line-height: 1.3;">
+          <h4 style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px; line-height: 1.3;">
             ${safeDesc}
           </h4>
-          <div style="font-size: 12px; color: #5f6368; margin-bottom: 4px;">
+          <div style="font-size: 12px; color: #475569; margin-bottom: 4px;">
             ${speedText} ${inc.delaySeconds > 0 ? `• Độ trễ: <strong>+${Math.round(inc.delaySeconds / 60)} phút</strong>` : ''}
           </div>
-          <div style="font-size: 11px; color: #70757a; border-top: 1px solid #eee; padding-top: 4px; margin-top: 6px;">
-            🛰️ ${safeSource}
+          <div style="font-size: 11px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 4px; margin-top: 6px;">
+            Nguồn: ${safeSource}
           </div>
           ${verifyButtons}
         </div>
@@ -547,9 +545,9 @@ class MapEngine {
       } else {
         const customIcon = L.divIcon({
           className: 'gm-traffic-pin-container',
-          html: `<div class="gm-traffic-pin" style="background: ${pinBg}; display: flex; align-items: center; justify-content: center; font-size: 14px;">${pinIcon}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
+          html: `<div class="gm-traffic-pin" style="background: ${pinBg};">${pinText}</div>`,
+          iconSize: [64, 24],
+          iconAnchor: [32, 12]
         });
 
         const marker = L.marker([inc.lat, inc.lng], { icon: customIcon });
@@ -658,7 +656,7 @@ class MapEngine {
               });
               const safeName = String(st.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
               const safeProvider = String(st.provider || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-              marker.bindPopup(`<b>⚡ ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
+              marker.bindPopup(`<b>Trạm sạc: ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
               this.layers.evLayer.addLayer(marker);
             });
             this._loadedEvCity = currentCity;

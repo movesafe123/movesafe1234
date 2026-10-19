@@ -95,9 +95,8 @@ class CrowdsourceService {
       });
       const data = await res.json();
       if (data.status === 'success') {
-        alert(voteType === 'up' ? '👍 Cảm ơn bạn đã xác nhận tình trạng!' : '✅ Cảm ơn bạn đã báo đường thông thoáng!');
+        alert(voteType === 'up' ? 'Cảm ơn bạn đã xác nhận tình trạng!' : 'Cảm ơn bạn đã báo đường thông thoáng!');
         if (data.action === 'removed') {
-          // Xóa ngay khỏi bộ nhớ cục bộ
           if (window.appState && window.appState.liveData) {
             window.appState.liveData.floodPoints = window.appState.liveData.floodPoints.filter(p => p.id !== reportId);
             window.appState.liveData.trafficIncidents = window.appState.liveData.trafficIncidents.filter(p => p.id !== reportId);
@@ -148,10 +147,10 @@ class CrowdsourceService {
         passable_car: depthVal < 35,
         isJam,
         categoryName: isJam ? 'Báo cáo ùn tắc cộng đồng' : (rType === 'hazard' ? 'Cảnh báo vật cản' : 'Điểm ngập cộng đồng'),
-        icon: rType === 'flood' ? '🌊' : (isJam ? '🚗' : '⚠️'),
+        icon: '',
         description: isJam
-          ? `🚗 Cộng đồng báo kẹt xe tại ${locName}`
-          : (rType === 'hazard' ? `⚠️ Sự cố/vật cản tại ${locName}` : `🌊 Ngập ${depthVal}cm tại ${locName}`),
+          ? `Cộng đồng báo kẹt xe tại ${locName}`
+          : (rType === 'hazard' ? `Sự cố/vật cản tại ${locName}` : `Ngập ${depthVal}cm tại ${locName}`),
         delaySeconds: isJam ? 450 : 180,
         speedKmh: isJam ? 10 : 25,
         source: 'Báo cáo trực tiếp từ bạn',
