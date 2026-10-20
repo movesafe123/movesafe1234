@@ -2745,7 +2745,7 @@ class GoogleMapsApp {
     }
 
     // 6. Kết luận tuyến đề xuất
-    const recLabel = recommended.avoidLevel === 1 ? 'An toàn tuyệt đối' : recommended.avoidLevel === 2 ? 'Cân bằng thông minh' : 'Nhanh nhất';
+    const recLabel = recommended.label || (recommended.avoidLevel === 1 ? 'An toàn hành lang lớn' : recommended.avoidLevel === 2 ? 'Trục chính êm ái' : 'Nhanh thực tế');
     details.push({ text: `<strong>Đề xuất: ${recLabel}</strong> — ${recommended.distanceKm} km, ~${recommended.durationMin} phút (${recommended.trafficDesc}).` });
 
     // ====== RENDER HTML ======
@@ -3154,17 +3154,65 @@ class GoogleMapsApp {
         `;
       }
 
+      // Huy hiệu RPI (Độ tin cậy thời gian thực tế)
+      let rpiHtml = '';
+      if (route.rpi !== undefined) {
+        const rpiClass = route.rpi >= 85 ? 'gm-rpi-high' : (route.rpi >= 65 ? 'gm-rpi-med' : 'gm-rpi-low');
+        const rpiIcon = route.rpi >= 85 ? '✓' : (route.rpi >= 65 ? '~' : '⚠️');
+        rpiHtml = `<span class="gm-route-rpi-badge ${rpiClass}" title="Độ tin cậy lộ trình: ${route.rpi}% (xác suất đến đúng giờ dự kiến)">${rpiIcon} Tin cậy ${route.rpi}%</span>`;
+      }
+
+      // Thẻ tốc độ thực tế dòng xe & độ trễ
+      let speedTagHtml = '';
+      if (route.realAvgSpeedKmh) {
+        const delayStr = route.delayMin > 0 ? ` • Trễ +${route.delayMin}p do tắc` : ' • Lưu thông đều';
+        speedTagHtml = `
+          <div class="gm-route-speed-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Tốc độ thực tế: <strong>~${route.realAvgSpeedKmh} km/h</strong>${delayStr}
+          </div>
+        `;
+      }
+
+      // Cảnh báo nút thắt cổ chai
+      let bottleneckHtml = '';
+      if (route.bottleneckWarnings && route.bottleneckWarnings.length > 0) {
+        bottleneckHtml = `
+          <div class="gm-bottleneck-tag">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Nút thắt cổ chai: ${route.bottleneckWarnings.slice(0, 2).join(', ')}
+          </div>
+        `;
+      }
+
+      // Cảnh báo bẫy ngõ hẹp cho ô tô
+      let alleyTrapHtml = '';
+      if (route.hasAlleyTrap) {
+        alleyTrapHtml = `
+          <div class="gm-alley-warning-tag">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Đoạn ngõ hẹp (${route.alleyDistanceMeters}m) • Ô tô khó quay đầu
+          </div>
+        `;
+      }
+
       html += `
         <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
           ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
-          <div class="gm-route-label ${labelClass}" style="color: ${route.color};">
+          <div class="gm-route-label ${labelClass}" style="color: ${route.color}; padding-right: ${route.isRecommended ? '75px' : '0'};">
             ${route.label}
           </div>
-          <div class="gm-route-time ${timeClass}">
-            <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
-            <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
+          <div class="gm-route-time ${timeClass}" style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
+            <div>
+              <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
+              <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
+            </div>
+            ${rpiHtml}
           </div>
-          <div class="gm-route-meta" style="font-size: 12px; color: #3c4043; margin-top: 2px;">${route.trafficDesc}</div>
+          ${speedTagHtml}
+          <div class="gm-route-meta" style="font-size: 12px; color: #3c4043; margin-top: 3px;">${route.trafficDesc}</div>
+          ${bottleneckHtml}
+          ${alleyTrapHtml}
 
           <!-- Huy hiệu kiểm định kỹ thuật phương tiện -->
           <div style="font-size: 11px; color: #137333; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
