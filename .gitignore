@@ -25,3 +25,7 @@ scratch/
 convert.js
 generate_full_doc.js
 
+# Local agent skills junctions
+.agents/
+
+

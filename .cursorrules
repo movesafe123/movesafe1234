@@ -1,0 +1,13 @@
+# MoveSafe VN - Cursor & Agent Rules
+
+## Specialized Skills Available in Project
+The project has locally mounted skills in `.agents/skills/`:
+- **UI/UX Guidelines**: `.agents/skills/ui-ux-pro-max-skill-2.15.0/SKILL.md`
+- **Office Document Processing**: `.agents/skills/OfficeCLI-1.0.153/SKILL.md`
+- **Project Memory & Wiki**: `.agents/skills/ai-memory-retrieval/SKILL.md`
+- **Reverse Engineering**: `.agents/skills/reverse-engineer-anything/SKILL.md`
+
+## UI Rules
+- Strictly NO icons or emojis in the UI, map pins, toasts, or AI responses.
+- Use clean, minimal typography and high-contrast badges.
+- Primary colors: Slate Dark (`#0f172a`), Royal Blue (`#2563eb`), Subtle Gray (`#f8fafc`).
