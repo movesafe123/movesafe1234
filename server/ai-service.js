@@ -259,6 +259,51 @@ class AIAssistantService {
       };
     }
 
+    // 5. Hỏi về trạm sạc xe điện, pin, trạm sạc Open Charge Map / VinFast
+    if (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('sạc điện') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) {
+      const evService = require('./ev-service');
+      const stations = evService.getStations(city, false);
+      const fastCount = stations.filter(s => s.isFastCharge).length;
+
+      let matchedStation = null;
+      for (const st of stations) {
+        const cleanName = (st.name || '').toLowerCase();
+        if (lower.includes(cleanName) || (st.address && lower.includes(st.address.toLowerCase()))) {
+          matchedStation = st;
+          break;
+        }
+      }
+
+      if (matchedStation) {
+        return {
+          text: `**Thông tin trạm sạc: ${matchedStation.name}**\n\n` +
+                `• **Đơn vị vận hành**: ${matchedStation.operator}\n` +
+                `• **Địa chỉ**: ${matchedStation.address}\n` +
+                `• **Công suất tối đa**: ${matchedStation.maxPowerKw} kW (${matchedStation.isFastCharge ? 'DC Sạc nhanh' : 'AC Tiêu chuẩn'})\n` +
+                `• **Trạng thái**: ${matchedStation.isOperational ? 'Đang hoạt động 24/7' : 'Đang bảo trì'}\n` +
+                `• **Cổng sạc**: ${(matchedStation.connectors || []).map(c => `${c.type} (${c.powerKw}kW)`).join(', ') || 'CCS2 / Type 2'}\n\n` +
+                `*Hệ thống đã tự động định vị trạm sạc trên bản đồ và mở lớp trạm sạc xe điện.*`,
+          action: {
+            type: 'SHOW_EV_LAYER',
+            targetStation: matchedStation.name
+          }
+        };
+      }
+
+      const sampleList = stations.slice(0, 3).map(s => 
+        `• **${s.name}** (${s.operator}) - ${s.maxPowerKw}kW - ${s.address}`
+      ).join('\n');
+
+      return {
+        text: `**Hệ thống Trạm sạc Xe điện (${cityName}) - Open Charge Map & Đối tác**:\n\n` +
+              `Hiện có **${stations.length} trạm sạc khả dụng** trong thành phố (gồm **${fastCount} trạm sạc nhanh DC** từ 60kW - 250kW và các trạm đổi pin Selex).\n\n` +
+              `**Một số trạm sạc tiêu biểu gần bạn**:\n` +
+              sampleList +
+              `\n\nLớp trạm sạc xe điện với biểu tượng công suất thực tế đã được hiển thị trực tiếp trên bản đồ. Bạn có thể nhấn vào bất kỳ trạm nào để xem cổng sạc hoặc chọn **Chỉ đường né ngập**.`,
+        action: { type: 'SHOW_EV_LAYER' }
+      };
+    }
+
     return {
       text: `Xin chào! Tôi là **Trợ lý Di chuyển Thông minh MoveSafe AI**.\n\n` +
             `Tôi theo dõi dữ liệu thời gian thực từ **HSDC Hà Nội**, **UDi Maps TP.HCM**, **VOV Giao Thông** và **TomTom Traffic**.\n\n` +
@@ -281,6 +326,7 @@ class AIAssistantService {
     const lower = query.toLowerCase();
     const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
+    const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('sạc điện') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
 
     let wardContext = '';
     if (city === 'hanoi' && Array.isArray(HANOI_WARDS_DATA)) {
@@ -317,6 +363,17 @@ class AIAssistantService {
       instructions = `YÊU CẦU TRẢ LỜI:
 1. Người dùng hỏi về NGẬP NƯỚC / THỦY KÍCH / MƯA LŨ. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại đường phố khô ráo (0cm ngập). Nếu có điểm ngập >0cm, nêu rõ độ sâu ngập (cm) và hướng đi thay thế.
 2. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+    } else if (isAskingEV) {
+      const evService = require('./ev-service');
+      const stations = evService.getStations(city, false);
+      dynamicContext += `Dữ liệu trạm sạc xe điện Open Charge Map & Đối tác tại ${cityName}:
+- Tổng số trạm sạc: ${stations.length}
+- Danh sách trạm tiêu biểu: ${JSON.stringify(stations.slice(0, 6).map(s => ({ name: s.name, operator: s.operator, maxPowerKw: s.maxPowerKw, isFastCharge: s.isFastCharge, address: s.address })))}`;
+
+      instructions = `YÊU CẦU TRẢ LỜI:
+1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
+2. Tư vấn các trạm sạc phù hợp nhất, công suất (kW), sạc nhanh hay sạc chậm, lưu ý đường đi an toàn né ngập.
+3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else {
       dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName}:
 - Số điểm đang ngập (>0cm): ${activeFloodPoints.length}
@@ -357,7 +414,7 @@ ${instructions}`;
         if (reply && reply.trim().length > 0) {
           let action = isAskingTrafficOnly
             ? { type: 'SHOW_TRAFFIC_LAYER' }
-            : (lower.includes('thời tiết') || lower.includes('mưa') ? { type: 'SHOW_WEATHER_LAYER' } : { type: 'SHOW_FLOOD_LAYER' });
+            : (isAskingEV ? { type: 'SHOW_EV_LAYER' } : (lower.includes('thời tiết') || lower.includes('mưa') ? { type: 'SHOW_WEATHER_LAYER' } : { type: 'SHOW_FLOOD_LAYER' }));
 
           const routeMatch = reply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
           if (parsedRoute) {

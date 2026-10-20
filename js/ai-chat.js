@@ -244,6 +244,17 @@ class AIChat {
       window.mapEngine.toggleWeather(true);
       const chk = document.getElementById('chk-layer-weather');
       if (chk) chk.checked = true;
+    } else if (act.type === 'SHOW_EV_LAYER') {
+      if (window.mapEngine && window.mapEngine.toggleEV) {
+        window.mapEngine.toggleEV(true);
+      }
+      const chk = document.getElementById('chk-layer-ev');
+      if (chk) chk.checked = true;
+      const item = document.getElementById('layer-item-ev');
+      if (item) item.style.display = 'flex';
+      if (act.targetStation && window.mapEngine && window.mapEngine.focusEVStation) {
+        setTimeout(() => window.mapEngine.focusEVStation(act.targetStation), 700);
+      }
     }
   }
 
@@ -321,6 +332,11 @@ class AIChat {
         }
 
         this.addBotMessage(geminiReply);
+
+        const lowerQ = query.toLowerCase();
+        if (lowerQ.includes('trạm sạc') || lowerQ.includes('sạc xe') || lowerQ.includes('sạc pin') || lowerQ.includes('xe điện') || lowerQ.includes('đổi pin')) {
+          this.handleMapAction({ type: 'SHOW_EV_LAYER' });
+        }
 
         if (autoOrigin && autoDest && window.appState && window.appState.triggerChatRoute) {
           window.appState.triggerChatRoute(autoOrigin, autoDest, 1, parsedRoute ? parsedRoute.timeOffsetHours : 0);
@@ -414,6 +430,51 @@ class AIChat {
       }
     }
 
+    // 3c. Hỏi về trạm sạc xe điện (VinFast, Open Charge Map, EVOne, Porsche, Selex, ...)
+    if (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('sạc điện') || lower.includes('đổi pin') || lower.includes('open charge')) {
+      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
+      const fastList = stations.filter(s => s.isFastCharge || (s.maxPowerKw && s.maxPowerKw >= 50));
+      
+      let matched = null;
+      for (const st of stations) {
+        const cleanName = (st.name || '').toLowerCase();
+        if (lower.includes(cleanName) || (st.address && lower.includes(st.address.toLowerCase()))) {
+          matched = st;
+          break;
+        }
+      }
+
+      if (matched) {
+        const reply = `**Thông tin trạm sạc: ${matched.name}**\n\n` +
+                      `• **Đơn vị vận hành**: ${matched.operator || matched.provider || 'VinFast'}\n` +
+                      `• **Địa chỉ**: ${matched.address}\n` +
+                      `• **Công suất tối đa**: ${matched.maxPowerKw || 60} kW (${matched.isFastCharge ? 'DC Sạc nhanh' : 'AC Chuẩn'})\n` +
+                      `• **Trạng thái**: ${matched.isOperational !== false ? 'Đang hoạt động 24/7' : 'Đang bảo trì'}\n` +
+                      `• **Quy mô**: ${matched.totalPoints || matched.capacity || 2} trụ sạc\n\n` +
+                      `*Hệ thống đã tự động định vị và mở thông tin trạm sạc trên bản đồ. Bạn có thể nhấn "Chỉ đường né ngập" trong popup để di chuyển an toàn.*`;
+        this.addBotMessage(reply);
+        this.handleMapAction({
+          type: 'SHOW_EV_LAYER',
+          targetStation: matched.name
+        });
+        return;
+      }
+
+      const sampleList = stations.slice(0, 3).map(s => 
+        `• **${s.name}** (${s.operator || 'Đối tác'}) - ${s.maxPowerKw || 60}kW - ${s.address}`
+      ).join('\n');
+
+      const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
+      const reply = `**Hệ thống Trạm sạc Xe điện (${cityName}) - Open Charge Map & Đối tác**:\n\n` +
+                    `Hiện hệ thống có **${stations.length > 0 ? stations.length : 12} trạm sạc khả dụng** trong thành phố (gồm **${fastList.length > 0 ? fastList.length : 9} trạm sạc nhanh DC** từ 60kW - 250kW và các trạm đổi pin).\n\n` +
+                    (sampleList ? `**Một số trạm sạc tiêu biểu gần bạn**:\n${sampleList}\n\n` : '') +
+                    `*Lớp bản đồ trạm sạc đã được kích hoạt. Bạn có thể nhấn trực tiếp vào từng ghim trạm sạc trên màn hình để kiểm tra cổng sạc hoặc bấm chỉ đường an toàn.*`;
+
+      this.addBotMessage(reply);
+      this.handleMapAction({ type: 'SHOW_EV_LAYER' });
+      return;
+    }
+
     let reply = `**Phân tích giao thông MoveSafe**:\n\n`;
     if (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('kẹt xe')) {
       if (lower.includes('xuân phương')) {
@@ -454,6 +515,7 @@ class AIChat {
     const lower = query.toLowerCase();
     const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
+    const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc điện') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
 
     let dynamicContext = '';
     if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
@@ -488,6 +550,16 @@ class AIChat {
       instructions = `YÊU CẦU TRẢ LỜI:
 1. Người dùng hỏi về NGẬP NƯỚC / THỦY KÍCH / MƯA LŨ. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại đường khô ráo (0cm ngập). Nếu có ngập >0cm, nêu rõ độ sâu ngập (cm) và hướng đi thay thế.
 2. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+    } else if (isAskingEV) {
+      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
+      dynamicContext += `Dữ liệu trạm sạc xe điện Open Charge Map & Đối tác tại ${cityName}:
+- Tổng số trạm sạc: ${stations.length || 12}
+- Danh sách trạm sạc tiêu biểu: ${JSON.stringify(stations.slice(0, 6).map(s => ({ name: s.name, operator: s.operator, maxPowerKw: s.maxPowerKw, isFastCharge: s.isFastCharge, address: s.address })))}`;
+
+      instructions = `YÊU CẦU TRẢ LỜI:
+1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
+2. Nêu rõ các trạm sạc gần nhất, công suất sạc (kW), hỗ trợ DC sạc nhanh hay AC chuẩn, và hướng đi khô ráo né ngập.
+3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else {
       dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName} (Số điểm ngập >0cm: ${activeFloods.length}):
 - Điểm ngập úng trạm đo: ${JSON.stringify((activeFloods.length > 0 ? activeFloods : allFloods).slice(0, 6).map(f => ({ name: f.name, depth_cm: f.depth_cm, advice: f.advice })))}

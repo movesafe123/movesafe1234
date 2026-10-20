@@ -80,8 +80,34 @@ class SupabaseService {
     }
   }
 
-  // 1. Lấy danh sách trạm sạc xe điện theo đúng thành phố
-  async getEVStations(city = 'hanoi') {
+  // 1. Lấy danh sách trạm sạc xe điện (Open Charge Map API v3 & Mạng lưới Quốc gia)
+  async getEVStations(city = 'hanoi', fastOnly = false) {
+    // 1. Thử gọi API backend Node.js (Open Charge Map Live Service)
+    try {
+      const res = await fetch(`/api/ev-stations?city=${city}&fastOnly=${fastOnly}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+          return json.data;
+        }
+      }
+    } catch (e) {
+      console.warn('[EVService] Không thể kết nối backend /api/ev-stations:', e.message);
+    }
+
+    // 2. Thử đọc file cache tĩnh (Client offline fallback)
+    try {
+      const cacheRes = await fetch('/data/ev_stations_cache.json');
+      if (cacheRes.ok) {
+        const cached = await cacheRes.json();
+        if (Array.isArray(cached) && cached.length > 0) {
+          const filtered = cached.filter(s => (!city || s.city === city) && (!fastOnly || s.isFastCharge));
+          if (filtered.length > 0) return filtered;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Thử Supabase nếu có
     if (this.isOnline && this.supabase) {
       const res = await this.safeQuery(
         this.supabase.from('ev_stations').select('*').eq('is_active', true)
@@ -95,25 +121,24 @@ class SupabaseService {
       }
     }
 
-    // Dữ liệu dự phòng chuẩn cho các thành phố
+    // 4. Dữ liệu dự phòng chuẩn cho các thành phố
     const mockStations = [
       // Hà Nội
-      { id: 'ev-hn-1', name: 'Trạm sạc Vincom Metropolis', provider: 'VinFast', city: 'hanoi', lat: 21.0319, lng: 105.8115, capacity: 6 },
-      { id: 'ev-hn-2', name: 'Trạm sạc Vincom Trần Duy Hưng', provider: 'VinFast', city: 'hanoi', lat: 21.0069, lng: 105.7951, capacity: 8 },
-      { id: 'ev-hn-3', name: 'Trạm sạc Royal City', provider: 'VinFast', city: 'hanoi', lat: 21.0028, lng: 105.8155, capacity: 12 },
-      { id: 'ev-hn-4', name: 'Tủ thay pin Selex Motors Bách Khoa', provider: 'Selex', city: 'hanoi', lat: 21.0041, lng: 105.8437, capacity: 4 },
-      { id: 'ev-hn-5', name: 'Trạm sạc EVOne Hồ Tây', provider: 'EVOne', city: 'hanoi', lat: 21.0620, lng: 105.8230, capacity: 4 },
-      { id: 'ev-hn-6', name: 'Trạm sạc Aeon Mall Hà Đông', provider: 'VinFast', city: 'hanoi', lat: 20.9818, lng: 105.7538, capacity: 10 },
+      { id: 'ev-hn-1', name: 'Trạm sạc Siêu Nhanh Vincom Smart City', provider: 'VinFast', city: 'hanoi', lat: 20.9942, lng: 105.7482, maxPowerKw: 250, isFastCharge: true, capacity: 16 },
+      { id: 'ev-hn-2', name: 'Trạm sạc Vincom Metropolis', provider: 'VinFast', city: 'hanoi', lat: 21.0319, lng: 105.8115, maxPowerKw: 150, isFastCharge: true, capacity: 10 },
+      { id: 'ev-hn-3', name: 'Trạm sạc Royal City', provider: 'VinFast', city: 'hanoi', lat: 21.0028, lng: 105.8155, maxPowerKw: 180, isFastCharge: true, capacity: 18 },
+      { id: 'ev-hn-4', name: 'Tủ thay pin Selex Motors Bách Khoa', provider: 'Selex Motors', city: 'hanoi', lat: 21.0041, lng: 105.8437, maxPowerKw: 15, isFastCharge: false, capacity: 8 },
+      { id: 'ev-hn-5', name: 'Trạm sạc EVOne Hồ Tây', provider: 'EVOne', city: 'hanoi', lat: 21.0620, lng: 105.8230, maxPowerKw: 120, isFastCharge: true, capacity: 6 },
       // TP. Hồ Chí Minh
-      { id: 'ev-hcm-1', name: 'Trạm sạc Vincom Landmark 81', provider: 'VinFast', city: 'hcm', lat: 10.7950, lng: 106.7218, capacity: 10 },
-      { id: 'ev-hcm-2', name: 'Trạm sạc Vincom Đồng Khởi', provider: 'VinFast', city: 'hcm', lat: 10.7780, lng: 106.7020, capacity: 8 },
-      { id: 'ev-hcm-3', name: 'Tủ thay pin Selex Q.10', provider: 'Selex', city: 'hcm', lat: 10.7712, lng: 106.6685, capacity: 4 },
+      { id: 'ev-hcm-1', name: 'Trạm sạc Siêu Nhanh Landmark 81', provider: 'VinFast', city: 'hcm', lat: 10.7950, lng: 106.7218, maxPowerKw: 250, isFastCharge: true, capacity: 16 },
+      { id: 'ev-hcm-2', name: 'Trạm sạc Vincom Đồng Khởi', provider: 'VinFast', city: 'hcm', lat: 10.7780, lng: 106.7020, maxPowerKw: 150, isFastCharge: true, capacity: 10 },
+      { id: 'ev-hcm-3', name: 'Tủ thay pin Selex Q.10', provider: 'Selex Motors', city: 'hcm', lat: 10.7712, lng: 106.6685, maxPowerKw: 15, isFastCharge: false, capacity: 8 },
       // Đà Nẵng
-      { id: 'ev-dn-1', name: 'Trạm sạc Vincom Ngô Quyền', provider: 'VinFast', city: 'danang', lat: 16.0714, lng: 108.2312, capacity: 8 },
-      { id: 'ev-dn-2', name: 'Trạm sạc Cầu Rồng EVOne', provider: 'EVOne', city: 'danang', lat: 16.0610, lng: 108.2230, capacity: 4 }
+      { id: 'ev-dn-1', name: 'Trạm sạc Siêu Nhanh Vincom Ngô Quyền', provider: 'VinFast', city: 'danang', lat: 16.0714, lng: 108.2312, maxPowerKw: 250, isFastCharge: true, capacity: 12 },
+      { id: 'ev-dn-2', name: 'Trạm sạc Cầu Rồng EVOne', provider: 'EVOne', city: 'danang', lat: 16.0610, lng: 108.2230, maxPowerKw: 120, isFastCharge: true, capacity: 8 }
     ];
 
-    return mockStations.filter(s => s.city === city || !city);
+    return mockStations.filter(s => (s.city === city || !city) && (!fastOnly || s.isFastCharge));
   }
 
   // 2. Lấy dự báo kẹt xe từ AI (+1h, +2h, +3h) theo đúng tọa độ thành phố

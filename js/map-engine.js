@@ -740,18 +740,40 @@ class MapEngine {
           this.layers.evLayer.clearLayers();
           const stations = await window.supabaseService.getEVStations(currentCity);
           if (Array.isArray(stations)) {
+            this._evStationsData = stations;
             stations.forEach(st => {
-              const marker = L.circleMarker([st.lat, st.lng], {
-                radius: 8,
-                fillColor: "#1e8e3e",
-                color: "#ffffff",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9
+              if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
+              
+              const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
+              const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
+              const pinClass = isSwap ? 'ev-swap' : (isFast ? 'ev-fast' : 'ev-standard');
+
+              const zapSvg = `<svg class="ev-pin-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+              const powerLabel = isSwap ? 'Đổi pin' : (st.maxPowerKw ? `${st.maxPowerKw}kW` : (isFast ? 'DC Fast' : '22kW'));
+
+              const pinHtml = `
+                <div class="gm-ev-pin ${pinClass}" title="${String(st.name || 'Trạm sạc').replace(/"/g, '&quot;')} (${powerLabel})">
+                  ${zapSvg}
+                  <span>${powerLabel}</span>
+                </div>
+              `;
+
+              const icon = L.divIcon({
+                className: 'gm-ev-pin-container',
+                html: pinHtml,
+                iconSize: [66, 24],
+                iconAnchor: [33, 12],
+                popupAnchor: [0, -14]
               });
-              const safeName = String(st.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-              const safeProvider = String(st.provider || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-              marker.bindPopup(`<b>Trạm sạc: ${safeName}</b><br>Nhà cung cấp: ${safeProvider}<br>Số cổng sạc: ${st.capacity || 1}`);
+
+              const marker = L.marker([st.lat, st.lng], { icon: icon });
+              marker.bindPopup(() => this.generateEVPopupHtml(st), {
+                maxWidth: 340,
+                autoPanPadding: [20, 20]
+              });
+              
+              // Gắn thông tin để tìm kiếm nhanh
+              marker._evStation = st;
               this.layers.evLayer.addLayer(marker);
             });
             this._loadedEvCity = currentCity;
@@ -767,6 +789,114 @@ class MapEngine {
         this.map.removeLayer(this.layers.evLayer);
       }
     }
+  }
+
+  generateEVPopupHtml(st) {
+    const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
+    const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
+    
+    const safeName = String(st.name || 'Trạm sạc xe điện').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeAddress = String(st.address || st.town || 'Việt Nam').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeOperator = String(st.operator || st.provider || 'Hệ thống đối tác').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const statusText = st.isOperational !== false ? 'Đang hoạt động 24/7' : 'Đang bảo trì';
+    const statusColor = st.isOperational !== false ? '#10b981' : '#f59e0b';
+    
+    // Thẻ cổng kết nối
+    let connectorsHtml = '';
+    if (Array.isArray(st.connectors) && st.connectors.length > 0) {
+      connectorsHtml = `
+        <div style="margin-top: 8px; margin-bottom: 8px;">
+          <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px;">Cổng kết nối khả dụng:</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            ${st.connectors.map(c => {
+              const isDc = (c.current === 'DC') || (c.powerKw && c.powerKw >= 50);
+              const tagClass = isDc ? 'tag-dc' : 'tag-ac';
+              const pLabel = c.powerKw ? `${c.powerKw}kW` : '';
+              return `<span class="ev-connector-tag ${tagClass}">⚡ ${c.type || 'Tiêu chuẩn'} ${pLabel}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    const typeBadge = isSwap ? 'Đổi pin xe máy điện' : (isFast ? 'DC Supercharge' : 'AC Tiêu chuẩn');
+    const badgeBg = isSwap ? '#fef3c7' : (isFast ? '#eff6ff' : '#f0fdf4');
+    const badgeColor = isSwap ? '#b45309' : (isFast ? '#1d4ed8' : '#047857');
+    const badgeBorder = isSwap ? '#fde68a' : (isFast ? '#bfdbfe' : '#bbf7d0');
+
+    return `
+      <div style="font-family: var(--font-family); min-width: 280px; max-width: 320px; line-height: 1.4;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px;">
+            ${typeBadge}
+          </span>
+          <span style="font-size: 11px; font-weight: 600; color: ${statusColor}; display: flex; align-items: center; gap: 4px;">
+            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: ${statusColor};"></span>
+            ${statusText}
+          </span>
+        </div>
+
+        <h3 style="font-size: 14.5px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0; line-height: 1.35;">
+          ${safeName}
+        </h3>
+
+        <div style="font-size: 11.5px; color: #64748b; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 4px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>${safeAddress}</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 9px; font-size: 11px; margin-bottom: 8px; color: #334155;">
+          <div><strong>Đơn vị:</strong> ${safeOperator}</div>
+          <div><strong>Công suất:</strong> ${st.maxPowerKw || (isFast ? 60 : 22)} kW</div>
+          <div><strong>Quy mô:</strong> ${st.totalPoints || st.capacity || 2} trụ sạc</div>
+          <div><strong>Nguồn:</strong> ${st.source ? 'OpenChargeMap' : 'MoveSafe VN'}</div>
+        </div>
+
+        ${connectorsHtml}
+
+        <div style="display: flex; gap: 6px; margin-top: 10px;">
+          <button 
+            style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+            onmouseover="this.style.background='#1d4ed8'"
+            onmouseout="this.style.background='#2563eb'"
+            onclick="window.appState && window.appState.routeToLocation(${st.lat}, ${st.lng}, '${safeName.replace(/'/g, "\\'")}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3" transform="rotate(45 12 12)"></rect><path d="M9.5 14.5v-3a1 1 0 0 1 1-1h4"></path><polyline points="12.5 8.5 14.5 10.5 12.5 12.5"></polyline></svg>
+            Chỉ đường né ngập
+          </button>
+          <button 
+            style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+            onmouseover="this.style.background='#dbeafe'"
+            onmouseout="this.style.background='#eff6ff'"
+            onclick="window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Tư vấn lộ trình xe điện đến trạm sạc ${safeName.replace(/'/g, "\\'")} (${safeAddress.replace(/'/g, "\\'")}), dọc đường có điểm ngập nào cần tránh không?'))">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+            Hỏi AI
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  focusEVStation(stationIdOrName) {
+    if (!this.layers.evLayer) return false;
+    const term = String(stationIdOrName || '').toLowerCase().trim();
+    let foundMarker = null;
+
+    this.layers.evLayer.eachLayer(marker => {
+      const st = marker._evStation;
+      if (st && (st.id === term || st.name.toLowerCase().includes(term) || (st.address && st.address.toLowerCase().includes(term)))) {
+        foundMarker = marker;
+      }
+    });
+
+    if (foundMarker) {
+      const latlng = foundMarker.getLatLng();
+      this.map.flyTo(latlng, 16);
+      setTimeout(() => {
+        foundMarker.openPopup();
+      }, 500);
+      return true;
+    }
+    return false;
   }
 
   zoomIn() { if (this.map) this.map.zoomIn(); }

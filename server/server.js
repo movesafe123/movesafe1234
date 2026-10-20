@@ -5,6 +5,7 @@ const config = require('./config');
 const botService = require('./bot-service');
 const aiService = require('./ai-service');
 const historyService = require('./history-service');
+const evService = require('./ev-service');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -151,6 +152,20 @@ app.get('/api/predictions', (req, res) => {
   res.json({
     status: 'success',
     ...predictions
+  });
+});
+
+// 2d. API Lấy danh sách Trạm sạc Xe điện (Open Charge Map API v3 & Mạng lưới Trạm sạc Quốc gia)
+app.get('/api/ev-stations', (req, res) => {
+  const city = req.query.city || 'hanoi';
+  const fastOnly = req.query.fastOnly === 'true' || req.query.fastOnly === '1';
+  const stations = evService.getStations(city, fastOnly);
+  res.json({
+    status: 'success',
+    source: 'Open Charge Map API v3 & Hybrid Network',
+    count: stations.length,
+    city,
+    data: stations
   });
 });
 
