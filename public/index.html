@@ -222,9 +222,6 @@
       <button class="gm-chip" id="chip-ai-trigger">
         🤖 Trợ lý AI
       </button>
-      <button class="gm-chip" id="btn-gm-open-settings">
-        ⚙️ Cài đặt
-      </button>
     </div>
 
   </div>
@@ -507,46 +504,6 @@
 
       <div class="modal-body streets-modal-body" id="streets-cards-container">
         <!-- Render tự động bởi JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 8. MODAL: CÀI ĐẶT API KEYS ==================== -->
-  <div class="modal-overlay" id="modal-settings">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 700;">⚙️ Quản Lý Cấu Hình & API Keys</h3>
-        <button class="gm-btn-icon" id="btn-close-settings">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Google Gemini API Key (Trợ lý AI)</label>
-          <input type="password" class="form-control" id="setting-gemini-key" placeholder="AIzaSy... (Đã nạp sẵn từ .env máy chủ)">
-          <div style="font-size: 11px; color: #1e8e3e;">
-            ✓ Đã tích hợp sẵn Gemini AI (Tier Free) - Bạn có thể tùy biến đổi sang Key cá nhân
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">TomTom Traffic API Key (Lưu lượng kẹt xe)</label>
-          <input type="text" class="form-control" id="setting-tomtom-key" placeholder="Điền TomTom API Key của bạn...">
-          <div style="font-size: 11px; color: #1e8e3e;">
-            ✓ Tự động nạp từ file .env máy chủ
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">OpenWeatherMap API Key (Thời tiết)</label>
-          <input type="text" class="form-control" id="setting-owm-key" placeholder="Điền OpenWeather API Key của bạn...">
-          <div style="font-size: 11px; color: #70757a;">
-            Tự động Fallback sang Open-Meteo không giới hạn.
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-gm-cancel" onclick="document.getElementById('modal-settings').classList.remove('open')">Đóng</button>
-        <button type="button" class="btn-gm-primary" id="btn-save-settings">Lưu Cấu Hình</button>
       </div>
     </div>
   </div>

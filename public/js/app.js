@@ -1331,40 +1331,6 @@ class GoogleMapsApp {
       }
     });
 
-    const settingsModal = document.getElementById('modal-settings');
-    document.getElementById('btn-gm-open-settings')?.addEventListener('click', () => {
-      const geminiInput = document.getElementById('setting-gemini-key');
-      const tomtomInput = document.getElementById('setting-tomtom-key');
-      const owmInput = document.getElementById('setting-owm-key');
-      if (geminiInput) geminiInput.value = localStorage.getItem('movesafe_gemini_key') || '';
-      if (tomtomInput) tomtomInput.value = localStorage.getItem('movesafe_tomtom_key') || '';
-      if (owmInput) owmInput.value = localStorage.getItem('movesafe_owm_key') || '';
-      settingsModal?.classList.add('open');
-    });
-    document.getElementById('btn-close-settings')?.addEventListener('click', () => settingsModal?.classList.remove('open'));
-
-    document.getElementById('btn-save-settings')?.addEventListener('click', () => {
-      const gemini = document.getElementById('setting-gemini-key')?.value;
-      const tomtom = document.getElementById('setting-tomtom-key')?.value;
-      const owm = document.getElementById('setting-owm-key')?.value;
-
-      if (gemini !== undefined) {
-        if (gemini.trim()) localStorage.setItem('movesafe_gemini_key', gemini.trim());
-        else localStorage.removeItem('movesafe_gemini_key');
-      }
-      if (tomtom && tomtom.trim()) {
-        localStorage.setItem('movesafe_tomtom_key', tomtom.trim());
-        window.mapEngine.setTomTomKey(tomtom.trim());
-      }
-      if (owm && owm.trim()) {
-        localStorage.setItem('movesafe_owm_key', owm.trim());
-        window.weatherService.setApiKey(owm.trim());
-      }
-
-      settingsModal?.classList.remove('open');
-      this.showToast('✓ Đã lưu cấu hình API thành công!', 'info');
-    });
-
     // 8. Modal Danh mục đường lớn & Thời tiết các phường Hà Nội
     document.getElementById('chip-hanoi-streets')?.addEventListener('click', () => {
       this.openHanoiStreetsModal();
