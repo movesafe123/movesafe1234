@@ -14,6 +14,6 @@ The repository mounts the following specialized skills:
 - `reverse-engineer-anything`: Reverse engineering tools for external APIs and bundles.
 
 ## Key Project Rules
-- **Icon / Emoji Policy**: Do not output icons or emojis anywhere in user interface templates, CSS, map popups, pin labels, or AI chat responses.
+- **Icon Policy**: Use clean, minimalist SVG line icons (e.g. Lucide/Feather style SVG icons) to make the interface lively and intuitive. Avoid playful/messy emojis.
 - **Frontend Stack**: Vanilla JS + CSS3 + Leaflet.js.
 - **Backend Stack**: Node.js + Express.

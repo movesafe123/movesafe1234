@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#1a73e8">
+  <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="MoveSafe VN">
@@ -12,17 +12,17 @@
   <meta name="description" content="Hệ thống bản đồ kiểu Google Maps tích hợp cảnh báo rốn ngập HSDC/UDi, lưu lượng kẹt xe TomTom và Trợ lý AI né ngập thời gian thực.">
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%231a73e8%22/><text x=%2250%22 y=%2268%22 font-family=%22Arial,sans-serif%22 font-size=%2254%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>M</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2268%22 font-family=%22Arial,sans-serif%22 font-size=%2254%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>M</text></svg>">
 
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Google Maps Style CSS -->
-  <link rel="stylesheet" href="css/style.css?v=3.3">
+  <!-- Modern Map Pro Style CSS -->
+  <link rel="stylesheet" href="css/style.css?v=4.0">
 </head>
 <body>
 
-  <!-- ==================== 1. BẢN ĐỒ TOÀN MÀN HÌNH (GOOGLE MAPS CANVAS) ==================== -->
+  <!-- ==================== 1. BẢN ĐỒ TOÀN MÀN HÌNH (FULLSCREEN CANVAS) ==================== -->
   <div id="map-container"></div>
 
   <!-- ==================== 2. THANH TÌM KIẾM & CATEGORY CHIPS GÓC TRÊN BÊN TRÁI ==================== -->
@@ -32,48 +32,107 @@
     <div class="gm-top-bar-row">
       <!-- Thanh tìm kiếm chính -->
       <div class="gm-search-box" id="gm-search-box">
-        <span class="gm-brand-badge" title="MoveSafe VN">MoveSafe</span>
-        <input 
-          type="text" 
-          class="gm-input-search" 
-          id="gm-search-input" 
-          placeholder="Tìm đường, địa điểm hoặc hỏi trợ lý AI..."
-          autocomplete="off"
-        >
-        <button class="gm-btn-text-action" id="btn-voice-search" title="Tìm bằng giọng nói" onclick="window.aiChat.toggleVoiceSearch()">
-          Giọng nói
+        <div class="gm-brand-badge" title="MoveSafe VN - Cổng Giao Thông Thông Minh">
+          <svg class="brand-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+          </svg>
+          <span class="brand-text">MoveSafe</span>
+        </div>
+
+        <div class="gm-search-input-wrapper">
+          <svg class="search-lead-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            class="gm-input-search" 
+            id="gm-search-input" 
+            placeholder="Tìm đường, địa điểm hoặc hỏi trợ lý AI..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+
+        <button class="gm-btn-text-action gm-btn-voice" id="btn-voice-search" title="Tìm bằng giọng nói (Web Speech API)" onclick="window.aiChat && window.aiChat.toggleVoiceSearch()">
+          <svg class="ui-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span class="btn-label">Giọng nói</span>
         </button>
+
         <div class="gm-divider-v"></div>
-        <button class="gm-btn-text-action gm-btn-primary-soft" id="btn-open-directions" title="Chỉ đường né ngập">
-          Chỉ đường
+
+        <button class="gm-btn-text-action gm-btn-primary-soft" id="btn-open-directions" title="Chỉ đường né ngập & kẹt xe">
+          <svg class="ui-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3" transform="rotate(45 12 12)"></rect>
+            <path d="M9.5 14.5v-3a1 1 0 0 1 1-1h4"></path>
+            <polyline points="12.5 8.5 14.5 10.5 12.5 12.5"></polyline>
+          </svg>
+          <span class="btn-label">Chỉ đường</span>
         </button>
-        <button class="gm-btn-text-action" id="btn-search-trigger" title="Tìm kiếm">
-          Tìm
+
+        <button class="gm-btn-text-action gm-btn-search-submit" id="btn-search-trigger" title="Tìm kiếm">
+          <svg class="ui-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="btn-label">Tìm</span>
         </button>
       </div>
 
       <!-- Category Filter Chips -->
       <div class="gm-chips-scroll" id="gm-chips-scroll">
         <button class="gm-chip" id="chip-weather-toggle" title="Bật/Tắt & Xem thời tiết chi tiết từng phường">
-          Thời tiết phường
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path>
+          </svg>
+          <span class="chip-text">Thời tiết phường</span>
         </button>
+
         <button class="gm-chip" id="chip-hanoi-streets" title="Xem danh sách các tuyến đường lớn theo từng phường ở Hà Nội">
-          Tuyến đường lớn Hà Nội
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20"></path><path d="M18 6H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h12l4-3.5L18 6z"></path>
+          </svg>
+          <span class="chip-text">Tuyến đường lớn Hà Nội</span>
         </button>
+
         <button class="gm-chip" id="chip-urban-insights" title="Xem xu hướng giao thông 7 ngày & Tin nhanh VOV Giao thông">
-          Xu hướng & VOV
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          <span class="chip-text">Xu hướng & VOV</span>
         </button>
+
         <button class="gm-chip gm-chip-safe" id="chip-flood-count">
-          Rốn ngập (0 - Khô ráo)
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+          <span class="chip-text">Rốn ngập (0 - Khô ráo)</span>
         </button>
+
         <button class="gm-chip gm-chip-safe" id="chip-traffic-count">
-          Ùn tắc (0 - Thông thoáng)
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="2" width="12" height="20" rx="3"></rect><circle cx="12" cy="6.5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="17.5" r="1.5"></circle>
+          </svg>
+          <span class="chip-text">Ùn tắc (0 - Thông thoáng)</span>
         </button>
+
         <button class="gm-chip gm-chip-ai" id="chip-ai-trigger">
-          Trợ lý AI
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+          </svg>
+          <span class="chip-text">Trợ lý AI</span>
         </button>
+
         <button class="gm-chip" id="btn-gm-open-settings">
-          Cài đặt
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+          <span class="chip-text">Cài đặt</span>
         </button>
       </div>
     </div>
@@ -87,12 +146,34 @@
 
       <div class="gm-directions-header">
         <div class="gm-travel-modes">
-          <button class="gm-mode-tab active" data-mode="motorbike" title="Xe máy xăng: Chịu ngập tối đa 20cm">Xe máy</button>
-          <button class="gm-mode-tab" data-mode="car" title="Ô tô xăng: Chịu ngập tối đa 25cm">Ô tô</button>
-          <button class="gm-mode-tab" data-mode="ebike" title="Xe máy điện: Chịu ngập tối đa 20cm">Xe máy điện</button>
-          <button class="gm-mode-tab" data-mode="ecar" title="Ô tô điện: Chịu ngập tối đa 30cm">Ô tô điện</button>
+          <button class="gm-mode-tab active" data-mode="motorbike" title="Xe máy xăng: Chịu ngập tối đa 20cm">
+            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L9 11l3-5 3 3h4"></path><path d="M12 17.5V14"></path>
+            </svg>
+            <span>Xe máy</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="car" title="Ô tô xăng: Chịu ngập tối đa 25cm">
+            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11 2 11.5 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle>
+            </svg>
+            <span>Ô tô</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="ebike" title="Xe máy điện: Chịu ngập tối đa 20cm">
+            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><path d="M15 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 12.5L9 11l3-5 3 3h4"></path><path d="m11 14 2-3h-2l1-2" stroke-width="1.8"></path>
+            </svg>
+            <span>Xe máy điện</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="ecar" title="Ô tô điện: Chịu ngập tối đa 30cm">
+            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11 2 11.5 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="m11 13 2-2.5h-2l1-2" stroke-width="1.8"></path>
+            </svg>
+            <span>Ô tô điện</span>
+          </button>
         </div>
-        <button class="gm-btn-close" id="btn-close-directions" title="Đóng chỉ đường">Đóng</button>
+        <button class="gm-btn-close" id="btn-close-directions" title="Đóng chỉ đường">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <div class="gm-route-inputs">
@@ -117,8 +198,13 @@
                 autocomplete="off"
                 spellcheck="false"
               >
-              <button class="gm-input-clear-btn" id="btn-clear-origin" title="Xóa điểm đi">×</button>
-              <button class="gm-input-action-btn" id="btn-gps-origin" title="Sử dụng vị trí của tôi">GPS</button>
+              <button class="gm-input-clear-btn" id="btn-clear-origin" title="Xóa điểm đi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              <button class="gm-input-action-btn" id="btn-gps-origin" title="Sử dụng vị trí của tôi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                <span>GPS</span>
+              </button>
               
               <!-- Dropdown gợi ý địa chỉ điểm đi -->
               <div class="gm-autocomplete-dropdown" id="dropdown-origin" style="display: none;"></div>
@@ -135,8 +221,13 @@
                 autocomplete="off"
                 spellcheck="false"
               >
-              <button class="gm-input-clear-btn" id="btn-clear-dest" title="Xóa điểm đến">×</button>
-              <button class="gm-input-action-btn" id="btn-pick-map-dest" title="Chọn trên bản đồ">Bản đồ</button>
+              <button class="gm-input-clear-btn" id="btn-clear-dest" title="Xóa điểm đến">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              <button class="gm-input-action-btn" id="btn-pick-map-dest" title="Chọn trên bản đồ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Bản đồ</span>
+              </button>
               
               <!-- Dropdown gợi ý địa chỉ điểm đến -->
               <div class="gm-autocomplete-dropdown" id="dropdown-dest" style="display: none;"></div>
@@ -145,12 +236,16 @@
 
           <!-- Nút Đổi Chiều Điểm Đi / Điểm Đến (Swap Button) -->
           <button class="gm-btn-swap" id="btn-swap-route" title="Đảo ngược điểm đi và điểm đến">
-            Đổi
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
           </button>
         </div>
 
         <!-- Banner thông báo khi đang trong chế độ click chọn trên bản đồ -->
         <div class="gm-pick-map-banner" id="gm-pick-map-banner" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
           <span>Nhấp vào điểm bất kỳ trên bản đồ để chọn vị trí...</span>
           <button id="btn-cancel-pick-map">Hủy</button>
         </div>
@@ -164,27 +259,38 @@
               <div class="gm-avoid-radio"></div>
               <div class="gm-avoid-content">
                 <div class="gm-avoid-text">
-                  <span class="gm-avoid-title">An toàn tuyệt đối</span>
+                  <div class="gm-avoid-title-row">
+                    <svg class="avoid-icon avoid-icon-safe" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    <span class="gm-avoid-title">An toàn tuyệt đối</span>
+                  </div>
                   <span class="gm-avoid-desc">Né hoàn toàn ùn tắc & ngập lụt</span>
                 </div>
               </div>
             </label>
+
             <label class="gm-avoidance-option gm-avoid-balanced" data-level="2" title="Chỉ tránh ùn tắc đỏ nặng & ngập sâu xe máy không đi được">
               <input type="radio" name="avoidLevel" value="2">
               <div class="gm-avoid-radio"></div>
               <div class="gm-avoid-content">
                 <div class="gm-avoid-text">
-                  <span class="gm-avoid-title">Cân bằng thông minh</span>
+                  <div class="gm-avoid-title-row">
+                    <svg class="avoid-icon avoid-icon-balanced" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>
+                    <span class="gm-avoid-title">Cân bằng thông minh</span>
+                  </div>
                   <span class="gm-avoid-desc">Tránh kẹt cứng & ngập sâu nguy hiểm</span>
                 </div>
               </div>
             </label>
+
             <label class="gm-avoidance-option gm-avoid-fast" data-level="3" title="Đường ngắn nhất & nhanh nhất trong các tuyến đi được">
               <input type="radio" name="avoidLevel" value="3">
               <div class="gm-avoid-radio"></div>
               <div class="gm-avoid-content">
                 <div class="gm-avoid-text">
-                  <span class="gm-avoid-title">Nhanh nhất</span>
+                  <div class="gm-avoid-title-row">
+                    <svg class="avoid-icon avoid-icon-fast" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span class="gm-avoid-title">Nhanh nhất</span>
+                  </div>
                   <span class="gm-avoid-desc">Ưu tiên thời gian di chuyển ngắn nhất</span>
                 </div>
               </div>
@@ -195,7 +301,10 @@
         <!-- THANH TRƯỢT DỰ BÁO GIAO THÔNG -->
         <div class="gm-prediction-slider-container">
           <div class="gm-prediction-header">
-            <span>Dự báo giao thông:</span>
+            <span class="prediction-title-group">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Dự báo giao thông:</span>
+            </span>
             <span id="prediction-time-label" class="gm-prediction-badge">Hiện tại</span>
           </div>
           <input type="range" id="traffic-prediction-slider" min="0" max="3" step="1" value="0">
@@ -208,7 +317,10 @@
         </div>
 
         <button class="gm-btn-find-route" id="btn-find-route-submit">
-          Tìm lộ trình thông minh
+          <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+          </svg>
+          <span>Tìm lộ trình thông minh</span>
         </button>
       </div>
 
@@ -233,16 +345,22 @@
   <!-- Banner trạng thái Kịch bản Giả lập khi được bật -->
   <div class="gm-simulation-banner" id="gm-simulation-banner" style="display: none;">
     <div class="gm-sim-banner-content">
+      <svg class="sim-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+        <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+      </svg>
       <span class="gm-sim-banner-text" id="gm-sim-banner-text">
         <strong>Chế độ giả lập ngẫu nhiên:</strong> Đang mô phỏng các rốn ngập ngẫu nhiên để thử nghiệm dẫn đường né ngập.
       </span>
     </div>
     <div class="gm-sim-banner-actions">
       <button class="gm-btn-sim-reroll" id="btn-reroll-simulation" title="Xáo trộn ngẫu nhiên vị trí và mức ngập mới">
-        Đổi kịch bản
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+        <span>Đổi kịch bản</span>
       </button>
       <button class="gm-btn-sim-exit" id="btn-exit-simulation" title="Quay lại dữ liệu thật">
-        Tắt giả lập
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <span>Tắt giả lập</span>
       </button>
     </div>
   </div>
@@ -264,27 +382,39 @@
     <!-- Huy hiệu Cloud Live 24/7 tự động cập nhật -->
     <div class="gm-live-cloud-pill" id="gm-live-status-pill" title="Hệ thống tự động cập nhật liên tục 24/24 trên Cloud">
       <span class="pulse-dot-green"></span>
+      <svg class="cloud-live-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
       <span id="txt-cloud-status">Trực tuyến 24/7</span>
       <span class="gm-countdown-badge" id="badge-countdown">30s</span>
     </div>
 
-    <select class="gm-city-select" id="city-select-gm">
-      <option value="hanoi" selected>Hà Nội</option>
-      <option value="hcm">TP. Hồ Chí Minh</option>
-      <option value="danang">Đà Nẵng</option>
-    </select>
+    <div class="gm-city-select-wrapper">
+      <svg class="city-pin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>
+      </svg>
+      <select class="gm-city-select" id="city-select-gm">
+        <option value="hanoi" selected>Hà Nội</option>
+        <option value="hcm">TP. Hồ Chí Minh</option>
+        <option value="danang">Đà Nẵng</option>
+      </select>
+    </div>
 
-    <button class="gm-btn-report-circle" id="btn-gm-open-report">
-      Báo ngập / Tắc đường
-    </button>
-  </div>
-
-  <!-- ==================== 4. THỜI TIẾT & CHỈ SỐ RỦI RO (GÓC DƯỚI TRÁI) ==================== -->
-  <div class="gm-bottom-left-widget">
-    <div class="gm-weather-pill" id="gm-weather-pill" onclick="window.aiChat.open(); window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay thế nào?')">
+    <!-- Widget Thời tiết & Nguy cơ ngập trung tâm (Đưa lên thanh công cụ góc trên để không che bảng chỉ đường) -->
+    <div class="gm-weather-pill" id="gm-weather-pill" onclick="window.aiChat && window.aiChat.open(); window.aiChat && window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay thế nào?')" title="Bấm để hỏi trợ lý AI về tình hình thời tiết và nguy cơ ngập">
+      <svg class="weather-pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path>
+      </svg>
       <span class="gm-risk-dot" id="weather-risk-dot"></span>
       <span id="weather-pill-text">Đang tải thời tiết...</span>
     </div>
+
+    <button class="gm-btn-report-circle" id="btn-gm-open-report" title="Báo cáo rốn ngập hoặc kẹt xe tới cộng đồng">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <span>Báo ngập / Tắc đường</span>
+    </button>
   </div>
 
   <!-- ==================== 5. CỤM PHÍM ĐIỀU KHIỂN BẢN ĐỒ (GÓC DƯỚI PHẢI) ==================== -->
@@ -292,54 +422,82 @@
     
     <!-- Menu chọn lớp bản đồ -->
     <div class="gm-layer-menu" id="gm-layer-menu">
-      <div class="gm-layer-menu-title">Lớp bản đồ hiển thị</div>
+      <div class="gm-layer-menu-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>Lớp bản đồ hiển thị</span>
+      </div>
       <label class="gm-layer-item">
-        <span>Lưu lượng xe TomTom</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"></rect><circle cx="12" cy="6.5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="17.5" r="1.5"></circle></svg>
+          <span>Lưu lượng xe TomTom</span>
+        </span>
         <input type="checkbox" id="chk-layer-traffic" checked>
       </label>
       <label class="gm-layer-item">
-        <span>Điểm ngập HSDC / UDi</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          <span>Điểm ngập HSDC / UDi</span>
+        </span>
         <input type="checkbox" id="chk-layer-flood" checked>
       </label>
       <label class="gm-layer-item">
-        <span>Trạm thời tiết các phường</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>
+          <span>Trạm thời tiết các phường</span>
+        </span>
         <input type="checkbox" id="chk-layer-weather" checked>
       </label>
       <label class="gm-layer-item" id="layer-item-ev" style="display: none;">
-        <span>Trạm sạc xe điện</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Trạm sạc xe điện</span>
+        </span>
         <input type="checkbox" id="chk-layer-ev">
       </label>
       <label class="gm-layer-item">
-        <span>Bản đồ vệ tinh</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          <span>Bản đồ vệ tinh</span>
+        </span>
         <input type="checkbox" id="chk-layer-satellite">
       </label>
       <div style="height: 1px; background: #e8eaed; margin: 6px 0;"></div>
       <label class="gm-layer-item gm-layer-sim" title="Bật kịch bản giả lập mưa ngập để biểu diễn thuật toán né ngập">
-        <span>Kịch bản ngập giả lập</span>
+        <span class="layer-item-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path></svg>
+          <span>Kịch bản ngập giả lập</span>
+        </span>
         <input type="checkbox" id="chk-layer-simulation">
       </label>
     </div>
 
     <!-- Nút Bật tắt Layer -->
-    <button class="gm-map-btn gm-map-btn-standalone gm-map-btn-label" id="btn-gm-layers" title="Các lớp bản đồ">
-      Lớp bản đồ
+    <button class="gm-map-btn gm-map-btn-standalone" id="btn-gm-layers" title="Các lớp bản đồ">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <span class="gm-map-btn-tooltip">Lớp bản đồ</span>
     </button>
 
     <!-- Nút Làm mới Bot -->
-    <button class="gm-map-btn gm-map-btn-standalone gm-map-btn-label" id="btn-gm-bot-refresh" title="Cập nhật dữ liệu mới từ HSDC, UDi, VOV & TomTom">
-      Làm mới
+    <button class="gm-map-btn gm-map-btn-standalone" id="btn-gm-bot-refresh" title="Cập nhật dữ liệu mới từ HSDC, UDi, VOV & TomTom">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+      <span class="gm-map-btn-tooltip">Làm mới</span>
     </button>
 
     <!-- Nút Định vị GPS của tôi -->
-    <button class="gm-map-btn gm-map-btn-standalone gm-map-btn-label" id="btn-gm-locate" title="Vị trí của tôi">
-      Vị trí
+    <button class="gm-map-btn gm-map-btn-standalone" id="btn-gm-locate" title="Vị trí của tôi">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line><circle cx="12" cy="12" r="3"></circle></svg>
+      <span class="gm-map-btn-tooltip">Vị trí</span>
     </button>
 
     <!-- Cụm Phóng to / Thu nhỏ -->
     <div class="gm-control-card">
-      <button class="gm-map-btn" id="btn-gm-zoom-in" title="Phóng to">+</button>
+      <button class="gm-map-btn" id="btn-gm-zoom-in" title="Phóng to">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
       <div style="height: 1px; background: #e8eaed;"></div>
-      <button class="gm-map-btn" id="btn-gm-zoom-out" title="Thu nhỏ">−</button>
+      <button class="gm-map-btn" id="btn-gm-zoom-out" title="Thu nhỏ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
     </div>
 
   </div>
@@ -348,23 +506,44 @@
   <div class="gm-ai-drawer" id="ai-chat-window">
     <div class="gm-ai-header">
       <div class="gm-ai-header-info">
-        <div class="gm-ai-title">Trợ lý AI Giao thông</div>
-        <div class="gm-ai-subtitle">
-          <span class="gm-ai-status-dot"></span>
-          <span>Dữ liệu thời gian thực HSDC & TomTom</span>
+        <div class="gm-ai-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="gm-ai-title">Trợ lý AI Giao thông</div>
+          <div class="gm-ai-subtitle">
+            <span class="gm-ai-status-dot"></span>
+            <span>Dữ liệu thời gian thực HSDC & TomTom</span>
+          </div>
         </div>
       </div>
       <div class="gm-ai-header-actions">
-        <button class="gm-btn-text-sm" onclick="window.aiChat.clearMessages()" title="Xóa lịch sử trò chuyện">Làm mới</button>
-        <button class="gm-btn-close" onclick="window.aiChat.close()" title="Đóng cửa sổ">Đóng</button>
+        <button class="gm-btn-text-sm" onclick="window.aiChat && window.aiChat.clearMessages()" title="Xóa lịch sử trò chuyện">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+          <span>Làm mới</span>
+        </button>
+        <button class="gm-btn-close" onclick="window.aiChat && window.aiChat.close()" title="Đóng cửa sổ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
     </div>
 
     <!-- Gợi ý câu hỏi nhanh -->
     <div class="gm-ai-quick-prompts" id="ai-quick-prompts">
-      <button class="gm-ai-prompt-chip" onclick="window.aiChat.sendMessage('Tình hình ngập úng và kẹt xe hiện tại thế nào?')">Tình hình hiện tại</button>
-      <button class="gm-ai-prompt-chip" onclick="window.aiChat.sendMessage('Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?')">Cầu Giấy đi Mỹ Đình</button>
-      <button class="gm-ai-prompt-chip" onclick="window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay?')">Dự báo thời tiết</button>
+      <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Tình hình ngập úng và kẹt xe hiện tại thế nào?')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Tình hình hiện tại</span>
+      </button>
+      <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+        <span>Cầu Giấy đi Mỹ Đình</span>
+      </button>
+      <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay?')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>
+        <span>Dự báo thời tiết</span>
+      </button>
     </div>
 
     <div class="gm-ai-body" id="ai-chat-body">
@@ -377,13 +556,16 @@
         class="gm-ai-input" 
         id="ai-chat-input" 
         placeholder="Nhập câu hỏi về lộ trình, điểm ngập, tình trạng kẹt xe..."
-        onkeydown="if(event.key==='Enter') window.aiChat.sendMessage()"
+        onkeydown="if(event.key==='Enter') window.aiChat && window.aiChat.sendMessage()"
+        autocomplete="off"
+        spellcheck="false"
       >
-      <button class="gm-btn-text-sm" id="btn-chat-voice" onclick="window.aiChat.toggleVoiceSearch()" title="Nhập bằng giọng nói">
-        Thu âm
+      <button class="gm-btn-text-sm" id="btn-chat-voice" onclick="window.aiChat && window.aiChat.toggleVoiceSearch()" title="Nhập bằng giọng nói">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
       </button>
-      <button class="gm-btn-send" onclick="window.aiChat.sendMessage()">
-        Gửi
+      <button class="gm-btn-send" onclick="window.aiChat && window.aiChat.sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <span>Gửi</span>
       </button>
     </div>
   </div>
@@ -392,8 +574,13 @@
   <div class="modal-overlay" id="modal-report">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 700;">Báo cáo điểm ngập / Ùn tắc</h3>
-        <button class="gm-btn-close" id="btn-close-report">Đóng</button>
+        <div class="modal-title-group">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d93025" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <h3 style="font-size: 16px; font-weight: 700;">Báo cáo điểm ngập / Ùn tắc</h3>
+        </div>
+        <button class="gm-btn-close" id="btn-close-report">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <form id="form-report">
         <div class="modal-body">
@@ -411,7 +598,8 @@
             <div style="display: flex; gap: 6px;">
               <input type="text" class="form-control" id="report-location-name" placeholder="Ví dụ: Phố Nguyễn Khuyến" required style="flex: 1;">
               <button type="button" class="btn-gm-secondary" id="btn-report-current-gps" title="Lấy vị trí GPS hiện tại">
-                Lấy GPS
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                <span>Lấy GPS</span>
               </button>
             </div>
             <input type="hidden" id="report-lat">
@@ -431,7 +619,10 @@
 
         <div class="modal-footer">
           <button type="button" class="btn-gm-cancel" onclick="document.getElementById('modal-report').classList.remove('open')">Hủy</button>
-          <button type="submit" class="btn-gm-primary" style="background: #d93025;">Gửi báo cáo</button>
+          <button type="submit" class="btn-gm-primary" style="background: #d93025; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <span>Gửi báo cáo</span>
+          </button>
         </div>
       </form>
     </div>
@@ -441,18 +632,29 @@
   <div class="modal-overlay" id="modal-urban-insights">
     <div class="modal-card" style="max-width: 650px; width: 92%;">
       <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 700;">Phân tích đô thị & Tin nhanh VOV</h3>
-        <button class="gm-btn-close" id="btn-close-urban-insights">Đóng</button>
+        <div class="modal-title-group">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          <h3 style="font-size: 16px; font-weight: 700;">Phân tích đô thị & Tin nhanh VOV</h3>
+        </div>
+        <button class="gm-btn-close" id="btn-close-urban-insights">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
         <div style="margin-bottom: 16px;">
-          <h4 style="font-size: 14px; font-weight: 700; color: #1a73e8; margin-bottom: 8px;">Kênh VOV Giao thông trực tiếp</h4>
+          <h4 style="font-size: 14px; font-weight: 700; color: #1a73e8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
+            <span>Kênh VOV Giao thông trực tiếp</span>
+          </h4>
           <div id="vov-news-list" style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; font-size: 13px; max-height: 180px; overflow-y: auto;">
             Đang tải bản tin phát thanh mới nhất...
           </div>
         </div>
         <div>
-          <h4 style="font-size: 14px; font-weight: 700; color: #1e8e3e; margin-bottom: 8px;">Biểu đồ chỉ số tắc nghẽn 7 ngày qua</h4>
+          <h4 style="font-size: 14px; font-weight: 700; color: #1e8e3e; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Biểu đồ chỉ số tắc nghẽn 7 ngày qua</span>
+          </h4>
           <div id="historical-trends-chart" style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 14px; min-height: 160px; font-size: 13px;">
             Đang nạp dữ liệu quan trắc...
           </div>
@@ -469,14 +671,17 @@
     <div class="modal-card modal-streets-card">
       <div class="modal-header">
         <div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #202124;">
-            Mạng lưới đường lớn & Thời tiết các phường Hà Nội
+          <h3 style="font-size: 16px; font-weight: 700; color: #202124; display: flex; align-items: center; gap: 6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M18 6H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h12l4-3.5L18 6z"></path></svg>
+            <span>Mạng lưới đường lớn & Thời tiết các phường Hà Nội</span>
           </h3>
           <p style="font-size: 12px; color: #5f6368; margin: 3px 0 0 0;">
             Hệ thống dữ liệu thời gian thực: 76 phường/xã và 299 trục đường huyết mạch thủ đô
           </p>
         </div>
-        <button class="gm-btn-close" id="btn-close-hanoi-streets">Đóng</button>
+        <button class="gm-btn-close" id="btn-close-hanoi-streets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <!-- Thanh tìm kiếm & Lọc quận -->
@@ -488,9 +693,12 @@
             class="form-control" 
             placeholder="Tìm nhanh: tên đường (VD: Cầu Diễn, Hoàng Công Chất...) hoặc tên phường (VD: Phú Diễn, Tây Tựu...)"
             style="font-size: 13px;"
+            autocomplete="off"
+            spellcheck="false"
           >
-          <button type="button" class="btn-gm-secondary" id="btn-reset-streets-filter" style="white-space: nowrap;">
-            Đặt lại
+          <button type="button" class="btn-gm-secondary" id="btn-reset-streets-filter" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+            <span>Đặt lại</span>
           </button>
         </div>
 
@@ -522,14 +730,19 @@
   <div class="modal-overlay" id="modal-settings">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 700;">Quản lý cấu hình & API Keys</h3>
-        <button class="gm-btn-close" id="btn-close-settings">Đóng</button>
+        <div class="modal-title-group">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          <h3 style="font-size: 16px; font-weight: 700;">Quản lý cấu hình & API Keys</h3>
+        </div>
+        <button class="gm-btn-close" id="btn-close-settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Google Gemini API Key (Trợ lý AI)</label>
           <input type="password" class="form-control" id="setting-gemini-key" placeholder="AIzaSy... (Đã nạp sẵn từ máy chủ)">
-          <div style="font-size: 11px; color: #1e8e3e;">
+          <div style="font-size: 11px; color: #1e8e3e; margin-top: 4px;">
             Đã tích hợp sẵn Gemini AI - Bạn có thể tùy chọn nhập Key cá nhân.
           </div>
         </div>
@@ -537,7 +750,7 @@
         <div class="form-group">
           <label class="form-label">TomTom Traffic API Key (Lưu lượng kẹt xe)</label>
           <input type="text" class="form-control" id="setting-tomtom-key" placeholder="Điền TomTom API Key của bạn...">
-          <div style="font-size: 11px; color: #1e8e3e;">
+          <div style="font-size: 11px; color: #1e8e3e; margin-top: 4px;">
             Tự động nạp từ cấu hình máy chủ.
           </div>
         </div>
@@ -545,7 +758,7 @@
         <div class="form-group">
           <label class="form-label">OpenWeatherMap API Key (Thời tiết)</label>
           <input type="text" class="form-control" id="setting-owm-key" placeholder="Điền OpenWeather API Key của bạn...">
-          <div style="font-size: 11px; color: #70757a;">
+          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">
             Tự động chuyển sang Open-Meteo nếu để trống.
           </div>
         </div>
@@ -553,7 +766,10 @@
 
       <div class="modal-footer">
         <button type="button" class="btn-gm-cancel" onclick="document.getElementById('modal-settings').classList.remove('open')">Đóng</button>
-        <button type="button" class="btn-gm-primary" id="btn-save-settings">Lưu cấu hình</button>
+        <button type="button" class="btn-gm-primary" id="btn-save-settings" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Lưu cấu hình</span>
+        </button>
       </div>
     </div>
   </div>
@@ -561,19 +777,39 @@
   <!-- ==================== 9. THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (MOBILE BOTTOM TAB BAR) ==================== -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Điều hướng di động">
     <button class="mobile-nav-item active" id="mnav-explore" data-tab="explore">
+      <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line>
+      </svg>
       <span class="mnav-label">Bản đồ</span>
     </button>
+
     <button class="mobile-nav-item" id="mnav-route" data-tab="route">
+      <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+      </svg>
       <span class="mnav-label">Chỉ đường</span>
     </button>
+
     <button class="mobile-nav-item mnav-report-fab" id="mnav-report" data-tab="report">
-      <div class="mnav-fab-circle">+</div>
+      <div class="mnav-fab-circle">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </div>
       <span class="mnav-label">Báo ngập</span>
     </button>
+
     <button class="mobile-nav-item" id="mnav-ai" data-tab="ai">
+      <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+      </svg>
       <span class="mnav-label">Trợ lý AI</span>
     </button>
+
     <button class="mobile-nav-item" id="mnav-insights" data-tab="insights">
+      <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>
+      </svg>
       <span class="mnav-label">Xu hướng</span>
     </button>
   </nav>
@@ -588,15 +824,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Client-side Scripts -->
+  <script src="js/icons.js?v=4.0"></script>
   <script src="js/supabase-service.js"></script>
-  <script src="js/hanoi-wards-streets.js?v=3.3"></script>
-  <script src="js/geocoding-service.js?v=3.3"></script>
-  <script src="js/weather-service.js?v=3.3"></script>
-  <script src="js/routing-service.js?v=3.3"></script>
-  <script src="js/map-engine.js?v=3.3"></script>
-  <script src="js/crowdsource.js?v=3.3"></script>
-  <script src="js/ai-chat.js?v=3.3"></script>
-  <script src="js/app.js?v=3.3"></script>
+  <script src="js/hanoi-wards-streets.js?v=4.0"></script>
+  <script src="js/geocoding-service.js?v=4.0"></script>
+  <script src="js/weather-service.js?v=4.0"></script>
+  <script src="js/routing-service.js?v=4.0"></script>
+  <script src="js/map-engine.js?v=4.0"></script>
+  <script src="js/crowdsource.js?v=4.0"></script>
+  <script src="js/ai-chat.js?v=4.0"></script>
+  <script src="js/app.js?v=4.0"></script>
 
 </body>
 </html>

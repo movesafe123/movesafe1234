@@ -533,18 +533,26 @@ class GoogleMapsApp {
     const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
     const floodChip = document.getElementById('chip-flood-count');
     const trafficChip = document.getElementById('chip-traffic-count');
+    const setChipText = (chip, text, className) => {
+      if (!chip) return;
+      if (className) chip.className = className;
+      const textSpan = chip.querySelector('.chip-text');
+      if (textSpan) {
+        textSpan.textContent = text;
+      } else {
+        chip.textContent = text;
+      }
+    };
+
     if (floodChip) {
       if (activeFloods.length > 0) {
         if (this.isSimulationMode) {
-          floodChip.className = 'gm-chip gm-chip-warning active';
-          floodChip.textContent = `Rốn ngập (${activeFloods.length} - Giả lập)`;
+          setChipText(floodChip, `Rốn ngập (${activeFloods.length} - Giả lập)`, 'gm-chip gm-chip-warning active');
         } else {
-          floodChip.className = 'gm-chip gm-chip-danger';
-          floodChip.textContent = `Rốn ngập (${activeFloods.length})`;
+          setChipText(floodChip, `Rốn ngập (${activeFloods.length})`, 'gm-chip gm-chip-danger');
         }
       } else {
-        floodChip.className = 'gm-chip gm-chip-safe';
-        floodChip.textContent = `Rốn ngập (0 - Khô ráo)`;
+        setChipText(floodChip, 'Rốn ngập (0 - Khô ráo)', 'gm-chip gm-chip-safe');
       }
     }
     if (trafficChip) {
@@ -552,14 +560,11 @@ class GoogleMapsApp {
       const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
 
       if (activeJams.length > 0) {
-        trafficChip.className = 'gm-chip gm-chip-danger';
-        trafficChip.textContent = `Kẹt xe (${activeJams.length})`;
+        setChipText(trafficChip, `Kẹt xe (${activeJams.length})`, 'gm-chip gm-chip-danger');
       } else if (roadworks.length > 0) {
-        trafficChip.className = 'gm-chip gm-chip-safe';
-        trafficChip.textContent = `Ùn tắc (0) • Công trường (${roadworks.length})`;
+        setChipText(trafficChip, `Ùn tắc (0) • Công trường (${roadworks.length})`, 'gm-chip gm-chip-safe');
       } else {
-        trafficChip.className = 'gm-chip gm-chip-safe';
-        trafficChip.textContent = `Ùn tắc (0 - Thông thoáng)`;
+        setChipText(trafficChip, 'Ùn tắc (0 - Thông thoáng)', 'gm-chip gm-chip-safe');
       }
     }
   }
@@ -601,6 +606,12 @@ class GoogleMapsApp {
 
     if (pillText) {
       pillText.innerHTML = `<strong>${city.name} ${w.temp}°C</strong> • Mưa: ${w.rain1h}mm • ${w.floodRisk.text}`;
+    }
+
+    const pillIcon = document.querySelector('#gm-weather-pill .weather-pill-icon');
+    if (pillIcon && window.getSvgIcon) {
+      const iconHtml = window.getSvgIcon(w.rain1h > 0 ? 'cloud-rain' : 'cloud-sun', 'weather-pill-icon', 18);
+      pillIcon.outerHTML = iconHtml;
     }
 
     if (pillDot) {
@@ -2112,39 +2123,41 @@ class GoogleMapsApp {
     this.calculateSmartRoute();
   }
 
-  // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps
+  // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps kèm Icon SVG tối giản
   translateStepInstruction(step) {
     const raw = (step.instruction || '').toLowerCase();
     const name = step.name || 'đoạn đường';
     let turn = 'Tiếp tục đi';
-    let icon = '•';
+    let iconName = 'straight';
 
     if (raw.includes('depart')) {
       turn = 'Khởi hành từ';
-      icon = 'A';
+      iconName = 'map-pin';
     } else if (raw.includes('arrive')) {
       turn = 'Đến điểm đích tại';
-      icon = 'B';
+      iconName = 'flag';
     } else if (raw.includes('right')) {
       turn = 'Rẽ phải vào';
-      icon = '→';
+      iconName = 'turn-right';
     } else if (raw.includes('left')) {
       turn = 'Rẽ trái vào';
-      icon = '←';
+      iconName = 'turn-left';
     } else if (raw.includes('uturn')) {
       turn = 'Quay đầu xe trên';
-      icon = '↺';
+      iconName = 'uturn';
     } else if (raw.includes('roundabout') || raw.includes('rotary')) {
       turn = 'Đi vào vòng xuyến rẽ vào';
-      icon = '↻';
+      iconName = 'roundabout';
     } else if (raw.includes('fork') || raw.includes('slight')) {
       turn = 'Chếch hướng vào';
-      icon = '↗';
+      iconName = 'fork';
     }
 
     const distText = step.distance > 1000
       ? `${(step.distance / 1000).toFixed(1)} km`
       : `${Math.round(step.distance)} m`;
+
+    const icon = window.getSvgIcon ? window.getSvgIcon(iconName, `step-icon-svg step-${iconName}`, 16) : '•';
 
     return {
       text: `${turn} <strong>${name}</strong>`,

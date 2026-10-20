@@ -91,7 +91,7 @@ class CrowdsourceService {
       const res = await fetch('/api/crowdsource/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId, voteType })
+        body: JSON.stringify({ id: reportId, voteType: voteType === 'up' ? 'confirm' : 'clear' })
       });
       const data = await res.json();
       if (data.status === 'success') {

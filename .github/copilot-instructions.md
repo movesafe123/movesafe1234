@@ -12,7 +12,7 @@ The workspace is configured with specialized Agent Skills in `.agents/skills/`:
      - `frontend-design/SKILL.md` (Anthropic: elegant layout, visual hierarchy, whitespace rhythm)
      - `better-ui/SKILL.md`, `better-interface/SKILL.md`, `better-accessibility/SKILL.md` (Jakub Krehel: micro-interactions, WCAG 2.2)
      - `web-design-guidelines/SKILL.md` (Vercel Labs: modern web product standards, speed, minimalism)
-   - **Project Specific Rule**: All icons and emojis must be eliminated across the user interface, map pins, toast messages, and AI responses. Use clean, high-contrast, text-first labels with modern Slate/Blue accents (`#0f172a`, `#2563eb`).
+   - **Project Specific Rule**: Use clean, minimalist SVG line icons (e.g. Feather/Lucide vector style) across the interface to enhance vibrancy and usability without clutter. Avoid playful emojis. Use clean, high-contrast typography with modern Slate/Blue accents (#0f172a, #2563eb).
 
 2. **Office Document Processing (`OfficeCLI-1.0.153`)**
    - **Path**: `.agents/skills/OfficeCLI-1.0.153/SKILL.md`

@@ -75,7 +75,7 @@ async function capture() {
     await page.evaluate(() => {
       if (window.aiChat) {
         window.aiChat.addMessage('user', 'Tuyến đường từ Cầu Giấy về Hoàn Kiếm có điểm nào ngập hoặc ùn tắc không AI?');
-        window.aiChat.addMessage('bot', '🤖 **Phân tích lộ trình thông minh:**\n- Tuyến Kim Mã - Nguyễn Thái Học: Hiện thông thoáng, không ghi nhận ngập nước.\n- Cảnh báo: Khu vực đường Đội Cấn đang có lưu lượng đông cục bộ.\n- Đề xuất lộ trình: Di chuyển theo hướng Kim Mã -> Tràng Thi -> Nhà Hát Lớn là tối ưu nhất (tiết kiệm 12 phút, an toàn 100%).');
+        window.aiChat.addMessage('bot', '**Phân tích lộ trình thông minh:**\n- Tuyến Kim Mã - Nguyễn Thái Học: Hiện thông thoáng, không ghi nhận ngập nước.\n- Cảnh báo: Khu vực đường Đội Cấn đang có lưu lượng đông cục bộ.\n- Đề xuất lộ trình: Di chuyển theo hướng Kim Mã -> Tràng Thi -> Nhà Hát Lớn là tối ưu nhất (tiết kiệm 12 phút, an toàn 100%).');
       }
     });
     await new Promise(r => setTimeout(r, 1000));
