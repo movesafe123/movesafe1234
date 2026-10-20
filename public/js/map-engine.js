@@ -20,9 +20,10 @@ class MapEngine {
       evLayer: null
     };
     this.currentBase = 'standard';
-    this.weatherVisible = true;
+    this.weatherVisible = false; // Mặc định tắt để bản đồ sạch thoáng, chỉ bật khi người dùng bấm nút Thời tiết phường
     this.trafficVisible = true;
     this.floodVisible = true;
+    this.evVisible = false; // Mặc định tắt, chỉ bật khi chọn xe điện hoặc bấm chip trạm sạc
     this._loadedEvCity = null;
   }
 
@@ -72,7 +73,7 @@ class MapEngine {
     // Nhóm layer rốn ngập, kẹt xe và trạm thời tiết các quận
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
     this.layers.trafficMarkers = L.layerGroup().addTo(this.map);
-    this.layers.weatherMarkers = L.layerGroup().addTo(this.map);
+    this.layers.weatherMarkers = L.layerGroup(); // Không addTo ngay từ đầu vì mặc định ẩn để bản đồ thoáng
     this.layers.evLayer = L.layerGroup(); // Không addTo(this.map) ngay từ đầu
 
     // Tự động kiểm soát hiển thị theo mức Zoom (Chỉ chạy khi kết thúc zoom để giữ 60fps mượt mà)
@@ -85,20 +86,42 @@ class MapEngine {
   }
 
   // Tự động ẩn/hiện icon theo mức zoom
-  handleZoomLevel() {
+  handleZoomLevel(force = false) {
     if (!this.map) return;
     const currentZoom = Math.round(this.map.getZoom());
-    if (this._lastProcessedZoom === currentZoom) return;
+    if (!force && this._lastProcessedZoom === currentZoom) return;
     this._lastProcessedZoom = currentZoom;
 
     // 1. Cập nhật các trạm thời tiết theo mức zoom
     if (this.weatherVisible && this.layers.weatherMarkers) {
-      this.updateWeatherMarkersByZoom(currentZoom);
+      if (currentZoom < 13) {
+        if (this.map.hasLayer(this.layers.weatherMarkers)) {
+          this.map.removeLayer(this.layers.weatherMarkers);
+        }
+      } else {
+        this.updateWeatherMarkersByZoom(currentZoom);
+      }
     } else if (this.layers.weatherMarkers && this.map.hasLayer(this.layers.weatherMarkers)) {
       this.map.removeLayer(this.layers.weatherMarkers);
     }
 
-    // 2. Với traffic markers
+    // 2. Với trạm sạc xe điện (EV): Kéo bản đồ ra xa (Zoom < 13) thì ẨN HOÀN TOÀN để tránh che lấp bản đồ
+    if (this.layers.evLayer) {
+      if (currentZoom < 13) {
+        if (this.map.hasLayer(this.layers.evLayer)) {
+          this.map.removeLayer(this.layers.evLayer);
+        }
+      } else {
+        if (this.evVisible && this._loadedEvCity) {
+          if (!this.map.hasLayer(this.layers.evLayer)) {
+            this.map.addLayer(this.layers.evLayer);
+          }
+          this.updateEVMarkersByZoom(currentZoom);
+        }
+      }
+    }
+
+    // 3. Với traffic markers
     if (currentZoom < 12) {
       if (this.layers.trafficMarkers && this.map.hasLayer(this.layers.trafficMarkers)) {
         this.map.removeLayer(this.layers.trafficMarkers);
@@ -109,7 +132,7 @@ class MapEngine {
       }
     }
 
-    // 3. Với rốn ngập: nếu lùi ra quá xa (Zoom < 10) thì tạm ẩn để tránh chật bản đồ
+    // 4. Với rốn ngập: nếu lùi ra quá xa (Zoom < 10) thì tạm ẩn để tránh chật bản đồ
     if (currentZoom < 10) {
       if (this.layers.floodMarkers && this.map.hasLayer(this.layers.floodMarkers)) {
         this.map.removeLayer(this.layers.floodMarkers);
@@ -121,9 +144,42 @@ class MapEngine {
     }
   }
 
-  // Cập nhật marker theo mức zoom: Ẩn bớt để tránh chật bản đồ
+  // Điều tiết hiển thị trạm sạc xe điện theo mức Zoom:
+  // Zoom 13: Chỉ hiện các trạm siêu sạc (>= 120kW) và đổi pin để không bị chen chúc
+  // Zoom >= 14: Hiện toàn bộ các trạm sạc
+  updateEVMarkersByZoom(currentZoom) {
+    if (!this.layers.evLayer) return;
+    if (!this.evVisible || currentZoom < 13) {
+      if (this.map && this.map.hasLayer(this.layers.evLayer)) {
+        this.map.removeLayer(this.layers.evLayer);
+      }
+      return;
+    }
+    this.layers.evLayer.eachLayer(marker => {
+      const st = marker._evStation;
+      const el = marker.getElement();
+      if (!el || !st) return;
+
+      if (currentZoom === 13) {
+        const isSuper = (st.maxPowerKw && st.maxPowerKw >= 120) || (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
+        el.style.display = isSuper ? 'inline-flex' : 'none';
+      } else {
+        el.style.display = 'inline-flex';
+      }
+    });
+  }
+
+  // Cập nhật marker thời tiết theo mức zoom: Không để dày đặc đè lên nhau
   updateWeatherMarkersByZoom(currentZoom) {
     if (!this.layers.weatherMarkers || !this.allWeatherStations) return;
+
+    // Nếu tính năng thời tiết đang tắt hoặc kéo bản đồ ra xa (Zoom < 13) thì ẩn hoàn toàn
+    if (!this.weatherVisible || currentZoom < 13) {
+      if (this.map && this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      return;
+    }
 
     let targetStations = [];
     let hasActiveRoute = false;
@@ -137,25 +193,39 @@ class MapEngine {
       }
     }
 
-    if (hasActiveRoute && currentZoom < 14) {
+    if (hasActiveRoute) {
+      // Khi đang tìm lộ trình: Chỉ hiện thời tiết ở điểm đầu, điểm cuối và 1 điểm giữa tuyến
+      const sampleStep = Math.max(1, Math.floor(activePolyline.length / 4));
       targetStations = this.allWeatherStations.filter(station => {
-        const sampleStep = Math.max(1, Math.floor(activePolyline.length / 20));
         return activePolyline.some((pt, idx) => {
-          if (idx % sampleStep !== 0) return false;
+          if (idx !== 0 && idx !== activePolyline.length - 1 && idx % sampleStep !== 0) return false;
           const dLat = (station.lat - pt[0]) * 111000;
           const dLng = (station.lng - pt[1]) * 111000;
-          return (dLat * dLat + dLng * dLng) < (1200 * 1200);
+          return (dLat * dLat + dLng * dLng) < (1500 * 1500);
         });
+      }).slice(0, 3);
+    } else if (currentZoom === 13) {
+      // Zoom 13: Chỉ hiện 1 trạm đại diện cho mỗi quận huyện để bao quát, tuyệt đối không đè nhau
+      const seenDistricts = new Set();
+      targetStations = this.allWeatherStations.filter(s => {
+        const d = s.district || 'Hà Nội';
+        if (!seenDistricts.has(d)) {
+          seenDistricts.add(d);
+          return true;
+        }
+        return false;
       });
-    } else if (currentZoom < 14) {
-      if (this.map.hasLayer(this.layers.weatherMarkers)) {
-        this.map.removeLayer(this.layers.weatherMarkers);
-      }
-      return;
+    } else if (currentZoom === 14) {
+      // Zoom 14: Hiện các phường trọng điểm (isHub)
+      targetStations = this.allWeatherStations.filter(s => s.isHub === true);
     } else {
-      targetStations = (currentZoom === 14 && this.allWeatherStations.length > 25)
-        ? this.allWeatherStations.filter(s => s.isHub !== false)
-        : this.allWeatherStations;
+      // Zoom >= 15: Phóng to vào phố -> Lọc theo khung nhìn màn hình hiện tại
+      const bounds = this.map ? this.map.getBounds() : null;
+      if (bounds) {
+        targetStations = this.allWeatherStations.filter(s => bounds.contains([s.lat, s.lng]));
+      } else {
+        targetStations = this.allWeatherStations;
+      }
     }
 
     if (targetStations.length > 0) {
@@ -169,11 +239,7 @@ class MapEngine {
       return;
     }
 
-    if (this._lastRenderedStationCount === targetStations.length && this.layers.weatherMarkers.getLayers().length > 0) {
-      return;
-    }
     this._lastRenderedStationCount = targetStations.length;
-
     this.layers.weatherMarkers.clearLayers();
     this.createWeatherMarkers(targetStations);
   }
@@ -255,7 +321,13 @@ class MapEngine {
     this.allWeatherStations = stations;
     this._lastRenderedStationCount = -1;
     if (!this.layers.weatherMarkers) return;
-    const currentZoom = this.map ? this.map.getZoom() : 13;
+    if (!this.weatherVisible) {
+      if (this.map && this.map.hasLayer(this.layers.weatherMarkers)) {
+        this.map.removeLayer(this.layers.weatherMarkers);
+      }
+      return;
+    }
+    const currentZoom = this.map ? Math.round(this.map.getZoom()) : 13;
     this.updateWeatherMarkersByZoom(currentZoom);
   }
 
@@ -673,19 +745,19 @@ class MapEngine {
   toggleFloods(show) {
     if (!this.map) return;
     this.floodVisible = show;
-    this.handleZoomLevel();
+    this.handleZoomLevel(true);
   }
 
   toggleIncidents(show) {
     if (!this.map) return;
     this.trafficVisible = show;
-    this.handleZoomLevel();
+    this.handleZoomLevel(true);
   }
 
   toggleWeather(show) {
     if (!this.map) return;
     this.weatherVisible = show;
-    this.handleZoomLevel();
+    this.handleZoomLevel(true);
   }
 
   switchBaseMap(type) {
@@ -727,10 +799,10 @@ class MapEngine {
 
   async toggleEV(show, forceReload = false) {
     if (!this.map) return;
+    this.evVisible = show;
+    const currentZoom = Math.round(this.map.getZoom());
+
     if (show) {
-      if (!this.map.hasLayer(this.layers.evLayer)) {
-        this.layers.evLayer.addTo(this.map);
-      }
       const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
       const needsLoad = forceReload || this._loadedEvCity !== currentCity || this.layers.evLayer.getLayers().length === 0;
 
@@ -808,6 +880,18 @@ class MapEngine {
           console.warn('[MapEngine] Lỗi nạp trạm sạc EV:', err);
         } finally {
           this._evLoading = false;
+        }
+      }
+
+      // Chỉ hiển thị lên bản đồ nếu mức zoom >= 13
+      if (currentZoom >= 13) {
+        if (!this.map.hasLayer(this.layers.evLayer)) {
+          this.layers.evLayer.addTo(this.map);
+        }
+        this.updateEVMarkersByZoom(currentZoom);
+      } else {
+        if (this.map.hasLayer(this.layers.evLayer)) {
+          this.map.removeLayer(this.layers.evLayer);
         }
       }
     } else {
