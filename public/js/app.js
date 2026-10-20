@@ -446,7 +446,7 @@ class GoogleMapsApp {
     const minD = Math.min(...depths);
     const maxD = Math.max(...depths);
     const cityName = this.citiesConfig[this.currentCity] ? this.citiesConfig[this.currentCity].name : this.currentCity;
-    this.showToast(`🎲 Đã đổi kịch bản ngẫu nhiên: ${newFloods.length} rốn ngập (${minD}cm - ${maxD}cm) tại ${cityName}!`, 'warning', 4500);
+    this.showToast(`Đã đổi kịch bản ngẫu nhiên: ${newFloods.length} rốn ngập (${minD}cm - ${maxD}cm) tại ${cityName}!`, 'warning', 4500);
   }
 
   // Lấy toàn bộ rốn ngập hiện tại (bao gồm kịch bản mô phỏng nếu đang bật Chế độ Giả lập)
@@ -485,7 +485,7 @@ class GoogleMapsApp {
     if (badge) {
       const modeText = badge.querySelector('.mode-text');
       if (modeText) {
-        modeText.textContent = this.isSimulationMode ? '🧪 Giả lập ngẫu nhiên' : '🟢 Dữ liệu thật';
+        modeText.textContent = this.isSimulationMode ? 'Giả lập ngẫu nhiên' : 'Dữ liệu thật';
       }
     }
 
@@ -514,9 +514,9 @@ class GoogleMapsApp {
         const depths = this.simulatedFloods.map(f => f.depth_cm);
         const minD = Math.min(...depths);
         const maxD = Math.max(...depths);
-        this.showToast(`🧪 Đã bật Chế độ Giả lập ngẫu nhiên: ${this.simulatedFloods.length} rốn ngập (${minD}cm - ${maxD}cm) để thử nghiệm thuật toán né ngập!`, 'warning', 4500);
+        this.showToast(`Đã bật Chế độ Giả lập ngẫu nhiên: ${this.simulatedFloods.length} rốn ngập (${minD}cm - ${maxD}cm) để thử nghiệm thuật toán né ngập!`, 'warning', 4500);
       } else {
-        this.showToast('🟢 Đã chuyển về Dữ liệu thật: 100% dữ liệu thời gian thực từ TomTom và trạm khí tượng.', 'info', 4000);
+        this.showToast('Đã chuyển về Dữ liệu thật: 100% dữ liệu thời gian thực từ TomTom và trạm khí tượng.', 'info', 4000);
       }
     }
   }
@@ -533,18 +533,26 @@ class GoogleMapsApp {
     const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
     const floodChip = document.getElementById('chip-flood-count');
     const trafficChip = document.getElementById('chip-traffic-count');
+    const setChipText = (chip, text, className) => {
+      if (!chip) return;
+      if (className) chip.className = className;
+      const textSpan = chip.querySelector('.chip-text');
+      if (textSpan) {
+        textSpan.textContent = text;
+      } else {
+        chip.textContent = text;
+      }
+    };
+
     if (floodChip) {
       if (activeFloods.length > 0) {
         if (this.isSimulationMode) {
-          floodChip.className = 'gm-chip gm-chip-warning active';
-          floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length} - Giả lập)`;
+          setChipText(floodChip, `Rốn ngập (${activeFloods.length} - Giả lập)`, 'gm-chip gm-chip-warning active');
         } else {
-          floodChip.className = 'gm-chip gm-chip-danger';
-          floodChip.textContent = `🌊 Rốn ngập (${activeFloods.length})`;
+          setChipText(floodChip, `Rốn ngập (${activeFloods.length})`, 'gm-chip gm-chip-danger');
         }
       } else {
-        floodChip.className = 'gm-chip gm-chip-safe';
-        floodChip.textContent = `🌊 Rốn ngập (0 - Khô ráo)`;
+        setChipText(floodChip, 'Rốn ngập (0 - Khô ráo)', 'gm-chip gm-chip-safe');
       }
     }
     if (trafficChip) {
@@ -552,14 +560,11 @@ class GoogleMapsApp {
       const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
 
       if (activeJams.length > 0) {
-        trafficChip.className = 'gm-chip gm-chip-danger';
-        trafficChip.textContent = `🚗 Kẹt xe (${activeJams.length})`;
+        setChipText(trafficChip, `Kẹt xe (${activeJams.length})`, 'gm-chip gm-chip-danger');
       } else if (roadworks.length > 0) {
-        trafficChip.className = 'gm-chip gm-chip-safe';
-        trafficChip.textContent = `🚗 Ùn tắc (0) • 🚧 Công trường (${roadworks.length})`;
+        setChipText(trafficChip, `Ùn tắc (0) • Công trường (${roadworks.length})`, 'gm-chip gm-chip-safe');
       } else {
-        trafficChip.className = 'gm-chip gm-chip-safe';
-        trafficChip.textContent = `🚗 Ùn tắc (0 - Thông thoáng)`;
+        setChipText(trafficChip, 'Ùn tắc (0 - Thông thoáng)', 'gm-chip gm-chip-safe');
       }
     }
   }
@@ -600,7 +605,13 @@ class GoogleMapsApp {
     const pillDot = document.getElementById('weather-risk-dot');
 
     if (pillText) {
-      pillText.innerHTML = `${w.icon} <strong>${city.name} ${w.temp}°C</strong> • Mưa: ${w.rain1h}mm • ${w.floodRisk.text}`;
+      pillText.innerHTML = `<strong>${city.name} ${w.temp}°C</strong> • Mưa: ${w.rain1h}mm • ${w.floodRisk.text}`;
+    }
+
+    const pillIcon = document.querySelector('#gm-weather-pill .weather-pill-icon');
+    if (pillIcon && window.getSvgIcon) {
+      const iconHtml = window.getSvgIcon(w.rain1h > 0 ? 'cloud-rain' : 'cloud-sun', 'weather-pill-icon', 18);
+      pillIcon.outerHTML = iconHtml;
     }
 
     if (pillDot) {
@@ -640,7 +651,7 @@ class GoogleMapsApp {
 
       const badge = document.getElementById('badge-countdown');
       if (badge) {
-        badge.textContent = `${this.remainingSeconds}s ↻`;
+        badge.textContent = `${this.remainingSeconds}s`;
       }
 
       if (this.remainingSeconds <= 0) {
@@ -684,9 +695,9 @@ class GoogleMapsApp {
     // 3. Thông báo cho người dùng
     const currentCount = (this.liveData.floodPoints || []).length;
     if (currentCount > prevCount && prevCount > 0) {
-      this.showToast('🌊 Hệ thống vừa cập nhật thêm điểm ngập mới!', 'warning');
+      this.showToast('Hệ thống vừa cập nhật thêm điểm ngập mới!', 'warning');
     } else if (isManualOrFocus) {
-      this.showToast('✓ Đã đồng bộ dữ liệu thời tiết & giao thông mới nhất từ Cloud 24/7!', 'info');
+      this.showToast('Đã đồng bộ dữ liệu thời tiết & giao thông mới nhất từ Cloud 24/7!', 'info');
     }
 
     this.lastSyncTime = Date.now();
@@ -713,7 +724,7 @@ class GoogleMapsApp {
             this.remainingSeconds = this.syncIntervalSeconds;
             // Chỉ hiển thị toast khi có gói update mới, không hiện với gói init
             if (payload.type === 'update') {
-              this.showToast('⚡ Cập nhật dữ liệu thời gian thực từ Cloud Server!', 'info', 3000);
+              this.showToast('Cập nhật dữ liệu thời gian thực từ Cloud Server!', 'info', 3000);
             }
           }
         } catch (e) {}
@@ -737,7 +748,7 @@ class GoogleMapsApp {
     toast.className = `gm-toast toast-${type}`;
     toast.innerHTML = `
       <span>${message}</span>
-      <button style="background: none; border: none; color: #fff; opacity: 0.7; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+      <button style="background: none; border: none; color: #fff; opacity: 0.7; cursor: pointer; font-size: 13px; font-weight: 600; line-height: 1;">Đóng</button>
     `;
 
     toast.querySelector('button')?.addEventListener('click', () => {
@@ -778,15 +789,15 @@ class GoogleMapsApp {
       panel.classList.add('open');
       panel.classList.remove('sheet-minimized');
       if (!isMobile) {
-        searchBox.style.display = 'none';
-        chips.style.display = 'none';
+        if (searchBox) searchBox.style.display = 'none';
+        if (chips) chips.style.display = 'none';
       }
       this.setMobileActiveTab('route');
     } else {
       panel.classList.remove('open');
       panel.classList.remove('sheet-minimized');
-      searchBox.style.display = 'flex';
-      chips.style.display = 'flex';
+      if (searchBox) searchBox.style.display = 'flex';
+      if (chips) chips.style.display = 'flex';
       this.setMobileActiveTab('explore');
     }
   }
@@ -887,14 +898,14 @@ class GoogleMapsApp {
 
       if (currentZoom < 12) {
         window.mapEngine.map.flyTo([city.lat, city.lng], 13);
-        this.showToast(`🌦️ Phóng to vào ${city.name} để xem chi tiết thời tiết & mưa từng phường!`, 'info', 4000);
+        this.showToast(`Phóng to vào ${city.name} để xem chi tiết thời tiết & mưa từng phường!`, 'info', 4000);
       } else {
         const nextState = !window.mapEngine.weatherVisible;
         window.mapEngine.toggleWeather(nextState);
         const chip = document.getElementById('chip-weather-toggle');
         if (nextState) {
           chip?.classList.remove('gm-chip-inactive');
-          this.showToast(`🌦️ Đã bật hiển thị thời tiết các phường`, 'info');
+          this.showToast(`Đã bật hiển thị thời tiết các phường`, 'info');
         } else {
           chip?.classList.add('gm-chip-inactive');
           this.showToast(`Đã ẩn trạm thời tiết các phường`, 'info');
@@ -909,11 +920,11 @@ class GoogleMapsApp {
         // Có ngập: Bay camera đến điểm ngập sâu nhất
         const worst = [...activeFloods].sort((a, b) => (b.depth_cm || 0) - (a.depth_cm || 0))[0];
         window.mapEngine.map.flyTo([worst.lat, worst.lng], 16);
-        const prefix = this.isSimulationMode ? '🧪 [Kịch bản Giả lập]' : '⚠️';
+        const prefix = this.isSimulationMode ? '[Kịch bản Giả lập]' : 'Cảnh báo:';
         this.showToast(`${prefix} Đang theo dõi rốn ngập sâu: ${worst.name} (${worst.depth_cm}cm)`, 'danger');
       } else {
         // Khô ráo, nước đã rút
-        this.showToast('✅ Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
+        this.showToast('Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
       }
     });
 
@@ -923,14 +934,14 @@ class GoogleMapsApp {
 
       if (activeJams.length > 0) {
         window.mapEngine.map.flyTo([activeJams[0].lat, activeJams[0].lng], 15);
-        this.showToast(`⚠️ Điểm ùn tắc giao thông: ${activeJams[0].description}`, 'warning');
+        this.showToast(`Điểm ùn tắc giao thông: ${activeJams[0].description}`, 'warning');
       } else {
         const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
         if (roadworks.length > 0) {
           window.mapEngine.map.flyTo([roadworks[0].lat, roadworks[0].lng], 15);
-          this.showToast(`🌙 Ban đêm đường phố thông thoáng! Ghi nhận ${roadworks.length} điểm rào chắn thi công bảo trì đêm (Vệ tinh TomTom v5).`, 'info', 5000);
+          this.showToast(`Đường phố thông thoáng! Ghi nhận ${roadworks.length} điểm rào chắn thi công bảo trì (Vệ tinh TomTom v5).`, 'info', 5000);
         } else {
-          this.showToast('✅ Giao thông toàn thành phố thông thoáng! Vận tốc trung bình 45-60 km/h, không có điểm kẹt xe.', 'info', 5000);
+          this.showToast('Giao thông toàn thành phố thông thoáng! Vận tốc trung bình 45-60 km/h, không có điểm kẹt xe.', 'info', 5000);
         }
       }
     });
@@ -957,8 +968,15 @@ class GoogleMapsApp {
       await this.updateWeatherStations();
 
       const chkEv = document.getElementById('chk-layer-ev');
-      if (chkEv && chkEv.checked && window.mapEngine.toggleEV) {
-        await window.mapEngine.toggleEV(true, true);
+      const chipEv = document.getElementById('chip-ev-stations');
+      const evCounts = { hanoi: 63, hcm: 65, danang: 25 };
+      const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
+      if (countEl) countEl.textContent = `${evCounts[this.currentCity] || 50} trạm`;
+
+      if ((chkEv && chkEv.checked) || (chipEv && chipEv.classList.contains('active'))) {
+        if (window.mapEngine && window.mapEngine.toggleEV) {
+          await window.mapEngine.toggleEV(true, true);
+        }
       }
       if (this.currentPredictionOffset > 0) {
         await this.applyPredictionOffset(this.currentPredictionOffset);
@@ -973,6 +991,27 @@ class GoogleMapsApp {
     // 4b. Chip Xu hướng & VOV Giao thông
     document.getElementById('chip-urban-insights')?.addEventListener('click', () => {
       this.openUrbanInsightsModal();
+    });
+
+    // 4c. Chip Trạm sạc xe điện (Bật/Tắt trực tiếp trên thanh công cụ)
+    document.getElementById('chip-ev-stations')?.addEventListener('click', () => {
+      const chip = document.getElementById('chip-ev-stations');
+      const isNowActive = !chip.classList.contains('active');
+      chip.classList.toggle('active', isNowActive);
+
+      const chkEv = document.getElementById('chk-layer-ev');
+      if (chkEv) chkEv.checked = isNowActive;
+
+      if (window.mapEngine && window.mapEngine.toggleEV) {
+        window.mapEngine.toggleEV(isNowActive);
+      }
+
+      const count = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData.length : 63;
+      if (isNowActive) {
+        this.showToast(`Đang hiển thị ${count} trạm sạc xe điện & tủ đổi pin tại ${this.getCityName(this.currentCity)}`, 'info', 2500);
+      } else {
+        this.showToast('Đã ẩn lớp trạm sạc xe điện', 'info', 1800);
+      }
     });
 
     document.getElementById('btn-close-urban-insights')?.addEventListener('click', () => {
@@ -993,19 +1032,22 @@ class GoogleMapsApp {
         
         // Tự động bật layer Trạm sạc nếu chọn xe điện
         const evLayerItem = document.getElementById('layer-item-ev');
+        const chipEv = document.getElementById('chip-ev-stations');
         if (this.currentVehicle === 'ebike' || this.currentVehicle === 'ecar') {
           if (evLayerItem) evLayerItem.style.display = 'flex';
           const chkEv = document.getElementById('chk-layer-ev');
           if (chkEv) chkEv.checked = true;
+          if (chipEv) chipEv.classList.add('active');
           if (window.mapEngine.toggleEV) {
             window.mapEngine.toggleEV(true);
-            this.showToast('⚡ Đã kích hoạt lớp bản đồ Trạm sạc xe điện', 'info', 2500);
+            this.showToast('Đã kích hoạt lớp bản đồ Trạm sạc xe điện', 'info', 2500);
           }
         } else {
           if (evLayerItem) evLayerItem.style.display = 'none';
           const chkEv = document.getElementById('chk-layer-ev');
           if (chkEv && chkEv.checked) {
              chkEv.checked = false;
+             if (chipEv) chipEv.classList.remove('active');
              if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(false);
           }
         }
@@ -1070,26 +1112,21 @@ class GoogleMapsApp {
 
     // Nút làm mới dữ liệu từ Bot
     document.getElementById('btn-gm-bot-refresh')?.addEventListener('click', async () => {
-      const btn = document.getElementById('btn-gm-bot-refresh');
-      btn.style.transition = 'transform 0.6s ease';
-      btn.style.transform = 'rotate(360deg)';
       try {
-        this.showToast('🔄 Đang kích hoạt Bot quét dữ liệu mới từ các nguồn...', 'info', 2500);
+        this.showToast('Đang kích hoạt Bot quét dữ liệu mới từ các nguồn...', 'info', 2500);
         // Gọi server crawl trước
         try {
           const resp = await fetch('/api/bot/refresh', { method: 'POST' });
           if (resp.status === 429) {
             const data = await resp.json().catch(() => ({}));
-            this.showToast(`⏱️ ${data.message || 'Vui lòng đợi thêm giây lát trước khi quét lại.'}`, 'warning', 4000);
+            this.showToast(`${data.message || 'Vui lòng đợi thêm giây lát trước khi quét lại.'}`, 'warning', 4000);
             return;
           }
         } catch (e) {}
 
         // Sau đó sync dữ liệu mới về giao diện
         await this.syncFromCloud(true);
-      } finally {
-        setTimeout(() => { btn.style.transform = 'none'; }, 600);
-      }
+      } catch (err) {}
     });
 
     // Menu bật tắt lớp bản đồ
@@ -1130,12 +1167,12 @@ class GoogleMapsApp {
       this.setSimulationMode(!this.isSimulationMode, true);
     });
 
-    // Nút [🎲 Đổi kịch bản] trên Floating Banner
+    // Nút [Đổi kịch bản] trên Floating Banner
     document.getElementById('btn-reroll-simulation')?.addEventListener('click', () => {
       this.rerollSimulation();
     });
 
-    // Nút [Tắt giả lập ✕] trên Floating Banner
+    // Nút [Tắt giả lập] trên Floating Banner
     document.getElementById('btn-exit-simulation')?.addEventListener('click', () => {
       this.setSimulationMode(false, true);
     });
@@ -1152,7 +1189,7 @@ class GoogleMapsApp {
         const type = this.pickingLocationType;
         this.stopPickLocationOnMap();
 
-        this.showToast('🔍 Đang xác định ngõ ngách, địa chỉ...', 'info');
+        this.showToast('Đang xác định ngõ ngách, địa chỉ...', 'info');
 
         try {
           const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
@@ -1163,7 +1200,7 @@ class GoogleMapsApp {
             lat,
             lng
           });
-          this.showToast(`✓ Đã chọn: ${addrInfo.title}`, 'info');
+          this.showToast(`Đã chọn: ${addrInfo.title}`, 'info');
         } catch (err) {
           this.selectLocation(type, {
             title: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
@@ -1192,10 +1229,10 @@ class GoogleMapsApp {
                 <div class="gm-poi-coords">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
                 <div class="gm-poi-actions">
                   <button class="gm-btn-dir from" onclick="window.appState.setRouteFromPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
-                    <span class="icon">📍</span> Từ đây
+                    Từ đây
                   </button>
                   <button class="gm-btn-dir to" onclick="window.appState.setRouteToPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
-                    <span class="icon">🏁</span> Tới đây
+                    Tới đây
                   </button>
                 </div>
               </div>
@@ -1232,7 +1269,7 @@ class GoogleMapsApp {
         alert('Trình duyệt không hỗ trợ định vị GPS');
         return;
       }
-      this.showToast('📍 Đang xác định tọa độ GPS của bạn...', 'info');
+      this.showToast('Đang xác định tọa độ GPS của bạn...', 'info');
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
@@ -1244,7 +1281,7 @@ class GoogleMapsApp {
         if (latInput) latInput.value = lat;
         if (lngInput) lngInput.value = lng;
         if (coordDisplay) {
-          coordDisplay.textContent = `✓ Đã ghim tọa độ GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          coordDisplay.textContent = `Đã ghim tọa độ GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
           coordDisplay.style.display = 'block';
         }
 
@@ -1256,7 +1293,7 @@ class GoogleMapsApp {
           }
         } catch (e) {}
 
-        this.showToast('✓ Đã lấy tọa độ GPS chính xác!', 'info');
+        this.showToast('Đã lấy tọa độ GPS chính xác!', 'info');
       }, (err) => {
         alert('Không thể lấy vị trí GPS: ' + err.message);
       });
@@ -1316,13 +1353,13 @@ class GoogleMapsApp {
           reportModal?.classList.remove('open');
           const form = document.getElementById('form-report');
           if (form) form.reset();
-          this.showToast('✓ Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
+          this.showToast('Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
         } else {
-          this.showToast('⚠️ Không thể gửi báo cáo: ' + (res?.message || 'Lỗi không xác định'), 'warning');
+          this.showToast('Không thể gửi báo cáo: ' + (res?.message || 'Lỗi không xác định'), 'warning');
         }
       } catch (err) {
         console.error('Lỗi khi gửi báo cáo sự cố:', err);
-        this.showToast('❌ Có lỗi xảy ra khi gửi báo cáo: ' + err.message, 'danger');
+        this.showToast('Có lỗi xảy ra khi gửi báo cáo: ' + err.message, 'danger');
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -1430,7 +1467,6 @@ class GoogleMapsApp {
     if (filtered.length === 0) {
       container.innerHTML = `
         <div style="grid-column: 1 / -1; padding: 40px 20px; text-align: center; color: #5f6368;">
-          <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
           <div style="font-weight: 600; font-size: 15px; color: #202124;">Không tìm thấy phường hoặc tuyến đường khớp với "${keyword}"</div>
           <div style="font-size: 13px; margin-top: 4px;">Hãy thử tìm kiếm với tên đường (VD: Cầu Diễn, Hoàng Công Chất, Đức Diễn...) hoặc chọn quận khác.</div>
         </div>
@@ -1449,7 +1485,6 @@ class GoogleMapsApp {
       const liveWeather = stationMap.get(ward.name);
       const temp = liveWeather ? liveWeather.temp : 26;
       const desc = liveWeather ? liveWeather.description : 'Khô ráo';
-      const icon = liveWeather ? (liveWeather.icon || '☀️') : '☀️';
       const risk = liveWeather ? (liveWeather.floodRisk || { level: 'safe', text: 'Khô ráo' }) : { level: 'safe', text: 'Khô ráo' };
       const riskBadgeClass = risk.level === 'danger' ? 'danger' : (risk.level === 'warning' ? 'warning' : 'safe');
 
@@ -1465,7 +1500,7 @@ class GoogleMapsApp {
       if (ward.trafficHotspots && ward.trafficHotspots.length > 0) {
         hotspotsHtml = `
           <div class="ward-card-hotspots">
-            🚦 <strong>Giao cắt trọng điểm:</strong> ${ward.trafficHotspots.join(' • ')}
+            <strong>Giao cắt trọng điểm:</strong> ${ward.trafficHotspots.join(' • ')}
           </div>
         `;
       }
@@ -1474,7 +1509,7 @@ class GoogleMapsApp {
       if (ward.floodVulnerability) {
         floodNoteHtml = `
           <div class="ward-card-flood">
-            🌊 <strong>Lưu ý úng ngập:</strong> ${ward.floodVulnerability}
+            <strong>Lưu ý úng ngập:</strong> ${ward.floodVulnerability}
           </div>
         `;
       }
@@ -1490,7 +1525,6 @@ class GoogleMapsApp {
               <div class="ward-card-sub">Quận ${ward.district} • Hà Nội</div>
             </div>
             <div class="ward-weather-pill weather-pill-${riskBadgeClass}">
-              <span>${icon}</span>
               <span>${temp}°C</span>
               <span>•</span>
               <span style="font-weight: 500;">${desc}</span>
@@ -1498,7 +1532,7 @@ class GoogleMapsApp {
           </div>
 
           <div style="font-size: 11px; font-weight: 600; color: #5f6368; margin-bottom: 4px; text-transform: uppercase;">
-            🛣️ Các trục đường huyết mạch (${(ward.mainStreets || []).length} tuyến):
+            Các trục đường huyết mạch (${(ward.mainStreets || []).length} tuyến):
           </div>
           <div class="ward-card-streets">
             ${streetsTags}
@@ -1510,16 +1544,16 @@ class GoogleMapsApp {
           <div class="ward-card-footer">
             <button class="btn-card-map" 
                     onclick="window.appState && window.appState.flyToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
-              📍 Xem Trên Bản Đồ
+              Xem Trên Bản Đồ
             </button>
             <button class="btn-card-ai" 
                     onclick="window.appState && window.appState.askAiAboutWard('${ward.name.replace(/'/g, "\\'")}', '${ward.district.replace(/'/g, "\\'")}')">
-              🤖 Hỏi AI Về Phường
+              Hỏi AI Về Phường
             </button>
             <button class="btn-card-route" 
                     title="Chỉ đường đến ${ward.name}"
                     onclick="window.appState && window.appState.routeToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
-              🔀 Đến Đây
+              Đến Đây
             </button>
           </div>
         </div>
@@ -1540,7 +1574,7 @@ class GoogleMapsApp {
     }
     
     window.mapEngine.map.flyTo([lat, lng], 15);
-    this.showToast(`🏛️ Đã chuyển góc nhìn đến ${wardName}`, 'info');
+    this.showToast(`Đã chuyển góc nhìn đến ${wardName}`, 'info');
 
     setTimeout(() => {
       if (window.mapEngine && typeof window.mapEngine.openWardPopup === 'function') {
@@ -1562,7 +1596,7 @@ class GoogleMapsApp {
 
   searchStreetFromWard(streetName, wardName) {
     this.closeHanoiStreetsModal();
-    this.showToast(`🛣️ Tuyến đường lớn: ${streetName} (${wardName})`, 'info', 4000);
+    this.showToast(`Tuyến đường lớn: ${streetName} (${wardName})`, 'info', 4000);
     window.aiChat.open();
     window.aiChat.sendMessage(`Tình hình giao thông, ngập nước và lộ trình lưu thông trên đường ${streetName} qua khu vực ${wardName} như thế nào?`);
   }
@@ -1579,13 +1613,27 @@ class GoogleMapsApp {
       if (news.length === 0) {
         vovContainer.innerHTML = '<div style="color: #5f6368;">Hiện tại không có tin tức ùn tắc phát thanh khẩn cấp.</div>';
       } else {
-        vovContainer.innerHTML = news.map(item => `
-          <div style="border-bottom: 1px solid #e8eaed; padding: 6px 0;">
-            <div style="font-weight: 700; color: #202124;">${item.title || 'Tin giao thông'}</div>
-            <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${item.summary || item.content || ''}</div>
-            <div style="color: #1a73e8; font-size: 10px; margin-top: 2px;">Nguồn: VOV Giao thông 91MHz</div>
-          </div>
-        `).join('');
+        vovContainer.innerHTML = news.map(item => {
+          const title = item.title || 'Tin giao thông';
+          const content = item.summary || item.content || '';
+          const fullText = `${title}. ${content}`;
+          return `
+            <div style="border-bottom: 1px solid #e8eaed; padding: 8px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+              <div style="flex: 1;">
+                <div style="font-weight: 700; color: #202124;">${title}</div>
+                <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${content}</div>
+                <div style="color: #1a73e8; font-size: 10px; margin-top: 3px;">Nguồn: VOV Giao thông 91MHz</div>
+              </div>
+              <button class="gm-btn-tts" 
+                      style="flex-shrink: 0; margin-top: 2px;"
+                      onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(fullText)}'))"
+                      title="Đọc bằng giọng nói tiếng Việt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <span>Đọc tin</span>
+              </button>
+            </div>
+          `;
+        }).join('');
       }
     }
 
@@ -1598,7 +1646,7 @@ class GoogleMapsApp {
         if (series.length === 0) {
           chartContainer.innerHTML = `
             <div style="color: #5f6368; text-align: center; padding: 20px;">
-              📊 Chỉ số ùn tắc trung bình 7 ngày tại ${this.citiesConfig[this.currentCity]?.name || 'đô thị'}: <strong>Cấp độ 2.4/5.0 (Mức trung bình nhẹ)</strong><br>
+              Chỉ số ùn tắc trung bình 7 ngày tại ${this.citiesConfig[this.currentCity]?.name || 'đô thị'}: <strong>Cấp độ 2.4/5.0 (Mức trung bình nhẹ)</strong><br>
               <span style="font-size: 11px;">Giờ cao điểm ghi nhận ùn ứ nhiều nhất: 07:30 - 08:45 và 17:15 - 18:30 hàng ngày.</span>
             </div>
           `;
@@ -1700,7 +1748,7 @@ class GoogleMapsApp {
 
         dropdown.innerHTML = `
           <div style="padding: 10px 14px; font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 8px;">
-            <span style="display: inline-block; animation: pulse-ring 1s infinite;">🔍</span> Đang tìm kiếm ngõ, ngách, địa chỉ...
+            Đang tìm kiếm ngõ, ngách, địa chỉ...
           </div>
         `;
         dropdown.style.display = 'flex';
@@ -1759,14 +1807,12 @@ class GoogleMapsApp {
 
     dropdown.innerHTML = `
       <div class="gm-suggestion-item gm-quick-action" data-action="gps">
-        <div class="gm-sugg-icon icon-gps">🎯</div>
         <div class="gm-sugg-content">
           <div class="gm-sugg-title">Vị trí của bạn</div>
           <div class="gm-sugg-subtitle">Sử dụng định vị GPS hiện tại</div>
         </div>
       </div>
       <div class="gm-suggestion-item gm-quick-action" data-action="map">
-        <div class="gm-sugg-icon">🗺️</div>
         <div class="gm-sugg-content">
           <div class="gm-sugg-title">Chọn trên bản đồ</div>
           <div class="gm-sugg-subtitle">Click vào bất kỳ điểm nào trên bản đồ</div>
@@ -1811,7 +1857,6 @@ class GoogleMapsApp {
             Không tìm thấy địa chỉ khớp với "${query}".
           </div>
           <div class="gm-suggestion-item gm-quick-action" data-action="map">
-            <div class="gm-sugg-icon">🗺️</div>
             <div class="gm-sugg-content">
               <div class="gm-sugg-title">Chọn vị trí này trên bản đồ</div>
               <div class="gm-sugg-subtitle">Click trực tiếp vào vị trí cần đến</div>
@@ -1828,11 +1873,8 @@ class GoogleMapsApp {
 
       let html = '';
       results.forEach((item, index) => {
-        const isAlley = item.type === 'alley';
-        const iconClass = isAlley ? 'icon-alley' : '';
         html += `
           <div class="gm-suggestion-item" data-index="${index}">
-            <div class="gm-sugg-icon ${iconClass}">${item.icon || '📍'}</div>
             <div class="gm-sugg-content">
               <div class="gm-sugg-title">${item.title}</div>
               <div class="gm-sugg-subtitle">${item.subtitle}</div>
@@ -1869,7 +1911,7 @@ class GoogleMapsApp {
       this._tempClickMarker = null;
     }
     this.selectLocation('origin', { lat, lng, title, subtitle: fullAddress, fullAddress });
-    this.showToast('📍 Đã đặt Điểm Đi: ' + title, 'info');
+    this.showToast('Đã đặt Điểm Đi: ' + title, 'info');
   }
 
   setRouteToPOI(lat, lng, title, fullAddress) {
@@ -1878,7 +1920,7 @@ class GoogleMapsApp {
       this._tempClickMarker = null;
     }
     this.selectLocation('destination', { lat, lng, title, subtitle: fullAddress, fullAddress });
-    this.showToast('🏁 Đã đặt Điểm Đến: ' + title, 'info');
+    this.showToast('Đã đặt Điểm Đến: ' + title, 'info');
   }
 
   selectLocation(type, item) {
@@ -1987,13 +2029,13 @@ class GoogleMapsApp {
     const banner = document.getElementById('gm-pick-map-banner');
     if (banner) {
       const typeText = type === 'origin' ? 'Điểm xuất phát (A)' : 'Điểm đến (B)';
-      banner.querySelector('span').innerText = `🎯 Click vào điểm bất kỳ trên bản đồ để chọn ${typeText}...`;
+      banner.querySelector('span').innerText = `Click vào điểm bất kỳ trên bản đồ để chọn ${typeText}...`;
       banner.style.display = 'flex';
     }
 
     const container = document.getElementById('map-container');
     if (container) container.style.cursor = 'crosshair';
-    this.showToast(`🎯 Hãy nhấp chuột vào một vị trí trên bản đồ để chọn ${type === 'origin' ? 'điểm đi' : 'điểm đến'}`, 'info');
+    this.showToast(`Hãy nhấp chuột vào một vị trí trên bản đồ để chọn ${type === 'origin' ? 'điểm đi' : 'điểm đến'}`, 'info');
   }
 
   // Kết thúc chế độ click chọn trên bản đồ
@@ -2028,12 +2070,12 @@ class GoogleMapsApp {
     }
 
     this.calculateSmartRoute();
-    this.showToast('⇄ Đã đảo ngược điểm đi và điểm đến', 'info');
+    this.showToast('Đã đảo ngược điểm đi và điểm đến', 'info');
   }
 
   // Lấy vị trí GPS hiện tại cho điểm đi
   async setOriginToMyLocation() {
-    this.showToast('🎯 Đang xác định vị trí của bạn qua GPS...', 'info');
+    this.showToast('Đang xác định vị trí của bạn qua GPS...', 'info');
     try {
       const pos = await window.geocodingService.getCurrentPosition();
       const input = document.getElementById('gm-route-origin');
@@ -2045,18 +2087,18 @@ class GoogleMapsApp {
         fullAddress: pos.fullAddress
       };
       this.updateRouteMarker('origin', pos.lat, pos.lng, pos.title);
-      this.showToast(`✓ Đã nhận diện vị trí: ${pos.title}`, 'info');
+      this.showToast(`Đã nhận diện vị trí: ${pos.title}`, 'info');
       if (this.routeLocations.destination) {
         this.calculateSmartRoute();
       }
     } catch (e) {
-      this.showToast(`⚠️ Không thể lấy GPS: ${e.message}`, 'warning');
+      this.showToast(`Không thể lấy GPS: ${e.message}`, 'warning');
     }
   }
 
   // Lấy vị trí GPS cho điểm đến
   async setDestToMyLocation() {
-    this.showToast('🎯 Đang xác định vị trí của bạn qua GPS...', 'info');
+    this.showToast('Đang xác định vị trí của bạn qua GPS...', 'info');
     try {
       const pos = await window.geocodingService.getCurrentPosition();
       const input = document.getElementById('gm-route-dest');
@@ -2068,12 +2110,12 @@ class GoogleMapsApp {
         fullAddress: pos.fullAddress
       };
       this.updateRouteMarker('dest', pos.lat, pos.lng, pos.title);
-      this.showToast(`✓ Đã nhận diện vị trí: ${pos.title}`, 'info');
+      this.showToast(`Đã nhận diện vị trí: ${pos.title}`, 'info');
       if (this.routeLocations.origin) {
         this.calculateSmartRoute();
       }
     } catch (e) {
-      this.showToast(`⚠️ Không thể lấy GPS: ${e.message}`, 'warning');
+      this.showToast(`Không thể lấy GPS: ${e.message}`, 'warning');
     }
   }
 
@@ -2092,39 +2134,41 @@ class GoogleMapsApp {
     this.calculateSmartRoute();
   }
 
-  // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps
+  // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps kèm Icon SVG tối giản
   translateStepInstruction(step) {
     const raw = (step.instruction || '').toLowerCase();
     const name = step.name || 'đoạn đường';
     let turn = 'Tiếp tục đi';
-    let icon = '⬆️';
+    let iconName = 'straight';
 
     if (raw.includes('depart')) {
       turn = 'Khởi hành từ';
-      icon = '🟢';
+      iconName = 'map-pin';
     } else if (raw.includes('arrive')) {
       turn = 'Đến điểm đích tại';
-      icon = '🏁';
+      iconName = 'flag';
     } else if (raw.includes('right')) {
       turn = 'Rẽ phải vào';
-      icon = '➡️';
+      iconName = 'turn-right';
     } else if (raw.includes('left')) {
       turn = 'Rẽ trái vào';
-      icon = '⬅️';
+      iconName = 'turn-left';
     } else if (raw.includes('uturn')) {
       turn = 'Quay đầu xe trên';
-      icon = '🔄';
+      iconName = 'uturn';
     } else if (raw.includes('roundabout') || raw.includes('rotary')) {
       turn = 'Đi vào vòng xuyến rẽ vào';
-      icon = '🔄';
+      iconName = 'roundabout';
     } else if (raw.includes('fork') || raw.includes('slight')) {
       turn = 'Chếch hướng vào';
-      icon = '↗️';
+      iconName = 'fork';
     }
 
     const distText = step.distance > 1000
       ? `${(step.distance / 1000).toFixed(1)} km`
       : `${Math.round(step.distance)} m`;
+
+    const icon = window.getSvgIcon ? window.getSvgIcon(iconName, `step-icon-svg step-${iconName}`, 16) : '•';
 
     return {
       text: `${turn} <strong>${name}</strong>`,
@@ -2147,30 +2191,13 @@ class GoogleMapsApp {
     if (!query) return;
     const lower = query.toLowerCase();
 
-    // 0. Nếu hỏi lộ trình rõ ràng "từ A đến B" (hoặc "chỉ đường từ A về B") -> ưu tiên xử lý ngay
-    const routeMatch = query.match(/^(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới)\s+(.+)$/i);
-    if (routeMatch && routeMatch[1] && routeMatch[2]) {
-      this.toggleDirectionsPanel(true);
-      const rawOrigin = routeMatch[1].trim();
-      const rawDest = routeMatch[2].replace(/(\?|!|\.|né ngập|tránh tắc|không ngập)$/i, '').trim();
+    // 0. Nếu hỏi lộ trình rõ ràng "từ A đến/ra/vào/về/lên/xuống B" -> ưu tiên xử lý ngay
+    const parsedRoute = (window.aiChat && typeof window.aiChat.parseRouteQuery === 'function')
+      ? window.aiChat.parseRouteQuery(query)
+      : null;
 
-      const originInput = document.getElementById('gm-route-origin');
-      const destInput = document.getElementById('gm-route-dest');
-      if (originInput) originInput.value = rawOrigin;
-      if (destInput) destInput.value = rawDest;
-
-      this.showToast('🔍 Đang tìm kiếm địa chỉ và phân tích lộ trình...', 'info');
-
-      const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
-      const [origMatches, destMatches] = await Promise.all([
-        window.geocodingService.searchAddresses(rawOrigin, { city: this.currentCity, center: cityCenter, limit: 1 }),
-        window.geocodingService.searchAddresses(rawDest, { city: this.currentCity, center: cityCenter, limit: 1 })
-      ]);
-
-      if (origMatches && origMatches.length > 0) this.routeLocations.origin = origMatches[0];
-      if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
-
-      this.calculateSmartRoute();
+    if (parsedRoute && parsedRoute.origin && parsedRoute.dest) {
+      await this.triggerChatRoute(parsedRoute.origin, parsedRoute.dest, 1, parsedRoute.timeOffsetHours || 0);
       return;
     }
 
@@ -2182,9 +2209,9 @@ class GoogleMapsApp {
     if (matchedFlood) {
       window.mapEngine.map.flyTo([matchedFlood.lat, matchedFlood.lng], 16);
       if (matchedFlood.depth_cm > 0 && matchedFlood.danger_level !== 'safe') {
-        this.showToast(`🌊 Rốn ngập: ${matchedFlood.name} (${matchedFlood.depth_cm}cm)`, 'danger');
+        this.showToast(`Rốn ngập: ${matchedFlood.name} (${matchedFlood.depth_cm}cm)`, 'danger');
       } else {
-        this.showToast(`✅ Trạm đo ${matchedFlood.name}: Hiện tại khô ráo (0cm ngập)`, 'info');
+        this.showToast(`Trạm đo ${matchedFlood.name}: Hiện tại khô ráo (0cm ngập)`, 'info');
       }
       return;
     }
@@ -2228,12 +2255,10 @@ class GoogleMapsApp {
         const streetInfo = matchedStreetName 
           ? ` • Tuyến đường: ${matchedStreetName}` 
           : ` • Các đường lớn: ${(targetWard.mainStreets || []).slice(0, 3).join(', ')}`;
-        this.showToast(`🏛️ ${targetWard.name} (${targetWard.district})${streetInfo}`, 'info', 5000);
+        this.showToast(`${targetWard.name} (${targetWard.district})${streetInfo}`, 'info', 5000);
         return;
       }
     }
-
-
 
     // 3. Nếu là tìm kiếm địa chỉ, ngõ ngách, địa danh cụ thể (ví dụ: "Ngõ 168 Hào Nam", "Chợ Bến Thành", "Vincom")
     try {
@@ -2254,9 +2279,9 @@ class GoogleMapsApp {
 
         const icon = L.divIcon({
           className: 'gm-marker-container',
-          html: `<div style="font-size: 26px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
+          html: `<div class="gm-route-pin pin-dest" style="cursor: pointer;">•</div>`,
           iconSize: [30, 30],
-          iconAnchor: [15, 30]
+          iconAnchor: [15, 15]
         });
 
         this.searchResultMarker = L.marker([top.lat, top.lng], { icon }).addTo(window.mapEngine.map);
@@ -2265,13 +2290,13 @@ class GoogleMapsApp {
             <div style="font-weight: 700; font-size: 14px; color: #202124;">${top.title}</div>
             <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${top.subtitle}</div>
             <button onclick="window.appState.routeToLocation(${top.lat}, ${top.lng}, '${top.title.replace(/'/g, "\\'")}')" 
-              style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
-              🔀 Chỉ đường đến đây
+              style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              Chỉ đường đến đây
             </button>
           </div>
         `).openPopup();
 
-        this.showToast(`📍 Đã tìm thấy: ${top.title}`, 'info');
+        this.showToast(`Đã tìm thấy: ${top.title}`, 'info');
         return;
       }
     } catch (e) {
@@ -2284,12 +2309,22 @@ class GoogleMapsApp {
   }
 
   // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công)
-  async triggerChatRoute(originStr, destStr, avoidLevel = 1) {
+  async triggerChatRoute(originStr, destStr, avoidLevel = 1, timeOffsetHours = 0) {
     this.toggleDirectionsPanel(true);
     const originInput = document.getElementById('gm-route-origin');
     const destInput = document.getElementById('gm-route-dest');
     if (originInput) originInput.value = originStr;
     if (destInput) destInput.value = destStr;
+
+    if (timeOffsetHours > 0) {
+      const clampedOffset = Math.min(3, Math.max(0, Math.round(timeOffsetHours)));
+      const predictionSlider = document.getElementById('traffic-prediction-slider');
+      const labelEl = document.getElementById('prediction-time-label');
+      const labels = ['Hiện tại', '+1 Giờ tới', '+2 Giờ tới', '+3 Giờ tới'];
+      if (predictionSlider) predictionSlider.value = clampedOffset;
+      if (labelEl) labelEl.textContent = labels[clampedOffset];
+      await this.applyPredictionOffset(clampedOffset);
+    }
 
     this.currentAvoidLevel = avoidLevel;
     // Cập nhật giao diện radio 3 mức độ tránh né
@@ -2304,7 +2339,8 @@ class GoogleMapsApp {
       }
     });
 
-    this.showToast(`🚀 AI tự động vẽ lộ trình né ngập: ${originStr} ➔ ${destStr}`, 'info', 4500);
+    const timeNote = timeOffsetHours > 0 ? ` (Dự báo +${timeOffsetHours}h tới)` : '';
+    this.showToast(`Tự động vẽ lộ trình: ${originStr} đến ${destStr}${timeNote}`, 'info', 4500);
 
     const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
     const [origMatches, destMatches] = await Promise.all([
@@ -2353,7 +2389,7 @@ class GoogleMapsApp {
           city: this.currentCity,
           type: 'traffic_jam',
           categoryName: `AI Dự báo kẹt xe +${offset}h`,
-          icon: '🚗',
+          icon: '',
           isJam: true,
           speedKmh: p.level >= 4 ? 8 : 15,
           delaySeconds: p.level >= 4 ? 600 : 300,
@@ -2366,10 +2402,10 @@ class GoogleMapsApp {
         this.renderAllData();
 
         if (aiFloods.length > 0) {
-          this.showToast(`🌊 AI: Phát hiện ${aiFloods.length} điểm có nguy cơ ngập lụt sau +${offset}h tới!`, 'warning', 4500);
+          this.showToast(`AI: Phát hiện ${aiFloods.length} điểm có nguy cơ ngập lụt sau +${offset}h tới!`, 'warning', 4500);
         }
         if (aiTraffics.length > 0) {
-          this.showToast(`🤖 AI: Áp dụng ${aiTraffics.length} điểm dự báo kẹt xe cho +${offset}h tới.`, 'info', 4000);
+          this.showToast(`AI: Áp dụng ${aiTraffics.length} điểm dự báo kẹt xe cho +${offset}h tới.`, 'info', 4000);
         }
       } catch (err) {
         console.warn('Lỗi khi nạp dữ liệu dự báo AI:', err);
@@ -2377,7 +2413,7 @@ class GoogleMapsApp {
     } else {
       this.predictionOverlay = { floodPoints: [], trafficIncidents: [] };
       this.renderAllData();
-      this.showToast('✓ Đã khôi phục dữ liệu thời gian thực hiện tại', 'info', 2500);
+      this.showToast('Đã khôi phục dữ liệu thời gian thực hiện tại', 'info', 2500);
     }
   }
 
@@ -2391,9 +2427,8 @@ class GoogleMapsApp {
       const levelConfig = window.routingService.avoidanceLevels[this.currentAvoidLevel];
       resultsContainer.innerHTML = `
         <div style="padding: 16px; text-align: center;">
-          <div style="font-size: 24px; margin-bottom: 8px; animation: pulse-ring 1.6s infinite;">🔍</div>
-          <div style="font-size: 13px; color: #5f6368;">Đang tìm đường & phân tích ngõ ngách né ngập...</div>
-          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">Chế độ: ${levelConfig.icon} ${levelConfig.name}</div>
+          <div style="font-size: 13px; color: #5f6368; font-weight: 500;">Đang tìm đường & phân tích ngõ ngách né ngập...</div>
+          <div style="font-size: 11px; color: #70757a; margin-top: 4px;">Chế độ: ${levelConfig.name}</div>
         </div>
       `;
     }
@@ -2406,7 +2441,7 @@ class GoogleMapsApp {
     const destText = destInput?.value.trim();
 
     if (!originText || !destText) {
-      this.showToast('⚠️ Vui lòng nhập đầy đủ điểm đi và điểm đến', 'warning');
+      this.showToast('Vui lòng nhập đầy đủ điểm đi và điểm đến', 'warning');
       if (resultsContainer) {
         resultsContainer.innerHTML = `
           <div style="padding: 16px; text-align: center; color: #70757a; font-size: 13px;">
@@ -2456,13 +2491,12 @@ class GoogleMapsApp {
 
     // Nếu vẫn không tìm được tọa độ
     if (!origin || !dest) {
-      this.showToast('⚠️ Không tìm thấy địa chỉ cụ thể. Vui lòng bấm chọn gợi ý hoặc bấm "🗺️ Chọn trên bản đồ"', 'warning', 4500);
+      this.showToast('Không tìm thấy địa chỉ cụ thể. Vui lòng bấm chọn gợi ý hoặc bấm "Chọn trên bản đồ"', 'warning', 4500);
       if (resultsContainer) {
         resultsContainer.innerHTML = `
           <div style="padding: 14px; text-align: center;">
-            <div style="font-size: 20px; margin-bottom: 6px;">📍</div>
-            <div style="color: #d93025; font-size: 13px; font-weight: 500;">Không xác định được địa chỉ</div>
-            <div style="color: #70757a; font-size: 12px; margin-top: 4px;">Hãy chọn từ danh sách gợi ý khi gõ hoặc bấm biểu tượng 🗺️ để chọn trực tiếp trên bản đồ.</div>
+            <div style="color: #d93025; font-size: 13px; font-weight: 600;">Không xác định được địa chỉ</div>
+            <div style="color: #70757a; font-size: 12px; margin-top: 4px;">Hãy chọn từ danh sách gợi ý khi gõ hoặc bấm nút Bản đồ để chọn trực tiếp trên bản đồ.</div>
           </div>
         `;
       }
@@ -2519,7 +2553,7 @@ class GoogleMapsApp {
         const box = document.getElementById('gm-ai-suggestion');
         if (box) box.style.display = 'none';
 
-        this.showToast(`⛔ Không có đường đi được cho ${result.vehicleSpecs ? result.vehicleSpecs.name : 'xe'} do ngập sâu!`, 'danger', 5000);
+        this.showToast(`Không có đường đi được cho ${result.vehicleSpecs ? result.vehicleSpecs.name : 'xe'} do ngập sâu!`, 'danger', 5000);
         return;
       }
 
@@ -2536,7 +2570,7 @@ class GoogleMapsApp {
         this.renderRouteCards(resultsContainer, result);
       }
 
-      // 🤖 GỢI Ý THÔNG MINH TỰ ĐỘNG (Passive AI - Không tốn lượt API request)
+      // GỢI Ý THÔNG MINH TỰ ĐỘNG (Passive AI - Không tốn lượt API request)
       this.generateSmartSuggestion(result);
 
     } catch (e) {
@@ -2544,12 +2578,11 @@ class GoogleMapsApp {
       if (resultsContainer) {
         resultsContainer.innerHTML = `
           <div style="padding: 14px; text-align: center;">
-            <div style="font-size: 20px; margin-bottom: 6px;">😥</div>
-            <div style="color: #d93025; font-size: 13px; font-weight: 500;">Lỗi tính toán tuyến đường</div>
+            <div style="color: #d93025; font-size: 13px; font-weight: 600;">Lỗi tính toán tuyến đường</div>
             <div style="color: #70757a; font-size: 12px; margin-top: 4px;">${e.message}</div>
             <button onclick="window.appState.calculateSmartRoute()" 
               style="margin-top: 10px; padding: 6px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-              🔄 Thử lại
+              Thử lại
             </button>
           </div>
         `;
@@ -2558,7 +2591,7 @@ class GoogleMapsApp {
   }
 
   /**
-   * 🤖 GỢI Ý THÔNG MINH TỰ ĐỘNG (PASSIVE AI - KHÔNG TỐN LƯỢT API REQUEST)
+   * GỢI Ý THÔNG MINH TỰ ĐỘNG (PASSIVE AI - KHÔNG TỐN LƯỢT API REQUEST)
    * Phân tích ngữ cảnh: thời gian, phương tiện, thời tiết, ngập, kẹt xe
    * và đưa ra lời khuyên tùy từng trường hợp cụ thể.
    * Chạy 100% logic tất định trên Client, KHÔNG gọi Gemini API.
@@ -2575,7 +2608,6 @@ class GoogleMapsApp {
     const timeStr = `${String(vnHour).padStart(2,'0')}:${String(vnMinute).padStart(2,'0')}`;
     const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
     const dayName = dayNames[vnDay];
-    const dateStr = `${vnNow.getDate()}/${vnNow.getMonth()+1}/${vnNow.getFullYear()}`;
 
     const vehicle = this.currentVehicle; // 'motorbike', 'car', 'ebike', 'ecar'
     const vehicleNames = {
@@ -2627,121 +2659,120 @@ class GoogleMapsApp {
 
     // 1. Thời điểm trong ngày
     if (isPeakMorning) {
-      mainAdvice = `⏰ Đang là giờ cao điểm sáng (${timeStr}) — Lưu lượng xe rất đông trên các trục chính.`;
+      mainAdvice = `Đang là giờ cao điểm sáng (${timeStr}) — Lưu lượng xe rất đông trên các trục chính.`;
       if (vehicle === 'motorbike') {
-        details.push({ icon: '🛵', text: `Xe máy nên ưu tiên Tuyến An toàn (🛡️) đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
+        details.push({ text: `Xe máy nên ưu tiên Tuyến An toàn đi vòng qua các ngõ phố thông thoáng, tránh chen chúc trục đường lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `Ô tô nên đi theo Tuyến Cân bằng (⚖️) để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
+        details.push({ text: `Ô tô nên đi theo Tuyến Cân bằng để tối ưu cự ly. Hạn chế đường nhỏ vì khó quay đầu khi kẹt.` });
       }
     } else if (isPeakEvening) {
-      mainAdvice = `⏰ Đang là giờ cao điểm chiều (${timeStr}) — Mật độ phương tiện tan tầm rất lớn.`;
+      mainAdvice = `Đang là giờ cao điểm chiều (${timeStr}) — Mật độ phương tiện tan tầm rất lớn.`;
       if (vehicle === 'motorbike') {
-        details.push({ icon: '🛵', text: `Xe máy nên chọn Tuyến An toàn (🛡️). Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
+        details.push({ text: `Xe máy nên chọn Tuyến An toàn. Giờ tan tầm xe máy dễ bị kẹt khi trộn với ô tô ở các nút giao lớn.` });
       } else {
-        details.push({ icon: '🚗', text: `Ô tô nên chọn Tuyến Cân bằng (⚖️) hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
+        details.push({ text: `Ô tô nên chọn Tuyến Cân bằng hoặc chờ sau 19h30 khi lưu lượng giảm rõ rệt.` });
       }
     } else if (isLateNight) {
-      mainAdvice = `🌙 Ban đêm (${timeStr}) — Đường phố rất vắng, di chuyển thuận lợi.`;
-      details.push({ icon: '⚡', text: `Lúc này mọi tuyến đều thông thoáng. Chọn Tuyến Nhanh nhất (⚡) để tiết kiệm thời gian!` });
-      details.push({ icon: '⚠️', text: `Chú ý: Một số đoạn có rào chắn thi công đêm (trải thảm nhựa / sửa cống). Quan sát đèn hiệu.` });
+      mainAdvice = `Ban đêm (${timeStr}) — Đường phố rất vắng, di chuyển thuận lợi.`;
+      details.push({ text: `Lúc này mọi tuyến đều thông thoáng. Chọn Tuyến Nhanh nhất để tiết kiệm thời gian!` });
+      details.push({ text: `Chú ý: Một số đoạn có rào chắn thi công đêm (trải thảm nhựa / sửa cống). Quan sát đèn hiệu.` });
     } else if (isEarlyMorning) {
-      mainAdvice = `🌅 Đầu sáng sớm (${timeStr}) — Tầm nhìn hạn chế, đường chưa đông.`;
-      details.push({ icon: '⚡', text: `Giao thông thưa thớt, bạn có thể chọn Tuyến Nhanh nhất (⚡). Bật đèn phương tiện sáng rõ!` });
+      mainAdvice = `Đầu sáng sớm (${timeStr}) — Tầm nhìn hạn chế, đường chưa đông.`;
+      details.push({ text: `Giao thông thưa thớt, bạn có thể chọn Tuyến Nhanh nhất. Bật đèn phương tiện sáng rõ!` });
     } else if (isMidday && !isWeekend) {
-      mainAdvice = `☀️ Giữa trưa (${timeStr}) — Giao thông nội thành tương đối thoáng.`;
-      details.push({ icon: '⚖️', text: `Lượng xe vừa phải. Chọn Tuyến Cân bằng (⚖️) để đi nhanh và không quá xa so với đường thẳng.` });
+      mainAdvice = `Giữa trưa (${timeStr}) — Giao thông nội thành tương đối thoáng.`;
+      details.push({ text: `Lượng xe vừa phải. Chọn Tuyến Cân bằng để đi nhanh và không quá xa so với đường thẳng.` });
     } else if (isWeekend && !isPeakHour) {
-      mainAdvice = `🎉 ${dayName} (${timeStr}) — Cuối tuần giao thông khá dễ chịu.`;
-      details.push({ icon: '⚡', text: `Cuối tuần đường ít xe, chọn Tuyến Nhanh nhất (⚡) hoàn toàn phù hợp!` });
+      mainAdvice = `${dayName} (${timeStr}) — Cuối tuần giao thông khá dễ chịu.`;
+      details.push({ text: `Cuối tuần đường ít xe, chọn Tuyến Nhanh nhất hoàn toàn phù hợp!` });
     } else {
-      mainAdvice = `📊 ${dayName} ${timeStr} — Lưu lượng giao thông ở mức trung bình.`;
-      details.push({ icon: '⚖️', text: `Giao thông ổn định. Tuyến Cân bằng (⚖️) là lựa chọn hợp lý cho khung giờ này.` });
+      mainAdvice = `${dayName} ${timeStr} — Lưu lượng giao thông ở mức trung bình.`;
+      details.push({ text: `Giao thông ổn định. Tuyến Cân bằng là lựa chọn hợp lý cho khung giờ này.` });
     }
 
     // 2. Thời tiết & Mưa ngập
     if (isStormRain) {
-      details.push({ icon: '⛈️', text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn (🛡️) né 100% rốn ngập. ${vehicle === 'motorbike' ? 'Xe máy cực kỳ dễ chết máy bugi!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
+      details.push({ text: `Mưa xối xả (${maxRain} mm/h)! Bắt buộc chọn Tuyến An toàn né 100% rốn ngập. ${vehicle === 'motorbike' ? 'Xe máy cực kỳ dễ chết máy bugi!' : 'Ô tô gầm thấp nguy cơ thủy kích!'}` });
     } else if (isHeavyRain) {
-      details.push({ icon: '🌧️', text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${vehicle === 'motorbike' ? 'Xe máy nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
+      details.push({ text: `Đang mưa vừa (${maxRain} mm/h). Các rốn ngập trũng bắt đầu đọng nước 15-20cm. ${vehicle === 'motorbike' ? 'Xe máy nên đi vòng tránh vùng trũng.' : 'Ô tô giữ khoảng cách, giảm tốc qua vũng.'}` });
     } else if (isRaining) {
-      details.push({ icon: '🌦️', text: `Mưa nhẹ rải rác (${maxRain} mm/h). Đường hơi trơn, bật đèn và giảm tốc độ.` });
+      details.push({ text: `Mưa nhẹ rải rác (${maxRain} mm/h). Đường hơi trơn, bật đèn và giảm tốc độ.` });
     }
     if (avgTemp >= 37) {
-      details.push({ icon: '🌡️', text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${vehicle === 'car' ? 'Kiểm tra nước làm mát ô tô.' : ''}` });
+      details.push({ text: `Nhiệt độ cao (${avgTemp}°C). Nếu đi xa hãy nghỉ giữa đường, uống nước đủ. ${vehicle === 'car' ? 'Kiểm tra nước làm mát ô tô.' : ''}` });
     }
 
     // 3. Ngập trên tuyến
     if (hasDeepFlood) {
       const worstFlood = routeFloods.sort((a,b) => b.depth_cm - a.depth_cm)[0];
-      details.push({ icon: '🌊', text: `⚠️ Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${vehicle === 'motorbike' ? 'Xe máy KHÔNG THỂ QUA — hệ thống đã tự động bẻ hướng sang đường cao ráo!' : 'Ô tô gầm thấp nguy cơ thủy kích, chọn Tuyến An toàn!'}` });
+      details.push({ text: `Ngập sâu ${worstFlood.depth_cm}cm tại ${worstFlood.name}. ${vehicle === 'motorbike' ? 'Xe máy KHÔNG THỂ QUA — hệ thống đã tự động bẻ hướng sang đường cao ráo!' : 'Ô tô gầm thấp nguy cơ thủy kích, chọn Tuyến An toàn!'}` });
     } else if (hasRouteFlood) {
-      details.push({ icon: '💧', text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. Giảm tốc khi qua vùng nước đọng.` });
+      details.push({ text: `Có điểm ngập nhẹ trên tuyến nhưng vẫn đi được. Giảm tốc khi qua vùng nước đọng.` });
     }
 
     // 4. Kẹt xe trên tuyến
     if (hasRouteJam) {
       const worstJam = routeTraffics.filter(t => t.isJam).sort((a,b) => (b.delaySeconds||0) - (a.delaySeconds||0))[0];
       const delayMin = worstJam ? Math.round((worstJam.delaySeconds || 300) / 60) : 5;
-      details.push({ icon: '🚦', text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${vehicle === 'motorbike' ? 'Xe máy có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
+      details.push({ text: `Ùn tắc trên tuyến (trễ ~${delayMin} phút). ${vehicle === 'motorbike' ? 'Xe máy có thể luồn lách, ảnh hưởng nhẹ.' : 'Ô tô nên chuyển sang tuyến ít tắc hơn.'}` });
     }
 
     // 5. Phương tiện cụ thể
     if (vehicle === 'ebike') {
-      details.push({ icon: '⚡', text: `Xe máy điện: Động cơ bánh sau và khoang pin sàn rất nhạy cảm với nước. Tuyệt đối không qua rốn ngập sâu >15cm.` });
+      details.push({ text: `Xe máy điện: Động cơ bánh sau và khoang pin sàn rất nhạy cảm với nước. Tuyệt đối không qua rốn ngập sâu >15cm.` });
       if (isLongTrip) {
-        details.push({ icon: '🔋', text: `Quãng đường ~${distKm}km: Lưu ý kiểm tra dung lượng pin còn lại trước khi xuất phát.` });
+        details.push({ text: `Quãng đường ~${distKm}km: Lưu ý kiểm tra dung lượng pin còn lại trước khi xuất phát.` });
       }
     } else if (vehicle === 'ecar') {
-      details.push({ icon: '🚙', text: `Ô tô điện: Bộ pin gầm xe chống nước IP67 nhưng vẫn cần tránh rốn ngập sâu trên 30cm để đảm bảo an toàn cảm biến.` });
+      details.push({ text: `Ô tô điện: Bộ pin gầm xe chống nước IP67 nhưng vẫn cần tránh rốn ngập sâu trên 30cm để đảm bảo an toàn cảm biến.` });
       if (isPeakHour) {
-        details.push({ icon: '🅿️', text: `Giờ cao điểm: Ưu tiên điểm đỗ có sẵn trạm sạc nếu cần bổ sung năng lượng.` });
+        details.push({ text: `Giờ cao điểm: Ưu tiên điểm đỗ có sẵn trạm sạc nếu cần bổ sung năng lượng.` });
       }
     } else if (vehicle === 'motorbike') {
       if (isLongTrip) {
-        details.push({ icon: '🏍️', text: `Quãng đường ~${distKm}km khá dài cho xe máy. Nếu chở đồ cồng kềnh / nặng, ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng ⚖️).` });
+        details.push({ text: `Quãng đường ~${distKm}km khá dài cho xe máy. Nếu chở đồ cồng kềnh / nặng, ưu tiên tuyến ít rẽ ngoặt (Tuyến Cân bằng).` });
       }
       if (isRaining || isHeavyRain) {
-        details.push({ icon: '🧥', text: `Chuẩn bị áo mưa bộ. Tránh đỗ xe ở tầng hầm khu vực trũng.` });
+        details.push({ text: `Chuẩn bị áo mưa bộ. Tránh đỗ xe ở tầng hầm khu vực trũng.` });
       }
     } else {
       if (isLongTrip) {
-        details.push({ icon: '🚗', text: `Quãng đường ~${distKm}km. Ô tô nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu.` });
+        details.push({ text: `Quãng đường ~${distKm}km. Ô tô nên đi trục chính rộng, hạn chế ngõ hẹp khó quay đầu.` });
       }
       if (isPeakHour) {
-        details.push({ icon: '🅿️', text: `Giờ cao điểm — Cân nhắc bãi đỗ xe tại điểm đến trước khi xuất phát.` });
+        details.push({ text: `Giờ cao điểm — Cân nhắc bãi đỗ xe tại điểm đến trước khi xuất phát.` });
       }
     }
 
     // 6. Kết luận tuyến đề xuất
-    const recLabel = recommended.avoidLevel === 1 ? '🛡️ An toàn tuyệt đối' : recommended.avoidLevel === 2 ? '⚖️ Cân bằng thông minh' : '⚡ Nhanh nhất';
-    details.push({ icon: '✅', text: `<strong>Đề xuất: ${recLabel}</strong> — ${recommended.distanceKm} km, ~${recommended.durationMin} phút (${recommended.trafficDesc}).` });
+    const recLabel = recommended.avoidLevel === 1 ? 'An toàn tuyệt đối' : recommended.avoidLevel === 2 ? 'Cân bằng thông minh' : 'Nhanh nhất';
+    details.push({ text: `<strong>Đề xuất: ${recLabel}</strong> — ${recommended.distanceKm} km, ~${recommended.durationMin} phút (${recommended.trafficDesc}).` });
 
     // ====== RENDER HTML ======
     const contextTags = [
-      { icon: '🕐', text: `${timeStr} ${dayName}` },
-      { icon: vehicle === 'ebike' ? '⚡' : (vehicle === 'ecar' ? '🚙' : (vehicle === 'motorbike' ? '🛵' : '🚗')), text: vehicleName },
-      { icon: maxRain >= 1 ? '🌧️' : '☀️', text: maxRain >= 1 ? `Mưa ${maxRain}mm` : `${avgTemp}°C Khô ráo` },
-      { icon: '🌊', text: `${cityFloods.length} rốn ngập` },
-      { icon: '🚦', text: `${cityJams.length} điểm tắc` }
+      { text: `${timeStr} ${dayName}` },
+      { text: vehicleName },
+      { text: maxRain >= 1 ? `Mưa ${maxRain}mm` : `${avgTemp}°C Khô ráo` },
+      { text: `${cityFloods.length} rốn ngập` },
+      { text: `${cityJams.length} điểm tắc` }
     ];
 
     box.innerHTML = `
       <div class="gm-suggestion-header">
-        <span class="sug-icon">🤖</span>
         <span>Gợi ý thông minh</span>
-        <span class="sug-badge">⚡ Tự động • Không tốn lượt</span>
+        <span class="sug-badge">Tự động • Không tốn lượt</span>
       </div>
       <div class="gm-suggestion-body">
         <div class="sug-main-advice">${mainAdvice}</div>
         <ul class="sug-detail-list">
-          ${details.map(d => `<li><span class="sug-li-icon">${d.icon}</span><span>${d.text}</span></li>`).join('')}
+          ${details.map(d => `<li><span>•</span><span>${d.text}</span></li>`).join('')}
         </ul>
       </div>
       <div class="gm-suggestion-context">
-        ${contextTags.map(t => `<span class="ctx-tag"><span class="ctx-icon">${t.icon}</span> ${t.text}</span>`).join('')}
+        ${contextTags.map(t => `<span class="ctx-tag">${t.text}</span>`).join('')}
       </div>
-      <div class="gm-suggestion-toggle" onclick="this.parentElement.querySelector('.gm-suggestion-body').style.display = this.parentElement.querySelector('.gm-suggestion-body').style.display === 'none' ? 'block' : 'none'; this.textContent = this.textContent.includes('Thu gọn') ? '📖 Xem gợi ý chi tiết' : '📕 Thu gọn'">
-        📕 Thu gọn
+      <div class="gm-suggestion-toggle" onclick="this.parentElement.querySelector('.gm-suggestion-body').style.display = this.parentElement.querySelector('.gm-suggestion-body').style.display === 'none' ? 'block' : 'none'; this.textContent = this.textContent.includes('Thu gọn') ? 'Xem gợi ý chi tiết' : 'Thu gọn'">
+        Thu gọn
       </div>
     `;
     box.style.display = 'block';
@@ -2776,7 +2807,7 @@ class GoogleMapsApp {
 
     const spotsListHtml = blockedFloods.map(f => `
       <li style="margin-bottom: 6px;">
-        🌊 <strong>${f.name}:</strong> Ngập sâu <strong style="color: #d93025;">${f.depth_cm}cm</strong>
+        <strong>${f.name}:</strong> Ngập sâu <strong style="color: #d93025;">${f.depth_cm}cm</strong>
         <span style="color: #70757a; font-size: 11px;"> (vượt quá giới hạn lội nước ${specs.maxPassableDepth}cm của ${specs.name})</span>
       </li>
     `).join('');
@@ -2784,7 +2815,6 @@ class GoogleMapsApp {
     container.innerHTML = `
       <div class="gm-impassable-card" style="margin: 12px; padding: 16px; background: #fff5f5; border: 1.5px solid #ea4335; border-radius: 10px;">
         <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
-          <span style="font-size: 26px; line-height: 1;">⛔</span>
           <div>
             <div style="color: #d93025; font-size: 14px; font-weight: 700; text-transform: uppercase;">
               Không có tuyến đường đi được cho ${specs.name}
@@ -2796,7 +2826,7 @@ class GoogleMapsApp {
         </div>
 
         <div style="font-size: 12px; color: #3c4043; line-height: 1.5; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #fad2cf;">
-          ⚠️ <strong>MoveSafe bảo vệ xe của bạn:</strong> Hệ thống không chỉ đường liều lĩnh qua các rốn ngập sâu vì nguy cơ cốt tử: 
+          <strong>MoveSafe bảo vệ xe của bạn:</strong> Hệ thống không chỉ đường liều lĩnh qua các rốn ngập sâu vì nguy cơ cốt tử: 
           <strong style="color: #d93025;">${specs.hazardRisk}</strong>.
         </div>
 
@@ -2810,7 +2840,7 @@ class GoogleMapsApp {
         ` : ''}
 
         <div style="margin-top: 12px; padding: 8px 10px; background: #e8f0fe; border-radius: 6px; font-size: 11px; color: #1a73e8; line-height: 1.4;">
-          💡 <strong>Khuyến nghị:</strong> Bạn nên tạm hoãn di chuyển 30-45 phút chờ các trạm bơm tiêu thoát nước, hoặc chuyển sang phương tiện gầm cao (SUV / bán tải) hoặc tuyến metro trên cao.
+          <strong>Khuyến nghị:</strong> Bạn nên tạm hoãn di chuyển 30-45 phút chờ các trạm bơm tiêu thoát nước, hoặc chuyển sang phương tiện gầm cao (SUV / bán tải) hoặc tuyến metro trên cao.
         </div>
       </div>
     `;
@@ -2857,8 +2887,8 @@ class GoogleMapsApp {
           <span style="color: #5f6368; font-size: 11px;">${route.trafficDesc}</span><br>
           <div style="margin-top: 4px; font-size: 11px; font-weight: 600; color: ${lineColor};">${route.tagText}</div>
           <button onclick="window.appState.selectRouteOnMap(${index})" 
-            style="margin-top: 8px; width: 100%; padding: 5px 10px; background: ${lineColor}; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;">
-            👉 Chọn tuyến đường này
+            style="margin-top: 8px; width: 100%; padding: 5px 10px; background: ${lineColor}; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">
+            Chọn tuyến đường này
           </button>
         </div>
       `);
@@ -2882,7 +2912,7 @@ class GoogleMapsApp {
 
       mapEng.layers.routeSafe.bindPopup(`
         <div style="font-family: var(--font-family); padding: 4px;">
-          <strong style="color: ${recommended.color}; font-size: 13px;">✓ ${recommended.label} (Đang chọn)</strong><br>
+          <strong style="color: ${recommended.color}; font-size: 13px;">${recommended.label} (Đang chọn)</strong><br>
           <span style="color: #202124; font-weight: 600;">${recommended.distanceKm} km • ~${recommended.durationMin} phút</span><br>
           <span style="font-size: 11px; color: #3c4043;">${recommended.trafficDesc}</span><br>
           <div style="margin-top: 4px; font-size: 11px; color: ${recommended.color}; font-weight: 700;">${recommended.tagText}</div>
@@ -2893,13 +2923,58 @@ class GoogleMapsApp {
     }
   }
 
+  getCoordDistanceMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  getNearbyEVStationsForRoute(routeCoords, maxStations = 3) {
+    const allStations = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const cityStations = allStations.filter(s => !s.city || s.city === this.currentCity);
+    if (!cityStations.length || !routeCoords || !routeCoords.length) return [];
+
+    const sampleStep = Math.max(1, Math.floor(routeCoords.length / 30));
+    const sampledPoints = [];
+    for (let i = 0; i < routeCoords.length; i += sampleStep) {
+      sampledPoints.push(routeCoords[i]);
+    }
+    sampledPoints.push(routeCoords[routeCoords.length - 1]);
+
+    const results = [];
+    cityStations.forEach(st => {
+      if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
+      let minDist = Infinity;
+      for (let p of sampledPoints) {
+        const d = this.getCoordDistanceMeters(p[0], p[1], st.lat, st.lng);
+        if (d < minDist) minDist = d;
+      }
+      if (minDist <= 3000) {
+        results.push({
+          ...st,
+          routeDistMeters: Math.round(minDist)
+        });
+      }
+    });
+
+    results.sort((a, b) => a.routeDistMeters - b.routeDistMeters);
+    return results.slice(0, maxStations);
+  }
+
   // Render summary bar
   renderRouteSummary(container, result) {
     if (result.noPassableRoute) {
       container.innerHTML = `
         <div style="display: flex; align-items: center; width: 100%; gap: 8px;">
           <span class="gm-summary-badge" style="background: #d93025; color: #fff;">
-            ⛔ Không thể đi
+            Không thể đi
           </span>
           <span class="gm-summary-text" style="color: #d93025; font-weight: 600;">
             ${result.message}
@@ -2923,7 +2998,7 @@ class GoogleMapsApp {
       const diff = Math.round(recommended.durationMin - fastestRoute.durationMin);
       diffHtml = `
         <div style="font-size: 12px; color: #1e8e3e; margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-          <span style="font-size: 15px;">💡</span> Lộ trình này chậm hơn ${diff} phút nhưng đảm bảo an toàn kỹ thuật cho ${vehicleSpecs ? vehicleSpecs.name : 'xe'}.
+          Lộ trình này chậm hơn ${diff} phút nhưng đảm bảo an toàn kỹ thuật cho ${vehicleSpecs ? vehicleSpecs.name : 'xe'}.
         </div>
       `;
     }
@@ -2933,9 +3008,46 @@ class GoogleMapsApp {
       const b = blockedRoutes[0];
       avoidedNotice = `
         <div style="font-size: 11px; color: #137333; margin-top: 6px; padding: 5px 8px; background: #e6f4ea; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-          <span>🛡️</span> <strong>Đã tự động né ngập:</strong> Trục ngắn nhất (${b.distanceKm} km) bị loại bỏ vì ${b.reason}.
+          <strong>Đã tự động né ngập:</strong> Trục ngắn nhất (${b.distanceKm} km) bị loại bỏ vì ${b.reason}.
         </div>
       `;
+    }
+
+    let evSuggestionsHtml = '';
+    const routeCoords = recommended.polyline || recommended.coordinates;
+    if ((this.currentVehicle === 'ecar' || this.currentVehicle === 'ebike') && routeCoords && routeCoords.length > 0) {
+      const nearbyEVs = this.getNearbyEVStationsForRoute(routeCoords);
+      if (nearbyEVs.length > 0) {
+        const estBattery = Math.max(1, Math.round(recommended.distanceKm * 0.42));
+        evSuggestionsHtml = `
+          <div class="ev-route-suggestions">
+            <div class="ev-route-header">
+              <div class="ev-route-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Trạm sạc dọc lộ trình (${nearbyEVs.length} trạm tiện đường)</span>
+              </div>
+              <span class="ev-battery-tag">Tiêu thụ ước tính: ~${estBattery}% pin (${recommended.distanceKm} km)</span>
+            </div>
+            <div class="ev-stations-inline-list">
+              ${nearbyEVs.map(st => `
+                <div class="ev-station-inline-card" onclick="window.mapEngine && window.mapEngine.focusEVStation('${st.id}')" title="Bấm để xem vị trí trên bản đồ">
+                  <div class="ev-station-info">
+                    <div class="ev-station-name">${st.name}</div>
+                    <div class="ev-station-meta">
+                      <span class="ev-meta-power">⚡ ${st.maxPowerKw ? st.maxPowerKw + 'kW' : 'Đổi pin'}</span>
+                      <span class="ev-meta-dist">Cách tuyến ~${st.routeDistMeters < 1000 ? st.routeDistMeters + 'm' : (st.routeDistMeters/1000).toFixed(1) + 'km'}</span>
+                      <span class="ev-meta-op">${st.operator || 'VinFast'}</span>
+                    </div>
+                  </div>
+                  <button class="ev-btn-view" type="button">Xem trạm</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
     }
 
     container.innerHTML = `
@@ -2949,12 +3061,13 @@ class GoogleMapsApp {
           </div>
           ${vehicleSpecs ? `
             <span style="font-size: 11px; padding: 2px 8px; background: #f1f3f4; border-radius: 12px; color: #3c4043; font-weight: 600;" title="Ngưỡng an toàn kỹ thuật của ${vehicleSpecs.name}">
-              ${vehicleSpecs.icon} ${vehicleSpecs.name} (Ngưỡng lội: ${vehicleSpecs.maxPassableDepth}cm)
+              ${vehicleSpecs.name} (Ngưỡng lội: ${vehicleSpecs.maxPassableDepth}cm)
             </span>
           ` : ''}
         </div>
         ${avoidedNotice}
         ${diffHtml}
+        ${evSuggestionsHtml}
       </div>
     `;
     container.style.display = 'flex';
@@ -2990,8 +3103,8 @@ class GoogleMapsApp {
         const warningItems = route.warnings.slice(0, 3).map(w => {
           const dotClass = w.hazardType === 'flood' ? 'dot-flood' : 'dot-traffic';
           const label = w.hazardType === 'flood' 
-            ? `💧 Nước nông ${w.depth_cm}cm - ${w.name} (Đi an toàn)`
-            : `🚗 ${w.description || w.categoryName || 'Ùn tắc'}`;
+            ? `Nước nông ${w.depth_cm}cm - ${w.name} (Đi an toàn)`
+            : `${w.description || w.categoryName || 'Ùn tắc'}`;
           return `<div class="gm-warning-item"><span class="warn-dot ${dotClass}"></span> ${label}</div>`;
         }).join('');
         
@@ -3033,7 +3146,7 @@ class GoogleMapsApp {
 
         stepsHtml = `
           <div class="gm-route-steps-toggle" onclick="event.stopPropagation(); window.appState.toggleRouteSteps(${index})">
-            📋 Chi tiết lộ trình & các ngõ ngách (${route.steps.length} bước) ▾
+            Chi tiết lộ trình & các ngõ ngách (${route.steps.length} bước) ▾
           </div>
           <div class="gm-route-steps-list" id="steps-list-${index}" style="display: none;">
             ${stepItems}
@@ -3045,7 +3158,7 @@ class GoogleMapsApp {
         <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
           ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
           <div class="gm-route-label ${labelClass}" style="color: ${route.color};">
-            ${route.avoidLevel === 1 ? '🛡️' : route.avoidLevel === 2 ? '⚖️' : '⚡'} ${route.label}
+            ${route.label}
           </div>
           <div class="gm-route-time ${timeClass}">
             <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
@@ -3055,13 +3168,13 @@ class GoogleMapsApp {
 
           <!-- Huy hiệu kiểm định kỹ thuật phương tiện -->
           <div style="font-size: 11px; color: #137333; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-            <span>✓</span> Tuyến xe ĐI ĐƯỢC an toàn (${vehicleSpecs ? vehicleSpecs.name : 'Phương tiện'})
+            <span>•</span> Tuyến xe ĐI ĐƯỢC an toàn (${vehicleSpecs ? vehicleSpecs.name : 'Phương tiện'})
           </div>
           
           <!-- Phân loại mức độ tắc đường trực quan (Traffic Congestion Mini-Bar) -->
           <div class="gm-traffic-bar-container">
             <div class="gm-traffic-bar-header">
-              <span class="gm-traffic-bar-title">🚦 Đánh giá lưu thông:</span>
+              <span class="gm-traffic-bar-title">Đánh giá lưu thông:</span>
               <span class="gm-traffic-bar-ratio" style="color: ${route.color};">
                 ${jam === 0 ? '100% Thông thoáng' : `${freeFlow}% thoáng • ${jam}% kẹt`}
               </span>
@@ -3091,7 +3204,7 @@ class GoogleMapsApp {
         <div style="margin: 12px 0 6px 0; padding: 10px 12px; background: #fff8e1; border: 1px dashed #f9ab00; border-radius: 8px;">
           <div style="font-size: 12px; font-weight: 700; color: #b06000; display: flex; align-items: center; justify-content: space-between; cursor: pointer;"
                onclick="const d = this.nextElementSibling; d.style.display = d.style.display === 'none' ? 'block' : 'none';">
-            <span>🛡️ MoveSafe đã chủ động loại bỏ ${blockedRoutes.length} trục đường ngập sâu</span>
+            <span>MoveSafe đã chủ động loại bỏ ${blockedRoutes.length} trục đường ngập sâu</span>
             <span style="font-size: 11px;">Chi tiết ▾</span>
           </div>
           <div style="display: none; margin-top: 8px; font-size: 11px; color: #5f6368; line-height: 1.4;">

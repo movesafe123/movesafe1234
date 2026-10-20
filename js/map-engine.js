@@ -741,29 +741,55 @@ class MapEngine {
           const stations = await window.supabaseService.getEVStations(currentCity);
           if (Array.isArray(stations)) {
             this._evStationsData = stations;
+
+            // Cập nhật số lượng trạm sạc trên chip filter
+            const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
+            if (countEl) countEl.textContent = `${stations.length} trạm`;
+
             stations.forEach(st => {
               if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
               
               const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
+              const isSuperFast = st.maxPowerKw && st.maxPowerKw >= 120;
               const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
-              const pinClass = isSwap ? 'ev-swap' : (isFast ? 'ev-fast' : 'ev-standard');
+              const pinClass = isSwap ? 'ev-swap' : (isSuperFast ? 'ev-super-fast' : (isFast ? 'ev-fast' : 'ev-standard'));
 
-              const zapSvg = `<svg class="ev-pin-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
-              const powerLabel = isSwap ? 'Đổi pin' : (st.maxPowerKw ? `${st.maxPowerKw}kW` : (isFast ? 'DC Fast' : '22kW'));
+              let primaryLabel = 'Trạm sạc';
+              let subLabel = '22kW';
+              let iconSvg = '';
 
+              if (isSwap) {
+                primaryLabel = 'Đổi pin';
+                subLabel = 'Selex';
+                iconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 21h5v-5"></path></svg>`;
+              } else {
+                primaryLabel = isSuperFast ? 'Siêu sạc' : 'Trạm sạc';
+                subLabel = st.maxPowerKw ? `${st.maxPowerKw}kW` : (isFast ? 'DC Fast' : '22kW');
+                iconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+              }
+
+              const safeTitle = String(st.name || 'Trạm sạc xe điện').replace(/"/g, '&quot;');
               const pinHtml = `
-                <div class="gm-ev-pin ${pinClass}" title="${String(st.name || 'Trạm sạc').replace(/"/g, '&quot;')} (${powerLabel})">
-                  ${zapSvg}
-                  <span>${powerLabel}</span>
+                <div class="gm-ev-marker ${pinClass}" title="${safeTitle} - ${subLabel}">
+                  <div class="ev-marker-pill">
+                    <div class="ev-marker-icon-wrap">
+                      ${iconSvg}
+                    </div>
+                    <div class="ev-marker-content">
+                      <span class="ev-marker-label">${primaryLabel}</span>
+                      <span class="ev-marker-sub">${subLabel}</span>
+                    </div>
+                  </div>
+                  <div class="ev-marker-tip"></div>
                 </div>
               `;
 
               const icon = L.divIcon({
                 className: 'gm-ev-pin-container',
                 html: pinHtml,
-                iconSize: [66, 24],
-                iconAnchor: [33, 12],
-                popupAnchor: [0, -14]
+                iconSize: [110, 36],
+                iconAnchor: [55, 34],
+                popupAnchor: [0, -32]
               });
 
               const marker = L.marker([st.lat, st.lng], { icon: icon });
@@ -878,6 +904,9 @@ class MapEngine {
 
   focusEVStation(stationIdOrName) {
     if (!this.layers.evLayer) return false;
+    if (!this.map.hasLayer(this.layers.evLayer)) {
+      this.toggleEV(true);
+    }
     const term = String(stationIdOrName || '').toLowerCase().trim();
     let foundMarker = null;
 
@@ -890,13 +919,17 @@ class MapEngine {
 
     if (foundMarker) {
       const latlng = foundMarker.getLatLng();
-      this.map.flyTo(latlng, 16);
+      this.map.flyTo(latlng, 16, { animate: true, duration: 0.8 });
       setTimeout(() => {
         foundMarker.openPopup();
-      }, 500);
+      }, 900);
       return true;
     }
     return false;
+  }
+
+  focusOnEVStation(stationIdOrName) {
+    return this.focusEVStation(stationIdOrName);
   }
 
   zoomIn() { if (this.map) this.map.zoomIn(); }

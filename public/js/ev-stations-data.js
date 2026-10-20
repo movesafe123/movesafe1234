@@ -1,0 +1,4550 @@
+/**
+ * MoveSafe VN - Dữ liệu Mạng lưới Trạm sạc Xe điện Toàn quốc (153 trạm)
+ * Tự động nạp sẵn cho Client, đảm bảo hiển thị 100% trạm sạc trên mọi môi trường
+ */
+(function() {
+  var evStations = [
+  {
+    "id": "ev-hn-smartcity",
+    "name": "Trạm sạc Siêu Nhanh Vincom Smart City",
+    "operator": "VinFast",
+    "address": "Khu đô thị Vinhomes Smart City, Tây Mỗ, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9942,
+    "lng": 105.7482,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 8
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 và bãi đỗ xe nổi phân khu Sapphire"
+  },
+  {
+    "id": "ev-hn-metropolis",
+    "name": "Trạm sạc Vincom Center Liễu Giai",
+    "operator": "VinFast",
+    "address": "29 Liễu Giai, Ngọc Khánh, Ba Đình, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0319,
+    "lng": 105.8115,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B2 sảnh thương mại"
+  },
+  {
+    "id": "ev-hn-royalcity",
+    "name": "Trạm sạc Vincom Mega Mall Royal City",
+    "operator": "VinFast",
+    "address": "72A Nguyễn Trãi, Thượng Đình, Thanh Xuân, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0028,
+    "lng": 105.8155,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 18,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 8
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B3 cột R12-R18"
+  },
+  {
+    "id": "ev-hn-oceanpark1",
+    "name": "Trạm sạc Siêu Nhanh Ocean Park 1",
+    "operator": "VinFast",
+    "address": "Khu đô thị Vinhomes Ocean Park, Gia Lâm, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9925,
+    "lng": 105.9458,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 24,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 10
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Nhà xe nổi 5 tầng khu Sapphire 2"
+  },
+  {
+    "id": "ev-hn-timescity",
+    "name": "Trạm sạc Vincom Mega Mall Times City",
+    "operator": "VinFast",
+    "address": "458 Minh Khai, Vĩnh Tuy, Hai Bà Trưng, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.995,
+    "lng": 105.8682,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B2 sảnh T11"
+  },
+  {
+    "id": "ev-hn-tranduyhung",
+    "name": "Trạm sạc Vincom Trần Duy Hưng",
+    "operator": "VinFast",
+    "address": "119 Trần Duy Hưng, Trung Hòa, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0069,
+    "lng": 105.7951,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B3 sảnh chính"
+  },
+  {
+    "id": "ev-hn-aeonhadong",
+    "name": "Trạm sạc Aeon Mall Hà Đông",
+    "operator": "VinFast",
+    "address": "Dương Nội, Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9818,
+    "lng": 105.7538,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời Cổng 3"
+  },
+  {
+    "id": "ev-hn-aeonlongbien",
+    "name": "Trạm sạc Aeon Mall Long Biên",
+    "operator": "VinFast",
+    "address": "27 Cổ Linh, Long Biên, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0268,
+    "lng": 105.8988,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi xe ngoài trời Cổng Nam"
+  },
+  {
+    "id": "ev-hn-evone-tayho",
+    "name": "Trạm sạc EVOne Hồ Tây",
+    "operator": "EVOne",
+    "address": "Lạc Long Quân, Nhật Tân, Tây Hồ, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.062,
+    "lng": 105.823,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe công cộng Vườn hoa Lạc Long Quân"
+  },
+  {
+    "id": "ev-hn-selex-bachkhoa",
+    "name": "Tủ đổi pin Xe máy điện Selex Bách Khoa",
+    "operator": "Selex Motors",
+    "address": "Khuôn viên Đại học Bách Khoa, Hai Bà Trưng, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0041,
+    "lng": 105.8437,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cổng Trần Đại Nghĩa"
+  },
+  {
+    "id": "ev-hn-porsche",
+    "name": "Trạm sạc Siêu Nhanh Porsche Studio Hanoi",
+    "operator": "Porsche",
+    "address": "Capital Place, 29 Liễu Giai, Ngọc Khánh, Ba Đình, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0325,
+    "lng": 105.8122,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 350,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 350,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Hầm B1 tháp Capital Place, hỗ trợ chuẩn sạc điện cao thế 800V"
+  },
+  {
+    "id": "ev-hn-batrieu",
+    "name": "Trạm sạc Vincom Center Bà Triệu",
+    "operator": "VinFast",
+    "address": "191 Bà Triệu, Lê Đại Hành, Hai Bà Trưng, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0116,
+    "lng": 105.8497,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 Tháp B"
+  },
+  {
+    "id": "ev-hn-skylake",
+    "name": "Trạm sạc Vincom Plaza Skylake Phạm Hùng",
+    "operator": "VinFast",
+    "address": "Khu đô thị Cầu Giấy, Mỹ Đình 1, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0185,
+    "lng": 105.7801,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B2 sảnh thương mại Skylake"
+  },
+  {
+    "id": "ev-hn-bactuliem",
+    "name": "Trạm sạc Vincom Plaza Bắc Từ Liêm (Green Stars)",
+    "operator": "VinFast",
+    "address": "234 Phạm Văn Đồng, Cổ Nhuế 1, Bắc Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0531,
+    "lng": 105.7818,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B1 trung tâm thương mại Green Stars"
+  },
+  {
+    "id": "ev-hn-lottetayho",
+    "name": "Trạm sạc Siêu Nhanh Lotte Mall Tây Hồ",
+    "operator": "VinFast",
+    "address": "683 Lạc Long Quân / Võ Chí Công, Phú Thượng, Tây Hồ, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0712,
+    "lng": 105.8156,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 sảnh Aquarium & bãi xe ngoài trời"
+  },
+  {
+    "id": "ev-hn-keangnam",
+    "name": "Trạm sạc Keangnam Landmark 72",
+    "operator": "VinFast",
+    "address": "Khu E6 Đô thị mới Cầu Giấy, Mễ Trì, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0168,
+    "lng": 105.7838,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời & tầng hầm B2"
+  },
+  {
+    "id": "ev-hn-trangtien",
+    "name": "Trạm sạc Tràng Tiền Plaza",
+    "operator": "VinFast",
+    "address": "24 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0253,
+    "lng": 105.8534,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1, lối vào phố Hai Bà Trưng"
+  },
+  {
+    "id": "ev-hn-mydinh",
+    "name": "Trạm sạc Sân Vận Động Quốc Gia Mỹ Đình",
+    "operator": "VinFast",
+    "address": "Đường Lê Đức Thọ, Mỹ Đình 1, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0205,
+    "lng": 105.7638,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe quảng trường SVĐ Mỹ Đình"
+  },
+  {
+    "id": "ev-hn-goldmark",
+    "name": "Trạm sạc KĐT Goldmark City",
+    "operator": "VinFast",
+    "address": "136 Hồ Tùng Mậu, Phú Diễn, Bắc Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0402,
+    "lng": 105.7668,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Khu vực bãi đỗ xe phân khu Sapphire"
+  },
+  {
+    "id": "ev-hn-ngoaigiaodoan",
+    "name": "Trạm sạc KĐT Ngoại Giao Đoàn",
+    "operator": "VinFast",
+    "address": "Đường Xuân Tảo, Xuân Đỉnh, Bắc Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0645,
+    "lng": 105.7972,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khuôn viên quảng trường trung tâm Ngoại Giao Đoàn"
+  },
+  {
+    "id": "ev-hn-ciputra",
+    "name": "Trạm sạc KĐT Nam Thăng Long Ciputra",
+    "operator": "VinFast",
+    "address": "Phú Thượng, Tây Hồ, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0772,
+    "lng": 105.7925,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Cổng vào đường Võ Chí Công"
+  },
+  {
+    "id": "ev-hn-iph",
+    "name": "Trạm sạc Indochina Plaza Hanoi (IPH)",
+    "operator": "EVOne",
+    "address": "241 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0365,
+    "lng": 105.7825,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 tháp thương mại IPH"
+  },
+  {
+    "id": "ev-hn-petrolimex-tranquangkhai",
+    "name": "Trạm sạc Cây xăng Petrolimex Số 1",
+    "operator": "VinFast",
+    "address": "1 Trần Quang Khải, Tràng Tiền, Hoàn Kiếm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0289,
+    "lng": 105.8592,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Khuôn viên cây xăng Petrolimex chân cầu Chương Dương"
+  },
+  {
+    "id": "ev-hn-pvoil-nguyentrai",
+    "name": "Trạm sạc Cây xăng PVOIL Nguyễn Trãi",
+    "operator": "VinFast",
+    "address": "493 Nguyễn Trãi, Thanh Xuân Nam, Thanh Xuân, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9968,
+    "lng": 105.8085,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Mặt đường Nguyễn Trãi hướng đi Hà Đông"
+  },
+  {
+    "id": "ev-hn-petrolimex-caudien",
+    "name": "Trạm sạc Cây xăng Petrolimex QL32 Cầu Diễn",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 32, Cầu Diễn, Bắc Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0435,
+    "lng": 105.7512,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Trục đường 32 hướng đi Nhổn"
+  },
+  {
+    "id": "ev-hn-pvoil-giaiphong",
+    "name": "Trạm sạc Cây xăng PVOIL Giải Phóng",
+    "operator": "VinFast",
+    "address": "785 Giải Phóng, Giáp Bát, Hoàng Mai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9782,
+    "lng": 105.8425,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Gần ngã ba Kim Đồng - Giải Phóng"
+  },
+  {
+    "id": "ev-hn-bigcthanglong",
+    "name": "Trạm sạc Siêu thị GO! Thăng Long (Big C)",
+    "operator": "VinFast",
+    "address": "222 Trần Duy Hưng, Trung Hòa, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0075,
+    "lng": 105.7905,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời cổng Phạm Hùng"
+  },
+  {
+    "id": "ev-hn-mmmegathanglong",
+    "name": "Trạm sạc Siêu thị MM Mega Market Thăng Long",
+    "operator": "VinFast",
+    "address": "Đường Phạm Văn Đồng, Cổ Nhuế 1, Bắc Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0505,
+    "lng": 105.7808,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời siêu thị MM"
+  },
+  {
+    "id": "ev-hn-mmhadong",
+    "name": "Trạm sạc Siêu thị MM Mega Market Hà Đông",
+    "operator": "VinFast",
+    "address": "Đường Tô Hiệu, Hà Cầu, Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9635,
+    "lng": 105.7725,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm thương mại Hà Đông"
+  },
+  {
+    "id": "ev-hn-vanquan",
+    "name": "Trạm sạc KĐT Văn Quán",
+    "operator": "VinFast",
+    "address": "Đường Chiến Thắng, Văn Quán, Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9752,
+    "lng": 105.7915,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe bờ hồ Văn Quán"
+  },
+  {
+    "id": "ev-hn-molao",
+    "name": "Trạm sạc KĐT Mỗ Lao",
+    "operator": "VinFast",
+    "address": "Vũ Trọng Khánh, Mộ Lao, Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9835,
+    "lng": 105.7822,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khuôn viên chung cư Seasons Avenue & Mulberry Lane"
+  },
+  {
+    "id": "ev-hn-linhdam",
+    "name": "Trạm sạc KĐT Bán Đảo Linh Đàm",
+    "operator": "VinFast",
+    "address": "Bán đảo Linh Đàm, Hoàng Liệt, Hoàng Mai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9662,
+    "lng": 105.8285,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm bán đảo Linh Đàm"
+  },
+  {
+    "id": "ev-hn-kimvan",
+    "name": "Trạm sạc KĐT Kim Văn Kim Lũ",
+    "operator": "VinFast",
+    "address": "Đường Nghiêm Xuân Yêm, Đại Kim, Hoàng Mai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9821,
+    "lng": 105.8198,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe nổi phân khu CT11"
+  },
+  {
+    "id": "ev-hn-gamuda",
+    "name": "Trạm sạc KĐT Gamuda Gardens",
+    "operator": "VinFast",
+    "address": "Km 4.4 Pháp Vân, Trần Phú, Hoàng Mai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9685,
+    "lng": 105.8692,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Clubhouse Gamuda Gardens"
+  },
+  {
+    "id": "ev-hn-bxnuocngam",
+    "name": "Trạm sạc Bến Xe Nước Ngầm",
+    "operator": "VinFast",
+    "address": "Số 1 Ngọc Hồi, Hoàng Liệt, Hoàng Mai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9625,
+    "lng": 105.8395,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung chuyển bến xe Nước Ngầm"
+  },
+  {
+    "id": "ev-hn-bxmydinh",
+    "name": "Trạm sạc Bến Xe Mỹ Đình",
+    "operator": "VinFast",
+    "address": "Số 20 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0282,
+    "lng": 105.7782,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi xe ngoài trời cổng Nguyễn Hoàng"
+  },
+  {
+    "id": "ev-hn-bxyennghia",
+    "name": "Trạm sạc Bến Xe Yên Nghĩa",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 6, Yên Nghĩa, Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9495,
+    "lng": 105.7428,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe công cộng bến xe Yên Nghĩa"
+  },
+  {
+    "id": "ev-hn-riverside",
+    "name": "Trạm sạc KĐT Vinhomes Riverside",
+    "operator": "VinFast",
+    "address": "Khu đô thị sinh thái Vinhomes Riverside, Long Biên, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0482,
+    "lng": 105.9085,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Trung tâm hội nghị Almaz & Vincom Plaza Long Biên"
+  },
+  {
+    "id": "ev-hn-savico",
+    "name": "Trạm sạc Savico Megamall Long Biên",
+    "operator": "VinFast",
+    "address": "7-9 Nguyễn Văn Linh, Gia Thụy, Long Biên, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0498,
+    "lng": 105.8892,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trước cửa siêu thị BigC Long Biên"
+  },
+  {
+    "id": "ev-hn-viethung",
+    "name": "Trạm sạc KĐT Việt Hưng",
+    "operator": "VinFast",
+    "address": "Khu đô thị mới Việt Hưng, Giang Biên, Long Biên, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0585,
+    "lng": 105.9015,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe công cộng công viên Việt Hưng"
+  },
+  {
+    "id": "ev-hn-oceanpark2",
+    "name": "Trạm sạc Siêu Nhanh Ocean Park 2 - The Empire",
+    "operator": "VinFast",
+    "address": "Khu đô thị Vinhomes Ocean Park 2, Gia Lâm giáp Văn Giang, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9615,
+    "lng": 105.9785,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 20,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 8
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe công viên sóng Grand Wave Park"
+  },
+  {
+    "id": "ev-hn-dangxa",
+    "name": "Trạm sạc KĐT Đặng Xá",
+    "operator": "VinFast",
+    "address": "Khu đô thị Đặng Xá, Cổ Bi, Gia Lâm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0152,
+    "lng": 105.9625,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm phân khu D"
+  },
+  {
+    "id": "ev-hn-donganh",
+    "name": "Trạm sạc Thị trấn Đông Anh",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 3, Thị trấn Đông Anh, Đông Anh, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.1382,
+    "lng": 105.8455,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm thương mại Đông Anh"
+  },
+  {
+    "id": "ev-hn-geleximco",
+    "name": "Trạm sạc KĐT Geleximco Lê Trọng Tấn",
+    "operator": "VinFast",
+    "address": "Đường Lê Trọng Tấn, An Khánh, Hoài Đức, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9912,
+    "lng": 105.7365,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Khuôn viên phân khu A Geleximco"
+  },
+  {
+    "id": "ev-hn-vinhomesthanglong",
+    "name": "Trạm sạc Vinhomes Thăng Long",
+    "operator": "VinFast",
+    "address": "Khu đô thị Vinhomes Thăng Long, An Khánh, Hoài Đức, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9985,
+    "lng": 105.7192,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khuôn viên Clubhouse hồ điều hòa"
+  },
+  {
+    "id": "ev-hn-petrolimex-thanglong",
+    "name": "Trạm sạc Petrolimex Đại Lộ Thăng Long",
+    "operator": "VinFast",
+    "address": "Km 8 Đại Lộ Thăng Long, Hoài Đức, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0025,
+    "lng": 105.7315,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex làn đường gom Đại Lộ Thăng Long"
+  },
+  {
+    "id": "ev-hn-pvoil-phapvan",
+    "name": "Trạm sạc Siêu Nhanh PVOIL Pháp Vân - Cầu Giẽ",
+    "operator": "VinFast",
+    "address": "Km 182 Cao tốc Pháp Vân - Cầu Giẽ, Thanh Trì, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9385,
+    "lng": 105.8525,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Trạm dừng nghỉ PVOIL cửa ngõ phía Nam Thủ đô"
+  },
+  {
+    "id": "ev-hn-tu-hiep",
+    "name": "Trạm sạc KĐT Pháp Vân Tứ Hiệp",
+    "operator": "VinFast",
+    "address": "Khu đô thị Tứ Hiệp, Thanh Trì, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9515,
+    "lng": 105.8492,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm KĐT Tứ Hiệp Plaza"
+  },
+  {
+    "id": "ev-hn-discovery",
+    "name": "Trạm sạc Tòa nhà Discovery Complex",
+    "operator": "VinFast",
+    "address": "302 Cầu Giấy, Dịch Vọng, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0345,
+    "lng": 105.7932,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B3 tòa Discovery Complex"
+  },
+  {
+    "id": "ev-hn-fpt",
+    "name": "Trạm sạc FPT Tower Cầu Giấy",
+    "operator": "EVOne",
+    "address": "Số 10 Phạm Văn Bạch, Dịch Vọng, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0262,
+    "lng": 105.7865,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe tòa nhà FPT Tower"
+  },
+  {
+    "id": "ev-hn-nguyenchithanh",
+    "name": "Trạm sạc Vincom Center Nguyễn Chí Thanh",
+    "operator": "VinFast",
+    "address": "54A Nguyễn Chí Thanh, Láng Thượng, Đống Đa, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0242,
+    "lng": 105.8118,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Tầng hầm B2 sảnh thương mại Vincom"
+  },
+  {
+    "id": "ev-hn-mipec",
+    "name": "Trạm sạc Mipec Tower Tây Sơn",
+    "operator": "VinFast",
+    "address": "229 Tây Sơn, Ngã Tư Sở, Đống Đa, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0078,
+    "lng": 105.8235,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 tòa nhà Mipec"
+  },
+  {
+    "id": "ev-hn-hapulico",
+    "name": "Trạm sạc KĐT Hapulico Complex",
+    "operator": "VinFast",
+    "address": "Số 1 Nguyễn Huy Tưởng, Thanh Xuân Trung, Thanh Xuân, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0015,
+    "lng": 105.8082,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe tòa nhà 24T"
+  },
+  {
+    "id": "ev-hn-imperia",
+    "name": "Trạm sạc KĐT Imperia Garden",
+    "operator": "VinFast",
+    "address": "203 Nguyễn Huy Tưởng, Thanh Xuân Trung, Thanh Xuân, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9982,
+    "lng": 105.8035,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 sảnh căn hộ"
+  },
+  {
+    "id": "ev-hn-selex-qghn",
+    "name": "Tủ đổi pin Xe máy điện Selex ĐH Quốc Gia",
+    "operator": "Selex Motors",
+    "address": "144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0375,
+    "lng": 105.7815,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Khuôn viên ký túc xá sinh viên"
+  },
+  {
+    "id": "ev-hn-selex-ktqd",
+    "name": "Tủ đổi pin Xe máy điện Selex ĐH Kinh Tế Quốc Dân",
+    "operator": "Selex Motors",
+    "address": "207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0012,
+    "lng": 105.8425,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cổng phụ đường Trần Đại Nghĩa"
+  },
+  {
+    "id": "ev-hn-selex-giangvo",
+    "name": "Tủ đổi pin Selex Circle K Giảng Võ",
+    "operator": "Selex Motors",
+    "address": "187 Giảng Võ, Cát Linh, Đống Đa, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0282,
+    "lng": 105.8235,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Trước cửa cửa hàng tiện lợi Circle K"
+  },
+  {
+    "id": "ev-hn-selex-trunghoa",
+    "name": "Tủ đổi pin Selex WinMart+ Trung Hòa Nhân Chính",
+    "operator": "Selex Motors",
+    "address": "Đường Hoàng Đạo Thúy, Trung Hòa, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0095,
+    "lng": 105.8012,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Trước sảnh tòa nhà 17T"
+  },
+  {
+    "id": "ev-hn-selex-hqviet",
+    "name": "Tủ đổi pin Selex PVOIL Hoàng Quốc Việt",
+    "operator": "Selex Motors",
+    "address": "Hoàng Quốc Việt, Nghĩa Tân, Cầu Giấy, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0452,
+    "lng": 105.7925,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cây xăng PVOIL đối diện Học viện Kỹ thuật Quân sự"
+  },
+  {
+    "id": "ev-hn-eboost-manor",
+    "name": "Trạm sạc Eboost The Manor Hanoi",
+    "operator": "Eboost",
+    "address": "Mễ Trì, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0152,
+    "lng": 105.7765,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Tầng hầm B1 khu căn hộ The Manor"
+  },
+  {
+    "id": "ev-hn-eboost-goldenwestlake",
+    "name": "Trạm sạc Eboost Golden Westlake",
+    "operator": "Eboost",
+    "address": "151 Thụy Khuê, Tây Hồ, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0425,
+    "lng": 105.8215,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 tháp chung cư Golden Westlake"
+  },
+  {
+    "id": "ev-hn-eboost-hoangcau",
+    "name": "Trạm sạc Eboost D'. Le Pont D'or",
+    "operator": "Eboost",
+    "address": "36 Hoàng Cầu, Ô Chợ Dừa, Đống Đa, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0195,
+    "lng": 105.8225,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B2 tòa nhà Hoàng Cầu"
+  },
+  {
+    "id": "ev-hn-vinhomessmart-park",
+    "name": "Trạm sạc Vườn Nhật Zen Park Smart City",
+    "operator": "VinFast",
+    "address": "Vinhomes Smart City, Tây Mỗ, Nam Từ Liêm, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9995,
+    "lng": 105.7425,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe cạnh Vườn Nhật Zen Park"
+  },
+  {
+    "id": "ev-hcm-landmark81",
+    "name": "Trạm sạc Siêu Nhanh Landmark 81",
+    "operator": "VinFast",
+    "address": "720A Điện Biên Phủ, Phường 22, Bình Thạnh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.795,
+    "lng": 106.7218,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 20,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 10
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 & B3 tháp Landmark 81"
+  },
+  {
+    "id": "ev-hcm-dongkhoi",
+    "name": "Trạm sạc Vincom Center Đồng Khởi",
+    "operator": "VinFast",
+    "address": "72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.778,
+    "lng": 106.702,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B3 sảnh thương mại"
+  },
+  {
+    "id": "ev-hcm-bitexco",
+    "name": "Trạm sạc Tòa Tháp Bitexco Financial",
+    "operator": "VinFast",
+    "address": "2 Hải Triều, Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7715,
+    "lng": 106.7042,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B2 sảnh thương mại Bitexco"
+  },
+  {
+    "id": "ev-hcm-saigoncentre",
+    "name": "Trạm sạc Saigon Centre / Takashimaya",
+    "operator": "VinFast",
+    "address": "65 Lê Lợi, Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7735,
+    "lng": 106.7005,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B3 sảnh Takashimaya"
+  },
+  {
+    "id": "ev-hcm-grandpark",
+    "name": "Trạm sạc Siêu Nhanh Vinhomes Grand Park",
+    "operator": "VinFast",
+    "address": "Đường Nguyễn Xiển, Long Thạnh Mỹ, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8455,
+    "lng": 106.8385,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 24,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 8
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 10
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe công viên Ánh Sáng 36ha & nhà để xe nổi"
+  },
+  {
+    "id": "ev-hcm-thaodien",
+    "name": "Trạm sạc Vincom Mega Mall Thảo Điền",
+    "operator": "VinFast",
+    "address": "159 Xa Lộ Hà Nội, Thảo Điền, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8035,
+    "lng": 106.7415,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 trung tâm thương mại Thảo Điền"
+  },
+  {
+    "id": "ev-hcm-sala",
+    "name": "Trạm sạc KĐT Sala Đại Quang Minh",
+    "operator": "VinFast",
+    "address": "10 Mai Chí Thọ, An Lợi Đông, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7685,
+    "lng": 106.7235,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Công viên Sala & tòa nhà Sarimi"
+  },
+  {
+    "id": "ev-hcm-crescentmall",
+    "name": "Trạm sạc Crescent Mall Phú Mỹ Hưng",
+    "operator": "VinFast",
+    "address": "101 Tôn Dật Tiên, Tân Phú, Quận 7, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7292,
+    "lng": 106.7215,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 sảnh Crescent Hub"
+  },
+  {
+    "id": "ev-hcm-scvivocity",
+    "name": "Trạm sạc TTTM SC VivoCity",
+    "operator": "VinFast",
+    "address": "1058 Nguyễn Văn Linh, Tân Phong, Quận 7, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7325,
+    "lng": 106.7065,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời & tầng hầm B1"
+  },
+  {
+    "id": "ev-hcm-starhill",
+    "name": "Trạm sạc KĐT Star Hill Phú Mỹ Hưng",
+    "operator": "VinFast",
+    "address": "Tân Phú, Quận 7, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7265,
+    "lng": 106.7245,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu thương mại tài chính quốc tế Phú Mỹ Hưng"
+  },
+  {
+    "id": "ev-hcm-vanhanhmall",
+    "name": "Trạm sạc Vạn Hạnh Mall",
+    "operator": "VinFast",
+    "address": "11 Sư Vạn Hạnh, Phường 12, Quận 10, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7698,
+    "lng": 106.6695,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Hầm B1 sảnh thương mại Vạn Hạnh"
+  },
+  {
+    "id": "ev-hcm-hungvuong",
+    "name": "Trạm sạc Hùng Vương Plaza",
+    "operator": "VinFast",
+    "address": "126 Hồng Bàng, Phường 12, Quận 5, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7562,
+    "lng": 106.6598,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 tòa Hùng Vương"
+  },
+  {
+    "id": "ev-hcm-tansonnhat",
+    "name": "Trạm sạc Siêu Nhanh Sân Bay Tân Sơn Nhất",
+    "operator": "VinFast",
+    "address": "Đường Trường Sơn, Phường 2, Tân Bình, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8162,
+    "lng": 106.6625,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Nhà xe TCP ga quốc nội & bãi xe công viên Hoàng Văn Thụ"
+  },
+  {
+    "id": "ev-hcm-picoplaza",
+    "name": "Trạm sạc Pico Plaza Cộng Hòa",
+    "operator": "VinFast",
+    "address": "20 Cộng Hòa, Phường 12, Tân Bình, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8015,
+    "lng": 106.6515,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trước sảnh Pico Plaza"
+  },
+  {
+    "id": "ev-hcm-gigamall",
+    "name": "Trạm sạc Giga Mall Phạm Văn Đồng",
+    "operator": "VinFast",
+    "address": "240-242 Phạm Văn Đồng, Hiệp Bình Chánh, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8285,
+    "lng": 106.7235,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 sảnh trung tâm Giga Mall"
+  },
+  {
+    "id": "ev-hcm-vanphuc",
+    "name": "Trạm sạc KĐT Vạn Phúc City",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 13, Hiệp Bình Phước, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8415,
+    "lng": 106.7115,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Quảng trường nhạc nước hồ Đại Nhật"
+  },
+  {
+    "id": "ev-hcm-emart",
+    "name": "Trạm sạc Đại siêu thị Emart Gò Vấp",
+    "operator": "VinFast",
+    "address": "366 Phan Văn Trị, Phường 5, Gò Vấp, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8245,
+    "lng": 106.6915,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời siêu thị Emart"
+  },
+  {
+    "id": "ev-hcm-aeontanphu",
+    "name": "Trạm sạc Aeon Mall Tân Phú Celadon",
+    "operator": "VinFast",
+    "address": "30 Bờ Bao Tân Thắng, Sơn Kỳ, Tân Phú, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8015,
+    "lng": 106.6185,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi xe ngoài trời Cổng K"
+  },
+  {
+    "id": "ev-hcm-aeonbinhtan",
+    "name": "Trạm sạc Aeon Mall Bình Tân",
+    "operator": "VinFast",
+    "address": "Số 1 Đường 17A, Bình Trị Đông B, Bình Tân, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7435,
+    "lng": 106.6125,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời phân khu F"
+  },
+  {
+    "id": "ev-hcm-pearlplaza",
+    "name": "Trạm sạc Pearl Plaza Văn Thánh",
+    "operator": "VinFast",
+    "address": "561A Điện Biên Phủ, Phường 25, Bình Thạnh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8005,
+    "lng": 106.7165,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 tòa Pearl Plaza"
+  },
+  {
+    "id": "ev-hcm-petrolimex-hangxanh",
+    "name": "Trạm sạc Petrolimex Ngã Tư Hàng Xanh",
+    "operator": "VinFast",
+    "address": "Vòng xoay Hàng Xanh, Phường 21, Bình Thạnh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8012,
+    "lng": 106.7112,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex ngay ngã tư Hàng Xanh"
+  },
+  {
+    "id": "ev-hcm-pvoil-ansuong",
+    "name": "Trạm sạc PVOIL Ngã Tư An Sương",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 22, Trung Mỹ Tây, Quận 12, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8515,
+    "lng": 106.6195,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng PVOIL hướng đi Củ Chi"
+  },
+  {
+    "id": "ev-hcm-petrolimex-nguyenvanlinh",
+    "name": "Trạm sạc Petrolimex Nguyễn Văn Linh",
+    "operator": "VinFast",
+    "address": "Nguyễn Văn Linh, Phong Phú, Bình Chánh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7185,
+    "lng": 106.6585,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex trục đại lộ Nguyễn Văn Linh"
+  },
+  {
+    "id": "ev-hcm-bxmiendongmoi",
+    "name": "Trạm sạc Bến Xe Miền Đông Mới",
+    "operator": "VinFast",
+    "address": "501 Xa Lộ Hà Nội, Long Bình, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8815,
+    "lng": 106.8295,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe trung chuyển Bến xe Miền Đông mới"
+  },
+  {
+    "id": "ev-hcm-bxmientay",
+    "name": "Trạm sạc Bến Xe Miền Tây",
+    "operator": "VinFast",
+    "address": "395 Kinh Dương Vương, An Lạc, Bình Tân, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7405,
+    "lng": 106.6215,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung chuyển hành khách bến xe Miền Tây"
+  },
+  {
+    "id": "ev-hcm-mmmegahiepphu",
+    "name": "Trạm sạc MM Mega Market Hiệp Phú",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 1A, Tân Thới Hiệp, Quận 12, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8652,
+    "lng": 106.6435,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời siêu thị MM Hiệp Phú"
+  },
+  {
+    "id": "ev-hcm-porsche",
+    "name": "Trạm sạc Siêu Nhanh Porsche Centre Saigon",
+    "operator": "Porsche",
+    "address": "Khu đô thị Phú Mỹ Hưng, Tân Phú, Quận 7, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7285,
+    "lng": 106.7315,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 350,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 350,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Showroom Porsche Saigon, hỗ trợ sạc siêu nhanh công nghệ 800V"
+  },
+  {
+    "id": "ev-hcm-selex-bachkhoa",
+    "name": "Tủ đổi pin Xe máy điện Selex ĐH Bách Khoa TP.HCM",
+    "operator": "Selex Motors",
+    "address": "268 Lý Thường Kiệt, Phường 14, Quận 10, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7712,
+    "lng": 106.6585,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cổng Tô Hiến Thành"
+  },
+  {
+    "id": "ev-hcm-selex-suphamkt",
+    "name": "Tủ đổi pin Selex ĐH Sư Phạm Kỹ Thuật",
+    "operator": "Selex Motors",
+    "address": "1 Võ Văn Ngân, Linh Chiểu, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8505,
+    "lng": 106.7715,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cổng chính đường Võ Văn Ngân"
+  },
+  {
+    "id": "ev-hcm-selex-phanxichlong",
+    "name": "Tủ đổi pin Selex Circle K Phan Xích Long",
+    "operator": "Selex Motors",
+    "address": "Phan Xích Long, Phường 2, Phú Nhuận, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7965,
+    "lng": 106.6912,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Trước cửa hàng Circle K"
+  },
+  {
+    "id": "ev-hcm-selex-truongchinh",
+    "name": "Tủ đổi pin Selex PVOIL Trường Chinh",
+    "operator": "Selex Motors",
+    "address": "Trường Chinh, Phường 15, Tân Bình, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8085,
+    "lng": 106.6385,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Khuôn viên cây xăng PVOIL"
+  },
+  {
+    "id": "ev-hcm-eboost-sunavenue",
+    "name": "Trạm sạc Eboost The Sun Avenue",
+    "operator": "Eboost",
+    "address": "28 Mai Chí Thọ, An Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7915,
+    "lng": 106.7535,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Tầng hầm B1 Tháp 4"
+  },
+  {
+    "id": "ev-hcm-eboost-sunrise",
+    "name": "Trạm sạc Eboost Sunrise City",
+    "operator": "Eboost",
+    "address": "23 Nguyễn Hữu Thọ, Tân Hưng, Quận 7, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7512,
+    "lng": 106.7005,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Hầm B1 phân khu South Towers"
+  },
+  {
+    "id": "ev-dn-vincom",
+    "name": "Trạm sạc Siêu Nhanh Vincom Plaza Ngô Quyền",
+    "operator": "VinFast",
+    "address": "910A Ngô Quyền, An Hải Bắc, Sơn Trà, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0718,
+    "lng": 108.2325,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B1 sảnh trung tâm thương mại Vincom"
+  },
+  {
+    "id": "ev-dn-lottemart",
+    "name": "Trạm sạc Lotte Mart Đà Nẵng",
+    "operator": "VinFast",
+    "address": "6 Nại Nam, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0352,
+    "lng": 108.2255,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời Cổng 1"
+  },
+  {
+    "id": "ev-dn-airport",
+    "name": "Trạm sạc Siêu Nhanh Sân Bay Quốc Tế Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Đường Duy Tân, Hòa Thuận Tây, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0545,
+    "lng": 108.2018,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ô tô ga Quốc nội T1"
+  },
+  {
+    "id": "ev-dn-petrolimex-nguyenvanlinh",
+    "name": "Trạm sạc Petrolimex Nguyễn Văn Linh",
+    "operator": "VinFast",
+    "address": "124 Nguyễn Văn Linh, Nam Dương, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0596,
+    "lng": 108.2116,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 1
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex trục Nguyễn Văn Linh - Cầu Rồng",
+    "ocmId": "ocm-274579",
+    "lastUpdated": "2023-10-09T02:47:00Z"
+  },
+  {
+    "id": "ev-dn-pvoil-ngoquyen",
+    "name": "Trạm sạc PVOIL Cảng Tiên Sa Ngô Quyền",
+    "operator": "VinFast",
+    "address": "Ngô Quyền, Thọ Quang, Sơn Trà, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0965,
+    "lng": 108.2395,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng PVOIL đường dẫn vào Cảng Tiên Sa"
+  },
+  {
+    "id": "ev-dn-coopmart",
+    "name": "Trạm sạc Co.opmart Điện Biên Phủ",
+    "operator": "VinFast",
+    "address": "478 Điện Biên Phủ, Thanh Khê, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0645,
+    "lng": 108.1885,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trước cửa Co.opmart Điện Biên Phủ"
+  },
+  {
+    "id": "ev-dn-mmmegacamle",
+    "name": "Trạm sạc MM Mega Market Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Đường Cách Mạng Tháng Tám, Khuê Trung, Cẩm Lệ, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0255,
+    "lng": 108.2045,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời siêu thị MM"
+  },
+  {
+    "id": "ev-dn-godanang",
+    "name": "Trạm sạc Siêu thị GO! Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Vĩnh Trung Plaza, 255-257 Hùng Vương, Thanh Khê, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0675,
+    "lng": 108.2125,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe tầng hầm và ngoài trời Vĩnh Trung Plaza"
+  },
+  {
+    "id": "ev-dn-petrolimex-tonducthang",
+    "name": "Trạm sạc Petrolimex Tôn Đức Thắng",
+    "operator": "VinFast",
+    "address": "Tôn Đức Thắng, Hòa Minh, Liên Chiểu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0615,
+    "lng": 108.1635,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex gần Bến xe Trung tâm"
+  },
+  {
+    "id": "ev-dn-bxtrungtam",
+    "name": "Trạm sạc Bến Xe Trung Tâm Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Nam Trân, Hòa Minh, Liên Chiểu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0585,
+    "lng": 108.1695,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe công cộng cổng Nam Trân"
+  },
+  {
+    "id": "ev-dn-biendong",
+    "name": "Trạm sạc Công Viên Biển Đông",
+    "operator": "VinFast",
+    "address": "Đường Võ Nguyên Giáp, Phước Mỹ, Sơn Trà, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0685,
+    "lng": 108.2465,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe quảng trường biển Mỹ Khê"
+  },
+  {
+    "id": "ev-dn-fptcity",
+    "name": "Trạm sạc KĐT FPT City Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Khu đô thị FPT City, Hòa Hải, Ngũ Hành Sơn, Đà Nẵng",
+    "city": "danang",
+    "lat": 15.9865,
+    "lng": 108.2585,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Khuôn viên FPT Complex"
+  },
+  {
+    "id": "ev-dn-nguhanhson",
+    "name": "Trạm sạc Danh Thắng Ngũ Hành Sơn",
+    "operator": "VinFast",
+    "address": "Huyền Trân Công Chúa, Hòa Hải, Ngũ Hành Sơn, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0045,
+    "lng": 108.2615,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe du lịch chân núi Ngũ Hành Sơn"
+  },
+  {
+    "id": "ev-dn-bachkhoa",
+    "name": "Trạm sạc & Đổi pin ĐH Bách Khoa Đà Nẵng",
+    "operator": "Selex Motors",
+    "address": "54 Nguyễn Lương Bằng, Hòa Khánh Bắc, Liên Chiểu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0745,
+    "lng": 108.1525,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Khuôn viên ký túc xá ĐH Bách Khoa"
+  },
+  {
+    "id": "ev-dn-furama",
+    "name": "Trạm sạc Furama Resort Đà Nẵng",
+    "operator": "EVOne",
+    "address": "105 Võ Nguyên Giáp, Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0395,
+    "lng": 108.2475,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe khách sạn Furama"
+  },
+  {
+    "id": "ev-dn-caurong",
+    "name": "Trạm sạc Bãi đỗ xe Cầu Rồng",
+    "operator": "VinFast",
+    "address": "Đường 2 Tháng 9, Bình Hiên, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0602,
+    "lng": 108.2215,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe công cộng phía Tây Cầu Rồng"
+  },
+  {
+    "id": "ev-dn-indochina",
+    "name": "Trạm sạc Indochina Riverside Towers",
+    "operator": "VinFast",
+    "address": "74 Bạch Đằng, Hải Châu 1, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0712,
+    "lng": 108.2245,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B1 sảnh trung tâm thương mại"
+  },
+  {
+    "id": "ev-dn-evone-camle",
+    "name": "Trạm sạc EVOne Cẩm Lệ",
+    "operator": "EVOne",
+    "address": "Đường Nguyễn Hữu Thọ, Khuê Trung, Cẩm Lệ, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0315,
+    "lng": 108.2095,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm đăng kiểm Cẩm Lệ"
+  },
+  {
+    "id": "ev-dn-pvoil-hoaphuoc",
+    "name": "Trạm sạc PVOIL Quốc Lộ 1A Hòa Phước",
+    "operator": "VinFast",
+    "address": "Quốc Lộ 1A, Hòa Phước, Hòa Vang, Đà Nẵng",
+    "city": "danang",
+    "lat": 15.9685,
+    "lng": 108.2085,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng PVOIL cửa ngõ phía Nam Đà Nẵng"
+  },
+  {
+    "id": "ev-dn-hightech",
+    "name": "Trạm sạc Khu Công Nghệ Cao Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Khu công nghệ cao Đà Nẵng, Hòa Liên, Hòa Vang, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0915,
+    "lng": 108.1095,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Trung tâm hành chính Khu công nghệ cao"
+  },
+  {
+    "id": "ev-dn-selex-kinhte",
+    "name": "Tủ đổi pin Selex ĐH Kinh Tế Đà Nẵng",
+    "operator": "Selex Motors",
+    "address": "71 Ngũ Hành Sơn, Bắc Mỹ An, Ngũ Hành Sơn, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0505,
+    "lng": 108.2355,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cổng chính ĐH Kinh Tế"
+  },
+  {
+    "id": "ev-dn-selex-nguyenvanthoai",
+    "name": "Tủ đổi pin Selex Circle K Nguyễn Văn Thoại",
+    "operator": "Selex Motors",
+    "address": "Nguyễn Văn Thoại, Bắc Mỹ Phú, Ngũ Hành Sơn, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0585,
+    "lng": 108.2405,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 15,
+    "isFastCharge": false,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Pin Lithium chuyên dụng Selex",
+        "powerKw": 15,
+        "current": "DC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Trước cửa Circle K cách biển Mỹ Khê 300m"
+  },
+  {
+    "id": "ev-dn-vinmec",
+    "name": "Trạm sạc Bệnh Viện Đa Khoa Quốc Tế Vinmec Đà Nẵng",
+    "operator": "VinFast",
+    "address": "Đường 30 Tháng 4, Khu dân cư số 4 Nguyễn Tri Phương, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0385,
+    "lng": 108.2165,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe bệnh viện Vinmec"
+  },
+  {
+    "id": "ev-dn-sontra",
+    "name": "Trạm sạc Bãi đỗ xe Bán đảo Sơn Trà",
+    "operator": "VinFast",
+    "address": "Đường Hoàng Sa, Thọ Quang, Sơn Trà, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.1085,
+    "lng": 108.2625,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi xe chân Chùa Linh Ứng Sơn Trà"
+  },
+  {
+    "id": "ev-dn-petrolimex-nguyentatthanh",
+    "name": "Trạm sạc Petrolimex Nguyễn Tất Thành",
+    "operator": "VinFast",
+    "address": "Nguyễn Tất Thành, Thanh Khê Tây, Thanh Khê, Đà Nẵng",
+    "city": "danang",
+    "lat": 16.0755,
+    "lng": 108.1815,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cây xăng Petrolimex tuyến đường ven biển Nguyễn Tất Thành"
+  },
+  {
+    "id": "ev-hcm-lytutrong",
+    "name": "Trạm sạc Vincom Center Lý Tự Trọng",
+    "operator": "VinFast",
+    "address": "45A Lý Tự Trọng, Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7765,
+    "lng": 106.7012,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Tầng hầm B2 sảnh Pasteur"
+  },
+  {
+    "id": "ev-hcm-leman",
+    "name": "Trạm sạc Léman Luxury Apartments",
+    "operator": "EVOne",
+    "address": "117 Nguyễn Đình Chiểu, Võ Thị Sáu, Quận 3, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7785,
+    "lng": 106.6915,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 tháp Léman"
+  },
+  {
+    "id": "ev-hcm-coopnguyendinhchieu",
+    "name": "Trạm sạc Co.opmart Nguyễn Đình Chiểu",
+    "operator": "VinFast",
+    "address": "168 Nguyễn Đình Chiểu, Phường 6, Quận 3, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7772,
+    "lng": 106.6908,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trước cửa Co.opmart"
+  },
+  {
+    "id": "ev-hcm-grandriverside",
+    "name": "Trạm sạc Grand Riverside Bến Vân Đồn",
+    "operator": "VinFast",
+    "address": "278-283 Bến Vân Đồn, Phường 2, Quận 4, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7585,
+    "lng": 106.6955,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 khu căn hộ Grand Riverside"
+  },
+  {
+    "id": "ev-hcm-rivapark",
+    "name": "Trạm sạc Riva Park Nguyễn Tất Thành",
+    "operator": "VinFast",
+    "address": "504 Nguyễn Tất Thành, Phường 18, Quận 4, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7552,
+    "lng": 106.7115,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi xe chân cầu Tân Thuận 1"
+  },
+  {
+    "id": "ev-hcm-coophaugiang",
+    "name": "Trạm sạc Co.opmart Hậu Giang",
+    "operator": "VinFast",
+    "address": "188 Hậu Giang, Phường 6, Quận 6, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7512,
+    "lng": 106.6492,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời Co.opmart"
+  },
+  {
+    "id": "ev-hcm-diamondriverside",
+    "name": "Trạm sạc KĐT Diamond Riverside Võ Văn Kiệt",
+    "operator": "VinFast",
+    "address": "Đại lộ Võ Văn Kiệt, Phường 16, Quận 8, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7285,
+    "lng": 106.6345,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe mặt tiền Đại lộ Võ Văn Kiệt"
+  },
+  {
+    "id": "ev-hcm-topazcity",
+    "name": "Trạm sạc KĐT Topaz City Cao Lỗ",
+    "operator": "VinFast",
+    "address": "Đường Cao Lỗ, Phường 4, Quận 8, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7412,
+    "lng": 106.6815,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khuôn viên phân khu Topaz Elite"
+  },
+  {
+    "id": "ev-hcm-kingdom101",
+    "name": "Trạm sạc KĐT Kingdom 101 Tô Hiến Thành",
+    "operator": "VinFast",
+    "address": "334 Tô Hiến Thành, Phường 14, Quận 10, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7745,
+    "lng": 106.6612,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 sảnh căn hộ Kingdom"
+  },
+  {
+    "id": "ev-hcm-flemington",
+    "name": "Trạm sạc TTTM The Flemington Parkson",
+    "operator": "VinFast",
+    "address": "182 Lê Đại Hành, Phường 15, Quận 11, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7655,
+    "lng": 106.6538,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe tòa nhà Flemington"
+  },
+  {
+    "id": "ev-hcm-damsen",
+    "name": "Trạm sạc Công Viên Văn Hóa Đầm Sen",
+    "operator": "VinFast",
+    "address": "Số 3 Hòa Bình, Phường 3, Quận 11, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7682,
+    "lng": 106.6425,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe Cổng 1 đường Lạc Long Quân"
+  },
+  {
+    "id": "ev-hcm-centrepoint",
+    "name": "Trạm sạc Tòa nhà Centre Point Nguyễn Văn Trỗi",
+    "operator": "EVOne",
+    "address": "106 Nguyễn Văn Trỗi, Phường 8, Phú Nhuận, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7962,
+    "lng": 106.6785,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi xe tòa nhà Centre Point"
+  },
+  {
+    "id": "ev-hcm-vincomgovap",
+    "name": "Trạm sạc Vincom Plaza Gò Vấp",
+    "operator": "VinFast",
+    "address": "12 Phan Văn Trị, Phường 7, Gò Vấp, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8268,
+    "lng": 106.6892,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 6
+      },
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 38
+      }
+    ],
+    "accessComments": "Tầng hầm B1 TTTM Vincom Plaza",
+    "ocmId": "ocm-267276",
+    "lastUpdated": "2023-07-04T03:26:00Z"
+  },
+  {
+    "id": "ev-hcm-sunwahpearl",
+    "name": "Trạm sạc KĐT Sunwah Pearl Nguyễn Hữu Cảnh",
+    "operator": "VinFast",
+    "address": "90 Nguyễn Hữu Cảnh, Phường 22, Bình Thạnh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7875,
+    "lng": 106.7165,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Hầm B1 tháp White House"
+  },
+  {
+    "id": "ev-hcm-botanica",
+    "name": "Trạm sạc Botanica Premier Sân Bay",
+    "operator": "VinFast",
+    "address": "108 Hồng Hà, Phường 2, Tân Bình, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8145,
+    "lng": 106.6715,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe cạnh công viên Gia Định"
+  },
+  {
+    "id": "ev-hcm-pandora",
+    "name": "Trạm sạc TTTM Pandora City Trường Chinh",
+    "operator": "VinFast",
+    "address": "1/1 Trường Chinh, Tây Thạnh, Tân Phú, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8115,
+    "lng": 106.6315,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi xe ngoài trời BigC Trường Chinh"
+  },
+  {
+    "id": "ev-hcm-richstar",
+    "name": "Trạm sạc KĐT RichStar Hòa Bình",
+    "operator": "VinFast",
+    "address": "278 Hòa Bình, Hiệp Tân, Tân Phú, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7685,
+    "lng": 106.6295,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe tháp 1 RichStar"
+  },
+  {
+    "id": "ev-hcm-tenlua",
+    "name": "Trạm sạc KĐT Tên Lửa Bình Tân",
+    "operator": "VinFast",
+    "address": "Đường Số 7, An Lạc A, Bình Tân, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7485,
+    "lng": 106.6175,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe trung tâm KĐT Tên Lửa"
+  },
+  {
+    "id": "ev-hcm-estellaplace",
+    "name": "Trạm sạc Estella Place Song Hành",
+    "operator": "VinFast",
+    "address": "88 Song Hành, An Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8015,
+    "lng": 106.7485,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Tầng hầm B1 TTTM Estella"
+  },
+  {
+    "id": "ev-hcm-masterilumiere",
+    "name": "Trạm sạc Masteri Lumiere Riverside",
+    "operator": "VinFast",
+    "address": "628A Xa Lộ Hà Nội, An Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8045,
+    "lng": 106.7435,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Hầm B1 tháp Lumiere"
+  },
+  {
+    "id": "ev-hcm-khucongnghecao",
+    "name": "Trạm sạc Khu Công Nghệ Cao TP.HCM (SHTP)",
+    "operator": "VinFast",
+    "address": "Đường D1, Khu Công nghệ cao, Tăng Nhơn Phú B, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8525,
+    "lng": 106.7915,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Khuôn viên nhà máy FPT & Samsung Electronics"
+  },
+  {
+    "id": "ev-hcm-vincomlevanviet",
+    "name": "Trạm sạc Vincom Plaza Lê Văn Việt",
+    "operator": "VinFast",
+    "address": "50 Lê Văn Việt, Hiệp Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8485,
+    "lng": 106.7785,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Tầng hầm B1 TTTM Vincom Lê Văn Việt"
+  },
+  {
+    "id": "ev-hcm-vincomthuduc",
+    "name": "Trạm sạc Vincom Plaza Võ Văn Ngân",
+    "operator": "VinFast",
+    "address": "216 Võ Văn Ngân, Bình Thọ, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8512,
+    "lng": 106.7625,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi đỗ xe TTTM Vincom Thủ Đức"
+  },
+  {
+    "id": "ev-hcm-celestarise",
+    "name": "Trạm sạc KĐT Celesta Rise Nhà Bè",
+    "operator": "VinFast",
+    "address": "Đường Nguyễn Hữu Thọ, Phước Kiển, Nhà Bè, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7185,
+    "lng": 106.7025,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu bãi đỗ xe dự án Celesta Rise"
+  },
+  {
+    "id": "ev-hcm-kentonnode",
+    "name": "Trạm sạc Kenton Node Cầu Rạch Đĩa",
+    "operator": "VinFast",
+    "address": "116A Nguyễn Hữu Thọ, Phước Kiển, Nhà Bè, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7325,
+    "lng": 106.7015,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Quảng trường nhạc nước Kenton"
+  },
+  {
+    "id": "ev-hcm-loverapark",
+    "name": "Trạm sạc KĐT Lovera Park Phong Phú",
+    "operator": "VinFast",
+    "address": "Khu dân cư Phong Phú 4, Bình Chánh, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7025,
+    "lng": 106.6545,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Công viên trung tâm KĐT Lovera Park"
+  },
+  {
+    "id": "ev-hcm-pvoil-suoitien",
+    "name": "Trạm sạc PVOIL Suối Tiên Xa Lộ Hà Nội",
+    "operator": "VinFast",
+    "address": "Xa Lộ Hà Nội, Tân Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8655,
+    "lng": 106.8045,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Cây xăng PVOIL đối diện Khu du lịch Suối Tiên"
+  },
+  {
+    "id": "ocm-494307",
+    "name": "86 Chế Lan Viên, Tây Thạnh, TP.HCM, Việt Nam",
+    "operator": "EVOne",
+    "address": "30 Đường D11",
+    "town": "Tay Thanh",
+    "city": "hcm",
+    "lat": 10.812103354121845,
+    "lng": 106.62878881061545,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 1,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      }
+    ],
+    "source": "Open Charge Map API (Live)",
+    "lastUpdated": "2026-06-21T03:35:00Z"
+  },
+  {
+    "id": "ocm-492405",
+    "name": "Hàm Nghi",
+    "operator": "EVOne",
+    "address": "Hàm Nghi",
+    "town": "",
+    "city": "hcm",
+    "lat": 10.771267228263671,
+    "lng": 106.7002503659336,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 1,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "source": "Open Charge Map API (Live)",
+    "lastUpdated": "2026-06-07T02:52:00Z"
+  },
+  {
+    "id": "ocm-461673",
+    "name": "Charging Station A",
+    "operator": "EVOne",
+    "address": "20 D7, Khu đô thị mới, Bình Nguyên, Bình Dương, Việt Nam",
+    "town": "Bien Hoa City",
+    "city": "hcm",
+    "lat": 10.891655483102014,
+    "lng": 106.8047775168684,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 1,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "source": "Open Charge Map API (Live)",
+    "lastUpdated": "2025-10-03T05:39:00Z"
+  },
+  {
+    "id": "ocm-461659",
+    "name": "Charging Station",
+    "operator": "EVOne",
+    "address": "Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh, Việt Nam",
+    "town": "",
+    "city": "hcm",
+    "lat": 10.841320778974648,
+    "lng": 106.80753715366711,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 500,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 500,
+        "current": "DC",
+        "quantity": 12
+      }
+    ],
+    "source": "Open Charge Map API (Live)",
+    "lastUpdated": "2025-10-02T09:54:00Z"
+  },
+  {
+    "id": "ocm-208970",
+    "name": "Trường Cao Đẳng Lý Tự Trọng",
+    "operator": "EVOne",
+    "address": "Hoàng Văn Thụ",
+    "town": "Tân Bình",
+    "city": "hcm",
+    "lat": 10.797634648670268,
+    "lng": 106.65591013732762,
+    "isOperational": true,
+    "statusText": "Đang hoạt động",
+    "maxPowerKw": 22,
+    "isFastCharge": false,
+    "totalPoints": 1,
+    "connectors": [
+      {
+        "type": "Cổng sạc chuẩn",
+        "powerKw": 22,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "source": "Open Charge Map API (Live)",
+    "lastUpdated": "2022-10-25T03:24:00Z",
+    "ocmId": "ocm-208969"
+  }
+];
+  if (typeof window !== 'undefined') {
+    window.MOVE_SAFE_EV_STATIONS = evStations;
+  }
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = evStations;
+  }
+})();

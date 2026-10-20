@@ -968,8 +968,15 @@ class GoogleMapsApp {
       await this.updateWeatherStations();
 
       const chkEv = document.getElementById('chk-layer-ev');
-      if (chkEv && chkEv.checked && window.mapEngine.toggleEV) {
-        await window.mapEngine.toggleEV(true, true);
+      const chipEv = document.getElementById('chip-ev-stations');
+      const evCounts = { hanoi: 63, hcm: 65, danang: 25 };
+      const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
+      if (countEl) countEl.textContent = `${evCounts[this.currentCity] || 50} trạm`;
+
+      if ((chkEv && chkEv.checked) || (chipEv && chipEv.classList.contains('active'))) {
+        if (window.mapEngine && window.mapEngine.toggleEV) {
+          await window.mapEngine.toggleEV(true, true);
+        }
       }
       if (this.currentPredictionOffset > 0) {
         await this.applyPredictionOffset(this.currentPredictionOffset);
@@ -984,6 +991,27 @@ class GoogleMapsApp {
     // 4b. Chip Xu hướng & VOV Giao thông
     document.getElementById('chip-urban-insights')?.addEventListener('click', () => {
       this.openUrbanInsightsModal();
+    });
+
+    // 4c. Chip Trạm sạc xe điện (Bật/Tắt trực tiếp trên thanh công cụ)
+    document.getElementById('chip-ev-stations')?.addEventListener('click', () => {
+      const chip = document.getElementById('chip-ev-stations');
+      const isNowActive = !chip.classList.contains('active');
+      chip.classList.toggle('active', isNowActive);
+
+      const chkEv = document.getElementById('chk-layer-ev');
+      if (chkEv) chkEv.checked = isNowActive;
+
+      if (window.mapEngine && window.mapEngine.toggleEV) {
+        window.mapEngine.toggleEV(isNowActive);
+      }
+
+      const count = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData.length : 63;
+      if (isNowActive) {
+        this.showToast(`Đang hiển thị ${count} trạm sạc xe điện & tủ đổi pin tại ${this.getCityName(this.currentCity)}`, 'info', 2500);
+      } else {
+        this.showToast('Đã ẩn lớp trạm sạc xe điện', 'info', 1800);
+      }
     });
 
     document.getElementById('btn-close-urban-insights')?.addEventListener('click', () => {
@@ -1004,10 +1032,12 @@ class GoogleMapsApp {
         
         // Tự động bật layer Trạm sạc nếu chọn xe điện
         const evLayerItem = document.getElementById('layer-item-ev');
+        const chipEv = document.getElementById('chip-ev-stations');
         if (this.currentVehicle === 'ebike' || this.currentVehicle === 'ecar') {
           if (evLayerItem) evLayerItem.style.display = 'flex';
           const chkEv = document.getElementById('chk-layer-ev');
           if (chkEv) chkEv.checked = true;
+          if (chipEv) chipEv.classList.add('active');
           if (window.mapEngine.toggleEV) {
             window.mapEngine.toggleEV(true);
             this.showToast('Đã kích hoạt lớp bản đồ Trạm sạc xe điện', 'info', 2500);
@@ -1017,6 +1047,7 @@ class GoogleMapsApp {
           const chkEv = document.getElementById('chk-layer-ev');
           if (chkEv && chkEv.checked) {
              chkEv.checked = false;
+             if (chipEv) chipEv.classList.remove('active');
              if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(false);
           }
         }
@@ -2892,6 +2923,51 @@ class GoogleMapsApp {
     }
   }
 
+  getCoordDistanceMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  getNearbyEVStationsForRoute(routeCoords, maxStations = 3) {
+    const allStations = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const cityStations = allStations.filter(s => !s.city || s.city === this.currentCity);
+    if (!cityStations.length || !routeCoords || !routeCoords.length) return [];
+
+    const sampleStep = Math.max(1, Math.floor(routeCoords.length / 30));
+    const sampledPoints = [];
+    for (let i = 0; i < routeCoords.length; i += sampleStep) {
+      sampledPoints.push(routeCoords[i]);
+    }
+    sampledPoints.push(routeCoords[routeCoords.length - 1]);
+
+    const results = [];
+    cityStations.forEach(st => {
+      if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
+      let minDist = Infinity;
+      for (let p of sampledPoints) {
+        const d = this.getCoordDistanceMeters(p[0], p[1], st.lat, st.lng);
+        if (d < minDist) minDist = d;
+      }
+      if (minDist <= 3000) {
+        results.push({
+          ...st,
+          routeDistMeters: Math.round(minDist)
+        });
+      }
+    });
+
+    results.sort((a, b) => a.routeDistMeters - b.routeDistMeters);
+    return results.slice(0, maxStations);
+  }
+
   // Render summary bar
   renderRouteSummary(container, result) {
     if (result.noPassableRoute) {
@@ -2937,6 +3013,43 @@ class GoogleMapsApp {
       `;
     }
 
+    let evSuggestionsHtml = '';
+    const routeCoords = recommended.polyline || recommended.coordinates;
+    if ((this.currentVehicle === 'ecar' || this.currentVehicle === 'ebike') && routeCoords && routeCoords.length > 0) {
+      const nearbyEVs = this.getNearbyEVStationsForRoute(routeCoords);
+      if (nearbyEVs.length > 0) {
+        const estBattery = Math.max(1, Math.round(recommended.distanceKm * 0.42));
+        evSuggestionsHtml = `
+          <div class="ev-route-suggestions">
+            <div class="ev-route-header">
+              <div class="ev-route-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Trạm sạc dọc lộ trình (${nearbyEVs.length} trạm tiện đường)</span>
+              </div>
+              <span class="ev-battery-tag">Tiêu thụ ước tính: ~${estBattery}% pin (${recommended.distanceKm} km)</span>
+            </div>
+            <div class="ev-stations-inline-list">
+              ${nearbyEVs.map(st => `
+                <div class="ev-station-inline-card" onclick="window.mapEngine && window.mapEngine.focusEVStation('${st.id}')" title="Bấm để xem vị trí trên bản đồ">
+                  <div class="ev-station-info">
+                    <div class="ev-station-name">${st.name}</div>
+                    <div class="ev-station-meta">
+                      <span class="ev-meta-power">⚡ ${st.maxPowerKw ? st.maxPowerKw + 'kW' : 'Đổi pin'}</span>
+                      <span class="ev-meta-dist">Cách tuyến ~${st.routeDistMeters < 1000 ? st.routeDistMeters + 'm' : (st.routeDistMeters/1000).toFixed(1) + 'km'}</span>
+                      <span class="ev-meta-op">${st.operator || 'VinFast'}</span>
+                    </div>
+                  </div>
+                  <button class="ev-btn-view" type="button">Xem trạm</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
     container.innerHTML = `
       <div style="display: flex; flex-direction: column; width: 100%;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
@@ -2954,6 +3067,7 @@ class GoogleMapsApp {
         </div>
         ${avoidedNotice}
         ${diffHtml}
+        ${evSuggestionsHtml}
       </div>
     `;
     container.style.display = 'flex';

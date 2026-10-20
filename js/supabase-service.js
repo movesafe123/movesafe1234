@@ -82,6 +82,12 @@ class SupabaseService {
 
   // 1. Lấy danh sách trạm sạc xe điện (Open Charge Map API v3 & Mạng lưới Quốc gia)
   async getEVStations(city = 'hanoi', fastOnly = false) {
+    // 0. Ưu tiên bộ dữ liệu mạng lưới 153 trạm sạc chuẩn hóa đã nạp sẵn trong window.MOVE_SAFE_EV_STATIONS
+    if (typeof window !== 'undefined' && Array.isArray(window.MOVE_SAFE_EV_STATIONS) && window.MOVE_SAFE_EV_STATIONS.length > 0) {
+      const filtered = window.MOVE_SAFE_EV_STATIONS.filter(s => (!city || s.city === city) && (!fastOnly || s.isFastCharge));
+      if (filtered.length > 0) return filtered;
+    }
+
     // 1. Thử gọi API backend Node.js (Open Charge Map Live Service)
     try {
       const res = await fetch(`/api/ev-stations?city=${city}&fastOnly=${fastOnly}`);
@@ -107,7 +113,19 @@ class SupabaseService {
       }
     } catch (e) {}
 
-    // 3. Thử Supabase nếu có
+    // 3. Thử đọc đường dẫn tương đối cho môi trường tĩnh / GitHub Pages
+    try {
+      const cacheRes2 = await fetch('data/ev_stations_cache.json');
+      if (cacheRes2.ok) {
+        const cached = await cacheRes2.json();
+        if (Array.isArray(cached) && cached.length > 0) {
+          const filtered = cached.filter(s => (!city || s.city === city) && (!fastOnly || s.isFastCharge));
+          if (filtered.length > 0) return filtered;
+        }
+      }
+    } catch (e) {}
+
+    // 4. Thử Supabase nếu có
     if (this.isOnline && this.supabase) {
       const res = await this.safeQuery(
         this.supabase.from('ev_stations').select('*').eq('is_active', true)
@@ -119,6 +137,11 @@ class SupabaseService {
         });
         if (filtered.length > 0) return filtered;
       }
+    }
+
+    // 5. Dự phòng cuối cùng: Nạp từ window.MOVE_SAFE_EV_STATIONS nếu có
+    if (typeof window !== 'undefined' && Array.isArray(window.MOVE_SAFE_EV_STATIONS) && window.MOVE_SAFE_EV_STATIONS.length > 0) {
+      return window.MOVE_SAFE_EV_STATIONS.filter(s => (s.city === city || !city) && (!fastOnly || s.isFastCharge));
     }
 
     // 4. Dữ liệu dự phòng chuẩn cho các thành phố

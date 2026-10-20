@@ -21,7 +21,7 @@ class RoutingService {
       motorbike: {
         type: 'motorbike',
         name: 'Xe máy xăng',
-        icon: '🛵',
+        icon: '',
         maxPassableDepth: 20, // cm - Quá 20cm là ngập ống pô, ướt bugi gây chết máy giữa dòng
         safeDepth: 10,        // cm - Nước nông dưới mép lốp, hoàn toàn an toàn
         corridorBuffer: 110,  // m - Bán kính ảnh hưởng rốn ngập (chuẩn đường phố đô thị VN)
@@ -33,7 +33,7 @@ class RoutingService {
       ebike: {
         type: 'ebike',
         name: 'Xe máy điện',
-        icon: '⚡',
+        icon: '',
         maxPassableDepth: 20, // cm - Khoang pin sàn & controller IC ngập nước gây chập hoặc ngắt an toàn
         safeDepth: 10,        // cm
         corridorBuffer: 110,
@@ -45,7 +45,7 @@ class RoutingService {
       car: {
         type: 'car',
         name: 'Ô tô xăng',
-        icon: '🚗',
+        icon: '',
         maxPassableDepth: 25, // cm - Mép hút gió sedan/hatchback, nguy cơ THỦY KÍCH phá hủy tay biên & vỡ lốc máy
         safeDepth: 15,        // cm - Nước dưới nửa bánh xe, an toàn cho gầm sedan
         corridorBuffer: 130,
@@ -57,7 +57,7 @@ class RoutingService {
       ecar: {
         type: 'ecar',
         name: 'Ô tô điện',
-        icon: '🚙',
+        icon: '',
         maxPassableDepth: 30, // cm - Khối pin IP67 nhưng ngập sâu > 30cm sinh lực đẩy bồng bềnh mất lái & ngắt rơ-le cao áp
         safeDepth: 15,        // cm
         corridorBuffer: 130,
@@ -72,19 +72,19 @@ class RoutingService {
     this.avoidanceLevels = {
       1: {
         name: 'An toàn tuyệt đối',
-        icon: '🛡️',
+        icon: '',
         description: 'Tuyến khô ráo 100% (0cm ngập) & né kẹt xe tối đa',
         color: '#1e8e3e'
       },
       2: {
         name: 'Cân bằng thông minh',
-        icon: '⚖️',
+        icon: '',
         description: 'Đi được nước nông an toàn, né ngập sâu & kẹt cứng để tối ưu cự ly',
         color: '#f9ab00'
       },
       3: {
         name: 'Nhanh nhất (Tuyến đi được)',
-        icon: '⚡',
+        icon: '',
         description: 'Tuyến ngắn nhất & nhanh nhất trong số các đường xe đi được an toàn',
         color: '#1a73e8'
       }
@@ -504,8 +504,8 @@ class RoutingService {
       ...safeRoute,
       routeType: 'safe_bypass',
       label: 'An toàn tuyệt đối',
-      sublabel: `🛡️ ${safeFloodText} • Né hoàn toàn ngập & kẹt xe`,
-      tagText: `🛡️ ${safeFloodText} • Tuyến đi an toàn`,
+      sublabel: `${safeFloodText} • Né hoàn toàn ngập & kẹt xe`,
+      tagText: `${safeFloodText} • Tuyến đi an toàn`,
       tagClass: 'gm-tag-safe',
       trafficDesc: safeRoute.matchedFloods.length === 0
         ? 'Tuyến đường cao ráo, hoàn toàn không ngập nước, an toàn tuyệt đối cho xe'
@@ -523,8 +523,8 @@ class RoutingService {
       ...balancedRoute,
       routeType: 'balanced',
       label: 'Cân bằng thông minh',
-      sublabel: '⚖️ Cân bằng cự ly & Đảm bảo an toàn kỹ thuật',
-      tagText: `⚖️ ${balJam}% kẹt • Tuyến xe đi được`,
+      sublabel: 'Cân bằng cự ly & Đảm bảo an toàn kỹ thuật',
+      tagText: `${balJam}% kẹt • Tuyến xe đi được`,
       tagClass: 'gm-tag-warning',
       trafficDesc: 'Tối ưu quãng đường và thời gian, đảm bảo 100% không lo chết máy hay thủy kích',
       jamPercent: balJam,
@@ -540,8 +540,8 @@ class RoutingService {
       ...fastestRoute,
       routeType: 'fastest',
       label: 'Nhanh nhất (Tuyến đi được)',
-      sublabel: `⚡ Tuyến nhanh nhất (~${fastestRoute.durationMin} phút • ${fastestRoute.distanceKm} km)`,
-      tagText: `⚡ Nhanh nhất (${fastestRoute.distanceKm} km) • Đảm bảo an toàn`,
+      sublabel: `Tuyến nhanh nhất (~${fastestRoute.durationMin} phút • ${fastestRoute.distanceKm} km)`,
+      tagText: `Nhanh nhất (${fastestRoute.distanceKm} km) • Đảm bảo an toàn`,
       tagClass: 'gm-tag-fastest',
       trafficDesc: 'Tuyến nhanh nhất trong số các hành lang xe có thể đi qua an toàn',
       jamPercent: fastJam,

@@ -13,7 +13,6 @@ class AIChat {
   }
 
   initSpeech() {
-    // Khởi tạo nhận diện giọng nói tiếng Việt
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
@@ -29,7 +28,6 @@ class AIChat {
         if (searchInput) searchInput.value = transcript;
         if (chatInput) chatInput.value = transcript;
 
-        // Tự động gửi câu hỏi vào AI
         this.open();
         this.sendMessage(transcript);
         this.stopListening();
@@ -55,7 +53,7 @@ class AIChat {
   startListening() {
     if (!this.recognition) return;
     this.isListening = true;
-    document.querySelectorAll('.btn-voice, #btn-voice-search').forEach(btn => btn.classList.add('mic-active'));
+    document.querySelectorAll('.btn-voice, #btn-voice-search, #btn-chat-voice').forEach(btn => btn.classList.add('mic-active'));
     try {
       this.recognition.start();
     } catch (e) {}
@@ -63,7 +61,7 @@ class AIChat {
 
   stopListening() {
     this.isListening = false;
-    document.querySelectorAll('.btn-voice, #btn-voice-search').forEach(btn => btn.classList.remove('mic-active'));
+    document.querySelectorAll('.btn-voice, #btn-voice-search, #btn-chat-voice').forEach(btn => btn.classList.remove('mic-active'));
     try {
       if (this.recognition) this.recognition.stop();
     } catch (e) {}
@@ -78,19 +76,36 @@ class AIChat {
     const win = document.getElementById('ai-chat-window');
     if (win) win.classList.add('open');
     if (this.messages.length === 0) {
-      this.addBotMessage(`Xin chào! Tôi là **Trợ lý AI MoveSafe** 🤖.\nTôi theo dõi mực nước trạm đo HSDC, UDi Maps và kẹt xe TomTom.\nBạn cần tôi tư vấn tuyến đường khô ráo hay kiểm tra rốn ngập nào?`);
+      this.addBotMessage(`Xin chào! Tôi là **Trợ lý AI MoveSafe**.\nTôi theo dõi trực tiếp mực nước các trạm đo HSDC, UDi Maps và lưu lượng giao thông TomTom.\nBạn cần tư vấn lộ trình di chuyển hay kiểm tra tình trạng ngập úng, kẹt xe tại khu vực nào?`);
     }
   }
 
   close() {
     this.isOpen = false;
+    this.stopSpeaking();
     const win = document.getElementById('ai-chat-window');
     if (win) win.classList.remove('open');
   }
 
   clearMessages() {
+    this.stopSpeaking();
     this.messages = [];
+    this.open();
     this.renderMessages();
+  }
+
+  stripEmojis(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu, '')
+      .replace(/[ \t]{2,}/g, ' ')
+      .replace(/^ +/gm, '')
+      .trim();
+  }
+
+  addMessage(sender, text) {
+    if (sender === 'user') return this.addUserMessage(text);
+    return this.addBotMessage(text);
   }
 
   addUserMessage(text) {
@@ -99,7 +114,7 @@ class AIChat {
   }
 
   addBotMessage(text) {
-    this.messages.push({ sender: 'bot', text });
+    this.messages.push({ sender: 'bot', text: this.stripEmojis(text) });
     this.renderMessages();
   }
 
@@ -113,43 +128,140 @@ class AIChat {
       .replace(/'/g, '&#39;');
   }
 
-  speakText(text) {
+  stopSpeaking() {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    this.isSpeaking = false;
+    this.currentSpeakingText = null;
+    this.currentSpeakingBtn = null;
+    this.updateAllTTSButtons(false);
+  }
+
+  toggleSpeakText(btn, text) {
     if (!('speechSynthesis' in window)) {
-      alert('Trình duyệt của bạn không hỗ trợ Text-to-Speech.');
+      alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
       return;
     }
-    window.speechSynthesis.cancel();
-    const cleanText = text.replace(/[*_#`[\]()]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    const cleanText = this.stripEmojis(text)
+      .replace(/[*_#`[\]()]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleanText) return;
+
+    // Nếu đang đọc chính đoạn tin này -> Bấm vào để NGỪNG ĐỌC
+    if (this.isSpeaking && (window.speechSynthesis.speaking || window.speechSynthesis.pending) && this.currentSpeakingText === cleanText) {
+      this.stopSpeaking();
+      return;
+    }
+
+    // Nếu đang đọc đoạn khác hoặc bắt đầu mới -> Dừng đoạn cũ và đọc đoạn này
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    this.updateAllTTSButtons(false);
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'vi-VN';
     utterance.rate = 1.05;
+
+    const onFinish = () => {
+      this.isSpeaking = false;
+      this.currentSpeakingText = null;
+      this.currentSpeakingBtn = null;
+      if (btn) this.setButtonSpeakingState(btn, false);
+      this.updateAllTTSButtons(false);
+    };
+
+    utterance.onstart = () => {
+      this.isSpeaking = true;
+      this.currentSpeakingText = cleanText;
+      this.currentSpeakingBtn = btn;
+      if (btn) this.setButtonSpeakingState(btn, true);
+    };
+
+    utterance.onend = onFinish;
+    utterance.onerror = (e) => {
+      if (e && e.error === 'canceled') {
+        onFinish();
+        return;
+      }
+      onFinish();
+    };
+
+    // Đánh dấu trạng thái ngay lập tức trên UI
+    this.isSpeaking = true;
+    this.currentSpeakingText = cleanText;
+    this.currentSpeakingBtn = btn;
+    if (btn) this.setButtonSpeakingState(btn, true);
+
     window.speechSynthesis.speak(utterance);
+  }
+
+  setButtonSpeakingState(btn, isSpeaking) {
+    if (!btn) return;
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const stopIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect></svg>`;
+
+    if (isSpeaking) {
+      btn.classList.add('is-speaking');
+      btn.setAttribute('title', 'Nhấn để ngừng đọc giọng nói');
+      btn.innerHTML = `${stopIconSvg}<span>Ngừng đọc</span>`;
+    } else {
+      btn.classList.remove('is-speaking');
+      btn.setAttribute('title', 'Đọc bằng giọng nói tiếng Việt');
+      btn.innerHTML = `${playIconSvg}<span>Đọc tin</span>`;
+    }
+  }
+
+  updateAllTTSButtons(isSpeaking) {
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    document.querySelectorAll('.gm-btn-tts').forEach(b => {
+      b.classList.remove('is-speaking');
+      b.setAttribute('title', 'Đọc bằng giọng nói tiếng Việt');
+      b.innerHTML = `${playIconSvg}<span>Đọc tin</span>`;
+    });
+  }
+
+  speakText(text, btnElement) {
+    this.toggleSpeakText(btnElement || null, text);
   }
 
   renderMessages() {
     const body = document.getElementById('ai-chat-body');
     if (!body) return;
 
-    body.innerHTML = this.messages.map((m, idx) => {
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const stopIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect></svg>`;
+
+    body.innerHTML = this.messages.map((m) => {
       const isUser = m.sender === 'user';
       let safeHtml = this.escapeHtml(m.text)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\n/g, '<br>');
 
+      const cleanText = this.stripEmojis(m.text)
+        .replace(/[*_#`[\]()]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const isSpeakingThis = Boolean(this.isSpeaking && this.currentSpeakingText === cleanText);
+
       const ttsButton = !isUser ? `
-        <div style="margin-top: 6px; text-align: right;">
-          <button style="background: none; border: none; font-size: 13px; cursor: pointer; opacity: 0.7; color: inherit;"
-                  onclick="window.aiChat && window.aiChat.speakText(decodeURIComponent('${encodeURIComponent(m.text)}'))"
-                  title="Đọc to bằng giọng nói tiếng Việt">
-            🔊 Nghe
+        <div class="gm-chat-actions">
+          <button class="gm-btn-tts ${isSpeakingThis ? 'is-speaking' : ''}"
+                  onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(m.text)}'))"
+                  title="${isSpeakingThis ? 'Nhấn để ngừng đọc giọng nói' : 'Đọc bằng giọng nói tiếng Việt'}">
+            ${isSpeakingThis ? stopIconSvg : playIconSvg}
+            <span>${isSpeakingThis ? 'Ngừng đọc' : 'Đọc tin'}</span>
           </button>
         </div>
       ` : '';
 
       return `
         <div class="gm-chat-bubble ${isUser ? 'gm-bubble-user' : 'gm-bubble-bot'}">
-          <div>${safeHtml}</div>
+          <div class="gm-bubble-content">${safeHtml}</div>
           ${ttsButton}
         </div>
       `;
@@ -158,11 +270,57 @@ class AIChat {
     body.scrollTop = body.scrollHeight;
   }
 
+  /**
+   * Phân tích câu hỏi tìm đường tự nhiên tiếng Việt
+   * Xử lý chính xác các câu như: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không"
+   */
+  parseRouteQuery(query) {
+    if (!query) return null;
+
+    // 1. Trích xuất mốc thời gian dự báo nếu có (VD: "trong 2h tới", "sau 1 giờ nữa", "3 tiếng tới")
+    let timeOffsetHours = 0;
+    const timeMatch = query.match(/(?:trong|sau|khoảng)?\s*(\d+)\s*(?:h|giờ|tiếng)\s*(?:tới|nữa|sau)?/i);
+    if (timeMatch && timeMatch[1]) {
+      timeOffsetHours = Math.min(3, Math.max(0, parseInt(timeMatch[1], 10)));
+    }
+
+    // 2. Làm sạch phần đuôi câu hỏi (thời gian, câu hỏi tắc đường/ngập nước) trước khi tách điểm đi - điểm đến
+    let cleaned = query
+      .replace(/(?:trong|sau|khoảng)\s*\d+\s*(?:h|giờ|tiếng|phút|p)\s*(?:tới|nữa|sau)?.*$/i, '')
+      .replace(/\s+\d+\s*(?:h|giờ|tiếng)\s*(?:tới|nữa).*$/i, '')
+      .replace(/\s+(?:hiện tại|bây giờ|lúc này|hôm nay|chiều nay|tối nay|sáng nay)?\s*(?:có bị|có đang|có|bị|đang)?\s*(?:tắc đường|kẹt xe|ùn tắc|tắc|kẹt|ngập nước|ngập úng|ngập|mưa|thông thoáng|đi được).*$/i, '')
+      .replace(/\s+(?:đi đường nào|đường nào|như thế nào|thế nào|ra sao|không|chưa|nhỉ|vậy|ạ|nhé|\?|\.|!)+$/i, '')
+      .trim();
+
+    // 3. Tách Điểm đi và Điểm đến với các giới từ chỉ hướng phổ biến (đến, về, sang, qua, tới, ra, vào, lên, xuống)
+    const routeRegex = /(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới|ra|vào|lên|xuống)\s+(.+)$/i;
+    const match = cleaned.match(routeRegex);
+    if (!match || !match[1] || !match[2]) return null;
+
+    const orig = match[1]
+      .replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi)\s+/i, '')
+      .replace(/[,.?!]+$/g, '')
+      .trim();
+
+    const dest = match[2]
+      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất).*$/i, '')
+      .replace(/[,.?!]+$/g, '')
+      .trim();
+
+    if (orig.length < 2 || dest.length < 2) return null;
+
+    return {
+      origin: orig,
+      destination: dest,
+      timeOffsetHours
+    };
+  }
+
   handleMapAction(act) {
     if (!act || !window.mapEngine) return;
     if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
       if (window.appState && window.appState.triggerChatRoute) {
-        window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1);
+        window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0);
       }
     } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
       window.mapEngine.map?.flyTo([act.lat, act.lng], 16);
@@ -184,6 +342,17 @@ class AIChat {
       window.mapEngine.toggleWeather(true);
       const chk = document.getElementById('chk-layer-weather');
       if (chk) chk.checked = true;
+    } else if (act.type === 'SHOW_EV_LAYER') {
+      if (window.mapEngine && window.mapEngine.toggleEV) {
+        window.mapEngine.toggleEV(true);
+      }
+      const chk = document.getElementById('chk-layer-ev');
+      if (chk) chk.checked = true;
+      const item = document.getElementById('layer-item-ev');
+      if (item) item.style.display = 'flex';
+      if (act.targetStation && window.mapEngine && window.mapEngine.focusEVStation) {
+        setTimeout(() => window.mapEngine.focusEVStation(act.targetStation), 700);
+      }
     }
   }
 
@@ -195,11 +364,11 @@ class AIChat {
     if (input) input.value = '';
     this.addUserMessage(query);
 
-    // Hiển thị đang suy nghĩ
-    this.addBotMessage('⏳ *Đang phân tích dữ liệu thời gian thực...*');
+    this.addBotMessage('*Đang phân tích dữ liệu giao thông thời gian thực...*');
 
     const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
     const geminiKey = localStorage.getItem('movesafe_gemini_key') || '';
+    const parsedRoute = this.parseRouteQuery(query);
 
     let responded = false;
 
@@ -214,47 +383,61 @@ class AIChat {
       if (res.ok) {
         const data = await res.json();
         if (data.status === 'success' && data.response?.text) {
-          this.messages.pop(); // Xóa tin nhắn chờ
+          this.messages.pop();
+
+          // Nếu câu hỏi là lộ trình từ A đến B nhưng backend trả kết quả bị tách sai, ưu tiên bộ phân tích chuẩn
+          if (parsedRoute && data.response.action?.type === 'AUTO_ROUTE') {
+            data.response.action.origin = parsedRoute.origin;
+            data.response.action.destination = parsedRoute.destination;
+            data.response.action.timeOffsetHours = parsedRoute.timeOffsetHours;
+          }
+
           this.addBotMessage(data.response.text);
           responded = true;
 
-          // Thực hiện hành động trên bản đồ nếu có
-          if (data.response.action) {
+          if (parsedRoute) {
+            this.handleMapAction({
+              type: 'AUTO_ROUTE',
+              origin: parsedRoute.origin,
+              destination: parsedRoute.destination,
+              avoidLevel: 1,
+              timeOffsetHours: parsedRoute.timeOffsetHours
+            });
+          } else if (data.response.action) {
             this.handleMapAction(data.response.action);
           }
         }
       }
     } catch (serverErr) {
-      // Backend không phản hồi (ví dụ khi chạy tĩnh trên GitHub Pages)
+      // Backend không phản hồi
     }
 
     if (responded) return;
 
-    // 2. Thử gọi trực tiếp Google Gemini API qua Client (dành cho GitHub Pages hoặc khi backend bận)
+    // 2. Thử gọi trực tiếp Google Gemini API qua Client
     if (geminiKey) {
       try {
         let geminiReply = await this.callDirectGemini(query, currentCity, geminiKey);
         this.messages.pop();
 
-        let autoOrigin = null;
-        let autoDest = null;
+        let autoOrigin = parsedRoute ? parsedRoute.origin : null;
+        let autoDest = parsedRoute ? parsedRoute.destination : null;
         const routeMatch = geminiReply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
         if (routeMatch) {
-          autoOrigin = routeMatch[1].trim();
-          autoDest = routeMatch[2].trim();
+          if (!autoOrigin) autoOrigin = routeMatch[1].trim();
+          if (!autoDest) autoDest = routeMatch[2].trim();
           geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*->\s*.*?\]/i, '').trim();
-        } else {
-          const qMatch = query.match(/(?:từ|đi từ|chỉ đường từ|lộ trình từ)\s+(.+?)\s+(?:đến|về|sang|qua|tới)\s+(.+?)(?:\.|\?|,|né ngập|tránh tắc|$)/i);
-          if (qMatch && qMatch[1] && qMatch[2]) {
-            autoOrigin = qMatch[1].replace(/^(tôi|bạn|hãy)\s+/i, '').trim();
-            autoDest = qMatch[2].replace(/(\?|!|\.|né ngập)$/i, '').trim();
-          }
         }
 
         this.addBotMessage(geminiReply);
 
+        const lowerQ = query.toLowerCase();
+        if (lowerQ.includes('trạm sạc') || lowerQ.includes('sạc xe') || lowerQ.includes('sạc pin') || lowerQ.includes('xe điện') || lowerQ.includes('đổi pin')) {
+          this.handleMapAction({ type: 'SHOW_EV_LAYER' });
+        }
+
         if (autoOrigin && autoDest && window.appState && window.appState.triggerChatRoute) {
-          window.appState.triggerChatRoute(autoOrigin, autoDest, 1);
+          window.appState.triggerChatRoute(autoOrigin, autoDest, 1, parsedRoute ? parsedRoute.timeOffsetHours : 0);
         }
         return;
       } catch (geminiErr) {
@@ -272,24 +455,29 @@ class AIChat {
     const activeJams = traffics.filter(t => t.isJam === true);
     const lower = query.toLowerCase();
 
-    // 3a. Kiểm tra nếu hỏi lộ trình từ A đến B (Tự động vẽ đường né ngập trên bản đồ)
-    const routeRegex = /(?:từ|đi từ|chỉ đường từ|lộ trình từ)\s+(.+?)\s+(?:đến|về|sang|qua|tới)\s+(.+?)(?:\.|\?|,|né ngập|tránh tắc|không ngập|$)/i;
-    const rMatch = query.match(routeRegex);
-    if (rMatch && rMatch[1] && rMatch[2]) {
-      const orig = rMatch[1].replace(/^(tôi|bạn|hãy|giúp)\s+/i, '').trim();
-      const dest = rMatch[2].replace(/(\?|!|\.|né ngập|tránh tắc|không ngập)$/i, '').trim();
+    // 3a. Nếu hỏi lộ trình từ A đến B (ví dụ: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không")
+    if (parsedRoute) {
+      const { origin, destination, timeOffsetHours } = parsedRoute;
+      const timeNote = timeOffsetHours > 0
+        ? `\n**Dự báo trong +${timeOffsetHours} giờ tới**: Hệ thống đã kích hoạt mô hình dự báo giao thông +${timeOffsetHours}h. Lưu lượng trên các trục chính hướng về **${destination}** được phân tích trực tiếp trên thanh trạng thái lộ trình.`
+        : '';
 
-      if (orig.length >= 2 && dest.length >= 2) {
-        const reply = `🎯 **Đã kích hoạt tự động vẽ lộ trình thông minh trên bản đồ!**\n\n` +
-                      `📍 **Lộ trình**: Điểm đi: **${orig}** ➔ Điểm đến: **${dest}**\n` +
-                      `🛡️ **Điều phối tự động né ngập & ùn tắc**: MoveSafe tự động chọn chế độ **An toàn tuyệt đối (Né 100% rốn ngập)**. Nếu phát hiện rốn ngập sâu trên trục chính, hệ thống sẽ tự động bẻ hướng sang hành lang đường vòng cao ráo.\n\n` +
-                      `*Bản đồ tác chiến và bảng chỉ đường đã được mở tự động cho bạn!*`;
-        this.addBotMessage(reply);
-        if (window.appState && window.appState.triggerChatRoute) {
-          window.appState.triggerChatRoute(orig, dest, 1);
-        }
-        return;
+      const trafficNote = activeJams.length > 0
+        ? `Hiện ghi nhận **${activeJams.length} điểm ùn ứ** trong khu vực, hệ thống đã tự động ưu tiên đường vòng thông thoáng.`
+        : `Hiện tại các trục đường chính tương đối thông thoáng, không ghi nhận điểm ùn tắc nghiêm trọng.`;
+
+      const reply = `**Đã tự động phân tích và vẽ lộ trình trên bản đồ**\n\n` +
+                    `• **Điểm xuất phát**: ${origin}\n` +
+                    `• **Điểm đến**: ${destination}\n` +
+                    `• **Tình trạng giao thông**: ${trafficNote}${timeNote}\n` +
+                    `• **Chế độ điều phối**: Ưu tiên lộ trình an toàn, né hoàn toàn các điểm ngập úng và nút giao ùn tắc.\n\n` +
+                    `*Bảng chi tiết lộ trình và bản đồ dẫn đường đã được mở ở phía bên trái màn hình.*`;
+
+      this.addBotMessage(reply);
+      if (window.appState && window.appState.triggerChatRoute) {
+        window.appState.triggerChatRoute(origin, destination, 1, timeOffsetHours);
       }
+      return;
     }
 
     // 3b. Kiểm tra nếu hỏi về phường hoặc trục đường cụ thể tại Hà Nội
@@ -319,20 +507,18 @@ class AIChat {
         const temp = stWeather ? stWeather.temp : 26;
         const desc = stWeather ? stWeather.description : 'Khô ráo';
         const rain = stWeather ? stWeather.rain1h : 0;
-        const weatherText = rain > 0 ? `🌧️ ${temp}°C, mưa ${rain}mm (${desc})` : `☀️ ${temp}°C, khô ráo (${desc})`;
+        const weatherText = rain > 0 ? `${temp}°C, lượng mưa ${rain}mm (${desc})` : `${temp}°C, khô ráo (${desc})`;
 
-        let reply = `🏛️ **Thông tin Giao thông & Thời tiết: ${matchedWard.name} (Q. ${matchedWard.district})**\n\n`;
-        reply += `🌦️ **Thời tiết hiện tại**: ${weatherText}\n`;
-        reply += `🛣️ **Các trục đường huyết mạch qua phường**:\n` +
-                 (matchedWard.mainStreets || []).map(s => `  • **${s}**`).join('\n') + `\n\n`;
+        let reply = `**Thông tin giao thông & thời tiết: ${matchedWard.name} (Quận ${matchedWard.district})**\n\n`;
+        reply += `• **Thời tiết hiện tại**: ${weatherText}\n`;
+        reply += `• **Các trục đường chính**: ${(matchedWard.mainStreets || []).join(', ')}\n`;
         if (matchedWard.trafficHotspots && matchedWard.trafficHotspots.length > 0) {
-          reply += `🚦 **Điểm giao cắt & Nút thắt ùn tắc thường gặp**:\n` +
-                   matchedWard.trafficHotspots.map(h => `  • ${h}`).join('\n') + `\n\n`;
+          reply += `• **Nút giao trọng điểm**: ${matchedWard.trafficHotspots.join('; ')}\n`;
         }
         if (matchedWard.floodVulnerability) {
-          reply += `🌊 **Đặc điểm ngập úng mùa mưa bão**: ${matchedWard.floodVulnerability}\n\n`;
+          reply += `• **Đặc điểm thoát nước**: ${matchedWard.floodVulnerability}\n`;
         }
-        reply += `💡 **Gợi ý**: Bạn có thể bấm vào ghim **${matchedWard.name}** trên bản đồ hoặc bấm **🔀 Chỉ đường** để MoveSafe tự động vạch lộ trình né ùn tắc & ngập úng!`;
+        reply += `\nBạn có thể nhấn vào nút **Chỉ đường** trên thanh tìm kiếm để vạch lộ trình chi tiết qua khu vực này.`;
 
         this.addBotMessage(reply);
         if (window.mapEngine && window.mapEngine.map) {
@@ -342,35 +528,78 @@ class AIChat {
       }
     }
 
-    let reply = `🚗 **Phân tích Trợ lý AI MoveSafe**:\n\n`;
+    // 3c. Hỏi về trạm sạc xe điện (VinFast, Open Charge Map, EVOne, Porsche, Selex, ...)
+    if (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('sạc điện') || lower.includes('đổi pin') || lower.includes('open charge')) {
+      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
+      const fastList = stations.filter(s => s.isFastCharge || (s.maxPowerKw && s.maxPowerKw >= 50));
+      
+      let matched = null;
+      for (const st of stations) {
+        const cleanName = (st.name || '').toLowerCase();
+        if (lower.includes(cleanName) || (st.address && lower.includes(st.address.toLowerCase()))) {
+          matched = st;
+          break;
+        }
+      }
+
+      if (matched) {
+        const reply = `**Thông tin trạm sạc: ${matched.name}**\n\n` +
+                      `• **Đơn vị vận hành**: ${matched.operator || matched.provider || 'VinFast'}\n` +
+                      `• **Địa chỉ**: ${matched.address}\n` +
+                      `• **Công suất tối đa**: ${matched.maxPowerKw || 60} kW (${matched.isFastCharge ? 'DC Sạc nhanh' : 'AC Chuẩn'})\n` +
+                      `• **Trạng thái**: ${matched.isOperational !== false ? 'Đang hoạt động 24/7' : 'Đang bảo trì'}\n` +
+                      `• **Quy mô**: ${matched.totalPoints || matched.capacity || 2} trụ sạc\n\n` +
+                      `*Hệ thống đã tự động định vị và mở thông tin trạm sạc trên bản đồ. Bạn có thể nhấn "Chỉ đường né ngập" trong popup để di chuyển an toàn.*`;
+        this.addBotMessage(reply);
+        this.handleMapAction({
+          type: 'SHOW_EV_LAYER',
+          targetStation: matched.name
+        });
+        return;
+      }
+
+      const sampleList = stations.slice(0, 3).map(s => 
+        `• **${s.name}** (${s.operator || 'Đối tác'}) - ${s.maxPowerKw || 60}kW - ${s.address}`
+      ).join('\n');
+
+      const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
+      const reply = `**Hệ thống Trạm sạc Xe điện (${cityName}) - Open Charge Map & Đối tác**:\n\n` +
+                    `Hiện hệ thống có **${stations.length > 0 ? stations.length : 12} trạm sạc khả dụng** trong thành phố (gồm **${fastList.length > 0 ? fastList.length : 9} trạm sạc nhanh DC** từ 60kW - 250kW và các trạm đổi pin).\n\n` +
+                    (sampleList ? `**Một số trạm sạc tiêu biểu gần bạn**:\n${sampleList}\n\n` : '') +
+                    `*Lớp bản đồ trạm sạc đã được kích hoạt. Bạn có thể nhấn trực tiếp vào từng ghim trạm sạc trên màn hình để kiểm tra cổng sạc hoặc bấm chỉ đường an toàn.*`;
+
+      this.addBotMessage(reply);
+      this.handleMapAction({ type: 'SHOW_EV_LAYER' });
+      return;
+    }
+
+    let reply = `**Phân tích giao thông MoveSafe**:\n\n`;
     if (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('kẹt xe')) {
       if (lower.includes('xuân phương')) {
-        reply += `🚦 **Tình trạng tuyến đường Xuân Phương (Nam Từ Liêm)**:\n` +
-                 `• **Nguyên nhân chính**: Mặt cắt đường hẹp, lưu lượng phương tiện từ các khu đô thị (Vân Canh, Hateco, Foresa...) đổ ra đường 32 và Trịnh Văn Bô rất lớn vào giờ cao điểm.\n` +
-                 `• **Điểm nghẽn**: Nút giao thắt cổ chai và xung đột xe máy với xe buýt, xe tải.\n` +
-                 `💡 **Khuyến nghị**: Nên chuyển hướng sang trục Trịnh Văn Bô hoặc đường Trần Hữu Dực để di chuyển thông thoáng hơn!`;
+        reply += `**Tình trạng tuyến đường Xuân Phương (Nam Từ Liêm)**:\n` +
+                 `• **Nguyên nhân**: Mặt cắt đường hẹp, lưu lượng phương tiện từ các khu đô thị đổ ra đường 32 và Trịnh Văn Bô lớn vào giờ cao điểm.\n` +
+                 `• **Điểm nghẽn**: Nút giao cầu vượt và các điểm giao cắt với xe tải, xe buýt.\n` +
+                 `• **Khuyến nghị**: Chuyển hướng sang trục Trịnh Văn Bô hoặc đường Trần Hữu Dực để di chuyển thông thoáng hơn.`;
       } else {
         reply += `Khu vực hiện ghi nhận **${activeJams.length} điểm ùn tắc** trên hệ thống TomTom Traffic.\n` +
-                 `Bạn hãy theo dõi lớp bản đồ nhiệt giao thông trực tiếp trên MoveSafe nhé!`;
+                 `Lớp bản đồ mật độ giao thông đã được hiển thị trực tiếp trên màn hình để bạn theo dõi.`;
       }
       this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
     } else if (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích')) {
       if (activeFloods.length > 0) {
-        reply += `Hiện hệ thống ghi nhận **${activeFloods.length} rốn ngập** tại khu vực.\n\n` +
-                 `📍 **Các điểm ngập sâu cần tránh**:\n` +
-                 activeFloods.slice(0, 3).map(f => `• **${f.name}**: Ngập sâu ${f.depth_cm}cm (${f.passable_motorbike ? 'Xe máy đi chậm' : 'Xe máy KHÔNG THỂ QUA'})`).join('\n') +
-                 `\n\n💡 **Gợi ý**: Bạn bấm vào nút **🔀 Chỉ đường** trên thanh tìm kiếm để MoveSafe tự động vạch lộ trình né ngập màu xanh lá nhé!`;
+        reply += `Hiện hệ thống ghi nhận **${activeFloods.length} điểm ngập** tại khu vực:\n\n` +
+                 activeFloods.slice(0, 3).map(f => `• **${f.name}**: Ngập ${f.depth_cm}cm (${f.passable_motorbike ? 'Xe máy đi chậm' : 'Xe máy không nên đi qua'})`).join('\n') +
+                 `\n\nBạn có thể mở mục **Chỉ đường** để hệ thống tự động vạch lộ trình vòng tránh các điểm ngập này.`;
       } else {
-        reply += `✅ Hiện tại toàn bộ các trạm quan trắc trong thành phố đều **khô ráo (0 điểm ngập)**. Các phương tiện lưu thông bình thường và an toàn!`;
+        reply += `Hiện tại toàn bộ các trạm quan trắc trong thành phố đều **khô ráo (0 điểm ngập)**. Các phương tiện lưu thông bình thường và an toàn.`;
       }
       this.handleMapAction({ type: 'SHOW_FLOOD_LAYER' });
     } else {
-      reply += `Khu vực hiện có **${activeFloods.length} rốn ngập** và **${activeJams.length} điểm ùn tắc**. Bạn cần kiểm tra tuyến đường nào hãy nhập vào thanh tìm kiếm nhé!`;
+      reply += `Khu vực hiện có **${activeFloods.length} điểm ngập** và **${activeJams.length} điểm ùn tắc**. Để tìm đường tự động, bạn có thể nhập câu hỏi theo cú pháp *"Từ [Điểm đi] đến [Điểm đến]"*.`;
     }
     this.addBotMessage(reply);
   }
 
-  // Gọi trực tiếp Google Gemini API từ trình duyệt
   async callDirectGemini(query, currentCity, apiKey) {
     const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const liveData = window.appState ? window.appState.liveData : { floodPoints: [], trafficIncidents: [], weatherAlerts: [] };
@@ -384,9 +613,9 @@ class AIChat {
     const lower = query.toLowerCase();
     const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
+    const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc điện') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
 
     let dynamicContext = '';
-    // Thêm ngữ cảnh phường và trục đường Hà Nội nếu có (không bị ghi đè ở dưới)
     if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
       const matched = window.HANOI_WARDS_DATA.find(w => {
         const wLower = w.name.toLowerCase();
@@ -407,10 +636,9 @@ class AIChat {
 - Sự cố / tình hình ùn tắc: ${JSON.stringify(traffics.slice(0, 6).map(t => ({ description: t.description, delay_min: Math.round((t.delaySeconds || 60) / 60) })))}`;
 
       instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng chỉ hỏi về TẮC ĐƯỜNG / KẸT XE, hoàn toàn KHÔNG hỏi về ngập úng hay thời tiết.
-2. TUYỆT ĐỐI KHÔNG tự động liệt kê danh sách các điểm ngập nước (mức ngập 0cm) hay cảnh báo mang áo mưa vì không liên quan.
-3. Nếu người dùng hỏi về một tuyến đường hoặc khu vực cụ thể: Hãy kết hợp kiến thức thực tế về tuyến đường đó tại ${cityName} để giải thích nguyên nhân rõ ràng và gợi ý hướng đi thay thế nếu có.
-4. Trả lời thẳng thắn, ngắn gọn, súc tích (2-3 đoạn ngắn), dùng emoji phù hợp.`;
+1. Người dùng hỏi về TẮC ĐƯỜNG / KẸT XE.
+2. Nếu người dùng hỏi lộ trình từ A đến B kèm câu hỏi tắc đường, hãy nhận định tình hình lưu thông trên trục đó và ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] (chỉ ghi tên địa điểm A và B ngắn gọn, không kèm cụm từ 'trong 2h tới' hay 'có bị tắc đường không').
+3. Trả lời lịch sự, rõ ràng, ngắn gọn (2-3 đoạn ngắn), KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else if (isAskingFloodOnly) {
       const floodsForPrompt = activeFloods.length > 0 ? activeFloods : allFloods.slice(0, 5);
       dynamicContext += `Dữ liệu đo đạc ngập úng từ trạm HSDC/UDi Maps tại ${cityName} (Số điểm ngập >0cm hiện tại: ${activeFloods.length}):
@@ -418,8 +646,18 @@ class AIChat {
 - Cảnh báo thời tiết KTTV: ${JSON.stringify(alerts.slice(0, 2))}`;
 
       instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng hỏi về NGẬP NƯỚC / THỦY KÍCH / MƯA LŨ. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại đường khô ráo (0cm ngập). Nếu có ngập >0cm, nêu rõ độ sâu ngập (cm), các rốn ngập cần tránh, khả năng đi qua của xe máy và ô tô.
-2. Trả lời súc tích, thực tế và mang tính hành động cao.`;
+1. Người dùng hỏi về NGẬP NƯỚC / THỦY KÍCH / MƯA LŨ. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại đường khô ráo (0cm ngập). Nếu có ngập >0cm, nêu rõ độ sâu ngập (cm) và hướng đi thay thế.
+2. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+    } else if (isAskingEV) {
+      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
+      dynamicContext += `Dữ liệu trạm sạc xe điện Open Charge Map & Đối tác tại ${cityName}:
+- Tổng số trạm sạc: ${stations.length || 12}
+- Danh sách trạm sạc tiêu biểu: ${JSON.stringify(stations.slice(0, 6).map(s => ({ name: s.name, operator: s.operator, maxPowerKw: s.maxPowerKw, isFastCharge: s.isFastCharge, address: s.address })))}`;
+
+      instructions = `YÊU CẦU TRẢ LỜI:
+1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
+2. Nêu rõ các trạm sạc gần nhất, công suất sạc (kW), hỗ trợ DC sạc nhanh hay AC chuẩn, và hướng đi khô ráo né ngập.
+3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else {
       dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName} (Số điểm ngập >0cm: ${activeFloods.length}):
 - Điểm ngập úng trạm đo: ${JSON.stringify((activeFloods.length > 0 ? activeFloods : allFloods).slice(0, 6).map(f => ({ name: f.name, depth_cm: f.depth_cm, advice: f.advice })))}
@@ -427,9 +665,8 @@ class AIChat {
 - Cảnh báo thời tiết: ${JSON.stringify(alerts.slice(0, 2))}`;
 
       instructions = `YÊU CẦU TRẢ LỜI:
-1. Trả lời đúng trọng tâm câu hỏi của người dùng. Không liệt kê lan man những thông tin không liên quan.
-2. Nếu hỏi đường, gợi ý lộ trình kết hợp cả né ngập và né kẹt xe. Súc tích, định dạng Markdown rõ ràng.
-3. ĐẶC BIỆT: Nếu người dùng hỏi đường đi / lộ trình từ [Điểm A] đến [Điểm B], ở dòng cuối cùng của câu trả lời hãy ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] để ứng dụng tự động vẽ tuyến đường né ngập.`;
+1. Trả lời đúng trọng tâm câu hỏi của người dùng, trình bày lịch sự, dễ đọc, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).
+2. Nếu hỏi đường đi / lộ trình từ [Điểm A] đến [Điểm B], ở dòng cuối cùng của câu trả lời hãy ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] (chỉ trích xuất tên địa danh Điểm A và Điểm B chuẩn xác).`;
     }
 
     const prompt = `Bạn là Trợ lý AI Giao Thông MoveSafe VN thông minh.
@@ -473,3 +710,4 @@ ${instructions}`;
 }
 
 window.aiChat = new AIChat();
+

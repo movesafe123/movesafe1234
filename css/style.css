@@ -3711,44 +3711,267 @@ body {
   transform: translateZ(0);
 }
 
-.gm-ev-pin.ev-fast {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
-}
-
-.gm-ev-pin.ev-fast .ev-pin-icon {
-  color: #2563eb;
+/* ==========================================================================
+   Thiết kế Marker Trạm sạc Xe điện Hiện đại & Trực quan (Drop Pin Style)
+   ========================================================================== */
+.gm-ev-marker {
   display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
+  user-select: none;
+  pointer-events: auto;
 }
 
-.gm-ev-pin.ev-standard {
-  border-color: #10b981;
-  background: #f0fdf4;
+.gm-ev-marker:hover {
+  transform: scale(1.12) translateY(-2px);
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.35));
+  z-index: 9999 !important;
+}
+
+.ev-marker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  padding: 3px 8px 3px 6px;
+  border-radius: 999px;
+  border: 1.5px solid #059669;
+  color: #065f46;
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  white-space: nowrap;
+}
+
+.ev-marker-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.ev-marker-content {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.ev-marker-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.ev-marker-sub {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(5, 150, 105, 0.12);
   color: #047857;
 }
 
-.gm-ev-pin.ev-standard .ev-pin-icon {
+.ev-marker-tip {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #059669;
+  margin-top: -1px;
+}
+
+/* Siêu sạc nhanh (>= 120kW: VinFast Supercharge, Porsche, EVOne High Power) */
+.gm-ev-marker.ev-super-fast .ev-marker-pill {
+  border-color: #0284c7;
+  color: #0369a1;
+  background: #ffffff;
+}
+.gm-ev-marker.ev-super-fast .ev-marker-icon-wrap {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+.gm-ev-marker.ev-super-fast .ev-marker-sub {
+  background: #0284c7;
+  color: #ffffff;
+}
+.gm-ev-marker.ev-super-fast .ev-marker-tip {
+  border-top-color: #0284c7;
+}
+
+/* Sạc nhanh thường (50kW - 110kW) */
+.gm-ev-marker.ev-fast .ev-marker-pill {
+  border-color: #2563eb;
+  color: #1d4ed8;
+  background: #ffffff;
+}
+.gm-ev-marker.ev-fast .ev-marker-icon-wrap {
+  background: #eff6ff;
+  color: #2563eb;
+}
+.gm-ev-marker.ev-fast .ev-marker-sub {
+  background: #2563eb;
+  color: #ffffff;
+}
+.gm-ev-marker.ev-fast .ev-marker-tip {
+  border-top-color: #2563eb;
+}
+
+/* Sạc AC Tiêu chuẩn (11kW - 22kW) */
+.gm-ev-marker.ev-standard .ev-marker-pill {
+  border-color: #10b981;
+  color: #065f46;
+}
+.gm-ev-marker.ev-standard .ev-marker-icon-wrap {
+  background: #ecfdf5;
   color: #10b981;
-  display: inline-flex;
+}
+.gm-ev-marker.ev-standard .ev-marker-sub {
+  background: #10b981;
+  color: #ffffff;
+}
+.gm-ev-marker.ev-standard .ev-marker-tip {
+  border-top-color: #10b981;
 }
 
-.gm-ev-pin.ev-swap {
-  border-color: #f59e0b;
-  background: #fffbeb;
-  color: #b45309;
+/* Tủ đổi pin xe máy điện (Selex Motors) */
+.gm-ev-marker.ev-swap .ev-marker-pill {
+  border-color: #d97706;
+  color: #92400e;
+}
+.gm-ev-marker.ev-swap .ev-marker-icon-wrap {
+  background: #fef3c7;
+  color: #d97706;
+}
+.gm-ev-marker.ev-swap .ev-marker-sub {
+  background: #d97706;
+  color: #ffffff;
+}
+.gm-ev-marker.ev-swap .ev-marker-tip {
+  border-top-color: #d97706;
 }
 
-.gm-ev-pin.ev-swap .ev-pin-icon {
-  color: #f59e0b;
-  display: inline-flex;
+/* ==========================================================================
+   Hộp Trạm sạc Gợi ý trên Lộ trình (EV Route Suggestions Card)
+   ========================================================================== */
+.ev-route-suggestions {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 9px 11px;
 }
 
-.gm-ev-pin:hover {
-  transform: scale(1.1) translateZ(0);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  z-index: 999;
+.ev-route-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.ev-route-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.ev-battery-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #047857;
+  background: #dcfce7;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.ev-stations-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ev-station-inline-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 6px;
+  padding: 6px 9px;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.ev-station-inline-card:hover {
+  transform: translateX(2px);
+  border-color: #059669;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.15);
+}
+
+.ev-station-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ev-station-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-station-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: #4b5563;
+}
+
+.ev-meta-power {
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.ev-meta-dist {
+  color: #059669;
+  font-weight: 600;
+}
+
+.ev-meta-op {
+  color: #6b7280;
+}
+
+.ev-btn-view {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 8px;
+  transition: all 0.12s ease;
+}
+
+.ev-station-inline-card:hover .ev-btn-view {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
 }
 
 .ev-connector-tag {

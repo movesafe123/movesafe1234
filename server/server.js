@@ -29,6 +29,10 @@ app.use('/screenshots', express.static(path.join(rootDir, 'public', 'screenshots
 app.get('/data/live_urban_cache.json', (req, res) => {
   res.sendFile(path.join(rootDir, 'data', 'live_urban_cache.json'));
 });
+app.get('/data/ev_stations_cache.json', (req, res) => {
+  res.sendFile(path.join(rootDir, 'data', 'ev_stations_cache.json'));
+});
+app.use('/data', express.static(path.join(rootDir, 'data'), staticOptions));
 
 // Phục vụ PWA Manifest
 app.get('/manifest.json', (req, res) => {
