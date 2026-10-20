@@ -3643,4 +3643,21 @@ body {
   }
 }
 
+/* ==========================================================================
+   Tối ưu phần cứng GPU & Tốc độ hiển thị Tile Bản đồ / Vệ tinh
+   ========================================================================== */
+.leaflet-tile {
+  image-rendering: -webkit-optimize-contrast;
+  will-change: transform, opacity;
+}
 
+.leaflet-tile-loaded {
+  transition: opacity 0.18s ease-in;
+}
+
+.gm-weather-pin-container,
+.gm-traffic-pin-container,
+.gm-flood-pin-container {
+  will-change: transform;
+  transform: translateZ(0);
+}
