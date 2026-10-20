@@ -151,7 +151,8 @@ app.get('/api/history', (req, res) => {
 // 2c. API Lấy dữ liệu dự báo tương lai thực tế (+1h, +2h, +3h)
 app.get('/api/predictions', (req, res) => {
   const city = req.query.city || 'hanoi';
-  const offset = Math.min(3, Math.max(1, parseInt(req.query.offset, 10) || 1));
+  const rawOffset = req.query.offsetHours || req.query.offset || 1;
+  const offset = Math.min(3, Math.max(1, parseInt(rawOffset, 10) || 1));
   const predictions = botService.getFuturePredictions(city, offset);
   res.json({
     status: 'success',

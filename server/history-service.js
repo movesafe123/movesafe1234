@@ -284,6 +284,35 @@ class HistoryService {
     return stations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
   }
 
+  // Lấy thống kê baseline trung bình của 7 ngày qua tại đúng khung giờ targetHour (0-23)
+  getHourlyBaseline(city = 'hanoi', targetHour = 18) {
+    try {
+      if (!fs.existsSync(this.historySummaryFile)) {
+        this.seedSevenDaysHistory();
+      }
+      const data = JSON.parse(fs.readFileSync(this.historySummaryFile, 'utf-8'));
+      const snapshots = (data.snapshots || []).filter(s => Number(s.hour) === Number(targetHour));
+      if (snapshots.length === 0) {
+        const isPeak = (targetHour >= 7 && targetHour <= 9) || (targetHour >= 17 && targetHour <= 19);
+        return { avgSpeedKmh: isPeak ? 16 : 32, congestionIndex: isPeak ? 3.8 : 1.5, sampleCount: 0 };
+      }
+      let speedSum = 0;
+      let congSum = 0;
+      snapshots.forEach(s => {
+        const cData = s[city] || s.hanoi || { avgSpeedKmh: 30, congestionIndex: 1.5 };
+        speedSum += (cData.avgSpeedKmh || 30);
+        congSum += (cData.congestionIndex || 1.5);
+      });
+      return {
+        avgSpeedKmh: Math.round(speedSum / snapshots.length),
+        congestionIndex: +(congSum / snapshots.length).toFixed(1),
+        sampleCount: snapshots.length
+      };
+    } catch (e) {
+      return { avgSpeedKmh: 28, congestionIndex: 2.0, sampleCount: 0 };
+    }
+  }
+
   // Lấy dữ liệu lịch sử theo thành phố và số ngày
   getHistory(city = 'hanoi', days = 7) {
     try {

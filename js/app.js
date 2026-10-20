@@ -449,14 +449,25 @@ class GoogleMapsApp {
     this.showToast(`Đã đổi kịch bản ngẫu nhiên: ${newFloods.length} rốn ngập (${minD}cm - ${maxD}cm) tại ${cityName}!`, 'warning', 4500);
   }
 
-  // Lấy toàn bộ rốn ngập hiện tại (bao gồm kịch bản mô phỏng nếu đang bật Chế độ Giả lập)
+  // Lấy toàn bộ rốn ngập hiện tại (bao gồm kịch bản mô phỏng hoặc dự báo AI nếu đang xem +1h/+2h/+3h)
   getCurrentFloods() {
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      return this.predictionOverlay.floodPoints || [];
+    }
     let floods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
     if (this.isSimulationMode) {
       const simFloods = this.getSimulatedFloods(this.currentCity);
       floods = [...simFloods, ...floods];
     }
     return floods;
+  }
+
+  // Lấy danh sách sự cố giao thông hiện tại (hoặc theo dự báo AI nếu đang xem +1h/+2h/+3h)
+  getCurrentTraffics() {
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      return this.predictionOverlay.trafficIncidents || [];
+    }
+    return (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
   }
 
   // Chuyển đổi trạng thái Chế độ Giả lập / Dữ liệu thật
@@ -527,7 +538,13 @@ class GoogleMapsApp {
       const simFloods = this.getSimulatedFloods(this.currentCity);
       cityFloods = [...simFloods, ...cityFloods];
     }
-    const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+    let cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+
+    // Nếu đang áp dụng dự báo tương lai (+1h/+2h/+3h), hiển thị trạng thái của tương lai
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      cityFloods = this.predictionOverlay.floodPoints || [];
+      cityTraffics = this.predictionOverlay.trafficIncidents || [];
+    }
 
     // Cập nhật số lượng trên các chip: Chỉ đếm các điểm ngập đang hoạt động (depth > 0 và danger_level !== 'safe')
     const activeFloods = cityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
@@ -545,7 +562,13 @@ class GoogleMapsApp {
     };
 
     if (floodChip) {
-      if (activeFloods.length > 0) {
+      if (this.currentPredictionOffset > 0) {
+        if (activeFloods.length > 0) {
+          setChipText(floodChip, `Dự báo ngập (${activeFloods.length} • +${this.currentPredictionOffset}h)`, 'gm-chip gm-chip-danger active');
+        } else {
+          setChipText(floodChip, `Dự báo ngập (0 • +${this.currentPredictionOffset}h)`, 'gm-chip gm-chip-safe');
+        }
+      } else if (activeFloods.length > 0) {
         if (this.isSimulationMode) {
           setChipText(floodChip, `Rốn ngập (${activeFloods.length} - Giả lập)`, 'gm-chip gm-chip-warning active');
         } else {
@@ -559,7 +582,15 @@ class GoogleMapsApp {
       const activeJams = cityTraffics.filter(t => t.isJam === true);
       const roadworks = cityTraffics.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
 
-      if (activeJams.length > 0) {
+      if (this.currentPredictionOffset > 0) {
+        if (activeJams.length > 0) {
+          setChipText(trafficChip, `Kẹt xe (${activeJams.length} • +${this.currentPredictionOffset}h)`, 'gm-chip gm-chip-danger active');
+        } else if (roadworks.length > 0) {
+          setChipText(trafficChip, `Thông thoáng (+${this.currentPredictionOffset}h) • Công trường (${roadworks.length})`, 'gm-chip gm-chip-safe');
+        } else {
+          setChipText(trafficChip, `Thông thoáng (+${this.currentPredictionOffset}h)`, 'gm-chip gm-chip-safe');
+        }
+      } else if (activeJams.length > 0) {
         setChipText(trafficChip, `Kẹt xe (${activeJams.length})`, 'gm-chip gm-chip-danger');
       } else if (roadworks.length > 0) {
         setChipText(trafficChip, `Ùn tắc (0) • Công trường (${roadworks.length})`, 'gm-chip gm-chip-safe');
@@ -579,14 +610,10 @@ class GoogleMapsApp {
       cityFloods = [...simFloods, ...cityFloods];
     }
 
-    // Nếu đang áp dụng dự báo tương lai (+1h/+2h/+3h), giữ lại lớp dự báo AI trên bản đồ
+    // Nếu đang áp dụng dự báo tương lai (+1h/+2h/+3h), thay thế bằng trạng thái tương lai (không dồn ứ các điểm quá khứ đã tan)
     if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
-      if (this.predictionOverlay.floodPoints.length > 0) {
-        cityFloods = [...this.predictionOverlay.floodPoints, ...cityFloods];
-      }
-      if (this.predictionOverlay.trafficIncidents.length > 0) {
-        cityTraffics = [...this.predictionOverlay.trafficIncidents, ...cityTraffics];
-      }
+      cityFloods = this.predictionOverlay.floodPoints || [];
+      cityTraffics = this.predictionOverlay.trafficIncidents || [];
     }
 
     // Vẽ lên bản đồ
@@ -920,16 +947,18 @@ class GoogleMapsApp {
         // Có ngập: Bay camera đến điểm ngập sâu nhất
         const worst = [...activeFloods].sort((a, b) => (b.depth_cm || 0) - (a.depth_cm || 0))[0];
         window.mapEngine.map.flyTo([worst.lat, worst.lng], 16);
-        const prefix = this.isSimulationMode ? '[Kịch bản Giả lập]' : 'Cảnh báo:';
+        const prefix = this.currentPredictionOffset > 0 ? `[Dự báo +${this.currentPredictionOffset}h]` : (this.isSimulationMode ? '[Kịch bản Giả lập]' : 'Cảnh báo:');
         this.showToast(`${prefix} Đang theo dõi rốn ngập sâu: ${worst.name} (${worst.depth_cm}cm)`, 'danger');
       } else {
         // Khô ráo, nước đã rút
-        this.showToast('Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
+        this.showToast(this.currentPredictionOffset > 0
+          ? `AI Dự báo sau +${this.currentPredictionOffset}h: Toàn thành phố khô ráo, không có điểm ngập úng.`
+          : 'Toàn thành phố hiện tại tạnh ráo! Nước tại các rốn ngập đã rút hoàn toàn, lưu thông an toàn.', 'info', 5000);
       }
     });
 
     document.getElementById('chip-traffic-count')?.addEventListener('click', () => {
-      const cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
+      const cityTraffics = this.getCurrentTraffics();
       const activeJams = cityTraffics.filter(t => t.isJam === true);
 
       if (activeJams.length > 0) {
@@ -941,7 +970,9 @@ class GoogleMapsApp {
           window.mapEngine.map.flyTo([roadworks[0].lat, roadworks[0].lng], 15);
           this.showToast(`Đường phố thông thoáng! Ghi nhận ${roadworks.length} điểm rào chắn thi công bảo trì (Vệ tinh TomTom v5).`, 'info', 5000);
         } else {
-          this.showToast('Giao thông toàn thành phố thông thoáng! Vận tốc trung bình 45-60 km/h, không có điểm kẹt xe.', 'info', 5000);
+          this.showToast(this.currentPredictionOffset > 0
+            ? `AI Dự báo sau +${this.currentPredictionOffset}h: Tuyến đường toàn thành phố thông thoáng, không có điểm kẹt xe!`
+            : 'Giao thông toàn thành phố thông thoáng! Vận tốc trung bình 45-60 km/h, không có điểm kẹt xe.', 'info', 5000);
         }
       }
     });
@@ -2382,21 +2413,32 @@ class GoogleMapsApp {
           updated_at: new Date().toISOString()
         }));
 
-        const aiTraffics = (predictions || []).map((p, idx) => ({
-          id: `ai-traffic-${idx}`,
-          lat: p.lat,
-          lng: p.lng,
-          city: this.currentCity,
-          type: 'traffic_jam',
-          categoryName: `AI Dự báo kẹt xe +${offset}h`,
-          icon: '',
-          isJam: true,
-          speedKmh: p.level >= 4 ? 8 : 15,
-          delaySeconds: p.level >= 4 ? 600 : 300,
-          description: p.description || `AI dự báo ùn tắc mức ${p.level}/5 sau +${offset}h`,
-          source: 'Mô hình AI XGBoost',
-          updated_at: new Date().toISOString()
-        }));
+        const aiTraffics = (predictions || [])
+          .filter(p => {
+            const lvl = p.level || p.predicted_level || (p.isJam ? 3 : 1);
+            return lvl >= 3 || p.type === 'roadwork' || p.type === 'road_closure';
+          })
+          .map((p, idx) => {
+            const lvl = p.level || p.predicted_level || 3;
+            const isWork = p.type === 'roadwork' || p.type === 'road_closure';
+            return {
+              id: p.id || `ai-traffic-${idx}`,
+              lat: p.lat,
+              lng: p.lng,
+              city: this.currentCity,
+              type: p.type || 'traffic_jam',
+              categoryName: isWork ? (p.categoryName || 'Công trường thi công') : `AI Dự báo kẹt xe +${offset}h`,
+              icon: p.icon || '',
+              isJam: !isWork && lvl >= 3,
+              level: lvl,
+              speedKmh: p.speedKmh || (lvl >= 4 ? 8 : (lvl === 3 ? 15 : 35)),
+              delaySeconds: p.delaySeconds || (lvl >= 4 ? 600 : (lvl === 3 ? 300 : 0)),
+              confidence: p.confidence || 0.88,
+              description: p.description || `AI dự báo ùn tắc mức ${lvl}/5 sau +${offset}h`,
+              source: p.source || 'Mô hình AI Spatio-Temporal',
+              updated_at: new Date().toISOString()
+            };
+          });
 
         this.predictionOverlay = { floodPoints: aiFloods, trafficIncidents: aiTraffics };
         this.renderAllData();
@@ -2405,7 +2447,13 @@ class GoogleMapsApp {
           this.showToast(`AI: Phát hiện ${aiFloods.length} điểm có nguy cơ ngập lụt sau +${offset}h tới!`, 'warning', 4500);
         }
         if (aiTraffics.length > 0) {
-          this.showToast(`AI: Áp dụng ${aiTraffics.length} điểm dự báo kẹt xe cho +${offset}h tới.`, 'info', 4000);
+          const jamCount = aiTraffics.filter(t => t.isJam).length;
+          const roadworkCount = aiTraffics.filter(t => !t.isJam).length;
+          let msg = `AI: Dự báo sau +${offset}h ghi nhận ${jamCount} điểm ùn tắc`;
+          if (roadworkCount > 0) msg += ` và ${roadworkCount} điểm công trường`;
+          this.showToast(msg, 'info', 4000);
+        } else {
+          this.showToast(`AI: Dự báo sau +${offset}h đường phố thông thoáng, không phát hiện ùn tắc lớn!`, 'info', 4000);
         }
       } catch (err) {
         console.warn('Lỗi khi nạp dữ liệu dự báo AI:', err);
@@ -2516,14 +2564,10 @@ class GoogleMapsApp {
       effectiveFloods = [...simFloods, ...effectiveFloods];
     }
 
-    // [DỰ BÁO TƯƠNG LAI]: Kết hợp các điểm ngập và kẹt xe dự đoán vào thuật toán tìm đường
+    // [DỰ BÁO TƯƠNG LAI]: Sử dụng trạng thái ngập và kẹt xe dự đoán thay vì dồn ứ các điểm quá khứ
     if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
-      if (this.predictionOverlay.floodPoints.length > 0) {
-        effectiveFloods = [...this.predictionOverlay.floodPoints, ...effectiveFloods];
-      }
-      if (this.predictionOverlay.trafficIncidents.length > 0) {
-        effectiveTraffic = [...this.predictionOverlay.trafficIncidents, ...effectiveTraffic];
-      }
+      effectiveFloods = this.predictionOverlay.floodPoints || [];
+      effectiveTraffic = this.predictionOverlay.trafficIncidents || [];
     }
 
     try {
@@ -2602,7 +2646,10 @@ class GoogleMapsApp {
 
     const now = new Date();
     const vnNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
-    const vnHour = vnNow.getHours();
+    let vnHour = vnNow.getHours();
+    if (this.currentPredictionOffset > 0) {
+      vnHour = (vnHour + this.currentPredictionOffset) % 24;
+    }
     const vnMinute = vnNow.getMinutes();
     const vnDay = vnNow.getDay(); // 0 = CN, 6 = T7
     const timeStr = `${String(vnHour).padStart(2,'0')}:${String(vnMinute).padStart(2,'0')}`;
@@ -2623,9 +2670,13 @@ class GoogleMapsApp {
     const recommended = routes.find(r => r.isRecommended) || routes[0];
     if (!recommended) { box.style.display = 'none'; return; }
 
-    // Lấy dữ liệu ngập & kẹt xe trong thành phố hiện tại
-    const cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity && f.depth_cm > 0 && f.danger_level !== 'safe');
-    const cityJams = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity && t.isJam === true);
+    // Lấy dữ liệu ngập & kẹt xe trong thành phố hiện tại (hoặc theo dự báo AI nếu đang xem tương lai)
+    let cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity && f.depth_cm > 0 && f.danger_level !== 'safe');
+    let cityJams = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity && t.isJam === true);
+    if (this.currentPredictionOffset > 0 && this.predictionOverlay) {
+      cityFloods = (this.predictionOverlay.floodPoints || []).filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
+      cityJams = (this.predictionOverlay.trafficIncidents || []).filter(t => t.isJam === true);
+    }
     const routeFloods = recommended.matchedFloods || [];
     const routeTraffics = recommended.matchedTraffics || [];
 
@@ -3199,15 +3250,13 @@ class GoogleMapsApp {
       html += `
         <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
           ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
-          <div class="gm-route-label ${labelClass}" style="color: ${route.color}; padding-right: ${route.isRecommended ? '75px' : '0'};">
-            ${route.label}
-          </div>
-          <div class="gm-route-time ${timeClass}" style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
-            <div>
-              <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
-              <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
-            </div>
+          <div class="gm-route-label ${labelClass}" style="color: ${route.color}; display: flex; align-items: center; justify-content: space-between;">
+            <span>${route.label}</span>
             ${rpiHtml}
+          </div>
+          <div class="gm-route-time ${timeClass}">
+            <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>
+            <span style="font-size: 13px; font-weight: normal; color: #5f6368;">(${route.distanceKm} km)</span>
           </div>
           ${speedTagHtml}
           <div class="gm-route-meta" style="font-size: 12px; color: #3c4043; margin-top: 3px;">${route.trafficDesc}</div>

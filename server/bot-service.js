@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events');
 const config = require('./config');
+const historyService = require('./history-service');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const PUBLIC_DATA_DIR = path.join(__dirname, '..', 'public', 'data');
@@ -1213,7 +1214,8 @@ class LocalUrbanBot extends EventEmitter {
     return [...realtimePoints, ...activeCrowdsourcedFloods];
   }
 
-  // Dự báo ngập lụt và kẹt xe tương lai (+1h, +2h, +3h) dựa trên lượng mưa dự báo thực tế
+  // Dự báo ngập lụt và kẹt xe tương lai (+1h, +2h, +3h)
+  // Ứng dụng Mô hình Spatio-Temporal: Tiêu tán/Duy trì sự cố hiện tại + Khởi phát điểm nghẽn theo Lịch sử 7 ngày & Mưa
   getFuturePredictions(cityKey = 'hanoi', offsetHours = 1) {
     const stations = (this.cachedData.weatherStations || {})[cityKey] || [];
     const maxForecastRain = stations.reduce((max, s) => {
@@ -1225,11 +1227,14 @@ class LocalUrbanBot extends EventEmitter {
     const isPeakHour = (vnHour >= 7 && vnHour <= 9) || (vnHour >= 17 && vnHour <= 19);
     const isNightTime = (vnHour >= 22 || vnHour <= 5);
 
+    // Lấy baseline lịch sử của khung giờ mục tiêu từ HistoryService
+    const baseline = historyService.getHourlyBaseline(cityKey, vnHour);
+
     // 1. Dự báo ngập
     const predictedFloods = [];
     const currentCityFloods = (this.cachedData.floodPoints || []).filter(f => f.city === cityKey && f.depth_cm > 0);
 
-    if (maxForecastRain >= 15 || currentCityFloods.length > 0) {
+    if (maxForecastRain >= 10 || currentCityFloods.length > 0) {
       const candidateStations = LOCAL_FLOOD_STATIONS.filter(s => s.city === cityKey);
       candidateStations.forEach(st => {
         const currMemory = this.floodMemory.get(st.id) || { depth_cm: 0 };
@@ -1247,33 +1252,120 @@ class LocalUrbanBot extends EventEmitter {
             lng: st.lng,
             target_hour: offsetHours,
             predicted_depth_cm: finalDepth,
-            confidence: Math.round((0.90 - offsetHours * 0.04) * 100) / 100
+            confidence: Math.round((0.92 - offsetHours * 0.04) * 100) / 100
           });
         }
       });
     }
 
-    // 2. Dự báo kẹt xe theo khung giờ thực tế
-    const candidateIntersections = CORE_INTERSECTIONS_GEO.filter(s => s.city === cityKey);
-    const baseLevel = isNightTime ? 1 : (isPeakHour ? 4 : (maxForecastRain >= 10 ? 4 : 2));
+    // 2. Dự báo kẹt xe Spatio-Temporal:
+    const predictedTraffic = [];
+    const currentCityTraffics = (this.cachedData.trafficIncidents || []).filter(t => t.city === cityKey);
 
-    const predictedTraffic = candidateIntersections.slice(0, 3).map((item, idx) => {
-      const level = Math.min(5, Math.max(1, baseLevel - (idx % 2)));
-      return {
-        lat: item.lat,
-        lng: item.lng,
-        level,
-        description: `Dự báo giao thông lúc ${String(vnHour).padStart(2, '0')}:00 tại ${item.name}: Mức ${level}/5 (${level >= 4 ? 'Ùn ứ cao' : 'Lưu thông ổn định'})`
-      };
+    // 2.1. Bước 1: Lan truyền & Tiêu tán từ các sự cố TomTom & VOV hiện tại
+    currentCityTraffics.forEach((inc, idx) => {
+      // Công trường, rào chắn, đóng đường dài hạn -> DUY TRÌ LIÊN TỤC
+      if (inc.type === 'road_closure' || inc.type === 'roadwork') {
+        predictedTraffic.push({
+          id: `ai-pred-fix-${inc.id || idx}`,
+          lat: inc.lat,
+          lng: inc.lng,
+          roadName: inc.roadName || inc.description,
+          type: inc.type,
+          level: 4,
+          speedKmh: inc.speedKmh || 12,
+          delaySeconds: inc.delaySeconds || 600,
+          confidence: 0.95,
+          description: `Dự báo (+${offsetHours}h): Duy trì công trường/đóng đường tại ${inc.roadName || inc.description}`
+        });
+        return;
+      }
+
+      // Điểm ùn tắc giao thông (isJam)
+      if (inc.isJam) {
+        let futureLevel = 3;
+        let futureSpeed = inc.speedKmh || 15;
+        let futureDelay = inc.delaySeconds || 300;
+
+        if (isNightTime) {
+          // Ban đêm: Tiêu tán nhanh
+          const decayedLevel = Math.max(1, 3 - offsetHours);
+          if (decayedLevel >= 3) {
+            futureLevel = decayedLevel;
+            futureSpeed = 25;
+            futureDelay = 120;
+          } else {
+            return; // Đã tiêu tán hoàn toàn lúc nửa đêm, không vẽ kẹt xe
+          }
+        } else if (isPeakHour || maxForecastRain >= 10) {
+          // Tiến vào giờ cao điểm hoặc mưa: Duy trì hoặc tăng độ trễ
+          futureLevel = Math.min(5, (inc.speedKmh && inc.speedKmh < 10) ? 5 : 4);
+          futureSpeed = Math.min(12, futureSpeed);
+          futureDelay = Math.round(futureDelay * 1.25);
+        } else {
+          // Giờ bình thường: Tiêu tán dần
+          futureLevel = Math.max(2, 4 - offsetHours);
+          if (futureLevel < 3) return; // Không còn kẹt xe
+          futureSpeed = 20;
+          futureDelay = 180;
+        }
+
+        predictedTraffic.push({
+          id: `ai-pred-jam-${inc.id || idx}`,
+          lat: inc.lat,
+          lng: inc.lng,
+          roadName: inc.roadName || inc.description,
+          type: 'traffic_jam',
+          level: futureLevel,
+          speedKmh: futureSpeed,
+          delaySeconds: futureDelay,
+          confidence: Math.round((0.88 - offsetHours * 0.03) * 100) / 100,
+          description: `AI Dự báo (+${offsetHours}h): ${inc.roadName || 'Điểm giao thông'} duy trì mức ${futureLevel}/5 (Dòng xe ~${futureSpeed} km/h)`
+        });
+      }
     });
 
+    // 2.2. Bước 2: Khởi phát điểm nghẽn giờ cao điểm theo chuỗi lịch sử 7 ngày
+    if (isPeakHour || baseline.congestionIndex >= 3.2 || maxForecastRain >= 12) {
+      const candidateIntersections = CORE_INTERSECTIONS_GEO.filter(s => s.city === cityKey);
+      candidateIntersections.forEach((item, idx) => {
+        // Kiểm tra xem vị trí này đã có trong danh sách tiêu tán chưa
+        const alreadyHas = predictedTraffic.some(p => {
+          const dLat = Math.abs(p.lat - item.lat);
+          const dLng = Math.abs(p.lng - item.lng);
+          return (dLat < 0.005 && dLng < 0.005);
+        });
+
+        if (!alreadyHas && predictedTraffic.length < 15) {
+          const peakLevel = (isPeakHour && maxForecastRain >= 10) ? 5 : (isPeakHour ? 4 : 3);
+          const estSpeed = peakLevel === 5 ? 8 : (peakLevel === 4 ? 14 : 20);
+          predictedTraffic.push({
+            id: `ai-pred-hist-${cityKey}-${idx}`,
+            lat: item.lat,
+            lng: item.lng,
+            roadName: item.name,
+            type: 'traffic_jam',
+            level: peakLevel,
+            speedKmh: estSpeed,
+            delaySeconds: peakLevel >= 4 ? 600 : 300,
+            confidence: Math.round((0.85 - offsetHours * 0.03) * 100) / 100,
+            description: `AI Dự báo (+${offsetHours}h): Khung giờ cao điểm bùng phát ùn ứ mức ${peakLevel}/5 tại ${item.name} (~${estSpeed} km/h)`
+          });
+        }
+      });
+    }
+
     return {
+      status: 'success',
       city: cityKey,
       targetHour: offsetHours,
       clockHour: vnHour,
       maxForecastRain,
+      historicalBaseline: baseline,
       floods: predictedFloods,
+      floodPredictions: predictedFloods,
       traffic: predictedTraffic,
+      trafficPredictions: predictedTraffic,
       updated_at: new Date().toISOString()
     };
   }

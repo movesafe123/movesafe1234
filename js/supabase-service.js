@@ -168,13 +168,14 @@ class SupabaseService {
   async getTrafficPrediction(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return null;
 
-    // 1. Thử gọi API backend Node.js
+    // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
     try {
-      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}`);
+      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
-        if (json.trafficPredictions && json.trafficPredictions.length > 0) {
-          return json.trafficPredictions;
+        const preds = json.trafficPredictions || json.traffic;
+        if (Array.isArray(preds)) {
+          return preds;
         }
       }
     } catch (e) {}
@@ -203,7 +204,14 @@ class SupabaseService {
       }
     }
 
-    // Dự báo tất định theo các nút giao trọng điểm của từng thành phố
+    // Heuristics theo nhịp sinh hoạt thực tế tại Việt Nam: Ban đêm (22h - 5h) thông thoáng, không tạo kẹt xe giả định
+    const vnHour = (new Date().getUTCHours() + 7 + offsetHours) % 24;
+    const isNight = vnHour >= 22 || vnHour <= 5;
+    if (isNight && !window.appState?.simulationMode) {
+      return [];
+    }
+
+    // Dự báo tất định theo các nút giao trọng điểm của từng thành phố khi ngoài giờ đêm
     return citySpots.map(s => {
       const level = Math.min(5, Math.max(1, s.baseLevel + (offsetHours === 1 ? 0 : (offsetHours === 2 ? -1 : -2))));
       return {
@@ -219,13 +227,14 @@ class SupabaseService {
   async getFloodPredictions(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return [];
 
-    // 1. Thử gọi API backend Node.js
+    // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
     try {
-      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}`);
+      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
-        if (json.floodPredictions) {
-          return json.floodPredictions;
+        const preds = json.floodPredictions || json.floods;
+        if (Array.isArray(preds)) {
+          return preds;
         }
       }
     } catch (e) {}
