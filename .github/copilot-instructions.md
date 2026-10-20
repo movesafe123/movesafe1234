@@ -5,9 +5,13 @@ This project is **MoveSafe VN**, a real-time smart traffic, weather monitoring, 
 ## Available Agent Skills (Local Workspace)
 The workspace is configured with specialized Agent Skills in `.agents/skills/`:
 
-1. **UI/UX Design Intelligence (`ui-ux-pro-max-skill-2.15.0`)**
-   - **Path**: `.agents/skills/ui-ux-pro-max-skill-2.15.0/SKILL.md`
-   - **Usage**: When modifying HTML/CSS, creating UI components, designing responsive layouts, or styling modals and cards, adhere to the guidelines, color palettes, and UX patterns defined in this skill.
+1. **UI/UX & Frontend Design Suites (`ui-ux-pro-max`, `addyosmani`, `anthropics`, `jakubkrehel`, `vercel-labs`)**
+   - **Paths**: Located in `.github/skills/` and `.agents/skills/`:
+     - `ui-ux-pro-max-skill-2.15.0/SKILL.md` (Design system, 84 UI styles, 192 color palettes, 74 font pairings)
+     - `frontend-ui-engineering/SKILL.md` (Addy Osmani: anti-AI-slop, responsive, accessible, high performance)
+     - `frontend-design/SKILL.md` (Anthropic: elegant layout, visual hierarchy, whitespace rhythm)
+     - `better-ui/SKILL.md`, `better-interface/SKILL.md`, `better-accessibility/SKILL.md` (Jakub Krehel: micro-interactions, WCAG 2.2)
+     - `web-design-guidelines/SKILL.md` (Vercel Labs: modern web product standards, speed, minimalism)
    - **Project Specific Rule**: All icons and emojis must be eliminated across the user interface, map pins, toast messages, and AI responses. Use clean, high-contrast, text-first labels with modern Slate/Blue accents (`#0f172a`, `#2563eb`).
 
 2. **Office Document Processing (`OfficeCLI-1.0.153`)**
