@@ -228,8 +228,8 @@ class GoogleMapsApp {
 
     // Trạng thái tọa độ & địa chỉ ngõ ngách thực tế
     this.routeLocations = {
-      origin: { lat: 21.0365, lng: 105.7925, title: 'Cầu Giấy', fullAddress: 'Cầu Giấy, Hà Nội' },
-      destination: { lat: 21.0242, lng: 105.8542, title: 'Nhà Hát Lớn', fullAddress: 'Nhà Hát Lớn, Hoàn Kiếm, Hà Nội' }
+      origin: null,
+      destination: null
     };
     this.routeMarkers = {
       origin: null,
@@ -833,7 +833,11 @@ class GoogleMapsApp {
     // 1. Nút chỉ đường
     document.getElementById('btn-open-directions')?.addEventListener('click', () => {
       this.toggleDirectionsPanel(true);
-      this.calculateSmartRoute();
+      const originInput = document.getElementById('gm-route-origin');
+      const destInput = document.getElementById('gm-route-dest');
+      if (originInput?.value.trim() && destInput?.value.trim()) {
+        this.calculateSmartRoute();
+      }
     });
 
     document.getElementById('btn-close-directions')?.addEventListener('click', () => {
@@ -1705,28 +1709,32 @@ class GoogleMapsApp {
     }
   }
 
-  // Đặt lại điểm mặc định khi chuyển thành phố
+  // Đặt lại điểm lộ trình khi chuyển thành phố hoặc bắt đầu mới
   resetCityRouteDefaults() {
-    if (this.currentCity === 'hcm') {
-      this.routeLocations = {
-        origin: { lat: 10.7769, lng: 106.6811, title: 'Chợ Bến Thành', fullAddress: 'Chợ Bến Thành, Quận 1, TP. Hồ Chí Minh' },
-        destination: { lat: 10.7412, lng: 106.7325, title: 'Khu Đô Thị Phú Mỹ Hưng', fullAddress: 'Phú Mỹ Hưng, Quận 7, TP. Hồ Chí Minh' }
-      };
-    } else if (this.currentCity === 'danang') {
-      this.routeLocations = {
-        origin: { lat: 16.0678, lng: 108.2208, title: 'Cầu Rồng', fullAddress: 'Cầu Rồng, Hải Châu, Đà Nẵng' },
-        destination: { lat: 16.0471, lng: 108.2068, title: 'Sân Bay Quốc Tế Đà Nẵng', fullAddress: 'Sân Bay Quốc Tế Đà Nẵng' }
-      };
-    } else {
-      this.routeLocations = {
-        origin: { lat: 21.0365, lng: 105.7925, title: 'Cầu Giấy', fullAddress: 'Cầu Giấy, Hà Nội' },
-        destination: { lat: 21.0242, lng: 105.8542, title: 'Nhà Hát Lớn', fullAddress: 'Nhà Hát Lớn, Hoàn Kiếm, Hà Nội' }
-      };
-    }
+    this.routeLocations = {
+      origin: null,
+      destination: null
+    };
     const originInput = document.getElementById('gm-route-origin');
     const destInput = document.getElementById('gm-route-dest');
-    if (originInput) originInput.value = this.routeLocations.origin.fullAddress;
-    if (destInput) destInput.value = this.routeLocations.destination.fullAddress;
+    if (originInput) originInput.value = '';
+    if (destInput) destInput.value = '';
+
+    if (this.routeMarkers.origin && window.mapEngine?.map) {
+      window.mapEngine.map.removeLayer(this.routeMarkers.origin);
+      this.routeMarkers.origin = null;
+    }
+    if (this.routeMarkers.destination && window.mapEngine?.map) {
+      window.mapEngine.map.removeLayer(this.routeMarkers.destination);
+      this.routeMarkers.destination = null;
+    }
+    if (window.mapEngine && window.mapEngine.clearRoute) {
+      window.mapEngine.clearRoute();
+    }
+    const resultsContainer = document.getElementById('gm-route-results');
+    if (resultsContainer) resultsContainer.innerHTML = '';
+    const summaryContainer = document.getElementById('gm-route-summary');
+    if (summaryContainer) summaryContainer.style.display = 'none';
   }
 
   // Thiết lập hệ thống tìm kiếm & gợi ý địa chỉ ngõ ngách chuẩn Google Maps
