@@ -1965,6 +1965,26 @@ body {
   border-color: #93c5fd;
 }
 
+.gm-btn-tts.is-speaking {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+  animation: pulse-tts 1.5s infinite ease-in-out;
+}
+
+.gm-btn-tts.is-speaking:hover {
+  background: #fecaca;
+  color: #b91c1c;
+  border-color: #f87171;
+}
+
+@keyframes pulse-tts {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
 .gm-ai-quick-prompts {
   padding: 8px 14px;
   background: #ffffff;

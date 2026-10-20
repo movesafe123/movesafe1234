@@ -82,11 +82,13 @@ class AIChat {
 
   close() {
     this.isOpen = false;
+    this.stopSpeaking();
     const win = document.getElementById('ai-chat-window');
     if (win) win.classList.remove('open');
   }
 
   clearMessages() {
+    this.stopSpeaking();
     this.messages = [];
     this.open();
     this.renderMessages();
@@ -126,22 +128,112 @@ class AIChat {
       .replace(/'/g, '&#39;');
   }
 
-  speakText(text) {
+  stopSpeaking() {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    this.isSpeaking = false;
+    this.currentSpeakingText = null;
+    this.currentSpeakingBtn = null;
+    this.updateAllTTSButtons(false);
+  }
+
+  toggleSpeakText(btn, text) {
     if (!('speechSynthesis' in window)) {
       alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
       return;
     }
-    window.speechSynthesis.cancel();
-    const cleanText = this.stripEmojis(text).replace(/[*_#`[\]()]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    const cleanText = this.stripEmojis(text)
+      .replace(/[*_#`[\]()]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleanText) return;
+
+    // Nếu đang đọc chính đoạn tin này -> Bấm vào để NGỪNG ĐỌC
+    if (this.isSpeaking && (window.speechSynthesis.speaking || window.speechSynthesis.pending) && this.currentSpeakingText === cleanText) {
+      this.stopSpeaking();
+      return;
+    }
+
+    // Nếu đang đọc đoạn khác hoặc bắt đầu mới -> Dừng đoạn cũ và đọc đoạn này
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    this.updateAllTTSButtons(false);
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'vi-VN';
     utterance.rate = 1.05;
+
+    const onFinish = () => {
+      this.isSpeaking = false;
+      this.currentSpeakingText = null;
+      this.currentSpeakingBtn = null;
+      if (btn) this.setButtonSpeakingState(btn, false);
+      this.updateAllTTSButtons(false);
+    };
+
+    utterance.onstart = () => {
+      this.isSpeaking = true;
+      this.currentSpeakingText = cleanText;
+      this.currentSpeakingBtn = btn;
+      if (btn) this.setButtonSpeakingState(btn, true);
+    };
+
+    utterance.onend = onFinish;
+    utterance.onerror = (e) => {
+      if (e && e.error === 'canceled') {
+        onFinish();
+        return;
+      }
+      onFinish();
+    };
+
+    // Đánh dấu trạng thái ngay lập tức trên UI
+    this.isSpeaking = true;
+    this.currentSpeakingText = cleanText;
+    this.currentSpeakingBtn = btn;
+    if (btn) this.setButtonSpeakingState(btn, true);
+
     window.speechSynthesis.speak(utterance);
+  }
+
+  setButtonSpeakingState(btn, isSpeaking) {
+    if (!btn) return;
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const stopIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect></svg>`;
+
+    if (isSpeaking) {
+      btn.classList.add('is-speaking');
+      btn.setAttribute('title', 'Nhấn để ngừng đọc giọng nói');
+      btn.innerHTML = `${stopIconSvg}<span>Ngừng đọc</span>`;
+    } else {
+      btn.classList.remove('is-speaking');
+      btn.setAttribute('title', 'Đọc bằng giọng nói tiếng Việt');
+      btn.innerHTML = `${playIconSvg}<span>Đọc tin</span>`;
+    }
+  }
+
+  updateAllTTSButtons(isSpeaking) {
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    document.querySelectorAll('.gm-btn-tts').forEach(b => {
+      b.classList.remove('is-speaking');
+      b.setAttribute('title', 'Đọc bằng giọng nói tiếng Việt');
+      b.innerHTML = `${playIconSvg}<span>Đọc tin</span>`;
+    });
+  }
+
+  speakText(text, btnElement) {
+    this.toggleSpeakText(btnElement || null, text);
   }
 
   renderMessages() {
     const body = document.getElementById('ai-chat-body');
     if (!body) return;
+
+    const playIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const stopIconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect></svg>`;
 
     body.innerHTML = this.messages.map((m) => {
       const isUser = m.sender === 'user';
@@ -150,13 +242,19 @@ class AIChat {
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\n/g, '<br>');
 
+      const cleanText = this.stripEmojis(m.text)
+        .replace(/[*_#`[\]()]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const isSpeakingThis = Boolean(this.isSpeaking && this.currentSpeakingText === cleanText);
+
       const ttsButton = !isUser ? `
         <div class="gm-chat-actions">
-          <button class="gm-btn-tts"
-                  onclick="window.aiChat && window.aiChat.speakText(decodeURIComponent('${encodeURIComponent(m.text)}'))"
-                  title="Đọc bằng giọng nói tiếng Việt">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-            <span>Đọc tin</span>
+          <button class="gm-btn-tts ${isSpeakingThis ? 'is-speaking' : ''}"
+                  onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(m.text)}'))"
+                  title="${isSpeakingThis ? 'Nhấn để ngừng đọc giọng nói' : 'Đọc bằng giọng nói tiếng Việt'}">
+            ${isSpeakingThis ? stopIconSvg : playIconSvg}
+            <span>${isSpeakingThis ? 'Ngừng đọc' : 'Đọc tin'}</span>
           </button>
         </div>
       ` : '';

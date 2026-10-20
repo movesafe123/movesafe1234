@@ -1616,13 +1616,27 @@ class GoogleMapsApp {
       if (news.length === 0) {
         vovContainer.innerHTML = '<div style="color: #5f6368;">Hiện tại không có tin tức ùn tắc phát thanh khẩn cấp.</div>';
       } else {
-        vovContainer.innerHTML = news.map(item => `
-          <div style="border-bottom: 1px solid #e8eaed; padding: 6px 0;">
-            <div style="font-weight: 700; color: #202124;">${item.title || 'Tin giao thông'}</div>
-            <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${item.summary || item.content || ''}</div>
-            <div style="color: #1a73e8; font-size: 10px; margin-top: 2px;">Nguồn: VOV Giao thông 91MHz</div>
-          </div>
-        `).join('');
+        vovContainer.innerHTML = news.map(item => {
+          const title = item.title || 'Tin giao thông';
+          const content = item.summary || item.content || '';
+          const fullText = `${title}. ${content}`;
+          return `
+            <div style="border-bottom: 1px solid #e8eaed; padding: 8px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+              <div style="flex: 1;">
+                <div style="font-weight: 700; color: #202124;">${title}</div>
+                <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${content}</div>
+                <div style="color: #1a73e8; font-size: 10px; margin-top: 3px;">Nguồn: VOV Giao thông 91MHz</div>
+              </div>
+              <button class="gm-btn-tts" 
+                      style="flex-shrink: 0; margin-top: 2px;"
+                      onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(fullText)}'))"
+                      title="Đọc bằng giọng nói tiếng Việt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <span>Đọc tin</span>
+              </button>
+            </div>
+          `;
+        }).join('');
       }
     }
 
