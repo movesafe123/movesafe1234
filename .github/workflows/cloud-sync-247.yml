@@ -18,12 +18,13 @@ jobs:
       - name: 📥 Tải mã nguồn repository
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: ⚙️ Cài đặt môi trường Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
       - name: 📦 Cài đặt thư viện dependencies
@@ -40,10 +41,12 @@ jobs:
           git config --global user.name "MoveSafe Cloud Bot"
           git config --global user.email "bot@movesafe.vn"
           
-          # Kiểm tra xem file cache có sự thay đổi không
-          if [[ -n $(git status -s data/live_urban_cache.json public/data/live_urban_cache.json) ]]; then
-            git add data/live_urban_cache.json public/data/live_urban_cache.json
+          # Đảm bảo đang ở nhánh main và kiểm tra thay đổi
+          git checkout main
+          if [[ -n $(git status -s data/ public/data/) ]]; then
+            git add data/ public/data/
             git commit -m "chore(cloud-sync): Tự động cập nhật rốn ngập & thời tiết 24/7 [skip ci]"
+            git pull --rebase origin main || true
             git push origin main
             echo "✓ Đã cập nhật và đẩy dữ liệu cache mới nhất lên GitHub Cloud!"
           else
