@@ -6,6 +6,7 @@ The project has locally mounted skills in `.agents/skills/`:
 - **Office Document Processing**: `.agents/skills/OfficeCLI-1.0.153/SKILL.md`
 - **Project Memory & Wiki**: `.agents/skills/ai-memory-retrieval/SKILL.md`
 - **Reverse Engineering**: `.agents/skills/reverse-engineer-anything/SKILL.md`
+- **Ponytail (Lazy Senior Dev)**: `.agents/skills/ponytail/SKILL.md`
 
 ## UI Rules
 - Strictly NO icons or emojis in the UI, map pins, toasts, or AI responses.
