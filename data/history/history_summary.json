@@ -1,148 +1,10 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 48,
+  "totalSnapshots": 40,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-21T07:18:46.022Z",
+  "updatedAt": "2026-10-21T13:06:23.592Z",
   "snapshots": [
-    {
-      "timestamp": "2026-10-14T08:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 15,
-      "hanoi": {
-        "avgSpeedKmh": 32,
-        "congestionIndex": 1.4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 30,
-        "congestionIndex": 1.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 38,
-        "congestionIndex": 1.1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T09:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 16,
-      "hanoi": {
-        "avgSpeedKmh": 32,
-        "congestionIndex": 1.4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 30,
-        "congestionIndex": 1.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 38,
-        "congestionIndex": 1.1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T10:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 17,
-      "hanoi": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 3.8,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 15,
-        "congestionIndex": 4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 24,
-        "congestionIndex": 2.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T11:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 18,
-      "hanoi": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 3.8,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 15,
-        "congestionIndex": 4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 24,
-        "congestionIndex": 2.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T12:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 19,
-      "hanoi": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 3.8,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 15,
-        "congestionIndex": 4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 24,
-        "congestionIndex": 2.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T13:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 20,
-      "hanoi": {
-        "avgSpeedKmh": 32,
-        "congestionIndex": 1.4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 30,
-        "congestionIndex": 1.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 38,
-        "congestionIndex": 1.1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-10-14T14:00:00.000Z",
       "date": "2026-10-14",
@@ -208,112 +70,6 @@
       "danang": {
         "avgSpeedKmh": 38,
         "congestionIndex": 1.1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T10:38:59.412Z",
-      "date": "2026-10-14",
-      "hour": 17,
-      "hanoi": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": [
-          {
-            "name": "Điểm do cộng đồng báo cáo",
-            "depth_cm": 20
-          }
-        ]
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": [
-          {
-            "name": "Đường Huỳnh Tấn Phát (Quận 7 - Đoạn gần cầu Phú Mỹ)",
-            "depth_cm": 25
-          },
-          {
-            "name": "Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)",
-            "depth_cm": 25
-          }
-        ]
-      },
-      "danang": {
-        "avgSpeedKmh": 7,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T10:58:59.811Z",
-      "date": "2026-10-14",
-      "hour": 17,
-      "hanoi": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": [
-          {
-            "name": "Điểm do cộng đồng báo cáo",
-            "depth_cm": 20
-          }
-        ]
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": [
-          {
-            "name": "Đường Huỳnh Tấn Phát (Quận 7 - Đoạn gần cầu Phú Mỹ)",
-            "depth_cm": 25
-          },
-          {
-            "name": "Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)",
-            "depth_cm": 25
-          }
-        ]
-      },
-      "danang": {
-        "avgSpeedKmh": 9,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T11:21:45.768Z",
-      "date": "2026-10-14",
-      "hour": 18,
-      "hanoi": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": [
-          {
-            "name": "Đường Huỳnh Tấn Phát (Quận 7 - Đoạn gần cầu Phú Mỹ)",
-            "depth_cm": 25
-          },
-          {
-            "name": "Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)",
-            "depth_cm": 25
-          }
-        ]
-      },
-      "danang": {
-        "avgSpeedKmh": 10,
-        "congestionIndex": 5,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }
@@ -1142,6 +898,29 @@
       "danang": {
         "avgSpeedKmh": 16,
         "congestionIndex": 2.6,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-21T13:06:23.592Z",
+      "date": "2026-10-21",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }
