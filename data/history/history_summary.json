@@ -1,56 +1,10 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 54,
+  "totalSnapshots": 53,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-20T23:03:14.480Z",
+  "updatedAt": "2026-10-21T01:53:19.758Z",
   "snapshots": [
-    {
-      "timestamp": "2026-10-14T00:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 7,
-      "hanoi": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 3.8,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 15,
-        "congestionIndex": 4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 24,
-        "congestionIndex": 2.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
-    {
-      "timestamp": "2026-10-14T01:00:00.000Z",
-      "date": "2026-10-14",
-      "hour": 8,
-      "hanoi": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 3.8,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 15,
-        "congestionIndex": 4,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 24,
-        "congestionIndex": 2.5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-10-14T02:00:00.000Z",
       "date": "2026-10-14",
@@ -1280,6 +1234,29 @@
       "danang": {
         "avgSpeedKmh": 25,
         "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-21T01:53:19.758Z",
+      "date": "2026-10-21",
+      "hour": 8,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }
