@@ -25,9 +25,14 @@ class AIChat {
         console.log('[Voice] Nhận diện được:', transcript);
         const searchInput = document.getElementById('gm-search-input');
         const chatInput = document.getElementById('ai-chat-input');
-        if (searchInput) searchInput.value = transcript;
+        const btnClearSearch = document.getElementById('btn-clear-search');
+        if (searchInput) {
+          searchInput.value = transcript;
+          if (btnClearSearch) btnClearSearch.style.display = 'inline-flex';
+        }
         if (chatInput) chatInput.value = transcript;
 
+        window.appState?.showToast?.(`Đã nhận diện: "${transcript}"`, 'info', 2500);
         this.open();
         this.sendMessage(transcript);
         this.stopListening();
@@ -40,7 +45,11 @@ class AIChat {
 
   toggleVoiceSearch() {
     if (!this.recognition) {
-      alert('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.');
+      if (window.appState?.showToast) {
+        window.appState.showToast('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.', 'warning');
+      } else {
+        alert('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.');
+      }
       return;
     }
     if (this.isListening) {
@@ -54,6 +63,7 @@ class AIChat {
     if (!this.recognition) return;
     this.isListening = true;
     document.querySelectorAll('.btn-voice, #btn-voice-search, #btn-chat-voice').forEach(btn => btn.classList.add('mic-active'));
+    window.appState?.showToast?.('Đang lắng nghe giọng nói... Hãy đọc câu hỏi hoặc địa điểm.', 'info', 3000);
     try {
       this.recognition.start();
     } catch (e) {}
@@ -140,7 +150,11 @@ class AIChat {
 
   toggleSpeakText(btn, text) {
     if (!('speechSynthesis' in window)) {
-      alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
+      if (window.appState?.showToast) {
+        window.appState.showToast('Trình duyệt của bạn không hỗ trợ đọc giọng nói.', 'warning');
+      } else {
+        alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
+      }
       return;
     }
 

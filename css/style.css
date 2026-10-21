@@ -3262,12 +3262,38 @@ body {
   .gm-search-box {
     height: 44px;
     border-radius: 24px;
-    padding: 0 10px;
+    padding: 0 8px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+    gap: 4px;
+  }
+
+  /* Tối ưu mobile: Ẩn nhãn chữ để nút trở thành Icon-only gọn gàng, dành toàn bộ không gian cho ô gõ tìm kiếm */
+  .gm-search-box .gm-btn-text-action .btn-label {
+    display: none !important;
+  }
+
+  .gm-search-box .gm-btn-text-action {
+    padding: 0 8px !important;
+    min-width: 34px !important;
+    width: 34px !important;
+    height: 34px !important;
+    gap: 0 !important;
+    justify-content: center !important;
+  }
+
+  .gm-search-box .gm-brand-badge .brand-text {
+    display: none !important;
+  }
+
+  .gm-search-box .gm-brand-badge {
+    padding: 6px 7px !important;
+    border-radius: 8px !important;
   }
 
   .gm-input-search {
-    font-size: 14px;
+    font-size: 13.5px;
+    width: 100% !important;
+    min-width: 110px !important;
   }
 
   .gm-chips-scroll {
@@ -3362,8 +3388,8 @@ body {
   }
 
   .gm-map-btn {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     font-size: 18px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
@@ -3621,8 +3647,8 @@ body {
   }
 
   .mnav-fab-circle {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ea4335, #c5221f);
     color: #ffffff;
@@ -3630,7 +3656,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    margin-top: -16px;
+    margin-top: -18px;
     box-shadow: 0 4px 10px rgba(217, 48, 37, 0.38);
     border: 2.5px solid #ffffff;
     transition: transform 0.15s ease;

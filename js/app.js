@@ -910,11 +910,31 @@ class GoogleMapsApp {
       this.setMobileActiveTab('insights');
     });
 
-    // 2. Ô tìm kiếm chính
+    // 2. Ô tìm kiếm chính & Nút Xóa nhanh
     const searchInput = document.getElementById('gm-search-input');
+    const btnClearSearch = document.getElementById('btn-clear-search');
+
+    searchInput?.addEventListener('input', () => {
+      if (btnClearSearch) {
+        btnClearSearch.style.display = searchInput.value.trim().length > 0 ? 'inline-flex' : 'none';
+      }
+    });
+
+    btnClearSearch?.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      btnClearSearch.style.display = 'none';
+    });
+
     searchInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         this.handleSearch(searchInput.value.trim());
+      } else if (e.key === 'Escape') {
+        searchInput.value = '';
+        if (btnClearSearch) btnClearSearch.style.display = 'none';
+        searchInput.blur();
       }
     });
 
@@ -1301,7 +1321,7 @@ class GoogleMapsApp {
     // Lấy vị trí GPS cho form báo cáo
     document.getElementById('btn-report-current-gps')?.addEventListener('click', () => {
       if (!navigator.geolocation) {
-        alert('Trình duyệt không hỗ trợ định vị GPS');
+        this.showToast('Trình duyệt không hỗ trợ định vị GPS', 'warning');
         return;
       }
       this.showToast('Đang xác định tọa độ GPS của bạn...', 'info');
@@ -1330,7 +1350,7 @@ class GoogleMapsApp {
 
         this.showToast('Đã lấy tọa độ GPS chính xác!', 'info');
       }, (err) => {
-        alert('Không thể lấy vị trí GPS: ' + err.message);
+        this.showToast('Không thể lấy vị trí GPS: ' + err.message, 'warning');
       });
     });
 
@@ -1439,6 +1459,62 @@ class GoogleMapsApp {
         c.classList.toggle('active', c.getAttribute('data-district') === 'all');
       });
       this.renderHanoiStreetsCards('all', '');
+    });
+
+    // 9. Phím tắt toàn cục Escape (Đóng modal, drawer, menu và hủy thao tác)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const openModal = document.querySelector('.modal-overlay.open');
+        if (openModal) {
+          openModal.classList.remove('open');
+          if (openModal.id === 'modal-urban-insights' && window.aiChat) {
+            window.aiChat.stopSpeaking();
+          }
+          return;
+        }
+        if (window.aiChat && window.aiChat.isOpen) {
+          window.aiChat.close();
+          this.setMobileActiveTab('explore');
+          return;
+        }
+        const layerMenu = document.getElementById('gm-layer-menu');
+        if (layerMenu && layerMenu.classList.contains('open')) {
+          layerMenu.classList.remove('open');
+          return;
+        }
+        if (this.pickingLocationType) {
+          this.stopPickLocationOnMap();
+          return;
+        }
+        const dirPanel = document.getElementById('gm-directions-panel');
+        if (dirPanel && dirPanel.classList.contains('open') && window.innerWidth <= 768) {
+          this.toggleDirectionsPanel(false);
+          return;
+        }
+      }
+    });
+
+    // 10. Bấm ra ngoài (Backdrop click) để đóng tất cả Modals
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+          if (overlay.id === 'modal-urban-insights' && window.aiChat) {
+            window.aiChat.stopSpeaking();
+          }
+        }
+      });
+    });
+
+    // 11. Bấm ra ngoài để đóng Menu Lớp bản đồ
+    document.addEventListener('pointerdown', (e) => {
+      const layerMenu = document.getElementById('gm-layer-menu');
+      const btnLayers = document.getElementById('btn-gm-layers');
+      if (layerMenu && layerMenu.classList.contains('open')) {
+        if (!layerMenu.contains(e.target) && !btnLayers?.contains(e.target)) {
+          layerMenu.classList.remove('open');
+        }
+      }
     });
   }
 

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server/server.js",
     "bot": "node server/bot-runner.js",
-    "dev": "node server/server.js"
+    "dev": "node server/server.js",
+    "test": "node tests/run-all-tests.js",
+    "report:test": "node scripts/generate_test_report_docx.js"
   },
   "keywords": [
     "traffic",
@@ -25,7 +27,8 @@
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "docx": "^9.7.2",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "puppeteer-core": "^25.12.0"

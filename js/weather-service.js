@@ -291,4 +291,9 @@ class WeatherService {
   }
 }
 
-window.weatherService = new WeatherService();
+if (typeof window !== 'undefined') {
+  window.weatherService = new WeatherService();
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = WeatherService;
+}
