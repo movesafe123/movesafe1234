@@ -305,7 +305,24 @@ class GoogleMapsApp {
   }
 
   async fetchLiveData() {
-    const cacheBuster = `?t=${Date.now()}`;
+    // 0. Tối ưu tốc độ tải tức thì cho thiết bị: Nạp ngay từ LocalStorage để không phải chờ mạng (0ms latency)
+    if (!this._hasInitialRendered) {
+      try {
+        const cached = localStorage.getItem('movesafe_cached_livedata');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && Array.isArray(parsed.floodPoints)) {
+            this.liveData = parsed;
+            this.renderAllData();
+            this._hasInitialRendered = true;
+          }
+        }
+      } catch (err) {}
+    }
+
+    // Tối ưu làm mới: Gom nhóm theo chu kỳ 30 giây để tận dụng bộ nhớ đệm HTTP
+    const cacheBucket = Math.floor(Date.now() / 30000);
+    const cacheBuster = `?v=${cacheBucket}`;
     let fetchedData = null;
 
     // 1. Thử gọi backend Node.js
@@ -333,6 +350,10 @@ class GoogleMapsApp {
 
     if (fetchedData) {
       this.liveData = fetchedData;
+      this._hasInitialRendered = true;
+      try {
+        localStorage.setItem('movesafe_cached_livedata', JSON.stringify(fetchedData));
+      } catch (e) {}
 
       // Hợp nhất các báo cáo người dùng đã gửi từ localStorage
       if (window.crowdsourceService && typeof window.crowdsourceService.getLocalReports === 'function') {
@@ -1024,9 +1045,6 @@ class GoogleMapsApp {
 
       const chkEv = document.getElementById('chk-layer-ev');
       const chipEv = document.getElementById('chip-ev-stations');
-      const evCounts = { hanoi: 63, hcm: 65, danang: 25 };
-      const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
-      if (countEl) countEl.textContent = `${evCounts[this.currentCity] || 50} trạm`;
 
       if ((chkEv && chkEv.checked) || (chipEv && chipEv.classList.contains('active'))) {
         if (window.mapEngine && window.mapEngine.toggleEV) {
@@ -3333,10 +3351,14 @@ class GoogleMapsApp {
 
       html += `
         <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
-          ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
-          <div class="gm-route-label ${labelClass}" style="color: ${route.color}; display: flex; align-items: center; justify-content: space-between;">
-            <span>${route.label}</span>
-            ${rpiHtml}
+          <div class="gm-route-header-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px;">
+            <div class="gm-route-label ${labelClass}" style="color: ${route.color}; margin-bottom: 0;">
+              <span>${route.label}</span>
+            </div>
+            <div class="gm-route-header-badges" style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+              ${route.isRecommended ? `<span class="gm-badge-selected" style="background: ${route.color}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;">Đang chọn</span>` : ''}
+              ${rpiHtml}
+            </div>
           </div>
           <div class="gm-route-time ${timeClass}">
             <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>

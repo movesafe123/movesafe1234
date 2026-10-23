@@ -814,10 +814,6 @@ class MapEngine {
           if (Array.isArray(stations)) {
             this._evStationsData = stations;
 
-            // Cập nhật số lượng trạm sạc trên chip filter
-            const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
-            if (countEl) countEl.textContent = `${stations.length} trạm`;
-
             stations.forEach(st => {
               if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
               

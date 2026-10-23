@@ -1,6 +1,7 @@
 const axios = require('axios');
 const botService = require('./bot-service');
 const HANOI_WARDS_DATA = require('../js/hanoi-wards-streets');
+const FOOD_ENTERTAINMENT_DATA = require('../js/food-entertainment-data');
 
 class AIAssistantService {
   stripEmojis(str) {
@@ -38,7 +39,7 @@ class AIAssistantService {
       .trim();
 
     const dest = match[2]
-      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất).*$/i, '')
+      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
       .replace(/[,.?!]+$/g, '')
       .trim();
 
@@ -103,6 +104,15 @@ class AIAssistantService {
           avoidLevel: 1,
           timeOffsetHours
         }
+      };
+    }
+
+    // 0b. Nếu người dùng hỏi về ăn uống, quán ngon, cafe hoặc điểm vui chơi giải trí
+    if (FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
+      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city);
+      return {
+        text: rec.text,
+        action: null
       };
     }
 
@@ -327,6 +337,7 @@ class AIAssistantService {
     const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
     const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('sạc điện') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
+    const isAskingFoodOrEntertainment = FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
 
     let wardContext = '';
     if (city === 'hanoi' && Array.isArray(HANOI_WARDS_DATA)) {
@@ -374,6 +385,20 @@ class AIAssistantService {
 1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
 2. Tư vấn các trạm sạc phù hợp nhất, công suất (kW), sạc nhanh hay sạc chậm, lưu ý đường đi an toàn né ngập.
 3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+    } else if (isAskingFoodOrEntertainment) {
+      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city);
+      dynamicContext += `Cơ sở dữ liệu địa phương chọn lọc tại ${cityName}:
+${rec.text}`;
+
+      instructions = `YÊU CẦU TRẢ LỜI ĐẶC BIỆT:
+1. Người dùng đang hỏi về ĐỊA ĐIỂM ĂN UỐNG, MÓN NGON, QUÁN CAFE HOẶC ĐIỂM VUI CHƠI GIẢI TRÍ tại khu vực này.
+2. Bạn là Chuyên gia Bản địa sành sỏi, am hiểu sâu sắc về ẩm thực và điểm vui chơi giải trí tại ${cityName}.
+3. Đề xuất cụ thể từ 3 đến 5 địa điểm ẩm thực hoặc vui chơi THỰC TẾ, NỔI TIẾNG, ĐƯỢC ĐÁNH GIÁ CAO NHẤT quanh khu vực người dùng hỏi:
+   - Tên quán/địa điểm & Địa chỉ cụ thể hoặc tên phố
+   - Món đặc sản / điểm hấp dẫn nhất
+   - Không gian / mức giá tham khảo
+4. Kèm theo mẹo giao thông & đỗ xe thực tế: chỗ để xe máy/ô tô có thuận tiện không, khung giờ nên ghé để tránh tắc đường hoặc chờ bàn.
+5. Trả lời đúng trọng tâm câu hỏi, văn phong thông minh, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon) màu mè. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.`;
     } else {
       dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName}:
 - Số điểm đang ngập (>0cm): ${activeFloodPoints.length}
@@ -395,11 +420,8 @@ Câu hỏi của người tham gia giao thông: "${query}"
 ${instructions}`;
 
     const candidateModels = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-2.0-flash',
-      'gemini-flash-latest',
-      'gemini-flash-lite-latest'
+      'gemini-3.6-flash',
+      'gemini-3.8-flash'
     ];
 
     let lastError = null;
@@ -408,7 +430,7 @@ ${instructions}`;
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await axios.post(url, {
           contents: [{ parts: [{ text: contextPrompt }] }]
-        }, { timeout: 10000 });
+        }, { timeout: 6000 });
 
         let reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply && reply.trim().length > 0) {

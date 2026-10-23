@@ -13,6 +13,7 @@ const path = require('path');
 const testSuites = [
   { file: 'tests/unit/routing-engine.test.js', category: 'Unit: Thuật toán Dẫn đường Né ngập', prefix: 'TC-NAV' },
   { file: 'tests/unit/weather-parser.test.js', category: 'Unit: Dữ liệu Khí tượng & Cảnh báo', prefix: 'TC-WTH' },
+  { file: 'tests/unit/user-features.test.js', category: 'Unit: Giao diện & Đề xuất Ẩm thực AI', prefix: 'TC-UI' },
   { file: 'tests/api/server-api.test.js', category: 'Integration: Backend REST API & Bảo mật', prefix: 'TC-API' },
   { file: 'tests/e2e/browser-e2e.test.js', category: 'E2E: Trải nghiệm Người dùng & Giao diện Bản đồ', prefix: 'TC-E2E' }
 ];

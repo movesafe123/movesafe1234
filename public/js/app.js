@@ -305,7 +305,24 @@ class GoogleMapsApp {
   }
 
   async fetchLiveData() {
-    const cacheBuster = `?t=${Date.now()}`;
+    // 0. Tối ưu tốc độ tải tức thì cho thiết bị: Nạp ngay từ LocalStorage để không phải chờ mạng (0ms latency)
+    if (!this._hasInitialRendered) {
+      try {
+        const cached = localStorage.getItem('movesafe_cached_livedata');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && Array.isArray(parsed.floodPoints)) {
+            this.liveData = parsed;
+            this.renderAllData();
+            this._hasInitialRendered = true;
+          }
+        }
+      } catch (err) {}
+    }
+
+    // Tối ưu làm mới: Gom nhóm theo chu kỳ 30 giây để tận dụng bộ nhớ đệm HTTP
+    const cacheBucket = Math.floor(Date.now() / 30000);
+    const cacheBuster = `?v=${cacheBucket}`;
     let fetchedData = null;
 
     // 1. Thử gọi backend Node.js
@@ -333,6 +350,10 @@ class GoogleMapsApp {
 
     if (fetchedData) {
       this.liveData = fetchedData;
+      this._hasInitialRendered = true;
+      try {
+        localStorage.setItem('movesafe_cached_livedata', JSON.stringify(fetchedData));
+      } catch (e) {}
 
       // Hợp nhất các báo cáo người dùng đã gửi từ localStorage
       if (window.crowdsourceService && typeof window.crowdsourceService.getLocalReports === 'function') {
@@ -910,11 +931,31 @@ class GoogleMapsApp {
       this.setMobileActiveTab('insights');
     });
 
-    // 2. Ô tìm kiếm chính
+    // 2. Ô tìm kiếm chính & Nút Xóa nhanh
     const searchInput = document.getElementById('gm-search-input');
+    const btnClearSearch = document.getElementById('btn-clear-search');
+
+    searchInput?.addEventListener('input', () => {
+      if (btnClearSearch) {
+        btnClearSearch.style.display = searchInput.value.trim().length > 0 ? 'inline-flex' : 'none';
+      }
+    });
+
+    btnClearSearch?.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      btnClearSearch.style.display = 'none';
+    });
+
     searchInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         this.handleSearch(searchInput.value.trim());
+      } else if (e.key === 'Escape') {
+        searchInput.value = '';
+        if (btnClearSearch) btnClearSearch.style.display = 'none';
+        searchInput.blur();
       }
     });
 
@@ -1004,9 +1045,6 @@ class GoogleMapsApp {
 
       const chkEv = document.getElementById('chk-layer-ev');
       const chipEv = document.getElementById('chip-ev-stations');
-      const evCounts = { hanoi: 63, hcm: 65, danang: 25 };
-      const countEl = document.getElementById('badge-ev-count') || document.getElementById('badge-ev-stations-count');
-      if (countEl) countEl.textContent = `${evCounts[this.currentCity] || 50} trạm`;
 
       if ((chkEv && chkEv.checked) || (chipEv && chipEv.classList.contains('active'))) {
         if (window.mapEngine && window.mapEngine.toggleEV) {
@@ -1301,7 +1339,7 @@ class GoogleMapsApp {
     // Lấy vị trí GPS cho form báo cáo
     document.getElementById('btn-report-current-gps')?.addEventListener('click', () => {
       if (!navigator.geolocation) {
-        alert('Trình duyệt không hỗ trợ định vị GPS');
+        this.showToast('Trình duyệt không hỗ trợ định vị GPS', 'warning');
         return;
       }
       this.showToast('Đang xác định tọa độ GPS của bạn...', 'info');
@@ -1330,7 +1368,7 @@ class GoogleMapsApp {
 
         this.showToast('Đã lấy tọa độ GPS chính xác!', 'info');
       }, (err) => {
-        alert('Không thể lấy vị trí GPS: ' + err.message);
+        this.showToast('Không thể lấy vị trí GPS: ' + err.message, 'warning');
       });
     });
 
@@ -1439,6 +1477,62 @@ class GoogleMapsApp {
         c.classList.toggle('active', c.getAttribute('data-district') === 'all');
       });
       this.renderHanoiStreetsCards('all', '');
+    });
+
+    // 9. Phím tắt toàn cục Escape (Đóng modal, drawer, menu và hủy thao tác)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const openModal = document.querySelector('.modal-overlay.open');
+        if (openModal) {
+          openModal.classList.remove('open');
+          if (openModal.id === 'modal-urban-insights' && window.aiChat) {
+            window.aiChat.stopSpeaking();
+          }
+          return;
+        }
+        if (window.aiChat && window.aiChat.isOpen) {
+          window.aiChat.close();
+          this.setMobileActiveTab('explore');
+          return;
+        }
+        const layerMenu = document.getElementById('gm-layer-menu');
+        if (layerMenu && layerMenu.classList.contains('open')) {
+          layerMenu.classList.remove('open');
+          return;
+        }
+        if (this.pickingLocationType) {
+          this.stopPickLocationOnMap();
+          return;
+        }
+        const dirPanel = document.getElementById('gm-directions-panel');
+        if (dirPanel && dirPanel.classList.contains('open') && window.innerWidth <= 768) {
+          this.toggleDirectionsPanel(false);
+          return;
+        }
+      }
+    });
+
+    // 10. Bấm ra ngoài (Backdrop click) để đóng tất cả Modals
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+          if (overlay.id === 'modal-urban-insights' && window.aiChat) {
+            window.aiChat.stopSpeaking();
+          }
+        }
+      });
+    });
+
+    // 11. Bấm ra ngoài để đóng Menu Lớp bản đồ
+    document.addEventListener('pointerdown', (e) => {
+      const layerMenu = document.getElementById('gm-layer-menu');
+      const btnLayers = document.getElementById('btn-gm-layers');
+      if (layerMenu && layerMenu.classList.contains('open')) {
+        if (!layerMenu.contains(e.target) && !btnLayers?.contains(e.target)) {
+          layerMenu.classList.remove('open');
+        }
+      }
     });
   }
 
@@ -3257,10 +3351,14 @@ class GoogleMapsApp {
 
       html += `
         <div class="gm-route-card ${cardClass}" data-route-index="${index}" onclick="window.appState.selectRouteOnMap(${index})">
-          ${route.isRecommended ? `<div class="gm-recommended-badge" style="background: ${route.color};">Đang chọn</div>` : ''}
-          <div class="gm-route-label ${labelClass}" style="color: ${route.color}; display: flex; align-items: center; justify-content: space-between;">
-            <span>${route.label}</span>
-            ${rpiHtml}
+          <div class="gm-route-header-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px;">
+            <div class="gm-route-label ${labelClass}" style="color: ${route.color}; margin-bottom: 0;">
+              <span>${route.label}</span>
+            </div>
+            <div class="gm-route-header-badges" style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+              ${route.isRecommended ? `<span class="gm-badge-selected" style="background: ${route.color}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;">Đang chọn</span>` : ''}
+              ${rpiHtml}
+            </div>
           </div>
           <div class="gm-route-time ${timeClass}">
             <span style="color: ${route.color};">~${route.durationMin} phút${timeDiffText}</span>

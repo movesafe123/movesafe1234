@@ -1,0 +1,105 @@
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const aiService = require('../../server/ai-service');
+const foodData = require('../../js/food-entertainment-data');
+
+function runTest(tcId, name, fn) {
+  const t0 = Date.now();
+  try {
+    fn();
+    const duration = Date.now() - t0;
+    console.log(`✔ [${tcId}] ${name} (${duration}ms)`);
+  } catch (err) {
+    const duration = Date.now() - t0;
+    console.error(`✖ [${tcId}] ${name} (${duration}ms) - ${err.message}`);
+    process.exitCode = 1;
+  }
+}
+
+async function runAsyncTest(tcId, name, fn) {
+  const t0 = Date.now();
+  try {
+    await fn();
+    const duration = Date.now() - t0;
+    console.log(`✔ [${tcId}] ${name} (${duration}ms)`);
+  } catch (err) {
+    const duration = Date.now() - t0;
+    console.error(`✖ [${tcId}] ${name} (${duration}ms) - ${err.message}`);
+    process.exitCode = 1;
+  }
+}
+
+async function main() {
+  const htmlPath = path.join(__dirname, '../../index.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const cssPath = path.join(__dirname, '../../css/style.css');
+  const css = fs.readFileSync(cssPath, 'utf8');
+
+  runTest('TC-UI-01', 'Thanh tìm kiếm nền trắng, đã bỏ logo và có placeholder "Nhập địa chỉ..."', () => {
+    assert.strictEqual(html.includes('class="gm-brand-badge"'), false, 'Vẫn còn gm-brand-badge');
+    assert.ok(html.includes('placeholder="Nhập địa chỉ..."'), 'Thiếu placeholder Nhập địa chỉ...');
+    assert.ok(css.includes('.gm-search-box'), 'Thiếu class .gm-search-box');
+  });
+
+  runTest('TC-UI-02', 'Thanh công cụ có nút mic (hình mic) và nút tìm kiếm cạnh ô nhập', () => {
+    assert.ok(html.includes('id="btn-voice-search"'), 'Thiếu id btn-voice-search');
+    assert.ok(html.includes('id="btn-search-trigger"'), 'Thiếu id btn-search-trigger');
+  });
+
+  runTest('TC-UI-03', 'Từ khóa "Trạm Sạc" chuẩn 2 từ, không hiển thị số lượng trạm sạc', () => {
+    assert.ok(html.includes('<span class="chip-text">Trạm Sạc</span>'), 'Chưa chuẩn nhãn Trạm Sạc');
+    assert.strictEqual(html.includes('id="badge-ev-count"'), false, 'Vẫn còn badge hiển thị số lượng');
+  });
+
+  runTest('TC-UI-04', 'Directions Panel cố định tiêu đề phương tiện và tạo thanh trượt cho dữ liệu bên dưới', () => {
+    assert.ok(html.includes('id="gm-directions-header"'), 'Thiếu id gm-directions-header');
+    assert.ok(html.includes('id="gm-directions-body"'), 'Thiếu id gm-directions-body');
+    assert.ok(css.includes('.gm-directions-body'), 'Thiếu CSS .gm-directions-body');
+  });
+
+  runTest('TC-UI-05', 'Thẻ lộ trình không bị đè chữ, huy hiệu Đang chọn và Tin cậy xếp linh hoạt', () => {
+    assert.ok(css.includes('.gm-badge-selected') || css.includes('.gm-recommended-badge'), 'Thiếu class badge');
+    const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+    assert.ok(appJs.includes('gm-route-header-badges'), 'Thiếu gm-route-header-badges chống đè chữ');
+  });
+
+  runTest('TC-UI-06', 'Phân loại câu hỏi ẩm thực, ăn uống và vui chơi giải trí chính xác 100%', () => {
+    assert.ok(foodData.isFoodOrFun('quanh mỹ đình có quán ăn nào nổi tiếng k'));
+    assert.ok(foodData.isFoodOrFun('khu vực cầu giấy có chỗ nào vui chơi checkin'));
+    assert.ok(foodData.isFoodOrFun('gợi ý quán cafe view đẹp hồ tây'));
+  });
+
+  await runAsyncTest('TC-UI-07', 'Chatbot AI đề xuất thực tế quán ăn nổi tiếng khu vực Mỹ Đình', async () => {
+    const res = await aiService.processQuery({
+      query: 'quanh mỹ đình có quán ăn nào nổi tiếng k',
+      city: 'hanoi'
+    });
+    assert.ok(!res.text.includes('Đặc điểm thoát nước'), 'Vẫn trả lời lạc đề thoát nước');
+    assert.ok(res.text.toLowerCase().includes('mỹ đình'), 'Thiếu địa danh Mỹ Đình');
+    assert.ok(res.text.includes('Hàn Quốc') || res.text.includes('Bún chả') || res.text.includes('K-Town') || res.text.includes('ẩm thực'), 'Chưa có gợi ý ẩm thực');
+  });
+
+  await runAsyncTest('TC-UI-08', 'Chatbot AI đề xuất địa điểm vui chơi giải trí tại Cầu Giấy', async () => {
+    const res = await aiService.processQuery({
+      query: 'cầu giấy có chỗ nào vui chơi không',
+      city: 'hanoi'
+    });
+    assert.ok(res.text.toLowerCase().includes('cầu giấy'));
+    assert.ok(res.text.includes('Công Viên') || res.text.includes('Tô Hiệu') || res.text.includes('vui chơi') || res.text.includes('ẩm thực'));
+  });
+
+  await runAsyncTest('TC-UI-09', 'Hệ thống dẫn đường tự động từ A đến B vẫn hoạt động chuẩn xác', async () => {
+    const res = await aiService.processQuery({
+      query: 'Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?',
+      city: 'hanoi'
+    });
+    assert.ok(res.action && res.action.type === 'AUTO_ROUTE');
+  });
+}
+
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
+

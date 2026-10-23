@@ -25,11 +25,13 @@ app.use('/css', express.static(path.join(rootDir, 'css'), staticOptions));
 app.use('/js', express.static(path.join(rootDir, 'js'), staticOptions));
 app.use('/screenshots', express.static(path.join(rootDir, 'public', 'screenshots'), staticOptions));
 
-// Phục vụ cache dữ liệu cho client fallback
+// Phục vụ cache dữ liệu cho client fallback kèm Cache-Control tối ưu tốc độ tải và làm mới
 app.get('/data/live_urban_cache.json', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=15, stale-while-revalidate=30');
   res.sendFile(path.join(rootDir, 'data', 'live_urban_cache.json'));
 });
 app.get('/data/ev_stations_cache.json', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=300');
   res.sendFile(path.join(rootDir, 'data', 'ev_stations_cache.json'));
 });
 app.use('/data', express.static(path.join(rootDir, 'data'), staticOptions));

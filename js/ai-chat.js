@@ -317,7 +317,7 @@ class AIChat {
       .trim();
 
     const dest = match[2]
-      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất).*$/i, '')
+      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
       .replace(/[,.?!]+$/g, '')
       .trim();
 
@@ -381,7 +381,7 @@ class AIChat {
     this.addBotMessage('*Đang phân tích dữ liệu giao thông thời gian thực...*');
 
     const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
-    const geminiKey = localStorage.getItem('movesafe_gemini_key') || '';
+    const geminiKey = localStorage.getItem('movesafe_gemini_key') || (window.CONFIG && window.CONFIG.GEMINI_KEY) || '';
     const parsedRoute = this.parseRouteQuery(query);
 
     let responded = false;
@@ -491,6 +491,13 @@ class AIChat {
       if (window.appState && window.appState.triggerChatRoute) {
         window.appState.triggerChatRoute(origin, destination, 1, timeOffsetHours);
       }
+      return;
+    }
+
+    // 3a1. Đề xuất địa điểm ăn uống, quán ngon, cafe hoặc điểm vui chơi giải trí
+    if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
+      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
+      this.addBotMessage(rec.text);
       return;
     }
 
@@ -628,6 +635,7 @@ class AIChat {
     const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
     const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc điện') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
+    const isAskingFoodOrEntertainment = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
 
     let dynamicContext = '';
     if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
@@ -672,6 +680,20 @@ class AIChat {
 1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
 2. Nêu rõ các trạm sạc gần nhất, công suất sạc (kW), hỗ trợ DC sạc nhanh hay AC chuẩn, và hướng đi khô ráo né ngập.
 3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+    } else if (isAskingFoodOrEntertainment) {
+      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
+      dynamicContext += `Cơ sở dữ liệu ẩm thực & vui chơi tại ${cityName}:
+${rec.text}`;
+
+      instructions = `YÊU CẦU TRẢ LỜI ĐẶC BIỆT:
+1. Người dùng đang hỏi về ĐỊA ĐIỂM ĂN UỐNG, MÓN NGON, QUÁN CAFE HOẶC ĐIỂM VUI CHƠI GIẢI TRÍ tại khu vực này.
+2. Bạn là Chuyên gia Bản địa sành sỏi, am hiểu sâu sắc về ẩm thực và điểm vui chơi giải trí tại ${cityName}.
+3. Đề xuất cụ thể từ 3 đến 5 địa điểm ẩm thực hoặc vui chơi THỰC TẾ, NỔI TIẾNG, ĐƯỢC ĐÁNH GIÁ CAO NHẤT quanh khu vực người dùng hỏi:
+   - Tên quán/địa điểm & Địa chỉ cụ thể hoặc tên phố
+   - Món đặc sản / điểm hấp dẫn nhất
+   - Không gian / mức giá tham khảo
+4. Kèm theo mẹo giao thông & đỗ xe thực tế: chỗ để xe máy/ô tô có thuận tiện không, khung giờ nên ghé để tránh tắc đường hoặc chờ bàn.
+5. Trả lời đúng trọng tâm câu hỏi, văn phong thông minh, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon) màu mè. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.`;
     } else {
       dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName} (Số điểm ngập >0cm: ${activeFloods.length}):
 - Điểm ngập úng trạm đo: ${JSON.stringify((activeFloods.length > 0 ? activeFloods : allFloods).slice(0, 6).map(f => ({ name: f.name, depth_cm: f.depth_cm, advice: f.advice })))}
@@ -692,22 +714,23 @@ Câu hỏi của người tham gia giao thông: "${query}"
 ${instructions}`;
 
     const candidateModels = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
-      'gemini-2.0-flash',
-      'gemini-flash-latest',
-      'gemini-flash-lite-latest'
+      'gemini-3.6-flash',
+      'gemini-3.8-flash'
     ];
     for (const model of candidateModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }]
-          })
+          }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
