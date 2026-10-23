@@ -63,10 +63,15 @@ class AIAssistantService {
     const systemGeminiKey = require('./config').API_KEYS.GEMINI || '';
     const activeKey = (userApiKey && userApiKey.trim().length > 10) ? userApiKey.trim() : systemGeminiKey;
 
-    if (activeKey && activeKey.length > 10) {
+    const isCooldown = this._geminiCooldownUntil && Date.now() < this._geminiCooldownUntil;
+    if (activeKey && activeKey.length > 10 && !isCooldown) {
       try {
         return await this.callGeminiAPI(query, liveData, city, activeKey);
       } catch (err) {
+        const status = err.response?.status;
+        if (status === 429 || status === 403 || status === 503 || (err.message && err.message.includes('timeout'))) {
+          this._geminiCooldownUntil = Date.now() + 60000; // Cooldown 60s khi quota/timeout để phản hồi tức thì (<5ms)
+        }
         console.warn('[AI] Gọi Gemini API thất bại, chuyển sang Bộ não AI tích hợp:', err.message);
       }
     }
@@ -112,7 +117,7 @@ class AIAssistantService {
       const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city);
       return {
         text: rec.text,
-        action: null
+        action: rec.action
       };
     }
 
@@ -420,8 +425,8 @@ Câu hỏi của người tham gia giao thông: "${query}"
 ${instructions}`;
 
     const candidateModels = [
-      'gemini-3.6-flash',
-      'gemini-3.8-flash'
+      'gemini-2.0-flash',
+      'gemini-1.5-flash'
     ];
 
     let lastError = null;
@@ -430,13 +435,15 @@ ${instructions}`;
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await axios.post(url, {
           contents: [{ parts: [{ text: contextPrompt }] }]
-        }, { timeout: 6000 });
+        }, { timeout: 3500 });
 
         let reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply && reply.trim().length > 0) {
-          let action = isAskingTrafficOnly
-            ? { type: 'SHOW_TRAFFIC_LAYER' }
-            : (isAskingEV ? { type: 'SHOW_EV_LAYER' } : (lower.includes('thời tiết') || lower.includes('mưa') ? { type: 'SHOW_WEATHER_LAYER' } : { type: 'SHOW_FLOOD_LAYER' }));
+          let action = isAskingFoodOrEntertainment
+            ? FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city).action
+            : (isAskingTrafficOnly
+              ? { type: 'SHOW_TRAFFIC_LAYER' }
+              : (isAskingEV ? { type: 'SHOW_EV_LAYER' } : (lower.includes('thời tiết') || lower.includes('mưa') ? { type: 'SHOW_WEATHER_LAYER' } : { type: 'SHOW_FLOOD_LAYER' })));
 
           const routeMatch = reply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
           if (parsedRoute) {

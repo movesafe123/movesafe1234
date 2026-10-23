@@ -931,13 +931,31 @@ class GoogleMapsApp {
       this.setMobileActiveTab('insights');
     });
 
-    // 2. Ô tìm kiếm chính & Nút Xóa nhanh
+    // 2. Ô tìm kiếm chính & Gợi ý địa chỉ thông minh (Autocomplete) & Nút Xóa nhanh
     const searchInput = document.getElementById('gm-search-input');
     const btnClearSearch = document.getElementById('btn-clear-search');
+    const mainDropdown = document.getElementById('dropdown-main-search');
+    let mainSearchDebounce = null;
 
     searchInput?.addEventListener('input', () => {
+      const val = searchInput.value.trim();
       if (btnClearSearch) {
-        btnClearSearch.style.display = searchInput.value.trim().length > 0 ? 'inline-flex' : 'none';
+        btnClearSearch.style.display = val.length > 0 ? 'inline-flex' : 'none';
+      }
+      clearTimeout(mainSearchDebounce);
+      if (val.length < 2) {
+        if (mainDropdown) mainDropdown.style.display = 'none';
+        return;
+      }
+      mainSearchDebounce = setTimeout(() => {
+        this.renderMainSearchSuggestions(val);
+      }, 240);
+    });
+
+    searchInput?.addEventListener('focus', () => {
+      const val = searchInput.value.trim();
+      if (val.length >= 2) {
+        this.renderMainSearchSuggestions(val);
       }
     });
 
@@ -947,20 +965,30 @@ class GoogleMapsApp {
         searchInput.focus();
       }
       btnClearSearch.style.display = 'none';
+      if (mainDropdown) mainDropdown.style.display = 'none';
     });
 
     searchInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
+        if (mainDropdown) mainDropdown.style.display = 'none';
         this.handleSearch(searchInput.value.trim());
       } else if (e.key === 'Escape') {
         searchInput.value = '';
         if (btnClearSearch) btnClearSearch.style.display = 'none';
+        if (mainDropdown) mainDropdown.style.display = 'none';
         searchInput.blur();
       }
     });
 
     document.getElementById('btn-search-trigger')?.addEventListener('click', () => {
+      if (mainDropdown) mainDropdown.style.display = 'none';
       this.handleSearch(searchInput?.value.trim() || '');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (mainDropdown && !e.target.closest('#gm-search-box')) {
+        mainDropdown.style.display = 'none';
+      }
     });
 
     // 3. Category Chips
@@ -974,6 +1002,8 @@ class GoogleMapsApp {
       } else {
         const nextState = !window.mapEngine.weatherVisible;
         window.mapEngine.toggleWeather(nextState);
+        const chkWeather = document.getElementById('chk-layer-weather');
+        if (chkWeather) chkWeather.checked = nextState;
         const chip = document.getElementById('chip-weather-toggle');
         if (nextState) {
           chip?.classList.remove('gm-chip-inactive');
@@ -1216,12 +1246,16 @@ class GoogleMapsApp {
     });
     document.getElementById('chk-layer-weather')?.addEventListener('change', (e) => {
       window.mapEngine.toggleWeather(e.target.checked);
+      const chip = document.getElementById('chip-weather-toggle');
+      if (chip) chip.classList.toggle('gm-chip-inactive', !e.target.checked);
     });
     document.getElementById('chk-layer-satellite')?.addEventListener('change', (e) => {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');
     });
     document.getElementById('chk-layer-ev')?.addEventListener('change', (e) => {
       if (window.mapEngine.toggleEV) window.mapEngine.toggleEV(e.target.checked);
+      const chipEv = document.getElementById('chip-ev-stations');
+      if (chipEv) chipEv.classList.toggle('active', e.target.checked);
     });
 
     // 6b. Nút gạt Chế độ Giả lập (Simulation Mode) ở góc trên bên phải
@@ -2319,18 +2353,222 @@ class GoogleMapsApp {
     }
   }
 
+  // Hiển thị gợi ý tự động cho ô tìm kiếm chính (Địa điểm, Phường/Đường, Quán ăn, Trạm sạc)
+  async renderMainSearchSuggestions(query) {
+    const dropdown = document.getElementById('dropdown-main-search');
+    if (!dropdown) return;
+
+    const clean = (query || '').trim();
+    if (clean.length < 2) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    const lower = clean.toLowerCase();
+    const suggestions = [];
+
+    // 1. Gợi ý nếu người dùng đang hỏi ẩm thực / vui chơi
+    if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(clean)) {
+      suggestions.push({
+        type: 'ai-food',
+        title: `Gợi ý ăn uống & vui chơi: "${clean}"`,
+        subtitle: 'Trợ lý AI đề xuất quán nổi tiếng + Ghim vị trí lên bản đồ',
+        query: clean
+      });
+    }
+
+    // 2. Gợi ý các quán ăn / điểm vui chơi khớp tên trực tiếp trong CSDL
+    if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.areas) {
+      for (const area of window.FOOD_ENTERTAINMENT_DATA.areas) {
+        if (area.city && area.city !== this.currentCity) continue;
+        const allSpots = [...(area.food || []), ...(area.entertainment || [])];
+        for (const spot of allSpots) {
+          if (
+            spot.name.toLowerCase().includes(lower) ||
+            spot.specialty.toLowerCase().includes(lower) ||
+            spot.address.toLowerCase().includes(lower)
+          ) {
+            suggestions.push({
+              type: 'spot',
+              title: spot.name,
+              subtitle: `${spot.address} • ${spot.specialty}`,
+              lat: spot.lat || area.lat,
+              lng: spot.lng || area.lng
+            });
+            if (suggestions.length >= 4) break;
+          }
+        }
+        if (suggestions.length >= 4) break;
+      }
+    }
+
+    // 3. Gợi ý Phường / Tuyến đường lớn Hà Nội
+    if (this.currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
+      for (const w of window.HANOI_WARDS_DATA) {
+        if (w.name.toLowerCase().includes(lower) || (w.district && w.district.toLowerCase().includes(lower))) {
+          suggestions.push({
+            type: 'ward',
+            title: `${w.name} (${w.district})`,
+            subtitle: `Các trục chính: ${(w.mainStreets || []).slice(0, 3).join(', ')}`,
+            lat: w.lat,
+            lng: w.lng,
+            wardName: w.name
+          });
+        } else {
+          const matchedSt = (w.mainStreets || []).find(s => s.toLowerCase().includes(lower));
+          if (matchedSt) {
+            suggestions.push({
+              type: 'street',
+              title: `${matchedSt} — ${w.name}`,
+              subtitle: `Quận/Huyện: ${w.district} • Chạm để xem khu vực`,
+              lat: w.lat,
+              lng: w.lng,
+              wardName: w.name
+            });
+          }
+        }
+        if (suggestions.length >= 6) break;
+      }
+    }
+
+    // 4. Gợi ý từ bộ máy Geocoding (Địa danh, Trạm sạc, Điểm ngập, OSM)
+    if (window.geocodingService && suggestions.length < 7) {
+      try {
+        const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+        const geoMatches = await window.geocodingService.searchAddresses(clean, {
+          city: this.currentCity,
+          center: cityCenter,
+          limit: 5
+        });
+        for (const m of (geoMatches || [])) {
+          if (!suggestions.some(s => s.title === m.title)) {
+            suggestions.push({
+              type: m.source || 'place',
+              title: m.title,
+              subtitle: m.subtitle || 'Địa điểm trên bản đồ',
+              lat: m.lat,
+              lng: m.lng
+            });
+          }
+          if (suggestions.length >= 7) break;
+        }
+      } catch (e) {
+        // Ignore geocoding errors in autocomplete
+      }
+    }
+
+    if (suggestions.length === 0) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    dropdown.innerHTML = suggestions.map((item, idx) => {
+      const iconSvg = item.type === 'ai-food'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`
+        : item.type === 'spot'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+
+      const routeBtn = (item.lat && item.lng)
+        ? `<button type="button" class="gm-sug-route-btn" data-idx="${idx}" title="Chỉ đường an toàn đến đây" style="margin-left:auto; padding:4px 8px; border-radius:6px; border:1px solid #dbeafe; background:#eff6ff; color:#1d4ed8; font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0;">Chỉ đường</button>`
+        : '';
+
+      return `
+        <div class="gm-autocomplete-item" data-idx="${idx}" style="display:flex; align-items:center; gap:10px;">
+          <div class="gm-item-icon" style="flex-shrink:0;">${iconSvg}</div>
+          <div class="gm-item-info" style="flex:1; min-width:0;">
+            <div class="gm-item-title" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>
+            <div class="gm-item-subtitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.subtitle}</div>
+          </div>
+          ${routeBtn}
+        </div>
+      `;
+    }).join('');
+
+    dropdown.style.display = 'block';
+
+    // Gắn sự kiện click cho từng dòng gợi ý
+    dropdown.querySelectorAll('.gm-autocomplete-item').forEach(el => {
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      const item = suggestions[idx];
+      if (!item) return;
+
+      const routeBtn = el.querySelector('.gm-sug-route-btn');
+      if (routeBtn) {
+        routeBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          dropdown.style.display = 'none';
+          const mainInput = document.getElementById('gm-search-input');
+          if (mainInput) mainInput.value = item.title;
+          this.routeToLocation(item.lat, item.lng, item.title);
+        });
+      }
+
+      el.addEventListener('click', () => {
+        dropdown.style.display = 'none';
+        const mainInput = document.getElementById('gm-search-input');
+        if (mainInput) mainInput.value = item.title;
+
+        if (item.type === 'ai-food') {
+          window.aiChat.open();
+          window.aiChat.sendMessage(item.query);
+          return;
+        }
+        if (item.wardName) {
+          this.flyToWardFromCard(item.lat, item.lng, item.wardName);
+          return;
+        }
+        if (item.lat && item.lng) {
+          window.mapEngine.map.flyTo([item.lat, item.lng], 16, { duration: 1.0 });
+          if (this.searchResultMarker) {
+            window.mapEngine.map.removeLayer(this.searchResultMarker);
+          }
+          const icon = L.divIcon({
+            className: 'gm-marker-container',
+            html: `<div class="gm-route-pin pin-dest" style="cursor: pointer;">•</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          this.searchResultMarker = L.marker([item.lat, item.lng], { icon }).addTo(window.mapEngine.map);
+          this.searchResultMarker.bindPopup(`
+            <div style="font-family: var(--font-family); min-width: 190px; padding: 4px;">
+              <div style="font-weight: 700; font-size: 14px; color: #202124;">${item.title}</div>
+              <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${item.subtitle}</div>
+              <button onclick="window.appState.routeToLocation(${item.lat}, ${item.lng}, '${item.title.replace(/'/g, "\\'")}')" 
+                style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                Chỉ đường an toàn đến đây
+              </button>
+            </div>
+          `).openPopup();
+        }
+      });
+    });
+  }
+
   // Xử lý tìm kiếm thông minh từ ô tìm kiếm chính
   async handleSearch(query) {
     if (!query) return;
     const lower = query.toLowerCase();
+    const mainDropdown = document.getElementById('dropdown-main-search');
+    if (mainDropdown) mainDropdown.style.display = 'none';
 
     // 0. Nếu hỏi lộ trình rõ ràng "từ A đến/ra/vào/về/lên/xuống B" -> ưu tiên xử lý ngay
     const parsedRoute = (window.aiChat && typeof window.aiChat.parseRouteQuery === 'function')
       ? window.aiChat.parseRouteQuery(query)
       : null;
 
-    if (parsedRoute && parsedRoute.origin && parsedRoute.dest) {
-      await this.triggerChatRoute(parsedRoute.origin, parsedRoute.dest, 1, parsedRoute.timeOffsetHours || 0);
+    const targetDest = parsedRoute ? (parsedRoute.destination || parsedRoute.dest) : null;
+    if (parsedRoute && parsedRoute.origin && targetDest) {
+      await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0);
+      return;
+    }
+
+    // 0b. Nếu là câu hỏi ẩm thực, vui chơi hoặc câu hỏi tự nhiên (có ... không, quán nào, ăn gì...) -> mở AI Chat & ghim bản đồ
+    const isFoodQuery = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
+    const isNaturalQuestion = /(có\s+.*(không|ko|k\b|chưa)|quán\s+nào|ăn\s+gì|chơi\s+gì|ở\s+đâu\s+ngon|đi\s+đường\s+nào|tắc\s+không|ngập\s+không|\?)/i.test(lower);
+    if (isFoodQuery || isNaturalQuestion) {
+      window.aiChat.open();
+      window.aiChat.sendMessage(query);
       return;
     }
 

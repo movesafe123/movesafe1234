@@ -98,6 +98,7 @@ body {
 
 /* Thanh tìm kiếm hiện đại nền trắng chuẩn Google Maps */
 .gm-search-box {
+  position: relative;
   background: #ffffff !important;
   height: 48px;
   width: 480px;
@@ -110,6 +111,23 @@ body {
   gap: 8px;
   transition: var(--transition);
   border: 1px solid rgba(226, 232, 240, 0.9);
+  z-index: 1200;
+}
+
+.gm-main-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  max-height: 360px;
+  overflow-y: auto;
+  z-index: 1300;
+  flex-direction: column;
+  padding: 6px 0;
 }
 
 .gm-search-box:focus-within {

@@ -1012,6 +1012,100 @@ class MapEngine {
     return this.focusEVStation(stationIdOrName);
   }
 
+  clearRoute() {
+    if (!this.map) return;
+    if (this.layers.routeSafeOutline) {
+      this.map.removeLayer(this.layers.routeSafeOutline);
+      this.layers.routeSafeOutline = null;
+    }
+    if (this.layers.routeSafe) {
+      this.map.removeLayer(this.layers.routeSafe);
+      this.layers.routeSafe = null;
+    }
+    if (this.layers.routeDanger) {
+      this.map.removeLayer(this.layers.routeDanger);
+      this.layers.routeDanger = null;
+    }
+    if (this._extraRouteLayers) {
+      this._extraRouteLayers.forEach(l => this.map.removeLayer(l));
+      this._extraRouteLayers = [];
+    }
+  }
+
+  renderFoodPlaces(spots = [], centerLat = null, centerLng = null) {
+    if (!this.map || !Array.isArray(spots) || spots.length === 0) return;
+    if (!this.layers.foodMarkers) {
+      this.layers.foodMarkers = L.layerGroup().addTo(this.map);
+    } else {
+      this.layers.foodMarkers.clearLayers();
+      if (!this.map.hasLayer(this.layers.foodMarkers)) {
+        this.layers.foodMarkers.addTo(this.map);
+      }
+    }
+
+    const validCoords = [];
+    spots.forEach((spot, idx) => {
+      if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
+      validCoords.push([spot.lat, spot.lng]);
+
+      const shortName = String(spot.name || '').split('(')[0].split('&')[0].trim().slice(0, 22);
+      const safeName = this.escapeHtml(spot.name || 'Địa điểm');
+      const safeAddr = this.escapeHtml(spot.address || '');
+      const safeFeature = this.escapeHtml(spot.feature || '');
+      const safePrice = this.escapeHtml(spot.price || '');
+
+      const iconHtml = `
+        <div class="gm-food-pin" style="display: inline-flex; align-items: center; gap: 5px; background: #ffffff; color: #1e293b; border: 2px solid #ea580c; border-radius: 99px; padding: 3px 9px 3px 5px; box-shadow: 0 3px 10px rgba(234,88,12,0.28); font-family: var(--font-family); font-size: 11.5px; font-weight: 700; white-space: nowrap;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 10.5px; font-weight: 700;">${idx + 1}</span>
+          <span>${this.escapeHtml(shortName)}</span>
+        </div>
+      `;
+
+      const icon = L.divIcon({
+        className: 'gm-food-pin-container',
+        html: iconHtml,
+        iconSize: [140, 28],
+        iconAnchor: [70, 14]
+      });
+
+      const marker = L.marker([spot.lat, spot.lng], { icon, zIndexOffset: 800 });
+      const popupHtml = `
+        <div style="font-family: var(--font-family); min-width: 250px; max-width: 300px; line-height: 1.4;">
+          <div style="font-size: 10.5px; font-weight: 700; color: #ea580c; text-transform: uppercase; margin-bottom: 4px;">
+            Đề xuất Ẩm thực & Vui chơi #${idx + 1}
+          </div>
+          <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">
+            ${safeName}
+          </h4>
+          <div style="font-size: 11.5px; color: #475569; margin-bottom: 6px;">
+            <strong>Địa chỉ:</strong> ${safeAddr}
+          </div>
+          <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; color: #7c2d12; margin-bottom: 6px;">
+            ${safeFeature}
+          </div>
+          <div style="font-size: 11.5px; color: #15803d; font-weight: 600; margin-bottom: 8px;">
+            Mức giá: ${safePrice}
+          </div>
+          <button
+            style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer;"
+            onclick="window.appState && window.appState.routeToLocation(${spot.lat}, ${spot.lng}, '${safeName.replace(/'/g, "\\'")}')">
+            Chỉ đường an toàn đến đây
+          </button>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      this.layers.foodMarkers.addLayer(marker);
+    });
+
+    if (validCoords.length > 1) {
+      const bounds = L.latLngBounds(validCoords);
+      this.map.flyToBounds(bounds, { padding: [70, 70], maxZoom: 15, duration: 0.9 });
+    } else if (centerLat && centerLng) {
+      this.map.flyTo([centerLat, centerLng], 14, { duration: 0.9 });
+    }
+  }
+
   zoomIn() { if (this.map) this.map.zoomIn(); }
   zoomOut() { if (this.map) this.map.zoomOut(); }
 }

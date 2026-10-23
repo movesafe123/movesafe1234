@@ -96,6 +96,25 @@ async function main() {
     });
     assert.ok(res.action && res.action.type === 'AUTO_ROUTE');
   });
+
+  await runAsyncTest('TC-UI-10', 'Chatbot AI trả kèm action SHOW_FOOD_PLACES với toạ độ ghim bản đồ và danh sách quán', async () => {
+    const res = await aiService.processQuery({
+      query: 'quanh đống đa chùa láng có quán ăn nào ngon',
+      city: 'hanoi'
+    });
+    assert.ok(res.action && res.action.type === 'SHOW_FOOD_PLACES', 'Thiếu action SHOW_FOOD_PLACES');
+    assert.ok(Array.isArray(res.action.spots) && res.action.spots.length >= 3, 'Thiếu danh sách spots có toạ độ');
+    assert.ok(typeof res.action.spots[0].lat === 'number' && typeof res.action.spots[0].lng === 'number', 'Thiếu lat/lng trên spot');
+  });
+
+  runTest('TC-UI-11', 'Ô tìm kiếm chính có Autocomplete Dropdown, MapEngine có clearRoute và renderFoodPlaces', () => {
+    assert.ok(html.includes('id="dropdown-main-search"'), 'Thiếu dropdown-main-search trong index.html');
+    const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    assert.ok(mapEngineJs.includes('renderFoodPlaces('), 'Thiếu hàm renderFoodPlaces trong map-engine.js');
+    assert.ok(mapEngineJs.includes('clearRoute()'), 'Thiếu hàm clearRoute trong map-engine.js');
+    const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+    assert.ok(appJs.includes('renderMainSearchSuggestions('), 'Thiếu hàm renderMainSearchSuggestions trong app.js');
+  });
 }
 
 main().catch(err => {

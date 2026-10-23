@@ -123,8 +123,12 @@ class AIChat {
     this.renderMessages();
   }
 
-  addBotMessage(text) {
-    this.messages.push({ sender: 'bot', text: this.stripEmojis(text) });
+  addBotMessage(text, options = {}) {
+    this.messages.push({
+      sender: 'bot',
+      text: this.stripEmojis(text),
+      spots: Array.isArray(options.spots) ? options.spots : null
+    });
     this.renderMessages();
   }
 
@@ -262,7 +266,27 @@ class AIChat {
         .trim();
       const isSpeakingThis = Boolean(this.isSpeaking && this.currentSpeakingText === cleanText);
 
+      const spotsButtonsHtml = (!isUser && Array.isArray(m.spots) && m.spots.length > 0) ? `
+        <div class="gm-chat-spots-actions" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
+          ${m.spots.map((sp, sIdx) => {
+            if (typeof sp.lat !== 'number' || typeof sp.lng !== 'number') return '';
+            const shortLabel = this.escapeHtml(String(sp.name || '').split('(')[0].split('&')[0].trim().slice(0, 26));
+            const fullSafe = this.escapeHtml(sp.name || 'Địa điểm').replace(/'/g, "\\'");
+            return `
+              <button type="button"
+                onclick="window.appState && window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
+                style="display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;"
+                title="Chỉ đường an toàn đến ${this.escapeHtml(sp.name || '')}">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                <span>Đi tới #${sIdx + 1}: ${shortLabel}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      ` : '';
+
       const ttsButton = !isUser ? `
+        ${spotsButtonsHtml}
         <div class="gm-chat-actions">
           <button class="gm-btn-tts ${isSpeakingThis ? 'is-speaking' : ''}"
                   onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(m.text)}'))"
@@ -367,6 +391,12 @@ class AIChat {
       if (act.targetStation && window.mapEngine && window.mapEngine.focusEVStation) {
         setTimeout(() => window.mapEngine.focusEVStation(act.targetStation), 700);
       }
+    } else if (act.type === 'SHOW_FOOD_PLACES') {
+      if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+        window.mapEngine.renderFoodPlaces(act.spots || [], act.lat, act.lng);
+      } else if (act.lat && act.lng) {
+        window.mapEngine.map?.flyTo([act.lat, act.lng], 14);
+      }
     }
   }
 
@@ -406,7 +436,9 @@ class AIChat {
             data.response.action.timeOffsetHours = parsedRoute.timeOffsetHours;
           }
 
-          this.addBotMessage(data.response.text);
+          this.addBotMessage(data.response.text, {
+            spots: data.response.action?.spots || null
+          });
           responded = true;
 
           if (parsedRoute) {
@@ -443,10 +475,17 @@ class AIChat {
           geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*->\s*.*?\]/i, '').trim();
         }
 
-        this.addBotMessage(geminiReply);
+        const isFoodQ = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
+        const foodRec = isFoodQ ? window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity) : null;
+
+        this.addBotMessage(geminiReply, {
+          spots: foodRec?.action?.spots || null
+        });
 
         const lowerQ = query.toLowerCase();
-        if (lowerQ.includes('trạm sạc') || lowerQ.includes('sạc xe') || lowerQ.includes('sạc pin') || lowerQ.includes('xe điện') || lowerQ.includes('đổi pin')) {
+        if (isFoodQ && foodRec?.action) {
+          this.handleMapAction(foodRec.action);
+        } else if (lowerQ.includes('trạm sạc') || lowerQ.includes('sạc xe') || lowerQ.includes('sạc pin') || lowerQ.includes('xe điện') || lowerQ.includes('đổi pin')) {
           this.handleMapAction({ type: 'SHOW_EV_LAYER' });
         }
 
@@ -497,7 +536,10 @@ class AIChat {
     // 3a1. Đề xuất địa điểm ăn uống, quán ngon, cafe hoặc điểm vui chơi giải trí
     if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
       const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
-      this.addBotMessage(rec.text);
+      this.addBotMessage(rec.text, { spots: rec.action?.spots || null });
+      if (rec.action) {
+        this.handleMapAction(rec.action);
+      }
       return;
     }
 
@@ -714,14 +756,14 @@ Câu hỏi của người tham gia giao thông: "${query}"
 ${instructions}`;
 
     const candidateModels = [
-      'gemini-3.6-flash',
-      'gemini-3.8-flash'
+      'gemini-2.0-flash',
+      'gemini-1.5-flash'
     ];
     for (const model of candidateModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

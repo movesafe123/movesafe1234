@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 43,
+  "totalSnapshots": 50,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-23T12:47:22.764Z",
+  "updatedAt": "2026-10-23T13:45:16.308Z",
   "snapshots": [
     {
       "timestamp": "2026-10-20T05:02:03.390Z",
@@ -990,6 +990,221 @@
       "danang": {
         "avgSpeedKmh": 10,
         "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:40:32.178Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:40:38.294Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 3,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:40:44.954Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 3,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:41:16.679Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 3,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:45:06.963Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 4.2,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:45:11.970Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792763108858",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 4.2,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T13:45:16.308Z",
+      "date": "2026-10-23",
+      "hour": 20,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": [
+          {
+            "id": "crowd-1792763108858",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "crowd-1792762834286",
+            "name": "Ngã tư Tràng Tiền - Hàng Bài",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 4.2,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }

@@ -85,6 +85,9 @@
           </svg>
           <span class="btn-label">Tìm</span>
         </button>
+
+        <!-- Dropdown gợi ý địa chỉ thông minh trực tiếp dưới thanh tìm kiếm chính -->
+        <div class="gm-autocomplete-dropdown gm-main-search-dropdown" id="dropdown-main-search" style="display: none;"></div>
       </div>
 
       <!-- Category Filter Chips -->
@@ -464,7 +467,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>
           <span>Trạm thời tiết các phường</span>
         </span>
-        <input type="checkbox" id="chk-layer-weather" checked aria-label="Hiển thị trạm thời tiết các phường">
+        <input type="checkbox" id="chk-layer-weather" aria-label="Hiển thị trạm thời tiết các phường">
       </label>
       <label class="gm-layer-item" id="layer-item-ev" style="display: none;">
         <span class="layer-item-label">
@@ -558,6 +561,10 @@
       <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
         <span>Cầu Giấy đi Mỹ Đình</span>
+      </button>
+      <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Quanh Mỹ Đình có quán ăn hay chỗ vui chơi nào nổi tiếng không?')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+        <span>Ăn chơi Mỹ Đình</span>
       </button>
       <button class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay?')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>
@@ -715,7 +722,6 @@
             autocomplete="off"
             spellcheck="false"
             aria-label="Tìm nhanh tên đường hoặc tên phường Hà Nội"
-          >
           >
           <button type="button" class="btn-gm-secondary" id="btn-reset-streets-filter" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
