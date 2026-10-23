@@ -1016,6 +1016,13 @@ class MapEngine {
     }
   }
 
+  // Xóa toàn bộ các ghim địa điểm ăn uống, giải trí do AI đề xuất
+  clearFoodPlaces() {
+    if (this.layers.foodMarkers) {
+      this.layers.foodMarkers.clearLayers();
+    }
+  }
+
   renderFoodPlaces(spots = [], centerLat = null, centerLng = null) {
     if (!this.map || !Array.isArray(spots) || spots.length === 0) return;
     if (!this.layers.foodMarkers) {

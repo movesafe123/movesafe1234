@@ -115,6 +115,22 @@ async function main() {
     const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
     assert.ok(appJs.includes('renderMainSearchSuggestions('), 'Thiếu hàm renderMainSearchSuggestions trong app.js');
   });
+
+  runTest('TC-UI-12', 'Mục Thời tiết phường đồng bộ chuẩn màu và kiểu dáng với các chip khác, không bị mờ lạc loài', () => {
+    assert.strictEqual(html.includes('id="chip-weather-toggle" class="gm-chip gm-chip-inactive"'), false, 'Vẫn còn gm-chip-inactive trong index.html');
+    assert.ok(html.includes('id="chip-weather-toggle"'), 'Thiếu id chip-weather-toggle');
+    const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    assert.ok(mapEngineJs.includes('clearFoodPlaces()'), 'Thiếu clearFoodPlaces() trên MapEngine');
+    const aiChatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(aiChatJs.includes('window.mapEngine.clearFoodPlaces()'), 'Nút làm mới chưa dọn dẹp food markers trên bản đồ');
+  });
+
+  await runAsyncTest('TC-UI-13', 'Trợ lý AI trả lời đúng rạp chiếu phim tại khu vực hiện tại khi hỏi "CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY"', async () => {
+    assert.ok(foodData.isFoodOrFun('CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY'), 'isFoodOrFun không nhận diện rạp chiếu phim');
+    const rec = foodData.getRecommendation('CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY', 'hanoi', { lastAreaKey: 'mydinh' });
+    assert.ok(rec.text.includes('Rạp Chiếu Phim') || rec.text.includes('CGV') || rec.text.includes('Beta') || rec.text.includes('Lotte'), 'Chưa trả về rạp chiếu phim');
+    assert.ok(Array.isArray(rec.action.spots) && rec.action.spots.some(s => s.name.includes('Rạp') || s.name.includes('Cinema') || s.name.includes('CGV')), 'Spots thiếu rạp phim');
+  });
 }
 
 main().catch(err => {

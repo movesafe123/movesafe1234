@@ -99,9 +99,33 @@ class AIChat {
 
   clearMessages() {
     this.stopSpeaking();
+    this.currentAreaKey = null;
     this.messages = [];
+
+    // Xóa sạch toàn bộ ghim đề xuất địa điểm ăn uống, giải trí cũ trên bản đồ
+    if (window.mapEngine) {
+      if (typeof window.mapEngine.clearFoodPlaces === 'function') {
+        window.mapEngine.clearFoodPlaces();
+      }
+      if (typeof window.mapEngine.clearRoute === 'function') {
+        window.mapEngine.clearRoute();
+      }
+    }
+
+    // Xóa các lớp chỉ đường và ghim tìm kiếm cũ
+    if (window.appState) {
+      if (typeof window.appState.clearRouteLayers === 'function') {
+        window.appState.clearRouteLayers();
+      }
+      if (window.appState.searchResultMarker && window.mapEngine?.map) {
+        window.mapEngine.map.removeLayer(window.appState.searchResultMarker);
+        window.appState.searchResultMarker = null;
+      }
+    }
+
     this.open();
     this.renderMessages();
+    window.appState?.showToast?.('Đã làm mới và xóa toàn bộ các ghim đề xuất cũ trên bản đồ', 'info', 3000);
   }
 
   stripEmojis(str) {
@@ -392,10 +416,18 @@ class AIChat {
         setTimeout(() => window.mapEngine.focusEVStation(act.targetStation), 700);
       }
     } else if (act.type === 'SHOW_FOOD_PLACES') {
+      if (act.areaKey) this.currentAreaKey = act.areaKey;
       if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
         window.mapEngine.renderFoodPlaces(act.spots || [], act.lat, act.lng);
       } else if (act.lat && act.lng) {
         window.mapEngine.map?.flyTo([act.lat, act.lng], 14);
+      }
+    }
+
+    // Nếu chuyển sang tác vụ khác (chỉ đường, xem lớp giao thông), dọn dẹp các ghim đề xuất cũ
+    if (act.type === 'AUTO_ROUTE' || act.type === 'SHOW_TRAFFIC_LAYER' || act.type === 'SHOW_FLOOD_LAYER' || act.type === 'SHOW_WEATHER_LAYER') {
+      if (window.mapEngine && typeof window.mapEngine.clearFoodPlaces === 'function') {
+        window.mapEngine.clearFoodPlaces();
       }
     }
   }
@@ -414,6 +446,13 @@ class AIChat {
     const geminiKey = localStorage.getItem('movesafe_gemini_key') || (window.CONFIG && window.CONFIG.GEMINI_KEY) || '';
     const parsedRoute = this.parseRouteQuery(query);
 
+    // Thu thập ngữ cảnh hiện tại (tọa độ tâm bản đồ & khu vực vừa thảo luận)
+    const mapCenter = (window.mapEngine && window.mapEngine.map) ? window.mapEngine.map.getCenter() : null;
+    const chatContext = {
+      lastAreaKey: this.currentAreaKey || null,
+      mapCenter: mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null
+    };
+
     let responded = false;
 
     // 1. Thử gọi backend API server nếu có (/api/ai/chat)
@@ -421,7 +460,7 @@ class AIChat {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, city: currentCity, apiKey: geminiKey })
+        body: JSON.stringify({ query, city: currentCity, apiKey: geminiKey, context: chatContext })
       });
 
       if (res.ok) {
@@ -476,7 +515,7 @@ class AIChat {
         }
 
         const isFoodQ = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
-        const foodRec = isFoodQ ? window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity) : null;
+        const foodRec = isFoodQ ? window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext) : null;
 
         this.addBotMessage(geminiReply, {
           spots: foodRec?.action?.spots || null
@@ -533,9 +572,9 @@ class AIChat {
       return;
     }
 
-    // 3a1. Đề xuất địa điểm ăn uống, quán ngon, cafe hoặc điểm vui chơi giải trí
+    // 3a1. Đề xuất địa điểm ăn uống, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
     if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
-      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
+      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
       this.addBotMessage(rec.text, { spots: rec.action?.spots || null });
       if (rec.action) {
         this.handleMapAction(rec.action);

@@ -52,7 +52,7 @@ class AIAssistantService {
     };
   }
 
-  async processQuery({ query, city = 'hanoi', userApiKey = '' }) {
+  async processQuery({ query, city = 'hanoi', userApiKey = '', context = {} }) {
     const liveData = botService.getData();
     const allCityFloods = (liveData.floodPoints || []).filter(f => f.city === city);
     const activeFloodPoints = allCityFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
@@ -66,7 +66,7 @@ class AIAssistantService {
     const isCooldown = this._geminiCooldownUntil && Date.now() < this._geminiCooldownUntil;
     if (activeKey && activeKey.length > 10 && !isCooldown) {
       try {
-        return await this.callGeminiAPI(query, liveData, city, activeKey);
+        return await this.callGeminiAPI(query, liveData, city, activeKey, context);
       } catch (err) {
         const status = err.response?.status;
         if (status === 429 || status === 403 || status === 503 || (err.message && err.message.includes('timeout'))) {
@@ -76,10 +76,10 @@ class AIAssistantService {
       }
     }
 
-    return this.generateSmartLocalResponse(query, city, activeFloodPoints, allCityFloods, trafficIncidents, weatherAlerts, cityStations);
+    return this.generateSmartLocalResponse(query, city, activeFloodPoints, allCityFloods, trafficIncidents, weatherAlerts, cityStations, context);
   }
 
-  generateSmartLocalResponse(query, city, activeFloods, allFloods, traffics, alerts, cityStations = []) {
+  generateSmartLocalResponse(query, city, activeFloods, allFloods, traffics, alerts, cityStations = [], context = {}) {
     const lower = query.toLowerCase();
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const parsedRoute = this.parseRouteQuery(query);
@@ -112,9 +112,9 @@ class AIAssistantService {
       };
     }
 
-    // 0b. Nếu người dùng hỏi về ăn uống, quán ngon, cafe hoặc điểm vui chơi giải trí
+    // 0b. Nếu người dùng hỏi về ăn uống, quán ngon, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
     if (FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
-      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city);
+      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context);
       return {
         text: rec.text,
         action: rec.action

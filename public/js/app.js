@@ -1010,10 +1010,10 @@ class GoogleMapsApp {
         if (chkWeather) chkWeather.checked = nextState;
         const chip = document.getElementById('chip-weather-toggle');
         if (nextState) {
-          chip?.classList.remove('gm-chip-inactive');
+          chip?.classList.add('active');
           this.showToast(`Đã bật hiển thị thời tiết các phường`, 'info');
         } else {
-          chip?.classList.add('gm-chip-inactive');
+          chip?.classList.remove('active');
           this.showToast(`Đã ẩn trạm thời tiết các phường`, 'info');
         }
       }
@@ -1251,7 +1251,7 @@ class GoogleMapsApp {
     document.getElementById('chk-layer-weather')?.addEventListener('change', (e) => {
       window.mapEngine.toggleWeather(e.target.checked);
       const chip = document.getElementById('chip-weather-toggle');
-      if (chip) chip.classList.toggle('gm-chip-inactive', !e.target.checked);
+      if (chip) chip.classList.toggle('active', e.target.checked);
     });
     document.getElementById('chk-layer-satellite')?.addEventListener('change', (e) => {
       window.mapEngine.switchBaseMap(e.target.checked ? 'satellite' : 'standard');

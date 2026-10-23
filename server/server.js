@@ -242,7 +242,7 @@ app.post('/api/crowdsource/vote', reportLimiter, (req, res) => {
 // 5. API Trợ lý AI Thông Minh
 app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
   try {
-    const { query, city, apiKey } = req.body;
+    const { query, city, apiKey, context } = req.body;
     if (!query) {
       return res.status(400).json({ status: 'error', message: 'Vui lòng cung cấp câu hỏi' });
     }
@@ -250,7 +250,8 @@ app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
     const response = await aiService.processQuery({
       query,
       city: city || 'hanoi',
-      userApiKey: apiKey || config.API_KEYS.GEMINI
+      userApiKey: apiKey || config.API_KEYS.GEMINI,
+      context: context || {}
     });
 
     res.json({

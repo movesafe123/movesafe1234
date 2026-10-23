@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 50,
+  "totalSnapshots": 58,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-23T13:45:16.308Z",
+  "updatedAt": "2026-10-23T14:34:07.420Z",
   "snapshots": [
     {
       "timestamp": "2026-10-20T05:02:03.390Z",
@@ -1205,6 +1205,190 @@
       "danang": {
         "avgSpeedKmh": 14,
         "congestionIndex": 4.2,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:31:08.898Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:31:15.552Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:31:21.124Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:31:55.763Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:33:22.753Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:33:57.338Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:34:01.540Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T14:34:07.420Z",
+      "date": "2026-10-23",
+      "hour": 21,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 5,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }

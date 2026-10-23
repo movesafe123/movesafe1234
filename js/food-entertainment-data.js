@@ -11,7 +11,7 @@
     root.FOOD_ENTERTAINMENT_DATA = factory();
   }
 })(typeof self !== 'undefined' ? self : this, function () {
-  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|vui chơi|chỗ chơi|đi chơi|chơi đâu|giải trí|check-in|checkin|dạo phố|rạp phim|trung tâm thương mại|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|đồ uống|chỗ tụ tập|ăn vặt)/i;
+  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|giải trí|check-in|checkin|dạo phố|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
 
   const AREAS_GUIDE = {
     // 1. Khu vực Mỹ Đình & Nam Từ Liêm
@@ -20,8 +20,35 @@
       title: 'Khu vực Mỹ Đình & Nam Từ Liêm (Hà Nội)',
       lat: 21.0205,
       lng: 105.7765,
-      highlight: 'Thiên đường ẩm thực nướng Hàn Quốc, món ngon truyền thống và không gian dạo mát rộng nhất Thủ đô.',
+      highlight: 'Thiên đường ẩm thực nướng Hàn Quốc, cụm rạp chiếu phim hiện đại và quảng trường dạo mát rộng nhất Thủ đô.',
       spots: [
+        {
+          name: 'TTTM The Garden Shopping Center & Rạp Phim CGV',
+          address: 'Khu đô thị The Manor, đường Mễ Trì, Q. Nam Từ Liêm',
+          lat: 21.0141,
+          lng: 105.7764,
+          feature: 'Cụm rạp chiếu phim CGV cao cấp âm thanh vòm sống động, tổ hợp mua sắm, ẩm thực quốc tế tầng hầm B1 và cafe kiến trúc Paris.',
+          vibe: 'Hiện đại, mát mẻ, xem phim và giải trí trọn gói cả ngày.',
+          price: 'Vé phim ~100.000đ - 140.000đ'
+        },
+        {
+          name: 'Beta Cinemas Mỹ Đình (Golden Palace Mễ Trì)',
+          address: 'Tầng hầm B1, Tòa Golden Palace, đường Mễ Trì, Q. Nam Từ Liêm',
+          lat: 21.0152,
+          lng: 105.7770,
+          feature: 'Cụm rạp chiếu phim chuẩn Hollywood giá vé cực tốt, màn chiếu rộng sắc nét, bắp rang bơ phô mai caramel giòn thơm.',
+          vibe: 'Trẻ trung, năng động, quầy chờ check-in đẹp mắt.',
+          price: '50.000đ - 90.000đ/vé'
+        },
+        {
+          name: 'Lotte Cinema Keangnam Landmark 72',
+          address: 'Tầng 5, Keangnam Landmark 72, đường Phạm Hùng, Q. Nam Từ Liêm',
+          lat: 21.0175,
+          lng: 105.7838,
+          feature: 'Rạp chiếu phim màn hình lớn, ghế đệm da êm ái ngả lưng thoải mái, không gian yên tĩnh và bãi đỗ xe ô tô cực rộng.',
+          vibe: 'Sang trọng, thư giãn, có phòng chiếu cao cấp.',
+          price: '85.000đ - 160.000đ/vé'
+        },
         {
           name: 'Phố Ẩm Thực Hàn Quốc K-Town (Đình Thôn - The Manor)',
           address: 'Đường Đình Thôn & Khu The Manor Mễ Trì',
@@ -41,15 +68,6 @@
           price: '50.000đ - 75.000đ/suất'
         },
         {
-          name: 'Nhà Hàng Hải Sản Biển Đông & Lẩu Cua Đồng',
-          address: 'Khu đô thị The Manor & Đường Đỗ Đức Dục',
-          lat: 21.0112,
-          lng: 105.7815,
-          feature: 'Hải sản tươi sống bắt tại bể (tôm hùm, cua Cà Mau, cá song) và lẩu riêu cua bắp bò thanh mát.',
-          vibe: 'Không gian rộng rãi, có phòng VIP tiếp khách hoặc tụ họp gia đình.',
-          price: '250.000đ - 500.000đ/người'
-        },
-        {
           name: 'Quảng Trường Sân Vận Động Quốc Gia Mỹ Đình',
           address: 'Đường Lê Đức Thọ, P. Mỹ Đình 1',
           lat: 21.0204,
@@ -57,18 +75,9 @@
           feature: 'Không gian gió mát lộng buổi chiều tối, thả diều, trượt patin, thưởng thức trà chanh giã tay, xúc xích nướng đá ven đường.',
           vibe: 'Cực kỳ thoáng đãng, điểm tụ tập hóng mát số 1 khu Tây Hà Nội.',
           price: '15.000đ - 40.000đ'
-        },
-        {
-          name: 'TTTM The Garden Shopping Center & Rạp Phim CGV',
-          address: 'Khu đô thị The Manor Mễ Trì',
-          lat: 21.0141,
-          lng: 105.7764,
-          feature: 'Tổ hợp mua sắm, ẩm thực quốc tế tầng hầm B1, cụm rạp chiếu phim CGV cao cấp và cà phê ngoài trời ngắm kiến trúc Paris thu nhỏ.',
-          vibe: 'Hiện đại, mát mẻ, tiện lợi giải trí trọn gói cả ngày.',
-          price: 'Vé phim ~100.000đ, ăn uống tự chọn'
         }
       ],
-      trafficTip: 'Xe máy có thể đỗ miễn phí trước cửa hầu hết các quán trên đường Lê Đức Thọ và Nguyễn Hoàng. Nếu đi ô tô, bạn nên gửi xe an toàn tại hầm TTTM The Garden hoặc bãi đỗ xe cạnh Cung Điền kinh Mỹ Đình để tránh bị phạt.'
+      trafficTip: 'Xe máy có thể đỗ miễn phí trước cửa hầu hết các quán trên đường Lê Đức Thọ và Nguyễn Hoàng. Nếu đi ô tô hoặc xem phim, bạn gửi xe an toàn tại hầm TTTM The Garden, hầm Golden Palace hoặc Keangnam Landmark 72.'
     },
 
     // 2. Khu vực Cầu Giấy
@@ -567,25 +576,60 @@
     }
   };
 
-  function findAreaGuide(query, currentCity = 'hanoi') {
+  function findAreaGuide(query, currentCity = 'hanoi', options = {}) {
     const q = (query || '').toLowerCase().trim();
 
-    for (const [, area] of Object.entries(AREAS_GUIDE)) {
+    // 1. Khớp theo tên khu vực/quận huyện được nhắc cụ thể trong câu hỏi
+    for (const [key, area] of Object.entries(AREAS_GUIDE)) {
       if (area.aliases.some(alias => q.includes(alias))) {
-        return area;
+        return { key, area };
       }
     }
 
-    if (currentCity === 'hcm') return AREAS_GUIDE.hcm;
-    if (currentCity === 'danang') return AREAS_GUIDE.danang;
-    return AREAS_GUIDE.mydinh;
+    // 2. Nếu người dùng hỏi "quanh đây", "gần đây", "ở đây" và có ngữ cảnh khu vực trước đó
+    const isNearbyQuery = /(?:quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này|tại đây)/i.test(q);
+    if (options.lastAreaKey && AREAS_GUIDE[options.lastAreaKey] && (isNearbyQuery || !options.mapCenter)) {
+      return { key: options.lastAreaKey, area: AREAS_GUIDE[options.lastAreaKey] };
+    }
+
+    // 3. Nếu có vị trí tâm bản đồ hiện tại của người dùng, tìm khu vực gần nhất
+    if (options.mapCenter && typeof options.mapCenter.lat === 'number') {
+      let closestKey = null;
+      let minDistance = Infinity;
+      for (const [key, area] of Object.entries(AREAS_GUIDE)) {
+        if (currentCity === 'hcm' && key !== 'hcm') continue;
+        if (currentCity === 'danang' && key !== 'danang') continue;
+        if (currentCity === 'hanoi' && (key === 'hcm' || key === 'danang')) continue;
+
+        const dLat = area.lat - options.mapCenter.lat;
+        const dLng = area.lng - options.mapCenter.lng;
+        const dist = dLat * dLat + dLng * dLng;
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestKey = key;
+        }
+      }
+      if (closestKey && AREAS_GUIDE[closestKey]) {
+        return { key: closestKey, area: AREAS_GUIDE[closestKey] };
+      }
+    }
+
+    if (currentCity === 'hcm') return { key: 'hcm', area: AREAS_GUIDE.hcm };
+    if (currentCity === 'danang') return { key: 'danang', area: AREAS_GUIDE.danang };
+    return { key: 'mydinh', area: AREAS_GUIDE.mydinh };
   }
 
-  function formatGuideMessage(area) {
-    let msg = `**Gợi Ý Địa Điểm Ăn Uống & Vui Chơi Nổi Tiếng: ${area.title}**\n\n`;
+  function formatGuideMessage(area, spots = [], categoryType = 'all') {
+    let categoryTitle = 'Địa Điểm Ăn Uống & Vui Chơi Nổi Tiếng';
+    if (categoryType === 'cinema') categoryTitle = 'Rạp Chiếu Phim & Giải Trí Hiện Đại';
+    else if (categoryType === 'cafe') categoryTitle = 'Quán Cà Phê View Đẹp & Không Gian Thư Giãn';
+    else if (categoryType === 'food') categoryTitle = 'Món Ngon Đặc Sản & Quán Ăn Nổi Tiếng';
+
+    let msg = `**Gợi Ý ${categoryTitle}: ${area.title}**\n\n`;
     msg += `*${area.highlight}*\n\n`;
 
-    area.spots.forEach((spot, idx) => {
+    const displaySpots = spots.length > 0 ? spots : area.spots;
+    displaySpots.forEach((spot, idx) => {
       msg += `**${idx + 1}. ${spot.name}**\n`;
       msg += `• **Địa chỉ**: ${spot.address}\n`;
       msg += `• **Đặc sản / Nổi bật**: ${spot.feature}\n`;
@@ -605,17 +649,42 @@
       if (!query) return false;
       return FOOD_KEYWORDS_REGEX.test(query);
     },
-    getRecommendation: function (query, currentCity = 'hanoi') {
-      const area = findAreaGuide(query, currentCity);
+    getRecommendation: function (query, currentCity = 'hanoi', options = {}) {
+      const { key, area } = findAreaGuide(query, currentCity, options);
+      const q = (query || '').toLowerCase();
+
+      const isCinema = /(?:rạp|chiếu phim|xem phim|cinema|cgv|beta|lotte|bhd|galaxy|phim)/i.test(q);
+      const isCafe = /(?:cafe|cà phê|coffee|trà sữa|trà chanh)/i.test(q) && !isCinema;
+      const isFood = /(?:ăn gì|quán ăn|quán ngon|món ngon|lẩu|nướng|nhà hàng|bún|phở|cơm|bánh mì|ăn sáng|ăn trưa|ăn tối)/i.test(q) && !isCinema && !isCafe;
+
+      let spots = [...area.spots];
+      let categoryType = 'all';
+
+      if (isCinema) {
+        categoryType = 'cinema';
+        const cinemaSpots = spots.filter(s => /(?:rạp|phim|cinema|cgv|beta|lotte|bhd|galaxy|the manor|keangnam|garden)/i.test(s.name + ' ' + s.feature));
+        if (cinemaSpots.length > 0) spots = cinemaSpots;
+      } else if (isCafe) {
+        categoryType = 'cafe';
+        const cafeSpots = spots.filter(s => /(?:cafe|cà phê|trà|coffee)/i.test(s.name + ' ' + s.feature));
+        if (cafeSpots.length > 0) spots = cafeSpots;
+      } else if (isFood) {
+        categoryType = 'food';
+        const foodSpots = spots.filter(s => !/(?:rạp phim|rạp chiếu phim|cinema)/i.test(s.name));
+        if (foodSpots.length > 0) spots = foodSpots;
+      }
+
       return {
-        text: formatGuideMessage(area),
+        text: formatGuideMessage(area, spots, categoryType),
         title: area.title,
+        areaKey: key,
         action: {
           type: 'SHOW_FOOD_PLACES',
+          areaKey: key,
           lat: area.lat,
           lng: area.lng,
           title: area.title,
-          spots: area.spots
+          spots: spots
         }
       };
     },
