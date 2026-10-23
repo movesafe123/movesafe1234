@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 79,
+  "totalSnapshots": 80,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-10-23T17:47:52.052Z",
+  "updatedAt": "2026-10-23T21:11:49.782Z",
   "snapshots": [
     {
       "timestamp": "2026-10-20T05:02:03.390Z",
@@ -1865,6 +1865,29 @@
       },
       "hcm": {
         "avgSpeedKmh": 37,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 38,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-10-23T21:11:49.782Z",
+      "date": "2026-10-24",
+      "hour": 4,
+      "hanoi": {
+        "avgSpeedKmh": 40,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 38,
         "congestionIndex": 1,
         "maxRainMm": 0,
         "activeFloodSpots": []
