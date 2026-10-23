@@ -206,9 +206,9 @@ class GoogleMapsApp {
   constructor() {
     this.currentCity = 'hanoi';
     this.citiesConfig = {
-      hanoi: { name: 'Hà Nội', lat: 21.0285, lng: 105.8542, zoom: 13 },
-      hcm: { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7008, zoom: 13 },
-      danang: { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022, zoom: 13 }
+      hanoi: { name: 'Hà Nội', lat: 21.0285, lng: 105.8542, zoom: 14.2 },
+      hcm: { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7008, zoom: 14.2 },
+      danang: { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022, zoom: 14.2 }
     };
     this.liveData = {
       floodPoints: [],

@@ -27,18 +27,20 @@ class MapEngine {
     this._loadedEvCity = null;
   }
 
-  init(containerId = 'map-container', initialCoords = [21.0285, 105.8542], zoom = 13) {
+  init(containerId = 'map-container', initialCoords = [21.0285, 105.8542], zoom = 14.2) {
     if (this.map) return;
 
     this.map = L.map(containerId, {
       center: initialCoords,
       zoom: zoom,
+      zoomSnap: 0.25,
+      zoomDelta: 0.5,
       zoomControl: false, // Ẩn zoom mặc định của Leaflet để dùng cụm nút chuẩn Google Maps
       attributionControl: false // Tắt dòng chữ bản quyền Leaflet ở góc bản đồ
     });
 
-    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn tích hợp vệt giao thông thời gian thực (Không bị đè lớp hybrid gây chữ to)
-    this.layers.baseStandard = L.tileLayer('https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}', {
+    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn tích hợp vệt giao thông độ nét cao Retina scale=2 (đường nét dày dặn, to rõ)
+    this.layers.baseStandard = L.tileLayer('https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       updateWhenZooming: false,
@@ -47,8 +49,8 @@ class MapEngine {
       crossOrigin: true
     }).addTo(this.map);
 
-    // Lớp vệ tinh Google Maps Hybrid (Chuyển sang lyrs=y pre-rendered + keepBuffer để tải nhanh gấp đôi)
-    this.layers.baseSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}', {
+    // Lớp vệ tinh Google Maps Hybrid (scale=2 sắc nét cao)
+    this.layers.baseSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       updateWhenZooming: false,
@@ -247,7 +249,7 @@ class MapEngine {
 
   flyToCity(cityObj) {
     if (!this.map || !cityObj) return;
-    this.map.flyTo([cityObj.lat, cityObj.lng], cityObj.zoom || 13, {
+    this.map.flyTo([cityObj.lat, cityObj.lng], cityObj.zoom || 14.2, {
       animate: true,
       duration: 1.2
     });
@@ -278,7 +280,7 @@ class MapEngine {
             const y = centerY + dy;
             const s = subdomains[Math.abs(x + y) % 4];
             const img = new Image();
-            img.src = `https://${s}.google.com/vt/lyrs=y&hl=vi&x=${x}&y=${y}&z=${zoom}`;
+            img.src = `https://${s}.google.com/vt/lyrs=y&hl=vi&scale=2&x=${x}&y=${y}&z=${zoom}`;
           }
         }
       } catch (e) {
@@ -718,13 +720,13 @@ class MapEngine {
     this.trafficFlowVisible = show;
     if (this.currentBase === 'standard' && this.layers.baseStandard) {
       const url = show
-        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}'
-        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}';
+        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&scale=2&x={x}&y={y}&z={z}';
       this.layers.baseStandard.setUrl(url);
     } else if (this.currentBase === 'satellite' && this.layers.baseSatellite) {
       const url = show
-        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}'
-        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}';
+        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&scale=2&x={x}&y={y}&z={z}';
       this.layers.baseSatellite.setUrl(url);
     }
   }
@@ -754,8 +756,8 @@ class MapEngine {
       this.currentBase = 'satellite';
 
       const satUrl = (this.trafficFlowVisible !== false)
-        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}'
-        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}';
+        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&scale=2&x={x}&y={y}&z={z}';
       if (this.layers.baseSatellite) this.layers.baseSatellite.setUrl(satUrl);
 
       // 1. Thêm lớp vệ tinh lên trên trước, giữ lớp chuẩn bên dưới để không bị nháy màn hình xám
@@ -776,8 +778,8 @@ class MapEngine {
       this.currentBase = 'standard';
 
       const stdUrl = (this.trafficFlowVisible !== false)
-        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}'
-        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}';
+        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&scale=2&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&scale=2&x={x}&y={y}&z={z}';
       if (this.layers.baseStandard) this.layers.baseStandard.setUrl(stdUrl);
 
       if (this.layers.baseStandard.setZIndex) this.layers.baseStandard.setZIndex(2);

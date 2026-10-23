@@ -3497,12 +3497,26 @@ body {
   /* 3. Widget Thời Tiết -> Nằm trong dải công cụ cuộn ngang ở bottom bar */
   .gm-weather-pill {
     height: 32px;
-    padding: 0 10px;
-    font-size: 11.5px;
+    padding: 0 8px 0 10px;
+    font-size: 11px;
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     white-space: nowrap;
     flex-shrink: 0;
+    gap: 6px;
+  }
+
+  .weather-pill-cta {
+    font-size: 9.5px;
+    padding: 2px 6px;
+    margin-left: 3px;
+  }
+
+  #chip-commute-comfort {
+    border-color: rgba(234, 88, 12, 0.45);
+    background: #fff7ed;
+    color: #c2410c;
+    font-weight: 700;
   }
 
   /* 4. Cụm Nút Điều Khiển Bản Đồ Góc Dưới Phải (Layers, Bot Refresh, GPS) */
@@ -3692,7 +3706,7 @@ body {
     transform: translateY(0);
   }
 
-  /* 7. Modals (Báo Cáo, Mạng Lưới Đường Lớn, Xu Hướng) trên Điện Thoại */
+  /* 7. Modals (Báo Cáo, Mạng Lưới Đường Lớn, Xu Hướng, Commute Comfort) trên Điện Thoại */
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
@@ -3705,6 +3719,66 @@ body {
     border-radius: 20px 20px 0 0 !important;
     margin-bottom: calc(58px + env(safe-area-inset-bottom));
     animation: mobileSheetUp 0.25s ease-out;
+  }
+
+  /* Bottom sheet tối ưu riêng cho Modal Commute Comfort trên Mobile */
+  .modal-comfort-card {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    max-height: calc(100vh - 64px) !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin-bottom: calc(58px + env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .modal-comfort-card .modal-header {
+    flex-shrink: 0 !important;
+    padding: 12px 16px !important;
+  }
+
+  .modal-comfort-card .modal-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-height: none !important;
+    padding: 12px 14px 28px 14px !important;
+  }
+
+  .modal-comfort-card .modal-footer {
+    flex-shrink: 0 !important;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom)) 14px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.06) !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .modal-comfort-card .modal-footer #btn-comfort-refresh {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .modal-comfort-card .modal-footer #btn-comfort-route {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .modal-comfort-card .modal-footer .btn-gm-cancel {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    flex-shrink: 0;
   }
 
   .streets-modal-body {
@@ -4347,10 +4421,11 @@ body {
   margin: 14px 0;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .comfort-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    margin: 10px 0;
   }
 }
 
@@ -4601,4 +4676,105 @@ body {
   color: #64748b;
   border: 1px solid #e2e8f0;
   opacity: 0.8;
+}
+
+/* Tối ưu chi tiết cho điện thoại di động (Mobile Specific Styling <= 480px) */
+@media (max-width: 480px) {
+  .comfort-highlight-card {
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    border-radius: 12px !important;
+  }
+  .comfort-score-circle {
+    width: 54px !important;
+    height: 54px !important;
+  }
+  .comfort-score-num {
+    font-size: 20px !important;
+  }
+  .comfort-score-max {
+    font-size: 10px !important;
+  }
+  .comfort-score-caption {
+    font-size: 10px !important;
+  }
+  .comfort-status-badge {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+  }
+  .comfort-advice-quote {
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+  }
+  .comfort-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin: 8px 0 !important;
+  }
+  .comfort-metric-card {
+    padding: 8px 8px !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
+  }
+  .cm-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+  .cm-icon svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+  .cm-label {
+    font-size: 10px !important;
+  }
+  .cm-val {
+    font-size: 14px !important;
+  }
+  .cm-sub {
+    font-size: 9px !important;
+  }
+  .comfort-timeline-section {
+    padding: 10px 10px !important;
+    border-radius: 12px !important;
+    margin-bottom: 10px !important;
+  }
+  .comfort-section-title {
+    font-size: 11.5px !important;
+    margin-bottom: 8px !important;
+  }
+  .comfort-chart-col {
+    flex: 0 0 58px !important;
+    min-width: 58px !important;
+    padding: 6px 2px !important;
+    border-radius: 8px !important;
+  }
+  .col-realfeel {
+    font-size: 12px !important;
+  }
+  .col-bar-track {
+    width: 10px !important;
+    height: 38px !important;
+    margin: 4px 0 !important;
+  }
+  .col-time, .col-hour, .col-rain, .col-status {
+    font-size: 9px !important;
+  }
+  .comfort-gear-section {
+    padding: 10px 10px !important;
+    border-radius: 12px !important;
+    margin-bottom: 6px !important;
+  }
+  .comfort-gear-pills {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  .gear-pill {
+    width: 100% !important;
+    padding: 7px 10px !important;
+    font-size: 11.5px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+  }
 }
