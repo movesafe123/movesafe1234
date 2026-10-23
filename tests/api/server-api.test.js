@@ -28,6 +28,29 @@ describe('Module TC-API: Backend REST API & Security Architecture', () => {
     if (server) {
       await new Promise((resolve) => server.close(resolve));
     }
+    // Dọn dẹp báo cáo thử nghiệm (TC-API-006) để không làm bẩn dữ liệu thật trên bản đồ
+    const fs = require('fs');
+    const path = require('path');
+    const crowdPath = path.join(__dirname, '../../data/crowdsource_reports.json');
+    if (fs.existsSync(crowdPath)) {
+      try {
+        const list = JSON.parse(fs.readFileSync(crowdPath, 'utf8'));
+        const cleaned = list.filter(r => r.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
+        fs.writeFileSync(crowdPath, JSON.stringify(cleaned, null, 2), 'utf8');
+      } catch (e) {}
+    }
+    for (const rel of ['../../data/live_urban_cache.json', '../../public/data/live_urban_cache.json']) {
+      const p = path.join(__dirname, rel);
+      if (fs.existsSync(p)) {
+        try {
+          const cache = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (Array.isArray(cache.floodPoints)) {
+            cache.floodPoints = cache.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
+          }
+          fs.writeFileSync(p, JSON.stringify(cache, null, 2), 'utf8');
+        } catch (e) {}
+      }
+    }
   });
 
   // TC-API-001: Kiểm tra cấu hình công khai an toàn, không lộ secret keys

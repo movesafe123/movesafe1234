@@ -57,15 +57,16 @@ class MapEngine {
       crossOrigin: true
     });
 
-    // Lớp TomTom Traffic Flow (Vệt giao thông thời gian thực xanh/vàng/đỏ)
+    // Lớp Mật độ Giao thông Thời gian thực (Vệt giao thông xanh/vàng/cam/đỏ chuẩn Google Traffic CDN tốc độ cao, không giới hạn lượt tải)
     this.layers.tomtomTraffic = L.tileLayer(
-      `https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=${this.tomtomKey}`,
+      'https://{s}.google.com/vt?lyrs=h@159000000,traffic|seconds_into_week:-1&style=15&hl=vi&x={x}&y={y}&z={z}',
       {
-        maxZoom: 19,
-        opacity: 0.82,
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        opacity: 0.9,
         updateWhenZooming: false,
         updateWhenIdle: true,
-        keepBuffer: 4,
+        keepBuffer: 6,
         crossOrigin: true
       }
     ).addTo(this.map);
@@ -247,24 +248,7 @@ class MapEngine {
   setTomTomKey(key) {
     if (key && key.trim()) {
       this.tomtomKey = key.trim();
-      if (this.layers.tomtomTraffic && this.map) {
-        const wasOnMap = this.map.hasLayer(this.layers.tomtomTraffic);
-        this.map.removeLayer(this.layers.tomtomTraffic);
-        this.layers.tomtomTraffic = L.tileLayer(
-          `https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=${this.tomtomKey}`,
-          {
-            maxZoom: 19,
-            opacity: 0.82,
-            updateWhenZooming: false,
-            updateWhenIdle: true,
-            keepBuffer: 4,
-            crossOrigin: true
-          }
-        );
-        if (wasOnMap) {
-          this.layers.tomtomTraffic.addTo(this.map);
-        }
-      }
+      // Giữ nguyên lớp Google Traffic Flow (lyrs=h@159000000,traffic&style=15) để đảm bảo hiển thị vệt mật độ giao thông xanh/vàng/đỏ 24/7 không bao giờ bị lỗi hết hạn mức (403 InsufficientFunds)
     }
   }
 

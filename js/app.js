@@ -312,6 +312,7 @@ class GoogleMapsApp {
         if (cached) {
           const parsed = JSON.parse(cached);
           if (parsed && Array.isArray(parsed.floodPoints)) {
+            parsed.floodPoints = parsed.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
             this.liveData = parsed;
             this.renderAllData();
             this._hasInitialRendered = true;
@@ -349,6 +350,9 @@ class GoogleMapsApp {
     }
 
     if (fetchedData) {
+      if (Array.isArray(fetchedData.floodPoints)) {
+        fetchedData.floodPoints = fetchedData.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
+      }
       this.liveData = fetchedData;
       this._hasInitialRendered = true;
       try {
