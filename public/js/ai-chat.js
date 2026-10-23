@@ -117,6 +117,9 @@ class AIChat {
       if (typeof window.appState.clearRouteLayers === 'function') {
         window.appState.clearRouteLayers();
       }
+      if (typeof window.appState.closeDirections === 'function') {
+        window.appState.closeDirections();
+      }
       if (window.appState.searchResultMarker && window.mapEngine?.map) {
         window.mapEngine.map.removeLayer(window.appState.searchResultMarker);
         window.appState.searchResultMarker = null;
@@ -445,6 +448,12 @@ class AIChat {
     const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
     const geminiKey = localStorage.getItem('movesafe_gemini_key') || (window.CONFIG && window.CONFIG.GEMINI_KEY) || '';
     const parsedRoute = this.parseRouteQuery(query);
+
+    // Tự động dọn dẹp các ghim đề xuất địa điểm cũ nếu câu hỏi mới không thuộc nhóm ẩm thực/giải trí
+    const isFoodQuery = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
+    if (!isFoodQuery && window.mapEngine && typeof window.mapEngine.clearFoodPlaces === 'function') {
+      window.mapEngine.clearFoodPlaces();
+    }
 
     // Thu thập ngữ cảnh hiện tại (tọa độ tâm bản đồ & khu vực vừa thảo luận)
     const mapCenter = (window.mapEngine && window.mapEngine.map) ? window.mapEngine.map.getCenter() : null;

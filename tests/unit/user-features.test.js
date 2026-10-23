@@ -131,6 +131,15 @@ async function main() {
     assert.ok(rec.text.includes('Rạp Chiếu Phim') || rec.text.includes('CGV') || rec.text.includes('Beta') || rec.text.includes('Lotte'), 'Chưa trả về rạp chiếu phim');
     assert.ok(Array.isArray(rec.action.spots) && rec.action.spots.some(s => s.name.includes('Rạp') || s.name.includes('Cinema') || s.name.includes('CGV')), 'Spots thiếu rạp phim');
   });
+
+  runTest('TC-UI-14', 'Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort Modal) và cơ chế dọn sạch ghim lộ trình', () => {
+    const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+    assert.ok(appJs.includes('openCommuteComfortModal('), 'Thiếu openCommuteComfortModal trong app.js');
+    assert.ok(appJs.includes('this.routeMarkers.origin'), 'clearRouteLayers thiếu xóa routeMarkers.origin');
+    assert.ok(appJs.includes('this.routeMarkers.destination'), 'clearRouteLayers thiếu xóa routeMarkers.destination');
+    const aiChatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(aiChatJs.includes('window.appState.closeDirections()'), 'clearMessages chưa gọi closeDirections()');
+  });
 }
 
 main().catch(err => {

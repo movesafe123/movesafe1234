@@ -289,6 +289,262 @@ class WeatherService {
   getWmoIcon() {
     return '';
   }
+
+  // 4. Lấy dữ liệu Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort Index) & Dự báo 15P
+  async getCommuteComfortData(lat = 21.0285, lng = 105.8542, cityName = 'Hà Nội') {
+    const cacheKey = `${lat.toFixed(3)}_${lng.toFixed(3)}`;
+    if (this._comfortCache && this._comfortCache[cacheKey]) {
+      const cached = this._comfortCache[cacheKey];
+      if (Date.now() - cached.timestamp < 3 * 60 * 1000) {
+        return cached.data;
+      }
+    }
+
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,uv_index,is_day&minutely_15=temperature_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&hourly=uv_index&forecast_minutely_15=8&forecast_days=1&timezone=Asia%2FBangkok`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
+      const data = await res.json();
+
+      const curr = data.current || {};
+      const min15 = data.minutely_15 || {};
+      const hourly = data.hourly || {};
+
+      const temp = Math.round(curr.temperature_2m !== undefined ? curr.temperature_2m : 28);
+      const apparentTemp = Math.round(curr.apparent_temperature !== undefined ? curr.apparent_temperature : temp);
+      const humidity = Math.round(curr.relative_humidity_2m || 75);
+      const windSpeed = Math.round(curr.wind_speed_10m || 10);
+      const windGusts = Math.round(curr.wind_gusts_10m || (windSpeed * 1.3));
+      const rainNow = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
+
+      // Ước tính chỉ số UV: ưu tiên từ current.uv_index, nếu 0 ban ngày thì lấy từ hourly
+      const currentHour = new Date().getHours();
+      let uvIndex = typeof curr.uv_index === 'number' ? curr.uv_index : 0;
+      if (uvIndex === 0 && hourly.uv_index && Array.isArray(hourly.uv_index) && currentHour >= 7 && currentHour <= 17) {
+        uvIndex = hourly.uv_index[currentHour] || 0;
+      }
+      uvIndex = Math.round(uvIndex * 10) / 10;
+
+      // Cảm nhận nhiệt mặt đường (Road RealFeel): Nhựa đường hấp thụ bức xạ mặt trời
+      const isDay = curr.is_day !== undefined ? (curr.is_day === 1) : (currentHour >= 6 && currentHour < 18);
+      const asphaltHeatBoost = (isDay && uvIndex >= 3) ? Math.round(uvIndex * 0.7) : 0;
+      const roadRealFeel = Math.round(apparentTemp + asphaltHeatBoost - (windSpeed * 0.08));
+
+      // 8 mốc dự báo 15 phút (2 giờ tới)
+      const times = min15.time || [];
+      const temps15 = min15.temperature_2m || [];
+      const appTemps15 = min15.apparent_temperature || [];
+      const rains15 = min15.precipitation || min15.rain || [];
+      const winds15 = min15.wind_speed_10m || [];
+
+      let hasRainIn2Hours = false;
+      let maxRainIn2Hours = 0;
+      let rainStartRelTime = null;
+
+      const timeline15 = [];
+      const count = Math.min(8, times.length > 0 ? times.length : 8);
+
+      for (let i = 0; i < count; i++) {
+        const timeRaw = times[i];
+        let timeLabel = '';
+        if (timeRaw) {
+          const parts = timeRaw.split('T')[1];
+          timeLabel = parts ? parts.slice(0, 5) : '';
+        }
+        if (!timeLabel) {
+          const d = new Date(Date.now() + i * 15 * 60 * 1000);
+          timeLabel = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        const tVal = typeof temps15[i] === 'number' ? Math.round(temps15[i]) : temp;
+        const appTVal = typeof appTemps15[i] === 'number' ? Math.round(appTemps15[i]) : apparentTemp;
+        const rVal = typeof rains15[i] === 'number' ? (Math.round(rains15[i] * 10) / 10) : 0;
+        const wVal = typeof winds15[i] === 'number' ? Math.round(winds15[i]) : windSpeed;
+
+        const intervalRealFeel = Math.round(appTVal + asphaltHeatBoost - (wVal * 0.08));
+        const relTime = i === 0 ? 'Hiện tại' : `+${i * 15}p`;
+
+        if (rVal >= 0.5) {
+          hasRainIn2Hours = true;
+          if (rVal > maxRainIn2Hours) maxRainIn2Hours = rVal;
+          if (!rainStartRelTime && i > 0) rainStartRelTime = relTime;
+        }
+
+        let roadStatus = 'Khô ráo';
+        let barColor = '#10b981';
+        if (rVal >= 4.0) {
+          roadStatus = 'Mưa to ngập';
+          barColor = '#dc2626';
+        } else if (rVal >= 1.0) {
+          roadStatus = 'Đường ướt trơn';
+          barColor = '#ea580c';
+        } else if (intervalRealFeel >= 39) {
+          roadStatus = 'Cực rát bỏng';
+          barColor = '#e11d48';
+        } else if (intervalRealFeel >= 35) {
+          roadStatus = 'Nắng hầm hập';
+          barColor = '#f59e0b';
+        } else if (intervalRealFeel >= 31) {
+          roadStatus = 'Nắng nhẹ';
+          barColor = '#3b82f6';
+        }
+
+        timeline15.push({
+          index: i,
+          relTime,
+          timeLabel,
+          temp: tVal,
+          realFeel: intervalRealFeel,
+          rain: rVal,
+          wind: wVal,
+          roadStatus,
+          barColor
+        });
+      }
+
+      // Tính toán điểm thoải mái khi đi đường (Commute Comfort Score - CCI: 0 đến 100)
+      let comfortScore = 95;
+      if (roadRealFeel > 33) comfortScore -= (roadRealFeel - 33) * 5.2;
+      else if (roadRealFeel < 18) comfortScore -= (18 - roadRealFeel) * 4.0;
+
+      if (uvIndex >= 6) comfortScore -= (uvIndex - 5) * 4.5;
+      if (humidity >= 80 && roadRealFeel >= 31) comfortScore -= 12;
+
+      if (rainNow >= 5) comfortScore -= 45;
+      else if (rainNow >= 1) comfortScore -= 30;
+      else if (rainNow > 0) comfortScore -= 15;
+      else if (hasRainIn2Hours) comfortScore -= 18;
+
+      comfortScore = Math.max(15, Math.min(98, Math.round(comfortScore)));
+
+      let comfortStatus = 'Dịu mát lý tưởng';
+      let comfortBadgeClass = 'cci-great';
+      let comfortThemeColor = '#10b981';
+
+      if (rainNow >= 2.0 || maxRainIn2Hours >= 4.0) {
+        comfortStatus = 'Mưa to - Đường ướt trơn';
+        comfortBadgeClass = 'cci-rain';
+        comfortThemeColor = '#2563eb';
+      } else if (roadRealFeel >= 40) {
+        comfortStatus = 'Nắng nóng cực độ (Nguy cơ sốc nhiệt)';
+        comfortBadgeClass = 'cci-danger';
+        comfortThemeColor = '#dc2626';
+      } else if (roadRealFeel >= 36 || uvIndex >= 8) {
+        comfortStatus = 'Nắng gắt hầm hập (Cháy rát da)';
+        comfortBadgeClass = 'cci-warning';
+        comfortThemeColor = '#ea580c';
+      } else if (roadRealFeel >= 32 || uvIndex >= 6) {
+        comfortStatus = 'Nắng nhẹ - Khá oi bức';
+        comfortBadgeClass = 'cci-moderate';
+        comfortThemeColor = '#f59e0b';
+      } else if (comfortScore >= 75) {
+        comfortStatus = 'Dễ chịu & Thuận lợi di chuyển';
+        comfortBadgeClass = 'cci-good';
+        comfortThemeColor = '#059669';
+      }
+
+      // Đề xuất trang bị thiết thực cho người đi đường
+      const gearList = [
+        {
+          id: 'sun_wear',
+          name: 'Áo chống nắng dài tay',
+          needed: (uvIndex >= 5 || roadRealFeel >= 33) && isDay,
+          reason: uvIndex >= 8 ? 'Chỉ số UV cực gắt, rát da sau 15p' : 'Giảm nhiệt phả vào cánh tay'
+        },
+        {
+          id: 'sunglasses',
+          name: 'Kính râm chống chói',
+          needed: uvIndex >= 5 && isDay,
+          reason: 'Chống lóa mắt và bụi đường khi lái xe'
+        },
+        {
+          id: 'mask',
+          name: 'Khẩu trang lọc khí nóng',
+          needed: true,
+          reason: 'Ngăn hơi nóng ống xả ô tô khi dừng đèn đỏ'
+        },
+        {
+          id: 'raincoat',
+          name: 'Áo mưa dự phòng trong cốp',
+          needed: rainNow > 0 || hasRainIn2Hours,
+          reason: hasRainIn2Hours ? `Khả năng mưa rào lúc ${rainStartRelTime || 'trong 2h tới'}` : 'Đường phố khô ráo nhưng nên dự phòng'
+        },
+        {
+          id: 'water',
+          name: 'Nước uống giải nhiệt',
+          needed: roadRealFeel >= 35 || humidity >= 82,
+          reason: 'Bù nước điện giải khi chạy xe ngoài nắng'
+        }
+      ];
+
+      // Lời khuyên hành trình thông minh
+      let commuteAdvice = '';
+      if (hasRainIn2Hours && rainStartRelTime) {
+        commuteAdvice = `Dự kiến bắt đầu có mưa rào (${maxRainIn2Hours}mm) sau khoảng ${rainStartRelTime}. Bạn nên tranh thủ xuất phát sớm hoặc chuẩn bị sẵn áo mưa.`;
+      } else if (roadRealFeel >= 37 && isDay) {
+        commuteAdvice = `Mặt đường bê tông hấp thụ bức xạ rất lớn (cảm nhận ${roadRealFeel}°C). Bạn nên chọn các tuyến đại lộ có hàng cây râm mát và tránh dừng xe lâu dưới nắng gắt.`;
+      } else if (comfortScore >= 80) {
+        commuteAdvice = `Thời tiết hiện tại rất thoáng mát và dễ chịu (${temp}°C, gió ${windSpeed} km/h). Đây là khung giờ lý tưởng nhất để di chuyển hoặc đi dạo phố!`;
+      } else {
+        commuteAdvice = `Không khí tương đối dễ chịu, đường phố khô ráo và tầm nhìn thông thoáng. Chúc bạn có chuyến đi an toàn!`;
+      }
+
+      const comfortData = {
+        cityName,
+        lat,
+        lng,
+        temp,
+        apparentTemp,
+        roadRealFeel,
+        humidity,
+        windSpeed,
+        windGusts,
+        uvIndex,
+        rainNow,
+        isDay,
+        comfortScore,
+        comfortStatus,
+        comfortBadgeClass,
+        comfortThemeColor,
+        commuteAdvice,
+        gearList,
+        timeline15,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!this._comfortCache) this._comfortCache = {};
+      this._comfortCache[cacheKey] = { timestamp: Date.now(), data: comfortData };
+      return comfortData;
+    } catch (err) {
+      console.warn('Lỗi lấy dữ liệu Commute Comfort từ Open-Meteo:', err);
+      // Fallback an toàn
+      return {
+        cityName,
+        lat,
+        lng,
+        temp: 28,
+        apparentTemp: 31,
+        roadRealFeel: 32,
+        humidity: 78,
+        windSpeed: 12,
+        windGusts: 18,
+        uvIndex: 4.5,
+        rainNow: 0,
+        isDay: true,
+        comfortScore: 78,
+        comfortStatus: 'Dễ chịu & Thuận lợi di chuyển',
+        comfortBadgeClass: 'cci-good',
+        comfortThemeColor: '#10b981',
+        commuteAdvice: 'Đường phố tạnh ráo, tầm nhìn tốt. Di chuyển thuận lợi và an toàn.',
+        gearList: [
+          { id: 'mask', name: 'Khẩu trang lọc khí nóng', needed: true, reason: 'Chống bụi mịn mặt đường' },
+          { id: 'raincoat', name: 'Áo mưa trong cốp', needed: false, reason: 'Dự phòng mùa mưa' }
+        ],
+        timeline15: [],
+        updatedAt: new Date().toISOString()
+      };
+    }
+  }
 }
 
 if (typeof window !== 'undefined') {

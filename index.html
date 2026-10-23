@@ -423,7 +423,7 @@
     </div>
 
     <!-- Widget Thời tiết & Nguy cơ ngập trung tâm (Đưa lên thanh công cụ góc trên để không che bảng chỉ đường) -->
-    <div class="gm-weather-pill" id="gm-weather-pill" onclick="window.aiChat && window.aiChat.open(); window.aiChat && window.aiChat.sendMessage('Dự báo thời tiết và nguy cơ ngập hôm nay thế nào?')" title="Bấm để hỏi trợ lý AI về tình hình thời tiết và nguy cơ ngập">
+    <div class="gm-weather-pill" id="gm-weather-pill" onclick="window.appState && window.appState.openCommuteComfortModal()" title="Bấm để xem Chỉ số thoải mái khi đi đường, nắng nóng & mưa 15P (Open-Meteo Nowcasting)">
       <svg class="weather-pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path>
       </svg>
@@ -753,7 +753,144 @@
     </div>
   </div>
 
-  <!-- ==================== 8. THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (MOBILE BOTTOM TAB BAR) ==================== -->
+    <!-- Modal Chỉ Số Thoải Mái Khi Đi Đường (Commute Comfort & 15P Nowcasting) -->
+  <div class="modal-overlay" id="modal-commute-comfort">
+    <div class="modal-card modal-comfort-card" style="max-width: 660px; width: 94%;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="comfort-header-icon" id="comfort-modal-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">
+                Độ Thoải Mái Khi Đi Đường (Commute Comfort)
+              </h3>
+              <p class="modal-subtitle" id="comfort-location-subtitle" style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">
+                Cảm nhận nhiệt mặt đường, nắng nóng, tia UV & mưa theo từng 15 phút
+              </p>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="document.getElementById('modal-commute-comfort').classList.remove('open')" title="Đóng" aria-label="Đóng bảng thông tin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="max-height: 72vh; overflow-y: auto; padding: 16px 20px;">
+        <!-- Banner Điểm Thoải Mái & Cảm Nhận Nhiệt -->
+        <div class="comfort-highlight-card" id="comfort-highlight-card">
+          <div class="comfort-score-col">
+            <div class="comfort-score-circle" id="comfort-score-circle">
+              <span class="comfort-score-num" id="comfort-score-num">--</span>
+              <span class="comfort-score-max">/100</span>
+            </div>
+            <div class="comfort-score-caption">Điểm Thoải Mái</div>
+          </div>
+          <div class="comfort-summary-col">
+            <div class="comfort-badge-row">
+              <span class="comfort-status-badge" id="comfort-status-badge">Đang phân tích...</span>
+            </div>
+            <div class="comfort-advice-quote" id="comfort-advice-quote">
+              Đang kết nối Open-Meteo và tính toán chỉ số cảm nhận nhiệt mặt đường...
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Thẻ Chỉ Số Cảm Nhận Môi Trường Đi Đường -->
+        <div class="comfort-metrics-grid">
+          <div class="comfort-metric-card">
+            <div class="cm-icon heat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+            </div>
+            <div class="cm-data">
+              <div class="cm-label">Mặt đường cảm nhận</div>
+              <div class="cm-val" id="cm-val-roadfeel">--°C</div>
+              <div class="cm-sub" id="cm-sub-roadfeel">Nhiệt kế: --°C</div>
+            </div>
+          </div>
+
+          <div class="comfort-metric-card">
+            <div class="cm-icon uv-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </div>
+            <div class="cm-data">
+              <div class="cm-label">Chỉ số UV (Tia bức xạ)</div>
+              <div class="cm-val" id="cm-val-uv">--</div>
+              <div class="cm-sub" id="cm-sub-uv">Mức độ: --</div>
+            </div>
+          </div>
+
+          <div class="comfort-metric-card">
+            <div class="cm-icon humidity-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <div class="cm-data">
+              <div class="cm-label">Độ ẩm & Độ oi bức</div>
+              <div class="cm-val" id="cm-val-humidity">--%</div>
+              <div class="cm-sub" id="cm-sub-humidity">Mồ hôi thoát tốt</div>
+            </div>
+          </div>
+
+          <div class="comfort-metric-card">
+            <div class="cm-icon wind-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+            </div>
+            <div class="cm-data">
+              <div class="cm-label">Vận tốc gió & Gió giật</div>
+              <div class="cm-val" id="cm-val-wind">-- km/h</div>
+              <div class="cm-sub" id="cm-sub-wind">Gió giật: -- km/h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biểu đồ Nắng Nóng & Mưa theo từng 15 Phút (2 Giờ tới) -->
+        <div class="comfort-timeline-section">
+          <div class="comfort-section-title">
+            <span>Diễn Biến Cảm Nhận Nhiệt & Mưa (2 Giờ Tới - 15 Phút/Mốc)</span>
+            <span class="comfort-source-tag">Open-Meteo Nowcasting</span>
+          </div>
+          <div class="comfort-chart-container" id="comfort-timeline-chart">
+            <!-- Render động 8 cột 15 phút -->
+          </div>
+        </div>
+
+        <!-- Hộp Đề Xuất Trang Bị Cho Người Đi Đường -->
+        <div class="comfort-gear-section">
+          <div class="comfort-section-title">Gợi Ý Trang Bị Khi Ra Đường Lúc Này</div>
+          <div class="comfort-gear-pills" id="comfort-gear-container">
+            <!-- Render động danh sách trang bị -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn-gm-outline" id="btn-comfort-refresh" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Làm mới
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-gm-primary" id="btn-comfort-route" style="display: inline-flex; align-items: center; gap: 6px; background: #1a73e8;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            Lộ trình râm mát & né ngập
+          </button>
+          <button type="button" class="btn-gm-cancel" onclick="document.getElementById('modal-commute-comfort').classList.remove('open')">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- ==================== 8. THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (MOBILE BOTTOM TAB BAR) ==================== -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Điều hướng di động">
     <button class="mobile-nav-item active" id="mnav-explore" data-tab="explore">
       <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -4211,3 +4211,314 @@ body {
   margin-top: 6px;
   line-height: 1.3;
 }
+
+/* ==========================================================================
+   Bảng Chỉ Số Thoải Mái Khi Đi Đường (Commute Comfort & 15P Nowcasting)
+   Tập trung trải nghiệm đi đường thực tế: Nắng nóng, RealFeel, UV & Mưa
+   ========================================================================== */
+.comfort-highlight-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1.5px solid #fed7aa;
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: 0 3px 12px rgba(234, 88, 12, 0.08);
+}
+
+.comfort-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.comfort-score-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #ea580c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.comfort-score-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ea580c;
+  line-height: 1;
+}
+
+.comfort-score-max {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.comfort-score-caption {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.comfort-summary-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.comfort-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #ea580c;
+  margin-bottom: 6px;
+}
+
+.comfort-advice-quote {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #334155;
+  font-weight: 500;
+}
+
+.comfort-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+
+@media (max-width: 600px) {
+  .comfort-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.comfort-metric-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: transform 0.15s ease;
+}
+
+.comfort-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+}
+
+.cm-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cm-icon.heat-icon {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.cm-icon.uv-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.cm-icon.humidity-icon {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.cm-icon.wind-icon {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.cm-data {
+  min-width: 0;
+  flex: 1;
+}
+
+.cm-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cm-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.cm-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comfort-timeline-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.comfort-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.comfort-source-tag {
+  font-size: 10px;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.comfort-chart-container {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.comfort-chart-col {
+  flex: 1;
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 4px;
+  transition: all 0.15s ease;
+}
+
+.comfort-chart-col:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.comfort-col-reltime {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.comfort-col-clock {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.comfort-col-bar-wrap {
+  width: 14px;
+  height: 55px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 6px;
+}
+
+.comfort-col-bar-fill {
+  width: 100%;
+  border-radius: 99px;
+  transition: height 0.3s ease;
+}
+
+.comfort-col-temp {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.comfort-col-status {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 3px;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.comfort-gear-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.comfort-gear-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gear-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.gear-pill.gear-needed {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.gear-pill.gear-optional {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  opacity: 0.8;
+}

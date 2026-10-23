@@ -92,4 +92,34 @@ describe('Module TC-WTH: Weather Parser & Meteorological Services', () => {
     assert.ok(typeof sample.lng === 'number' && sample.lng > 0);
     assert.ok(Array.isArray(sample.mainStreets));
   });
+
+  // TC-WTH-005: Tính toán Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort & 15P Nowcasting)
+  it('[TC-WTH-005] getCommuteComfortData provides Road RealFeel, CCI score, and 15P timeline', async () => {
+    const data = await weather.getCommuteComfortData(21.0285, 105.8542, 'Hà Nội');
+    
+    assert.ok(typeof data.comfortScore === 'number' && data.comfortScore >= 0 && data.comfortScore <= 100, 'CCI Score phải từ 0 đến 100');
+    assert.ok(typeof data.roadRealFeel === 'number', 'roadRealFeel phải là số');
+    assert.ok(typeof data.uvIndex === 'number', 'uvIndex phải là số');
+    assert.ok(typeof data.humidity === 'number', 'humidity phải là số');
+    assert.ok(typeof data.windSpeed === 'number', 'windSpeed phải là số');
+    assert.ok(data.comfortStatus, 'Thiếu comfortStatus');
+    assert.ok(data.commuteAdvice, 'Thiếu commuteAdvice');
+    assert.ok(Array.isArray(data.gearList) && data.gearList.length >= 2, 'gearList phải có ít nhất 2 trang bị');
+    assert.ok(Array.isArray(data.timeline15), 'timeline15 phải là mảng');
+  });
+
+  // TC-WTH-006: Kiểm tra giao diện Modal Trải Nghiệm Thoải Mái Đi Đường trong index.html
+  it('[TC-WTH-006] index.html contains Commute Comfort modal and required interactive elements', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
+
+    assert.ok(html.includes('id="modal-commute-comfort"'), 'Thiếu id modal-commute-comfort');
+    assert.ok(html.includes('id="comfort-score-num"'), 'Thiếu id comfort-score-num');
+    assert.ok(html.includes('id="comfort-timeline-chart"'), 'Thiếu id comfort-timeline-chart');
+    assert.ok(html.includes('id="comfort-gear-container"'), 'Thiếu id comfort-gear-container');
+    assert.ok(html.includes('id="btn-comfort-refresh"'), 'Thiếu id btn-comfort-refresh');
+    assert.ok(html.includes('id="btn-comfort-route"'), 'Thiếu id btn-comfort-route');
+    assert.ok(html.includes('id="gm-weather-pill"'), 'Thiếu id gm-weather-pill');
+  });
 });

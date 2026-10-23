@@ -1125,6 +1125,22 @@ class GoogleMapsApp {
       document.getElementById('modal-urban-insights')?.classList.remove('open');
     });
 
+    // 4d. Bảng Chỉ Số Thoải Mái Khi Đi Đường (Commute Comfort & 15P Nowcasting)
+    document.getElementById('gm-weather-pill')?.addEventListener('click', () => {
+      this.openCommuteComfortModal();
+    });
+
+    document.getElementById('btn-comfort-refresh')?.addEventListener('click', () => {
+      this.openCommuteComfortModal();
+      this.showToast('Đang cập nhật chỉ số thoải mái & 15P Nowcasting...', 'info', 2000);
+    });
+
+    document.getElementById('btn-comfort-route')?.addEventListener('click', () => {
+      document.getElementById('modal-commute-comfort')?.classList.remove('open');
+      this.toggleDirectionsPanel(true);
+      this.showToast('Đã mở chỉ đường. Hãy chọn điểm đến để hệ thống tìm lộ trình râm mát & né ngập!', 'info', 3500);
+    });
+
     // 5. Nút tìm đường trong bảng Directions
     document.getElementById('btn-find-route-submit')?.addEventListener('click', () => {
       this.calculateSmartRoute();
@@ -1838,6 +1854,128 @@ class GoogleMapsApp {
       } catch (e) {
         chartContainer.innerHTML = '<div style="color: #5f6368;">Chưa thể nạp chuỗi thời gian Supabase.</div>';
       }
+    }
+  }
+
+  // Mở modal Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort & 15P Nowcasting)
+  async openCommuteComfortModal(targetLat = null, targetLng = null, targetName = null) {
+    const modal = document.getElementById('modal-commute-comfort');
+    if (!modal) return;
+    modal.classList.add('open');
+
+    const city = this.citiesConfig[this.currentCity] || { lat: 21.0285, lng: 105.8542, name: 'Hà Nội' };
+    const lat = typeof targetLat === 'number' ? targetLat : city.lat;
+    const lng = typeof targetLng === 'number' ? targetLng : city.lng;
+    const cityName = targetName || city.name;
+
+    const subTitle = document.getElementById('comfort-location-subtitle');
+    if (subTitle) {
+      subTitle.textContent = `Khu vực: ${cityName} • Cập nhật dữ liệu thời gian thực từ Open-Meteo`;
+    }
+
+    const scoreNum = document.getElementById('comfort-score-num');
+    const statusBadge = document.getElementById('comfort-status-badge');
+    const adviceQuote = document.getElementById('comfort-advice-quote');
+    if (statusBadge) statusBadge.textContent = 'Đang phân tích thời tiết mặt đường...';
+    if (adviceQuote) adviceQuote.textContent = 'Đang kết nối Open-Meteo và tính toán chỉ số cảm nhận nhiệt mặt đường...';
+
+    if (!window.weatherService || typeof window.weatherService.getCommuteComfortData !== 'function') {
+      if (adviceQuote) adviceQuote.textContent = 'Dịch vụ phân tích thời tiết đang khởi động, vui lòng thử lại sau.';
+      return;
+    }
+
+    try {
+      const data = await window.weatherService.getCommuteComfortData(lat, lng, cityName);
+      if (!data) return;
+
+      // 1. Điểm số và trạng thái
+      if (scoreNum) scoreNum.textContent = data.comfortScore;
+      const scoreCircle = document.getElementById('comfort-score-circle');
+      if (scoreCircle) {
+        scoreCircle.style.borderColor = data.comfortThemeColor || '#10b981';
+      }
+
+      if (statusBadge) {
+        statusBadge.textContent = data.comfortStatus;
+        statusBadge.className = `comfort-status-badge ${data.comfortBadgeClass || 'cci-good'}`;
+      }
+
+      if (adviceQuote) {
+        adviceQuote.textContent = data.commuteAdvice;
+      }
+
+      // 2. 4 Thẻ chỉ số môi trường
+      const elRoadFeel = document.getElementById('cm-val-roadfeel');
+      const elSubRoadFeel = document.getElementById('cm-sub-roadfeel');
+      if (elRoadFeel) elRoadFeel.textContent = `${data.roadRealFeel}°C`;
+      if (elSubRoadFeel) elSubRoadFeel.textContent = `Nhiệt kế: ${data.temp}°C (Cảm nhận: ${data.apparentTemp}°C)`;
+
+      const elUv = document.getElementById('cm-val-uv');
+      const elSubUv = document.getElementById('cm-sub-uv');
+      if (elUv) elUv.textContent = `${data.uvIndex}`;
+      if (elSubUv) {
+        const uvLevel = data.uvIndex >= 8 ? 'Cực gắt (Cháy rát da)' : (data.uvIndex >= 6 ? 'Cao (Cần bảo vệ)' : (data.uvIndex >= 3 ? 'Trung bình' : 'Thấp'));
+        elSubUv.textContent = `Mức độ: ${uvLevel}`;
+      }
+
+      const elHumidity = document.getElementById('cm-val-humidity');
+      const elSubHumidity = document.getElementById('cm-sub-humidity');
+      if (elHumidity) elHumidity.textContent = `${data.humidity}%`;
+      if (elSubHumidity) {
+        const humLevel = data.humidity >= 85 ? 'Oi bức nồng nặc' : (data.humidity >= 70 ? 'Khá ẩm' : 'Thoáng đãng mồ hôi');
+        elSubHumidity.textContent = humLevel;
+      }
+
+      const elWind = document.getElementById('cm-val-wind');
+      const elSubWind = document.getElementById('cm-sub-wind');
+      if (elWind) elWind.textContent = `${data.windSpeed} km/h`;
+      if (elSubWind) elSubWind.textContent = `Gió giật: ${data.windGusts} km/h`;
+
+      // 3. Biểu đồ diễn biến 15 phút (8 mốc trong 2 giờ tới)
+      const chartContainer = document.getElementById('comfort-timeline-chart');
+      if (chartContainer) {
+        const timeline = data.timeline15 || [];
+        if (timeline.length === 0) {
+          chartContainer.innerHTML = '<div style="color: #64748b; font-size: 12px; padding: 12px; text-align: center;">Chưa có dữ liệu dự báo 15P cho vị trí này.</div>';
+        } else {
+          chartContainer.innerHTML = timeline.map(item => `
+            <div class="comfort-chart-col">
+              <div class="col-realfeel" style="color: ${item.barColor}">${item.realFeel}°</div>
+              <div class="col-bar-track">
+                <div class="col-bar-fill" style="height: ${Math.max(16, Math.min(100, (item.realFeel - 20) * 4))}%; background: ${item.barColor};"></div>
+              </div>
+              <div class="col-time">${item.relTime}</div>
+              <div class="col-hour">${item.timeLabel}</div>
+              <div class="col-rain ${item.rain > 0 ? 'has-rain' : ''}">${item.rain > 0 ? `${item.rain}mm` : '0mm'}</div>
+              <div class="col-status">${item.roadStatus}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 4. Hộp đề xuất trang bị
+      const gearContainer = document.getElementById('comfort-gear-container');
+      if (gearContainer) {
+        const gears = data.gearList || [];
+        if (gears.length === 0) {
+          gearContainer.innerHTML = '<div style="color: #64748b; font-size: 12px;">Không có đề xuất đặc biệt.</div>';
+        } else {
+          gearContainer.innerHTML = gears.map(g => `
+            <div class="gear-pill ${g.needed ? 'gear-needed' : 'gear-optional'}">
+              <svg class="gear-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                ${g.needed 
+                  ? '<polyline points="20 6 9 17 4 12"></polyline>' 
+                  : '<circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>'}
+              </svg>
+              <span class="gear-name">${g.name}</span>
+              <span class="gear-reason">(${g.reason})</span>
+            </div>
+          `).join('');
+        }
+      }
+    } catch (e) {
+      console.error('Lỗi hiển thị Commute Comfort modal:', e);
+      if (adviceQuote) adviceQuote.textContent = 'Không thể tải dữ liệu thời tiết trực tiếp từ Open-Meteo. Vui lòng bấm "Làm mới" để thử lại.';
     }
   }
 
@@ -3193,6 +3331,18 @@ class GoogleMapsApp {
       mapEng._extraRouteLayers.forEach(l => mapEng.map.removeLayer(l));
     }
     mapEng._extraRouteLayers = [];
+
+    // Xóa điểm ghim xuất phát A và điểm đến B
+    if (this.routeMarkers) {
+      if (this.routeMarkers.origin && mapEng.map) {
+        mapEng.map.removeLayer(this.routeMarkers.origin);
+        this.routeMarkers.origin = null;
+      }
+      if (this.routeMarkers.destination && mapEng.map) {
+        mapEng.map.removeLayer(this.routeMarkers.destination);
+        this.routeMarkers.destination = null;
+      }
+    }
   }
 
   // Render thẻ cảnh báo khi KHÔNG CÓ ĐƯỜNG ĐI ĐƯỢC
