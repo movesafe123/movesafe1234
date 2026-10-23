@@ -1130,6 +1130,10 @@ class GoogleMapsApp {
       this.openCommuteComfortModal();
     });
 
+    document.getElementById('chip-commute-comfort')?.addEventListener('click', () => {
+      this.openCommuteComfortModal();
+    });
+
     document.getElementById('btn-comfort-refresh')?.addEventListener('click', () => {
       this.openCommuteComfortModal();
       this.showToast('Đang cập nhật chỉ số thoải mái & 15P Nowcasting...', 'info', 2000);

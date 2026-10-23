@@ -440,6 +440,32 @@ body {
   color: #b06000;
 }
 
+.gm-chip-weather-comfort {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5) !important;
+  border-color: #fdba74 !important;
+  color: #c2410c !important;
+  font-weight: 700 !important;
+}
+
+.gm-chip-weather-comfort:hover {
+  background: linear-gradient(135deg, #ffedd5, #fed7aa) !important;
+  border-color: #ea580c !important;
+  color: #9a3412 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.22);
+}
+
+.chip-forecast-badge {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
 /* ==========================================================================
    Google Maps Directions Panel (Bảng Chỉ Đường Lộ Trình Né Ngập)
    ========================================================================== */
@@ -1481,6 +1507,26 @@ body {
 .weather-pill-icon {
   color: #2563eb;
   flex-shrink: 0;
+}
+
+.weather-pill-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-left: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.3);
+}
+
+.gm-weather-pill:hover .weather-pill-cta {
+  background: #1d4ed8;
+  transform: scale(1.05);
 }
 
 .gm-risk-dot {

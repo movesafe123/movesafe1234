@@ -37,8 +37,8 @@ class MapEngine {
       attributionControl: false // Tắt dòng chữ bản quyền Leaflet ở góc bản đồ
     });
 
-    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn (Tối ưu buffer & không tải tile ngắt quãng khi zoom)
-    this.layers.baseStandard = L.tileLayer('https://{s}.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}', {
+    // Lớp bản đồ tiêu chuẩn: Google Maps chuẩn tích hợp vệt giao thông thời gian thực (Không bị đè lớp hybrid gây chữ to)
+    this.layers.baseStandard = L.tileLayer('https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       updateWhenZooming: false,
@@ -48,7 +48,7 @@ class MapEngine {
     }).addTo(this.map);
 
     // Lớp vệ tinh Google Maps Hybrid (Chuyển sang lyrs=y pre-rendered + keepBuffer để tải nhanh gấp đôi)
-    this.layers.baseSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}', {
+    this.layers.baseSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       updateWhenZooming: false,
@@ -57,19 +57,12 @@ class MapEngine {
       crossOrigin: true
     });
 
-    // Lớp Mật độ Giao thông Thời gian thực (Vệt giao thông xanh/vàng/cam/đỏ chuẩn Google Traffic CDN tốc độ cao, không giới hạn lượt tải)
-    this.layers.tomtomTraffic = L.tileLayer(
-      'https://{s}.google.com/vt?lyrs=h@159000000,traffic|seconds_into_week:-1&style=15&hl=vi&x={x}&y={y}&z={z}',
-      {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        opacity: 0.9,
-        updateWhenZooming: false,
-        updateWhenIdle: true,
-        keepBuffer: 6,
-        crossOrigin: true
-      }
-    ).addTo(this.map);
+    // Đối tượng quản lý trạng thái hiển thị giao thông (đồng bộ liền mạch với base layer)
+    this.trafficFlowVisible = true;
+    this.layers.tomtomTraffic = {
+      addTo: () => this.toggleTraffic(true),
+      remove: () => this.toggleTraffic(false)
+    };
 
     // Nhóm layer rốn ngập, kẹt xe và trạm thời tiết các quận
     this.layers.floodMarkers = L.layerGroup().addTo(this.map);
@@ -248,7 +241,7 @@ class MapEngine {
   setTomTomKey(key) {
     if (key && key.trim()) {
       this.tomtomKey = key.trim();
-      // Giữ nguyên lớp Google Traffic Flow (lyrs=h@159000000,traffic&style=15) để đảm bảo hiển thị vệt mật độ giao thông xanh/vàng/đỏ 24/7 không bao giờ bị lỗi hết hạn mức (403 InsufficientFunds)
+      // Giữ nguyên lớp Google Traffic Flow (lyrs=m,traffic) để đảm bảo hiển thị vệt mật độ giao thông xanh/vàng/đỏ 24/7 không bao giờ bị lỗi hết hạn mức (403 InsufficientFunds)
     }
   }
 
@@ -722,8 +715,18 @@ class MapEngine {
   // Bật / tắt các lớp
   toggleTraffic(show) {
     if (!this.map) return;
-    if (show) this.layers.tomtomTraffic.addTo(this.map);
-    else this.map.removeLayer(this.layers.tomtomTraffic);
+    this.trafficFlowVisible = show;
+    if (this.currentBase === 'standard' && this.layers.baseStandard) {
+      const url = show
+        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}';
+      this.layers.baseStandard.setUrl(url);
+    } else if (this.currentBase === 'satellite' && this.layers.baseSatellite) {
+      const url = show
+        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}';
+      this.layers.baseSatellite.setUrl(url);
+    }
   }
 
   toggleFloods(show) {
@@ -750,6 +753,11 @@ class MapEngine {
       if (this.currentBase === 'satellite') return;
       this.currentBase = 'satellite';
 
+      const satUrl = (this.trafficFlowVisible !== false)
+        ? 'https://{s}.google.com/vt/lyrs=y,traffic&hl=vi&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}';
+      if (this.layers.baseSatellite) this.layers.baseSatellite.setUrl(satUrl);
+
       // 1. Thêm lớp vệ tinh lên trên trước, giữ lớp chuẩn bên dưới để không bị nháy màn hình xám
       if (this.layers.baseSatellite.setZIndex) this.layers.baseSatellite.setZIndex(2);
       if (this.layers.baseStandard.setZIndex) this.layers.baseStandard.setZIndex(1);
@@ -766,6 +774,11 @@ class MapEngine {
     } else {
       if (this.currentBase === 'standard') return;
       this.currentBase = 'standard';
+
+      const stdUrl = (this.trafficFlowVisible !== false)
+        ? 'https://{s}.google.com/vt/lyrs=m,traffic&hl=vi&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}';
+      if (this.layers.baseStandard) this.layers.baseStandard.setUrl(stdUrl);
 
       if (this.layers.baseStandard.setZIndex) this.layers.baseStandard.setZIndex(2);
       if (this.layers.baseSatellite.setZIndex) this.layers.baseSatellite.setZIndex(1);

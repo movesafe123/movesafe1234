@@ -140,6 +140,14 @@ async function main() {
     const aiChatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(aiChatJs.includes('window.appState.closeDirections()'), 'clearMessages chưa gọi closeDirections()');
   });
+
+  runTest('TC-UI-15', 'Nút bấm Dự báo thời tiết 15P nổi bật và tối ưu lớp nền bản đồ không bị đè chữ to', () => {
+    assert.ok(html.includes('id="chip-commute-comfort"'), 'Thiếu nút chip-commute-comfort trên thanh Category Chips');
+    assert.ok(html.includes('class="weather-pill-cta"'), 'Thiếu badge CTA Dự báo 15P trên gm-weather-pill');
+    const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    assert.ok(mapEngineJs.includes('lyrs=m,traffic'), 'Thiếu tích hợp lyrs=m,traffic mượt mà');
+    assert.strictEqual(mapEngineJs.includes('lyrs=h@159000000'), false, 'Vẫn còn lớp hybrid lyrs=h gây chữ to');
+  });
 }
 
 main().catch(err => {

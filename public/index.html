@@ -101,6 +101,18 @@
           <span class="chip-text">Chỉ đường</span>
         </button>
 
+        <button class="gm-chip gm-chip-weather-comfort" id="chip-commute-comfort" title="Bấm xem Dự báo thời tiết 15P, Nắng nóng & Độ thoải mái đi đường (Open-Meteo)" onclick="window.appState && window.appState.openCommuteComfortModal()">
+          <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          </svg>
+          <span class="chip-text">Dự báo thời tiết 15P</span>
+          <span class="chip-forecast-badge">Mới</span>
+        </button>
+
         <button class="gm-chip" id="chip-weather-toggle" title="Bật/Tắt & Xem thời tiết chi tiết từng phường">
           <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.95 12.65a4 4 0 0 0-5.93-4.13"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path>
@@ -429,6 +441,10 @@
       </svg>
       <span class="gm-risk-dot" id="weather-risk-dot"></span>
       <span id="weather-pill-text">Đang tải thời tiết...</span>
+      <span class="weather-pill-cta" title="Mở bảng dự báo chi tiết">
+        <span>Dự báo 15P</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </span>
     </div>
 
     <button class="gm-btn-report-circle" id="btn-gm-open-report" title="Báo cáo rốn ngập hoặc kẹt xe tới cộng đồng" aria-label="Báo cáo rốn ngập hoặc kẹt xe tới cộng đồng">
