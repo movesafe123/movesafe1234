@@ -521,6 +521,18 @@ class MapEngine {
           <div style="font-size: 11px; color: #64748b;">
             Trạm bơm: ${safePump}
           </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; padding-top: 6px; border-top: 1px solid #f1f5f9;">
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; cursor: pointer;"
+                    onclick="window.appState && window.appState.openSosRescueModal(${point.lat}, ${point.lng}, '${safeName.replace(/'/g, "\\'")}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              <span>Trú mưa / SOS</span>
+            </button>
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                    onclick="window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Điểm ${safeName.replace(/'/g, "\\'")} đang ngập ${point.depth_cm}cm, tư vấn giúp tôi các tuyến đường cao ráo lân cận để đi vòng tránh điểm ngập này!'))">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>Hỏi AI đường vòng</span>
+            </button>
+          </div>
           ${verifyButtons}
         </div>
       `;
@@ -570,7 +582,17 @@ class MapEngine {
     if (!this.layers.trafficMarkers) return;
     if (!this._trafficMarkerMap) this._trafficMarkerMap = new Map();
 
-    const newIds = new Set(incidents.map(i => String(i.id)));
+    // Chỉ hiển thị các điểm cảnh báo sự cố thực tế (Cấm đường, Rào chắn, Thi công, Sự cố, Ùn tắc).
+    // Bỏ qua các điểm lưu thông bình thường để giữ bản đồ trực quan, thoáng đãng, không bị che khuất
+    const alertIncidents = incidents.filter(inc => {
+      const isRoadwork = inc.type === 'roadwork';
+      const isClosure = inc.type === 'road_closure';
+      const isAccident = inc.type === 'accident';
+      const isRealJam = inc.isJam === true;
+      return isRoadwork || isClosure || isAccident || isRealJam;
+    });
+
+    const newIds = new Set(alertIncidents.map(i => String(i.id)));
 
     for (const [id, marker] of this._trafficMarkerMap.entries()) {
       if (!newIds.has(id)) {
@@ -579,15 +601,15 @@ class MapEngine {
       }
     }
 
-    incidents.forEach(inc => {
+    alertIncidents.forEach(inc => {
       const incId = String(inc.id);
       const isRoadwork = inc.type === 'roadwork';
       const isClosure = inc.type === 'road_closure';
       const isAccident = inc.type === 'accident';
       const isRealJam = inc.isJam === true;
 
-      let pinText = 'Tắc';
-      let pinBg = '#f29900';
+      let pinText = 'Ùn tắc';
+      let pinBg = '#d93025';
       let headerText = 'Cảnh báo đường bộ';
       let headerColor = '#b06000';
 
@@ -611,11 +633,6 @@ class MapEngine {
         pinBg = '#d93025';
         headerText = 'Ùn tắc phương tiện cao điểm';
         headerColor = '#d93025';
-      } else {
-        pinText = 'Lưu thông';
-        pinBg = '#1e8e3e';
-        headerText = 'Lưu thông bình thường';
-        headerColor = '#1e8e3e';
       }
 
       const speedText = isClosure
@@ -1110,6 +1127,58 @@ class MapEngine {
     } else if (centerLat && centerLng) {
       this.map.flyTo([centerLat, centerLng], 14, { duration: 0.9 });
     }
+  }
+
+  focusShelterOnMap(shelter) {
+    if (!this.map || !shelter || typeof shelter.lat !== 'number' || typeof shelter.lng !== 'number') return;
+    if (this._shelterMarker) {
+      this.map.removeLayer(this._shelterMarker);
+      this._shelterMarker = null;
+    }
+
+    const safeName = this.escapeHtml(shelter.name || 'Điểm trú mưa cao ráo');
+    const safeAddr = this.escapeHtml(shelter.address || '');
+    const safeNote = this.escapeHtml(shelter.note || 'Cốt nền cao ráo, gửi xe an toàn');
+
+    const icon = L.divIcon({
+      className: 'gm-shelter-pin-container',
+      html: `
+        <div style="display: inline-flex; align-items: center; gap: 5px; background: #1e8e3e; color: #ffffff; border: 2px solid #ffffff; border-radius: 99px; padding: 4px 10px; box-shadow: 0 3px 10px rgba(30,142,62,0.38); font-family: var(--font-family); font-size: 11px; font-weight: 700; white-space: nowrap;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Trú mưa an toàn</span>
+        </div>
+      `,
+      iconSize: [130, 28],
+      iconAnchor: [65, 14]
+    });
+
+    this._shelterMarker = L.marker([shelter.lat, shelter.lng], { icon, zIndexOffset: 950 }).addTo(this.map);
+    this._shelterMarker.bindPopup(`
+      <div style="font-family: var(--font-family); min-width: 240px; max-width: 290px; line-height: 1.4;">
+        <div style="font-size: 10.5px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 4px;">
+          Điểm Gửi Xe & Trú Mưa Cao Ráo
+        </div>
+        <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">
+          ${safeName}
+        </h4>
+        <div style="font-size: 11.5px; color: #475569; margin-bottom: 6px;">
+          ${safeAddr}
+        </div>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; color: #166534; margin-bottom: 8px;">
+          ${safeNote}
+        </div>
+        <button
+          style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer;"
+          onclick="window.appState && window.appState.routeToLocation(${shelter.lat}, ${shelter.lng}, '${safeName.replace(/'/g, "\\'")}')">
+          Chỉ đường tới điểm trú mưa này
+        </button>
+      </div>
+    `);
+
+    this.map.flyTo([shelter.lat, shelter.lng], 16, { duration: 0.85 });
+    setTimeout(() => {
+      if (this._shelterMarker) this._shelterMarker.openPopup();
+    }, 900);
   }
 
   zoomIn() { if (this.map) this.map.zoomIn(); }

@@ -4778,3 +4778,275 @@ body {
     box-sizing: border-box !important;
   }
 }
+
+
+/* ==================== 4 TÍNH NĂNG MỚI: SOS CỨU HỘ, LỘ TRÌNH 1-CHẠM, CHIA SẺ & DẪN ĐƯỜNG GIỌNG NÓI ==================== */
+.gm-chip-sos {
+  border-color: #fecaca !important;
+  background: #fff1f2 !important;
+  color: #b91c1c !important;
+  font-weight: 600 !important;
+}
+.gm-chip-sos:hover {
+  background: #ffe4e6 !important;
+  border-color: #f87171 !important;
+  transform: translateY(-1px);
+}
+
+/* Lộ trình quen thuộc 1-Chạm (Nhà <-> Cơ quan) */
+.gm-quick-commute-bar {
+  margin: 8px 0 6px 0;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gm-qc-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gm-qc-pill {
+  flex: 1;
+  min-width: 105px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.gm-qc-pill:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.gm-qc-go-home {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.gm-qc-go-home:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.gm-qc-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.gm-qc-save-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.gm-qc-sos-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  transition: all 0.15s ease;
+}
+
+.gm-qc-sos-btn:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.gm-qc-sub {
+  font-size: 10.5px;
+  color: #64748b;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modal SOS Cứu Hộ Thủy Kích & Trú Mưa */
+.sos-tabs-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.sos-tab-btn {
+  flex: 1;
+  min-width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sos-tab-btn.active {
+  background: #ffffff;
+  color: #dc2626;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.sos-shelter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 10px;
+}
+
+.sos-shelter-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sos-shelter-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.sos-hotline-card {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sos-guide-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+/* Nút Dẫn đường giọng nói & Chia sẻ lộ trình trên Route Card */
+.gm-route-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.gm-btn-voice-nav {
+  flex: 1.4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: none;
+  background: #1a73e8;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gm-btn-voice-nav:hover {
+  background: #1557b0;
+}
+
+.gm-btn-voice-nav.is-speaking {
+  background: #dc2626;
+  animation: pulseSos 1.5s infinite;
+}
+
+.gm-btn-share-route {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gm-btn-share-route:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.gm-step-item.clickable-step {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 8px;
+  transition: background 0.15s ease;
+}
+
+.gm-step-item.clickable-step:hover {
+  background: #eff6ff;
+}
+
+@keyframes pulseSos {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}

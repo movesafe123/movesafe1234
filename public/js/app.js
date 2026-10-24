@@ -272,9 +272,13 @@ class GoogleMapsApp {
     // 5. Gán các sự kiện tương tác UI & Tìm kiếm địa chỉ ngõ ngách
     this.bindEvents();
     this.setupAddressAutocomplete();
+    this.initQuickCommutePresets();
 
     // 6. Kích hoạt động cơ tự động đồng bộ 24/24 trên Cloud
     this.start247CloudSync();
+
+    // 7. Tự động khôi phục lộ trình chia sẻ từ URL (nếu người dùng mở từ link chia sẻ)
+    this.checkSharedRouteFromUrl();
 
     console.log('[MoveSafe Cloud 24/7] Đã kích hoạt hoàn tất vòng lặp cập nhật liên tục 24/24!');
   }
@@ -1074,6 +1078,7 @@ class GoogleMapsApp {
       const city = this.citiesConfig[this.currentCity];
       window.mapEngine.flyToCity(city);
       this.resetCityRouteDefaults();
+      this.updateCommutePlacesLabel();
       await this.updateWeather();
       await this.updateWeatherStations();
 
@@ -2733,33 +2738,17 @@ class GoogleMapsApp {
       return;
     }
 
-    // 1b. Tìm kiếm theo danh mục 76 Phường & 299 Tuyến đường lớn Hà Nội
-    if (window.HANOI_WARDS_DATA && window.HANOI_WARDS_DATA.length > 0) {
-      const cleanQuery = lower.replace(/^đường\s+|^phố\s+|^phường\s+|^xã\s+|^quốc lộ\s+/i, '').trim();
+    // 1b. Nếu người dùng gõ đích danh tên Phường/Xã trong danh mục 76 Phường Hà Nội (ví dụ: "Phường Tây Tựu", "Phường Dịch Vọng Hậu", "Tây Tựu")
+    const isSpecificAddressOrPoi = /\b(số|sn|ngõ|ngách|hẻm|kiệt|đh|đại học|bv|bệnh viện|bx|bến xe|chợ|tttm|vincom|aeon|lotte|chung cư|tòa nhà|cầu|hồ|sân bay|ga)\b|\d+/i.test(lower);
+    if (!isSpecificAddressOrPoi && window.HANOI_WARDS_DATA && window.HANOI_WARDS_DATA.length > 0) {
+      const noAccentLower = window.geocodingService ? window.geocodingService.removeAccents(lower) : lower;
+      const cleanQuery = noAccentLower.replace(/^(duong|pho|phuong|xa|quoc lo)\s+/i, '').trim();
 
-      // Kiểm tra tên phường (ví dụ: Tây Tựu, Phú Diễn, Phúc Diễn, Cầu Diễn, Mai Dịch...)
       let targetWard = window.HANOI_WARDS_DATA.find(w => {
-        const wName = w.name.toLowerCase();
-        const rawWName = wName.replace(/^phường\s+|^xã\s+/i, '').trim();
-        return lower.includes(wName) || lower.includes(rawWName) || (cleanQuery.length >= 3 && rawWName.includes(cleanQuery));
+        const wNorm = window.geocodingService ? window.geocodingService.removeAccents(w.name) : w.name.toLowerCase();
+        const rawWName = wNorm.replace(/^(phuong|xa)\s+/i, '').trim();
+        return noAccentLower === wNorm || noAccentLower === rawWName || ( lower.startsWith('phường ') && rawWName.includes(cleanQuery) );
       });
-
-      let matchedStreetName = '';
-      if (!targetWard && cleanQuery.length >= 3) {
-        // Kiểm tra tên đường trong danh mục các trục đường lớn (ví dụ: Hoàng Công Chất, Cầu Diễn, Đức Diễn...)
-        for (const w of window.HANOI_WARDS_DATA) {
-          const st = (w.mainStreets || []).find(s => {
-            const sLower = s.toLowerCase();
-            const cleanSt = sLower.replace(/^đường\s+|^phố\s+|^quốc lộ\s+/i, '').trim();
-            return lower.includes(sLower) || (cleanQuery.length >= 3 && (cleanSt.includes(cleanQuery) || cleanQuery.includes(cleanSt)));
-          });
-          if (st) {
-            targetWard = w;
-            matchedStreetName = st;
-            break;
-          }
-        }
-      }
 
       if (targetWard) {
         if (this.currentCity !== 'hanoi') {
@@ -2769,26 +2758,24 @@ class GoogleMapsApp {
           await this.updateWeatherStations();
         }
         this.flyToWardFromCard(targetWard.lat, targetWard.lng, targetWard.name);
-        const streetInfo = matchedStreetName 
-          ? ` • Tuyến đường: ${matchedStreetName}` 
-          : ` • Các đường lớn: ${(targetWard.mainStreets || []).slice(0, 3).join(', ')}`;
+        const streetInfo = ` • Các đường lớn: ${(targetWard.mainStreets || []).slice(0, 3).join(', ')}`;
         this.showToast(`${targetWard.name} (${targetWard.district})${streetInfo}`, 'info', 5000);
         return;
       }
     }
 
-    // 3. Nếu là tìm kiếm địa chỉ, ngõ ngách, địa danh cụ thể (ví dụ: "Ngõ 168 Hào Nam", "Chợ Bến Thành", "Vincom")
+    // 2. Tìm kiếm địa chỉ chính xác Đa tầng (TomTom Commercial + Esri ArcGIS + CSDL Nội bộ + Photon/Nominatim + Lùi cấp địa chỉ)
     try {
       const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
       const matches = await window.geocodingService.searchAddresses(query, {
         city: this.currentCity,
         center: cityCenter,
-        limit: 3
+        limit: 5
       });
 
       if (matches && matches.length > 0) {
         const top = matches[0];
-        window.mapEngine.map.flyTo([top.lat, top.lng], 16);
+        window.mapEngine.map.flyTo([top.lat, top.lng], 16, { duration: 1.0 });
 
         if (this.searchResultMarker) {
           window.mapEngine.map.removeLayer(this.searchResultMarker);
@@ -2801,19 +2788,26 @@ class GoogleMapsApp {
           iconAnchor: [15, 15]
         });
 
+        const safeTitle = (top.title || query).replace(/'/g, "\\'");
         this.searchResultMarker = L.marker([top.lat, top.lng], { icon }).addTo(window.mapEngine.map);
         this.searchResultMarker.bindPopup(`
-          <div style="font-family: var(--font-family); min-width: 180px; padding: 4px;">
+          <div style="font-family: var(--font-family); min-width: 210px; padding: 4px;">
             <div style="font-weight: 700; font-size: 14px; color: #202124;">${top.title}</div>
-            <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${top.subtitle}</div>
-            <button onclick="window.appState.routeToLocation(${top.lat}, ${top.lng}, '${top.title.replace(/'/g, "\\'")}')" 
-              style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
-              Chỉ đường đến đây
-            </button>
+            <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${top.subtitle || ''}</div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button onclick="window.appState.routeToLocation(${top.lat}, ${top.lng}, '${safeTitle}')" 
+                style="flex: 1; padding: 6px 10px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                Chỉ đường tới đây
+              </button>
+              <button onclick="window.appState.openSosRescueModal(${top.lat}, ${top.lng}, '${safeTitle}')" 
+                style="padding: 6px 8px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;" title="Xem điểm trú mưa & cứu hộ gần vị trí này">
+                SOS
+              </button>
+            </div>
           </div>
         `).openPopup();
 
-        this.showToast(`Đã tìm thấy: ${top.title}`, 'info');
+        this.showToast(`Đã định vị: ${top.title} (${top.subtitle || ''})`, 'info', 3500);
         return;
       }
     } catch (e) {
@@ -3391,6 +3385,14 @@ class GoogleMapsApp {
         <div style="margin-top: 12px; padding: 8px 10px; background: #e8f0fe; border-radius: 6px; font-size: 11px; color: #1a73e8; line-height: 1.4;">
           <strong>Khuyến nghị:</strong> Bạn nên tạm hoãn di chuyển 30-45 phút chờ các trạm bơm tiêu thoát nước, hoặc chuyển sang phương tiện gầm cao (SUV / bán tải) hoặc tuyến metro trên cao.
         </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button type="button" onclick="window.appState && window.appState.openSosRescueModal()" 
+            style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #dc2626; color: #ffffff; border: none; border-radius: 7px; padding: 9px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Tìm Điểm Trú Mưa Cao Ráo & Cứu Hộ 24/7</span>
+          </button>
+        </div>
       </div>
     `;
   }
@@ -3680,10 +3682,10 @@ class GoogleMapsApp {
       // Render chi tiết từng bước đi / ngõ ngách (Itinerary)
       let stepsHtml = '';
       if (route.steps && route.steps.length > 0) {
-        const stepItems = route.steps.map(s => {
+        const stepItems = route.steps.map((s, sIdx) => {
           const trans = this.translateStepInstruction(s);
           return `
-            <div class="gm-step-item">
+            <div class="gm-step-item clickable-step" title="Nhấp để định vị và nghe đọc bước rẽ này" onclick="event.stopPropagation(); window.appState.previewRouteStep(${index}, ${sIdx})">
               <span class="gm-step-icon">${trans.icon}</span>
               <div class="gm-step-info">
                 <div class="gm-step-instruction">${trans.text}</div>
@@ -3792,6 +3794,19 @@ class GoogleMapsApp {
 
           <div class="gm-route-tag ${route.tagClass}" style="margin-top: 6px;">${route.tagText}</div>
           ${warningsHtml}
+
+          <!-- Cụm nút Dẫn đường Giọng nói (Turn-by-Turn) & Chia sẻ Link Lộ trình An toàn -->
+          <div class="gm-route-card-actions">
+            <button type="button" class="gm-btn-voice-nav" onclick="event.stopPropagation(); window.appState.startVoiceNavigation(${index}, this)" title="Phóng to lộ trình và đọc hướng dẫn từng bước bằng giọng nói tiếng Việt">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+              <span>Bắt đầu dẫn đường (Giọng nói)</span>
+            </button>
+            <button type="button" class="gm-btn-share-route" onclick="event.stopPropagation(); window.appState.shareSafeRoute(${index})" title="Sao chép link lộ trình an toàn này để gửi cho người thân hoặc đồng nghiệp">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span>Chia sẻ lộ trình</span>
+            </button>
+          </div>
+
           ${stepsHtml}
         </div>
       `;
@@ -3862,6 +3877,568 @@ class GoogleMapsApp {
     const summaryContainer = document.getElementById('gm-route-summary');
     if (summaryContainer) {
       this.renderRouteSummary(summaryContainer, this.lastRouteResult);
+    }
+  }
+
+  // =========================================================================
+  // 13. 4 TÍNH NĂNG MỚI: QUICK COMMUTE, SHARE ROUTE, VOICE NAV, SOS RESCUE
+  // =========================================================================
+
+  initQuickCommutePresets() {
+    this.updateCommutePlacesLabel();
+
+    document.getElementById('btn-commute-go-work')?.addEventListener('click', () => {
+      this.triggerQuickCommute('work');
+    });
+
+    document.getElementById('btn-commute-go-home')?.addEventListener('click', () => {
+      this.triggerQuickCommute('home');
+    });
+
+    document.getElementById('btn-save-commute-places')?.addEventListener('click', () => {
+      this.saveCurrentCommutePlaces();
+    });
+
+    document.getElementById('btn-directions-sos')?.addEventListener('click', () => {
+      this.openSosRescueModal();
+    });
+
+    document.getElementById('chip-sos-rescue')?.addEventListener('click', () => {
+      this.openSosRescueModal();
+    });
+
+    document.getElementById('btn-close-sos-rescue')?.addEventListener('click', () => {
+      document.getElementById('modal-sos-rescue')?.classList.remove('open');
+    });
+
+    document.getElementById('btn-sos-copy-gps')?.addEventListener('click', () => {
+      this.copySosGpsLocation();
+    });
+  }
+
+  getCommutePresets() {
+    const city = this.currentCity || 'hanoi';
+    const defaults = {
+      hanoi: {
+        home: { name: 'Nhà (KĐT Cầu Giấy, Hà Nội)', lat: 21.0285, lng: 105.7820 },
+        work: { name: 'Cơ quan (Hồ Hoàn Kiếm, Hà Nội)', lat: 21.0285, lng: 105.8542 }
+      },
+      hcm: {
+        home: { name: 'Nhà (Thảo Điền, TP. Thủ Đức)', lat: 10.8030, lng: 106.7365 },
+        work: { name: 'Cơ quan (Chợ Bến Thành, Quận 1)', lat: 10.7725, lng: 106.6980 }
+      },
+      danang: {
+        home: { name: 'Nhà (Hải Châu, Đà Nẵng)', lat: 16.0471, lng: 108.2198 },
+        work: { name: 'Cơ quan (Cầu Rồng, Sơn Trà)', lat: 16.0611, lng: 108.2274 }
+      }
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('movesafe_commute_presets_v1') || '{}');
+      if (saved[city] && saved[city].home && saved[city].work) {
+        return saved[city];
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+    return defaults[city] || defaults.hanoi;
+  }
+
+  updateCommutePlacesLabel() {
+    const labelEl = document.getElementById('gm-qc-places-label');
+    if (!labelEl) return;
+    const presets = this.getCommutePresets();
+    const shortHome = presets.home.name.length > 26 ? presets.home.name.slice(0, 26) + '...' : presets.home.name;
+    const shortWork = presets.work.name.length > 26 ? presets.work.name.slice(0, 26) + '...' : presets.work.name;
+    labelEl.innerHTML = `<strong>Nhà:</strong> ${shortHome} &nbsp;↔&nbsp; <strong>Cơ quan:</strong> ${shortWork}`;
+  }
+
+  saveCurrentCommutePlaces() {
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (!originInput || !destInput) return;
+
+    const oName = originInput.value.trim();
+    const dName = destInput.value.trim();
+    const oLoc = this.routeLocations?.origin;
+    const dLoc = this.routeLocations?.destination;
+    const oLat = oLoc ? Number(oLoc.lat) : parseFloat(originInput.dataset.lat);
+    const oLng = oLoc ? Number(oLoc.lng) : parseFloat(originInput.dataset.lng);
+    const dLat = dLoc ? Number(dLoc.lat) : parseFloat(destInput.dataset.lat);
+    const dLng = dLoc ? Number(dLoc.lng) : parseFloat(destInput.dataset.lng);
+
+    if (!oName || !dName || isNaN(oLat) || isNaN(oLng) || isNaN(dLat) || isNaN(dLng)) {
+      this.showToast('Hãy chọn Điểm đi (Nhà) và Điểm đến (Cơ quan) hợp lệ trước khi lưu!', 'warning', 3000);
+      return;
+    }
+
+    const city = this.currentCity || 'hanoi';
+    try {
+      const saved = JSON.parse(localStorage.getItem('movesafe_commute_presets_v1') || '{}');
+      saved[city] = {
+        home: { name: oName, lat: oLat, lng: oLng },
+        work: { name: dName, lat: dLat, lng: dLng }
+      };
+      localStorage.setItem('movesafe_commute_presets_v1', JSON.stringify(saved));
+      this.updateCommutePlacesLabel();
+      this.showToast(`Đã lưu lộ trình cố định: Nhà (${oName}) ↔ Cơ quan (${dName})`, 'success', 3500);
+    } catch (e) {
+      this.showToast('Không thể lưu vào trình duyệt', 'error', 2000);
+    }
+  }
+
+  triggerQuickCommute(direction = 'work') {
+    const presets = this.getCommutePresets();
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (!originInput || !destInput) return;
+
+    const btnWork = document.getElementById('btn-commute-go-work');
+    const btnHome = document.getElementById('btn-commute-go-home');
+    btnWork?.classList.toggle('active', direction === 'work');
+    btnHome?.classList.toggle('active', direction === 'home');
+
+    const fromPlace = direction === 'work' ? presets.home : presets.work;
+    const toPlace = direction === 'work' ? presets.work : presets.home;
+
+    originInput.value = fromPlace.name;
+    originInput.dataset.lat = fromPlace.lat;
+    originInput.dataset.lng = fromPlace.lng;
+    this.routeLocations.origin = { title: fromPlace.name, fullAddress: fromPlace.name, lat: fromPlace.lat, lng: fromPlace.lng };
+
+    destInput.value = toPlace.name;
+    destInput.dataset.lat = toPlace.lat;
+    destInput.dataset.lng = toPlace.lng;
+    this.routeLocations.destination = { title: toPlace.name, fullAddress: toPlace.name, lat: toPlace.lat, lng: toPlace.lng };
+
+    const label = direction === 'work' ? 'Đi làm / Đi học (Nhà → Cơ quan)' : 'Về nhà ngay (Cơ quan → Nhà)';
+    this.showToast(`Đang phân tích lộ trình an toàn 1-chạm: ${label}...`, 'info', 2800);
+    this.calculateSmartRoute();
+  }
+
+  // --- CHIA SẺ LỘ TRÌNH AN TOÀN QUA LINK ---
+  shareSafeRoute(routeIndex = 0) {
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (!originInput || !destInput) return;
+
+    const oLoc = this.routeLocations?.origin;
+    const dLoc = this.routeLocations?.destination;
+
+    const params = new URLSearchParams();
+    params.set('city', this.currentCity || 'hanoi');
+    params.set('fromName', originInput.value || 'Điểm đi');
+    params.set('fromLat', String(oLoc?.lat || originInput.dataset.lat || ''));
+    params.set('fromLng', String(oLoc?.lng || originInput.dataset.lng || ''));
+    params.set('toName', destInput.value || 'Điểm đến');
+    params.set('toLat', String(dLoc?.lat || destInput.dataset.lat || ''));
+    params.set('toLng', String(dLoc?.lng || destInput.dataset.lng || ''));
+    params.set('veh', this.currentVehicle || 'motorbike');
+    params.set('avoid', String(this.currentAvoidLevel || 1));
+    params.set('offset', String(this.currentPredictionOffset || 0));
+    params.set('rIdx', String(routeIndex || 0));
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', shareUrl);
+
+    const route = this.lastRouteResult?.routes?.[routeIndex];
+    const safetyScore = route ? route.safetyScore : 95;
+    const shareSummary = `[MoveSafe VN] Lộ trình an toàn (${safetyScore}/100): ${originInput.value} → ${destInput.value}. Xem bản đồ né ngập & kẹt xe: ${shareUrl}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        this.showToast('Đã sao chép Link lộ trình an toàn vào bộ nhớ tạm! Hãy dán gửi cho người thân.', 'success', 4000);
+      }).catch(() => {
+        prompt('Sao chép link lộ trình an toàn bên dưới:', shareSummary);
+      });
+    } else {
+      prompt('Sao chép link lộ trình an toàn bên dưới:', shareSummary);
+    }
+  }
+
+  checkSharedRouteFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromLat = parseFloat(params.get('fromLat'));
+      const fromLng = parseFloat(params.get('fromLng'));
+      const toLat = parseFloat(params.get('toLat'));
+      const toLng = parseFloat(params.get('toLng'));
+
+      if (isNaN(fromLat) || isNaN(fromLng) || isNaN(toLat) || isNaN(toLng)) return;
+
+      const city = params.get('city');
+      if (city && ['hanoi', 'hcm', 'danang'].includes(city) && city !== this.currentCity) {
+        this.currentCity = city;
+        const citySelect = document.getElementById('city-select-gm');
+        if (citySelect) citySelect.value = city;
+        window.mapEngine.flyToCity(city);
+      }
+
+      const veh = params.get('veh');
+      if (veh) {
+        this.currentVehicle = veh;
+        document.querySelectorAll('.gm-veh-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.vehicle === veh);
+        });
+      }
+
+      const avoid = parseInt(params.get('avoid'), 10);
+      if (!isNaN(avoid) && [1, 2, 3].includes(avoid)) {
+        this.currentAvoidLevel = avoid;
+        document.querySelectorAll('.gm-avoidance-option').forEach(opt => {
+          const isMatch = parseInt(opt.dataset.level, 10) === avoid;
+          opt.classList.toggle('active', isMatch);
+          const radio = opt.querySelector('input[type="radio"]');
+          if (radio) radio.checked = isMatch;
+        });
+      }
+
+      const fromName = params.get('fromName') || 'Điểm xuất phát đã chia sẻ';
+      const toName = params.get('toName') || 'Điểm đến đã chia sẻ';
+      const originInput = document.getElementById('gm-route-origin');
+      const destInput = document.getElementById('gm-route-dest');
+      if (originInput && destInput) {
+        originInput.value = fromName;
+        originInput.dataset.lat = String(fromLat);
+        originInput.dataset.lng = String(fromLng);
+        this.routeLocations.origin = { title: fromName, fullAddress: fromName, lat: fromLat, lng: fromLng };
+
+        destInput.value = toName;
+        destInput.dataset.lat = String(toLat);
+        destInput.dataset.lng = String(toLng);
+        this.routeLocations.destination = { title: toName, fullAddress: toName, lat: toLat, lng: toLng };
+
+        setTimeout(() => {
+          this.toggleDirectionsPanel(true);
+          this.showToast('Đã tải lộ trình an toàn được chia sẻ qua liên kết!', 'info', 3500);
+          this.calculateSmartRoute();
+        }, 500);
+      }
+    } catch (e) {
+      console.warn('Không thể đọc lộ trình từ URL:', e);
+    }
+  }
+
+  // --- CHẾ ĐỘ DẪN ĐƯỜNG TỪNG BƯỚC BẰNG GIỌNG NÓI (VOICE NAVIGATION) ---
+  startVoiceNavigation(routeIndex = 0, btnEl = null) {
+    if (!this.lastRouteResult || !this.lastRouteResult.routes) return;
+    const route = this.lastRouteResult.routes[routeIndex];
+    if (!route) return;
+
+    this.selectRouteOnMap(routeIndex);
+
+    // Mở danh sách các bước đi của thẻ này
+    const cardEl = document.querySelector(`.gm-route-card[data-route-index="${routeIndex}"]`);
+    if (cardEl) {
+      const stepsEl = cardEl.querySelector('.gm-route-steps');
+      if (stepsEl) stepsEl.style.display = 'block';
+    }
+
+    // Phóng bản đồ tới điểm xuất phát
+    if (route.geometry && route.geometry.length > 0 && window.mapEngine && window.mapEngine.map) {
+      window.mapEngine.map.flyTo(route.geometry[0], 15, { duration: 1.0 });
+    }
+
+    const originName = document.getElementById('gm-route-origin')?.value || 'Điểm xuất phát';
+    const destName = document.getElementById('gm-route-dest')?.value || 'Điểm đến';
+    const firstSteps = (route.steps || []).slice(0, 3).map(s => {
+      return `${s.instruction}${s.distance > 0 ? ` trong ${s.distanceText}` : ''}`;
+    }).join('. Tiếp theo, ');
+
+    const floodNotice = route.floodRiskCount > 0
+      ? `Chú ý có ${route.floodRiskCount} điểm nguy cơ ngập trên tuyến.`
+      : `Tuyến đường hoàn toàn khô ráo, không qua điểm ngập.`;
+
+    const voiceScript = `Bắt đầu dẫn đường lộ trình ${route.label} từ ${originName} đến ${destName}. Tổng quãng đường ${route.distanceKm} ki lô mét, thời gian dự kiến ${route.estimatedMinutes} phút, chỉ số an toàn ${route.safetyScore} trên 100. ${floodNotice} Hướng dẫn chặng đầu: ${firstSteps}. Bạn có thể bấm vào từng chặng bên dưới để nghe đọc chi tiết.`;
+
+    this.showToast(`Đang phát giọng nói dẫn đường: ${route.label} (${route.distanceKm} km)`, 'info', 4000);
+
+    if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
+      const targetBtn = btnEl || cardEl?.querySelector('.gm-btn-voice-nav');
+      window.aiChat.toggleSpeakText(voiceScript, targetBtn);
+    }
+  }
+
+  previewRouteStep(routeIndex, stepIndex) {
+    const route = this.lastRouteResult?.routes?.[routeIndex];
+    if (!route || !route.steps || !route.steps[stepIndex]) return;
+    const step = route.steps[stepIndex];
+
+    // Highlight step item
+    document.querySelectorAll('.gm-step-item.active-voice-step').forEach(el => el.classList.remove('active-voice-step'));
+    const cardEl = document.querySelector(`.gm-route-card[data-route-index="${routeIndex}"]`);
+    const stepEls = cardEl?.querySelectorAll('.gm-step-item');
+    if (stepEls && stepEls[stepIndex]) {
+      stepEls[stepIndex].classList.add('active-voice-step');
+    }
+
+    // Ước lượng vị trí bước đi dọc theo geometry của route để flyTo
+    if (route.geometry && route.geometry.length > 1 && window.mapEngine && window.mapEngine.map) {
+      const ratio = stepIndex / Math.max(1, route.steps.length - 1);
+      const geoIdx = Math.min(route.geometry.length - 1, Math.floor(ratio * route.geometry.length));
+      const coord = route.geometry[geoIdx];
+      if (coord) {
+        window.mapEngine.map.flyTo(coord, 16, { duration: 0.8 });
+      }
+    }
+
+    const textToSpeak = `Chặng ${stepIndex + 1}: ${step.instruction}${step.distance > 0 ? `, đi tiếp ${step.distanceText}` : ''}.`;
+    this.showToast(textToSpeak, 'info', 2500);
+    if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
+      window.aiChat.toggleSpeakText(textToSpeak, null);
+    }
+  }
+
+  // --- CỨU HỘ THỦY KÍCH & ĐIỂM TRÚ MƯA CAO RÁO (SOS & SAFE SHELTER) ---
+  getSafeSheltersByCity(city) {
+    const db = {
+      hanoi: [
+        { name: 'Ga Metro Cát Linh (Nhà ga trên cao Tầng 2-3)', address: '167 Hào Nam, Đống Đa, Hà Nội', lat: 21.0282, lng: 105.8268, elevation: '+14.5m (Tuyệt đối không ngập)', capacity: 'Gửi xe máy & Trú mưa 24/7', phone: '02438565656', type: 'metro' },
+        { name: 'Ga Metro Cầu Giấy - ĐH Giao Thông Vận Tải', address: 'Nút giao Cầu Giấy - Kim Mã, Ba Đình', lat: 21.0292, lng: 105.8025, elevation: '+12.0m (Sảnh cao ráo)', capacity: 'Bãi gửi xe cao + Sảnh chờ có mái che', phone: '02437663311', type: 'metro' },
+        { name: 'TTTM Lotte Center Hà Nội (Bãi đỗ xe nổi & Sảnh cao)', address: '54 Liễu Giai, Ba Đình, Hà Nội', lat: 21.0321, lng: 105.8127, elevation: '+9.5m (Hệ thống bơm chống ngập kép)', capacity: 'Ô tô, Xe máy, Trạm sạc EV', phone: '02433332500', type: 'mall' },
+        { name: 'TTTM Aeon Mall Long Biên (Bãi đỗ xe nổi Tầng 2-3)', address: '27 Cổ Linh, Long Biên, Hà Nội', lat: 21.0268, lng: 105.8992, elevation: '+11.0m (Đường dốc lên tầng nổi)', capacity: 'Sức chứa >1.500 ô tô & xe máy', phone: '02432693000', type: 'mall' },
+        { name: 'Vincom Center Trần Duy Hưng (Khu vực đỗ xe có đập chắn ngập)', address: '119 Trần Duy Hưng, Cầu Giấy, Hà Nội', lat: 21.0063, lng: 105.7955, elevation: '+8.2m (Có vách ngăn chống tràn)', capacity: 'Ô tô, Xe máy, Sạc VinFast', phone: '02439749999', type: 'mall' }
+      ],
+      hcm: [
+        { name: 'Ga Metro Tân Cảng - Tuyến Metro Số 1 (Trên cao)', address: 'Chân cầu Sài Gòn, Bình Thạnh, TP.HCM', lat: 10.7985, lng: 106.7225, elevation: '+15.0m (Bãi giữ xe trên cao)', capacity: 'Giữ xe máy chống ngập + Trú mưa', phone: '02838221111', type: 'metro' },
+        { name: 'Ga Metro Thảo Điền (Bãi xe kết nối cầu bộ hành)', address: 'Xa lộ Hà Nội, Thảo Điền, TP. Thủ Đức', lat: 10.8035, lng: 106.7355, elevation: '+13.5m (Cao hơn đỉnh triều cường)', capacity: 'Cứu hộ trú mưa cho người đi đường', phone: '02838221112', type: 'metro' },
+        { name: 'TTTM Giga Mall Thủ Đức (Bãi xe nổi & Sảnh cao)', address: '240 Phạm Văn Đồng, Hiệp Bình Chánh, Thủ Đức', lat: 10.8278, lng: 106.7215, elevation: '+10.5m (Cốt nền cao ráo)', capacity: 'Ô tô, Xe máy, Trạm sạc EV', phone: '02871003838', type: 'mall' },
+        { name: 'TTTM Crescent Mall Quận 7 (Nhà xe nổi nhiều tầng)', address: '101 Tôn Dật Tiên, Tân Phú, Quận 7', lat: 10.7289, lng: 106.7186, elevation: '+12.0m (Nhà để xe nổi an toàn)', capacity: 'Tránh triều cường Huỳnh Tấn Phát / Nguyễn Thị Thập', phone: '02854133333', type: 'mall' },
+        { name: 'Diamond Plaza Quận 1 (Khu vực trung tâm cốt nền cao)', address: '34 Lê Duẩn, Bến Nghé, Quận 1', lat: 10.7812, lng: 106.6989, elevation: '+9.8m (Khu vực lịch sử không ngập)', capacity: 'Ô tô, Xe máy, Trú mưa an toàn', phone: '02838225500', type: 'mall' }
+      ],
+      danang: [
+        { name: 'TTTM Vincom Plaza Ngô Quyền (Bãi đỗ xe cao ráo)', address: '910A Ngô Quyền, Sơn Trà, Đà Nẵng', lat: 16.0715, lng: 108.2305, elevation: '+9.5m (An toàn mưa lớn)', capacity: 'Ô tô, Xe máy, Trạm sạc EV', phone: '02363996688', type: 'mall' },
+        { name: 'Sân vận động Hòa Xuân / Khu vực Đảo Xanh (Cốt nền cao)', address: 'Hòa Xuân, Cẩm Lệ, Đà Nẵng', lat: 16.0125, lng: 108.2155, elevation: '+10.0m (Bãi đỗ xe rộng chống ngập)', capacity: 'Điểm tập kết cứu hộ ô tô khi mưa bão', phone: '02363822333', type: 'shelter' },
+        { name: 'Nhà ga T2 Sân bay Quốc tế Đà Nẵng (Nhà để xe nổi)', address: 'Duy Tân, Hải Châu, Đà Nẵng', lat: 16.0538, lng: 108.2045, elevation: '+12.5m (Nhà xe nổi 2 tầng)', capacity: 'Sức chứa lớn cho Ô tô & Xe máy', phone: '02363539555', type: 'metro' },
+        { name: 'Lotte Mart Đà Nẵng (Bãi đỗ xe ngoài trời cốt cao)', address: '06 Nại Nam, Hòa Cường Bắc, Hải Châu', lat: 16.0389, lng: 108.2289, elevation: '+9.0m (Thoát nước trực tiếp sông Hàn)', capacity: 'Ô tô, Xe máy, Trú mưa 24/7', phone: '02363611999', type: 'mall' }
+      ]
+    };
+    return db[city] || db.hanoi;
+  }
+
+  getRescueHotlinesByCity(city) {
+    const common = [
+      { name: 'Tổng đài Cứu hộ Giao thông & Cứu nạn Khẩn cấp Toàn quốc', desc: 'Cảnh sát PCCC & Cứu nạn cứu hộ (Mắc kẹt trong vùng ngập sâu, cây đổ)', phone: '114', badge: 'Khẩn cấp 24/7' },
+      { name: 'Cứu hộ Kỹ thuật & Kéo xe Thủy kích VinFast / Xe điện 24/7', desc: 'Hỗ trợ cẩu kéo xe điện & ô tô chết máy do ngập nước về xưởng an toàn', phone: '1900232389', badge: 'Hỗ trợ EV & Ô tô' }
+    ];
+    const byCity = {
+      hanoi: [
+        { name: 'Đội Cứu hộ Giao thông 116 Hà Nội (Cẩu kéo Ô tô ngập nước)', desc: 'Trực chiến tại Cầu Giấy, Nguyễn Xiển, Giải Phóng, Long Biên', phone: '0909116116', badge: 'Có mặt sau 15p' },
+        { name: 'Đội Cứu hộ Xe máy Chết máy & Thủy kích lưu động Hà Nội', desc: 'Sửa bugi, hút nước pô, thay dầu tại chỗ hoặc chở xe qua vùng ngập', phone: '0988116116', badge: 'Cứu hộ Xe máy' },
+        { name: 'Đường dây nóng Công ty Thoát nước Hà Nội (Báo mất nắp cống / Ngập sâu)', desc: 'Ứng trực mở đập tràn và cắm biển cảnh báo hố ga nguy hiểm', phone: '02439746225', badge: 'Trực ban Mưa bão' }
+      ],
+      hcm: [
+        { name: 'Cứu hộ Giao thông Sài Gòn 116 (Kéo xe ngập triều cường)', desc: 'Chuyên ứng cứu Nguyễn Hữu Cảnh, Huỳnh Tấn Phát, Thảo Điền, Quốc lộ 13', phone: '0934116116', badge: 'Trực chiến 24/7' },
+        { name: 'Đội Hiệp sĩ & Cứu hộ Xe máy lưu động TP.HCM', desc: 'Hỗ trợ kích bình, xử lý xe tay ga vào nước nồi & chết máy ban đêm', phone: '0906116116', badge: 'Cứu hộ Xe máy' },
+        { name: 'Trung tâm Chống ngập & Hạ tầng Kỹ thuật TP.HCM', desc: 'Tiếp nhận điểm ngập mới, hố sụt và sự cố cây xanh ngã đổ', phone: '02839102126', badge: 'Trực ban Đô thị' }
+      ],
+      danang: [
+        { name: 'Cứu hộ Ô tô & Thủy kích Đà Nẵng 24/7 (116 Miền Trung)', desc: 'Xe sàn trượt chuyên dụng cứu hộ ngập lụt Hải Châu, Thanh Khê, Liên Chiểu', phone: '0905116116', badge: 'Có mặt sau 15p' },
+        { name: 'Đội Cứu hộ Xe máy Lưu động Đà Nẵng (SOS Mưa bão)', desc: 'Hỗ trợ sửa xe chết máy do ngập nước tại chỗ', phone: '0935116116', badge: 'Cứu hộ Xe máy' },
+        { name: 'Tổng đài Dịch vụ Công & Phòng chống Thiên tai Đà Nẵng (1022)', desc: 'Cập nhật rào chắn ngập lụt, hầm chui Điện Biên Phủ, Nguyễn Tri Phương', phone: '02361022', badge: 'Tổng đài 1022' }
+      ]
+    };
+    return [...(byCity[city] || byCity.hanoi), ...common];
+  }
+
+  openSosRescueModal(targetLat = null, targetLng = null, targetName = null) {
+    const modal = document.getElementById('modal-sos-rescue');
+    if (!modal) return;
+
+    // Lưu tọa độ tham chiếu để tính khoảng cách đến điểm trú mưa gần nhất
+    if (targetLat && targetLng) {
+      this._sosRefLocation = { lat: Number(targetLat), lng: Number(targetLng), name: targetName || 'Điểm ngập đang chọn' };
+    } else if (this.userLocation && this.userLocation.lat) {
+      this._sosRefLocation = { lat: this.userLocation.lat, lng: this.userLocation.lng, name: 'Vị trí GPS của bạn' };
+    } else if (this.routeLocations?.origin?.lat) {
+      this._sosRefLocation = { lat: Number(this.routeLocations.origin.lat), lng: Number(this.routeLocations.origin.lng), name: this.routeLocations.origin.title || 'Điểm xuất phát' };
+    } else {
+      const originInput = document.getElementById('gm-route-origin');
+      const oLat = parseFloat(originInput?.dataset?.lat);
+      const oLng = parseFloat(originInput?.dataset?.lng);
+      if (!isNaN(oLat) && !isNaN(oLng)) {
+        this._sosRefLocation = { lat: oLat, lng: oLng, name: originInput.value || 'Điểm xuất phát' };
+      } else {
+        const center = window.mapEngine?.map?.getCenter();
+        this._sosRefLocation = {
+          lat: center ? center.lat : 21.0285,
+          lng: center ? center.lng : 105.8542,
+          name: `Trung tâm ${this.getCityName(this.currentCity)}`
+        };
+      }
+    }
+
+    const subtitleEl = document.getElementById('sos-modal-subtitle');
+    if (subtitleEl) {
+      subtitleEl.textContent = `Đang sắp xếp theo khoảng cách gần nhất từ: ${this._sosRefLocation.name}`;
+    }
+
+    modal.classList.add('open');
+    this.switchSosTab('shelters');
+  }
+
+  switchSosTab(tabName = 'shelters') {
+    this._currentSosTab = tabName;
+    document.querySelectorAll('.sos-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sosTab === tabName);
+    });
+    this.renderSosContent(tabName);
+  }
+
+  _calcDistanceKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  renderSosContent(tabName = 'shelters') {
+    const bodyEl = document.getElementById('sos-modal-body');
+    if (!bodyEl) return;
+
+    const ref = this._sosRefLocation || { lat: 21.0285, lng: 105.8542, name: 'Vị trí hiện tại' };
+
+    if (tabName === 'shelters') {
+      const shelters = this.getSafeSheltersByCity(this.currentCity).map((s, idx) => {
+        const distKm = this._calcDistanceKm(ref.lat, ref.lng, s.lat, s.lng);
+        return { ...s, originalIdx: idx, distKm };
+      }).sort((a, b) => a.distKm - b.distKm);
+
+      this._sortedSheltersCache = shelters;
+
+      bodyEl.innerHTML = `
+        <div class="sos-shelters-grid">
+          ${shelters.map((s, idx) => `
+            <div class="sos-shelter-card">
+              <div class="sos-shelter-info">
+                <h4>
+                  ${idx === 0 ? '<span class="sos-shelter-badge" style="background:#dcfce7;color:#15803d;">GẦN NHẤT</span>' : ''}
+                  ${s.name}
+                  <span class="sos-shelter-badge">Cách ${s.distKm.toFixed(1)} km</span>
+                </h4>
+                <div class="sos-shelter-meta">
+                  <span>Cốt nền: <strong>${s.elevation}</strong></span>
+                  <span>•</span>
+                  <span>${s.capacity}</span>
+                  <span>•</span>
+                  <span>Đ/c: ${s.address}</span>
+                </div>
+              </div>
+              <div class="sos-shelter-actions">
+                <button class="sos-btn-action" onclick="window.appState.viewShelterOnMap(${idx})">Xem bản đồ</button>
+                <button class="sos-btn-action primary" onclick="window.appState.routeToShelter(${idx})">Chỉ đường trú ngay</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else if (tabName === 'hotlines') {
+      const hotlines = this.getRescueHotlinesByCity(this.currentCity);
+      bodyEl.innerHTML = `
+        <div class="sos-hotline-grid">
+          ${hotlines.map(h => `
+            <div class="sos-hotline-card">
+              <div class="sos-hotline-info">
+                <h4>${h.name} <span class="sos-shelter-badge">${h.badge}</span></h4>
+                <p>${h.desc}</p>
+              </div>
+              <a href="tel:${h.phone}" class="sos-call-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Gọi ${h.phone}
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      bodyEl.innerHTML = `
+        <div class="sos-guide-grid">
+          <div class="sos-guide-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              1. Ô tô & Xe máy Chết máy Giữa Vùng Ngập (Quy tắc Vàng)
+            </h4>
+            <ul>
+              <li><strong>TUYỆT ĐỐI KHÔNG ĐỀ NỔ LẠI (KHÔNG KHỞI ĐỘNG LẠI):</strong> Nước đã tràn vào cổ hút gió hoặc ống xả, việc cố đề nổ sẽ làm cong tay biên, vỡ lốc máy (Thủy kích) khiến chi phí sửa chữa tăng gấp 10–30 lần.</li>
+              <li><strong>Rút chìa khóa / Tắt nguồn điện ngay:</strong> Đẩy xe lên vỉa hè cao ráo hoặc bấm sang tab <em>"Điểm Gửi Xe & Trú Mưa Cao Ráo"</em> để tìm bãi đỗ trên cao gần nhất.</li>
+              <li><strong>Với Xe tay ga:</strong> Nước rất dễ vào lốc nồi và hộp số (dầu láp chuyển màu cà phê sữa). Cần thay dầu máy & dầu láp ngay sau khi thoát ngập.</li>
+            </ul>
+          </div>
+          <div class="sos-guide-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              2. Xe Điện (EV / Xe máy điện) Đi Qua Vùng Ngập
+            </h4>
+            <ul>
+              <li><strong>Chuẩn kháng nước IP67 chỉ chịu được ngâm tĩnh tạm thời:</strong> Khi di chuyển nhanh, áp lực sóng nước và sóng từ xe tải ngược chiều có thể phá vỡ gioăng bảo vệ pin & mô-tơ.</li>
+              <li><strong>Nếu bắt buộc phải đi qua vùng nước xấp xỉ 20–25cm:</strong> Tắt điều hòa (với ô tô), giữ đều chân ga ở tốc độ thấp (dưới 10–15 km/h), không giảm ga đột ngột.</li>
+              <li><strong>Không cắm sạc ngay sau khi lội nước:</strong> Hãy để cổng sạc và gầm pin khô ráo hoàn toàn hoặc kiểm tra cách điện trước khi kết nối trụ sạc nhanh DC.</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  viewShelterOnMap(sortedIdx) {
+    const shelter = this._sortedSheltersCache?.[sortedIdx];
+    if (!shelter) return;
+    document.getElementById('modal-sos-rescue')?.classList.remove('open');
+    if (window.mapEngine && typeof window.mapEngine.focusShelterOnMap === 'function') {
+      window.mapEngine.focusShelterOnMap(shelter);
+    }
+  }
+
+  routeToShelter(sortedIdx) {
+    const shelter = this._sortedSheltersCache?.[sortedIdx];
+    if (!shelter) return;
+
+    document.getElementById('modal-sos-rescue')?.classList.remove('open');
+    this.toggleDirectionsPanel(true);
+
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (originInput && destInput) {
+      if (this._sosRefLocation) {
+        originInput.value = this._sosRefLocation.name;
+        originInput.dataset.lat = String(this._sosRefLocation.lat);
+        originInput.dataset.lng = String(this._sosRefLocation.lng);
+        this.routeLocations.origin = {
+          title: this._sosRefLocation.name,
+          fullAddress: this._sosRefLocation.name,
+          lat: this._sosRefLocation.lat,
+          lng: this._sosRefLocation.lng
+        };
+      }
+      destInput.value = shelter.name;
+      destInput.dataset.lat = String(shelter.lat);
+      destInput.dataset.lng = String(shelter.lng);
+      this.routeLocations.destination = {
+        title: shelter.name,
+        fullAddress: shelter.address || shelter.name,
+        lat: shelter.lat,
+        lng: shelter.lng
+      };
+
+      this.showToast(`Đang tìm đường an toàn nhất tới điểm trú mưa: ${shelter.name}`, 'success', 3500);
+      this.calculateSmartRoute();
+    }
+  }
+
+  copySosGpsLocation() {
+    const ref = this._sosRefLocation || { lat: 21.0285, lng: 105.8542, name: 'Vị trí hiện tại' };
+    const text = `[SOS CỨU HỘ THỦY KÍCH - MOVESAFE VN] Tôi đang cần hỗ trợ tại: ${ref.name} (Tọa độ GPS: ${ref.lat.toFixed(5)}, ${ref.lng.toFixed(5)}) - Bản đồ: https://www.google.com/maps?q=${ref.lat},${ref.lng}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showToast('Đã sao chép Tọa độ GPS Cứu hộ! Hãy dán gửi cho Đội cứu hộ hoặc người thân.', 'success', 4000);
+      }).catch(() => {
+        prompt('Sao chép tọa độ GPS cứu hộ:', text);
+      });
+    } else {
+      prompt('Sao chép tọa độ GPS cứu hộ:', text);
     }
   }
 }
