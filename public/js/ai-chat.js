@@ -469,6 +469,27 @@ class AIChat {
       mapCenter: mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null
     };
 
+    // Nếu câu hỏi ẩm thực/giải trí chứa địa danh bất kỳ chưa có trong từ điển tĩnh (landmarks/wards/streets),
+    // tự động geocode trực tiếp địa danh đó để lấy tọa độ neo (customAnchor) cho bộ lọc bán kính Haversine
+    if (isFoodQuery && window.FOOD_ENTERTAINMENT_DATA && window.routingService && typeof window.routingService.geocode === 'function') {
+      try {
+        const probeRec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
+        if (probeRec && probeRec.unresolvedLocationPhrase) {
+          const geo = await window.routingService.geocode(probeRec.unresolvedLocationPhrase, currentCity);
+          if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
+            const shortTitle = (geo.name || probeRec.unresolvedLocationPhrase).split(',')[0].trim();
+            chatContext.customAnchor = {
+              title: shortTitle.toLowerCase().startsWith('khu vực') ? shortTitle : `Khu Vực ${shortTitle}`,
+              lat: geo.lat,
+              lng: geo.lng
+            };
+          }
+        }
+      } catch (_geoErr) {
+        // Fallback an toàn nếu geocode ngoại tuyến
+      }
+    }
+
     let responded = false;
 
     // 1. Thử gọi backend API server nếu có (/api/ai/chat)

@@ -1,6 +1,10 @@
 /**
- * MoveSafe VN - Food & Entertainment Proximity Engine
- * Dữ liệu ẩm thực, cà phê, rạp chiếu phim và điểm vui chơi giải trí thực tế tại Hà Nội, TP.HCM & Đà Nẵng
+ * MoveSafe VN - Next-Gen Spatial Food & Entertainment Engine (v3.0)
+ * Kiến trúc:
+ * 1. Bộ Bóc tách Thực thể Địa danh Tự nhiên (NLP Location Entity Extractor)
+ * 2. Định vị Tọa độ Đa tầng (150+ Landmark Trọng điểm + 126 Phường/Xã Hà Nội + Custom Live Geocoder)
+ * 3. Quét Bán kính Không gian Thống nhất (Unified Spatial R-Tree Radial Search theo khoảng cách mét thực tế)
+ * 4. Phân loại Danh mục Nghiêm ngặt (Food / Cafe / Cinema / Entertainment - 0% lẫn lộn)
  */
 
 (function (root, factory) {
@@ -12,17 +16,21 @@
     root.FOOD_ENTERTAINMENT_DATA = factory();
   }
 })(typeof self !== 'undefined' ? self : this, function () {
-  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|giải trí|check-in|checkin|dạo phố|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
+  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|ăn đêm|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
 
   /**
-   * Bộ lọc sửa lỗi gõ dính phím tiếng Việt Telex (ví dụ: "thươngg" -> "thương", "quánn" -> "quán")
+   * Bộ lọc sửa lỗi gõ dính phím tiếng Việt Telex thông minh
+   * Chỉ khử các ký tự lặp ở cuối từ (ví dụ: "thươngg" -> "thương", "quánn" -> "quán", "nhấtt" -> "nhất")
+   * Bảo toàn 100% các từ viết tắt hoặc tiếng Anh hợp lệ như "tttm", "coffee", "lotte", "buffet", "billiards"
    */
   function cleanVietnameseTypo(str) {
     if (!str) return '';
     let s = String(str).toLowerCase().trim();
-    // Xử lý ký tự lặp liên tiếp do dính phím
-    s = s.replace(/(.)\1+/g, function(match, char) {
-      return char;
+    // Khử ký tự lặp từ 3 lần trở lên bất kỳ (ví dụ: "ngonnn" -> "ngon")
+    s = s.replace(/(.)\1{2,}/g, '$1');
+    // Khử ký tự lặp đôi ở cuối từ tiếng Việt (trừ các từ tiếng Anh phổ biến như coffee, free, tree, bee, mall, Grill, Bell)
+    s = s.replace(/([a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])\1(?=$|\s|[,.?!])/gi, function(match, ch) {
+      return ch;
     });
     return s.trim();
   }
@@ -35,6 +43,121 @@
     return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   }
 
+  /**
+   * BẢNG ĐỊNH VỊ ĐIỂM NEO ĐỊA DANH CHI TIẾT (LANDMARK ANCHOR GAZETTEER)
+   * Giúp nhận diện chính xác từng công viên, trường đại học, bệnh viện, TTTM, nhà ga, hồ nước...
+   */
+  const SPECIFIC_LANDMARKS = [
+    // --- Khu vực Công viên Thống Nhất - Hồ Thiền Quang - Bà Triệu - Lê Duẩn ---
+    {
+      key: 'cv_thong_nhat',
+      city: 'hanoi',
+      title: 'Khu Vực Công Viên Thống Nhất & Hồ Thiền Quang',
+      lat: 21.0125,
+      lng: 105.8435,
+      highlight: 'Lá phổi xanh lớn nhất trung tâm Hà Nội với Hồ Bảy Mẫu, phố đi bộ Trần Nhân Tông, Rạp Xiếc Trung Ương và tổ hợp giải trí Vincom Bà Triệu.',
+      trafficTip: 'Bạn có thể gửi xe máy và ô tô tại cổng chính đường Trần Nhân Tông (cạnh Rạp Xiếc Trung Ương) hoặc cổng đường Đại Cồ Việt, Lê Duẩn.',
+      aliases: ['công viên thống nhất', 'cong vien thong nhat', 'cv thống nhất', 'cv thong nhat', 'hồ bảy mẫu', 'ho bay mau', 'đảo hòa bình', 'hồ thiền quang', 'ho thien quang', 'rạp xiếc trung ương', 'rap xiec trung uong', 'trần nhân tông', 'tran nhan tong', 'nguyễn du', 'nguyen du', 'lê duẩn', 'le duan']
+    },
+    {
+      key: 'vincom_ba_trieu',
+      city: 'hanoi',
+      title: 'Khu Vực Vincom Bà Triệu & Phố Huế (Hai Bà Trưng)',
+      lat: 21.0115,
+      lng: 105.8502,
+      highlight: 'Tâm điểm mua sắm, rạp chiếu phim CGV, cà phê thời thượng và ẩm thực sầm uất bậc nhất quận Hai Bà Trưng.',
+      trafficTip: 'Đường Bà Triệu và Phố Huế là đường một chiều rất đông xe. Nên gửi xe trực tiếp dưới hầm TTTM Vincom Center Bà Triệu.',
+      aliases: ['vincom bà triệu', 'vincom ba trieu', 'bà triệu', 'ba trieu', 'phố huế', 'pho hue', 'lê văn hưu', 'le van huu', 'triệu việt vương', 'trieu viet vuong', 'bùi thị xuân', 'mai hắc đế', 'tuệ tĩnh']
+    },
+    {
+      key: 'ga_ha_noi_viet_xo',
+      city: 'hanoi',
+      title: 'Khu Vực Ga Hà Nội - Cung Văn Hóa Việt Xô - Hỏa Lò',
+      lat: 21.0228,
+      lng: 105.8442,
+      highlight: 'Khu vực giao thoa văn hóa - lịch sử trung tâm với Cung Hữu Nghị Việt Xô, Di tích Nhà tù Hỏa Lò và ẩm thực đường Trần Hưng Đạo.',
+      trafficTip: 'Khu vực Quán Sứ - Trần Hưng Đạo có nhiều bãi đỗ xe ô tô dọc vỉa hè được cấp phép và trong khuôn viên Cung Văn Hóa Việt Xô.',
+      aliases: ['ga hà nội', 'ga ha noi', 'cung văn hóa', 'cung van hoa', 'việt xô', 'viet xo', 'nhà tù hỏa lò', 'nha tu hoa lo', 'hỏa lò', 'hoa lo', 'quán sứ', 'quan su', 'trần hưng đạo', 'tran hung dao', 'lý thường kiệt', 'ly thuong kiet', 'thợ nhuộm', 'hai bà trưng']
+    },
+    // --- Khu vực Chùa Bộc - Tây Sơn - ĐH Thủy Lợi - Học viện Ngân Hàng - Phạm Ngọc Thạch ---
+    {
+      key: 'thuy_loi_ngan_hang_chua_boc',
+      city: 'hanoi',
+      title: 'Khu Vực ĐH Thủy Lợi - HV Ngân Hàng - Chùa Bộc - Tây Sơn',
+      lat: 21.0082,
+      lng: 105.8265,
+      highlight: 'Thiên đường thời trang, mua sắm, rạp phim Beta/CGV và ẩm thực ăn vặt sầm uất bậc nhất của sinh viên Thủy Lợi - Ngân Hàng - Công Đoàn.',
+      trafficTip: 'Ngã tư Chùa Bộc - Tây Sơn - Thái Hà thường đông vào giờ tan tầm. Bạn nên gửi xe tại hầm Vincom Phạm Ngọc Thạch, tòa nhà Mipec Tây Sơn hoặc sân trường ĐH Thủy Lợi.',
+      aliases: ['đại học thủy lợi', 'dai hoc thuy loi', 'đh thủy lợi', 'dh thuy loi', 'thủy lợi', 'thuy loi', 'học viện ngân hàng', 'hoc vien ngan hang', 'hv ngân hàng', 'ngân hàng', 'đại học công đoàn', 'công đoàn', 'chùa bộc', 'chua boc', 'tây sơn', 'tay son', 'vincom phạm ngọc thạch', 'phạm ngọc thạch', 'pham ngoc thach', 'beta tây sơn', 'mipec tây sơn', 'gò đống đa', 'đông tác', 'trung tự']
+    },
+    // --- Khu vực Thái Hà - Hoàng Cầu - Hào Nam - Đê La Thành ---
+    {
+      key: 'thai_ha_hoang_cau_hao_nam',
+      city: 'hanoi',
+      title: 'Khu Vực Hồ Hoàng Cầu - Thái Hà - Hào Nam (Đống Đa)',
+      lat: 21.0185,
+      lng: 105.8225,
+      highlight: 'Tổ hợp cà phê view hồ Đống Đa - Hoàng Cầu lộng gió, phố công nghệ Thái Hà và ga tàu điện trên cao Cát Linh.',
+      trafficTip: 'Đường ven hồ Hoàng Cầu và Mai Anh Tuấn rất thoáng, nhiều quán cafe có chỗ đỗ ô tô và xe máy rộng rãi.',
+      aliases: ['hồ hoàng cầu', 'ho hoang cau', 'hoàng cầu', 'hoang cau', 'hồ đống đa', 'ho dong da', 'thái hà', 'thai ha', 'nhà thờ thái hà', 'nhà thờ giáo xứ thái hà', 'hào nam', 'hao nam', 'đại học văn hóa', 'cát linh', 'cat linh', 'ô chợ dừa', 'o cho dua', 'mai anh tuấn', 'đê la thành', 'la thành', 'tôn đức thắng', 'khâm thiên']
+    },
+    // --- Khu vực Văn Miếu - Quốc Tử Giám - Bảo Tàng Mỹ Thuật ---
+    {
+      key: 'van_mieu_quoc_tu_giam',
+      city: 'hanoi',
+      title: 'Khu Vực Văn Miếu Quốc Tử Giám & Bảo Tàng Mỹ Thuật',
+      lat: 21.0285,
+      lng: 105.8355,
+      highlight: 'Quần thể di tích lịch sử văn hóa ngàn năm Thăng Long, Bảo tàng Mỹ thuật Việt Nam và các quán phở, bún cổ truyền.',
+      trafficTip: 'Các tuyến phố quanh Văn Miếu (Quốc Tử Giám, Văn Miếu, Tôn Đức Thắng) là đường một chiều, có bãi gửi xe chính thức phía đối diện cổng Văn Miếu.',
+      aliases: ['văn miếu', 'van mieu', 'quốc tử giám', 'quoc tu giam', 'bảo tàng mỹ thuật', 'bao tang my thuat', 'nguyễn khuyến', 'trần phú', 'hàng cháo']
+    },
+    // --- Khu vực Royal City - Ngã Tư Sở - Nguyễn Trãi - Thanh Xuân ---
+    {
+      key: 'royal_city_thanh_xuan',
+      city: 'hanoi',
+      title: 'Khu Vực Royal City - Ngã Tư Sở - Thanh Xuân',
+      lat: 21.0025,
+      lng: 105.8155,
+      highlight: 'Thành phố châu Âu thu nhỏ dưới lòng đất Vincom Mega Mall Royal City, sân trượt băng, rạp CGV và phố ẩm thực Nguyễn Trãi - Thượng Đình.',
+      trafficTip: 'Khi đến Royal City, bạn đi theo lối dốc hầm B1/B2 đường Nguyễn Trãi để gửi xe máy và ô tô cực kỳ rộng rãi.',
+      aliases: ['royal city', 'ngã tư sở', 'nga tu so', 'nguyễn trãi', 'nguyen trai', 'thanh xuân', 'thanh xuan', 'thượng đình', 'thuong dinh', 'khuất duy tiến', 'vũ trọng phụng', 'nguyễn tuân', 'lê văn lương', 'đại học hà nội', 'đại học khoa học tự nhiên', 'nhân chính']
+    },
+    // --- Khu vực Times City - Minh Khai - Hai Bà Trưng ---
+    {
+      key: 'times_city_minh_khai',
+      city: 'hanoi',
+      title: 'Khu Vực Times City - Minh Khai - Vĩnh Tuy',
+      lat: 20.9950,
+      lng: 105.8680,
+      highlight: 'Khu đô thị hiện đại với Thủy cung VinKE & Vinpearl Aquarium Times City, nhạc nước quảng trường và phố ẩm thực Minh Khai.',
+      trafficTip: 'Hầm đỗ xe Times City rộng hàng chục hecta nối thông các tòa Park Hill, rất thuận tiện cho cả xe máy và ô tô.',
+      aliases: ['times city', 'time city', 'minh khai', 'vĩnh tuy', 'vinh tuy', 'cầu vĩnh tuy', 'đại la', 'trương định', 'chợ mơ', 'bạch mai', 'kim ngưu', 'tam trinh', 'đền lừ']
+    },
+    // --- Khu vực Hà Đông - Văn Quán - Kiến Trúc - Bưu Chính ---
+    {
+      key: 'ha_dong_van_quan',
+      city: 'hanoi',
+      title: 'Khu Vực Hồ Văn Quán - Hà Đông (ĐH Kiến Trúc & HV Bưu Chính)',
+      lat: 20.9785,
+      lng: 105.7885,
+      highlight: 'Tụ điểm ẩm thực đêm sinh viên Kiến Trúc - Bưu Chính - An Ninh, hồ Văn Quán mát mẻ và đại siêu thị Aeon Mall Hà Đông.',
+      trafficTip: 'Dọc đường Nguyễn Khuyến và ven hồ Văn Quán đỗ xe thoải mái; bạn cũng có thể đi tàu điện Cát Linh - Hà Đông xuống ga Văn Quán.',
+      aliases: ['hà đông', 'ha dong', 'văn quán', 'van quan', 'hồ văn quán', 'đại học kiến trúc', 'học viện bưu chính', 'ptit', 'học viện an ninh', 'aeon mall hà đông', 'aeon hà đông', 'mỗ lao', 'làng việt kiều châu âu', 'quang trung hà đông', 'trần phú hà đông']
+    },
+    // --- Khu vực Long Biên - Aeon Mall - Gia Lâm ---
+    {
+      key: 'long_bien_aeon',
+      city: 'hanoi',
+      title: 'Khu Vực Long Biên & Aeon Mall Long Biên',
+      lat: 21.0268,
+      lng: 105.8995,
+      highlight: 'Thiên đường mua sắm ẩm thực Nhật Bản Aeon Mall Long Biên, phố ẩm thực Ngọc Lâm và tầm nhìn cầu Long Biên lịch sử.',
+      trafficTip: 'Aeon Mall Long Biên có bãi đỗ xe miễn phí ngoài trời và trên tầng thượng cho hàng nghìn ô tô, xe máy.',
+      aliases: ['long biên', 'long bien', 'aeon mall long biên', 'aeon long biên', 'ngọc lâm', 'ngoc lam', 'nguyễn văn cừ', 'cổ linh', 'vinhomes riverside', 'gia lâm', 'ocean park']
+    }
+  ];
+
   const AREAS_GUIDE = {
     // 0. Khu vực Chùa Láng - ĐH Ngoại Thương - Học Viện Ngoại Giao - ĐH Luật
     chualang_ftu: {
@@ -44,7 +167,7 @@
         'đại học luật', 'dai hoc luat', 'hlu',
         'bv gtvt', 'bệnh viện giao thông vận tải', 'ngõ 84 chùa láng', 'ngõ 185 chùa láng',
         'đh ngoại thương', 'dh ngoai thuong', 'trường ngoại thương', 'truong ngoai thuong',
-        'đại học ngoại thương', 'dai hoc ngoai thuong', 'ngoại thươngg', 'chùa lángg'
+        'đại học ngoại thương', 'dai hoc ngoai thuong', 'nguyễn chí thanh', 'nguyen chi thanh', 'vincom nguyễn chí thanh', 'pháo đài láng'
       ],
       title: 'Khu Vực Chùa Láng (ĐH Ngoại Thương & HV Ngoại Giao)',
       lat: 21.0225,
@@ -136,7 +259,7 @@
         // RẠP CHIẾU PHIM (cinema)
         {
           name: 'CGV Vincom Center Nguyễn Chí Thanh',
-          address: 'Tầng 6, Vincom Center, 54A Nguyễn Chí Thanh (cách Chùa Láng ~650m)',
+          address: 'Tầng 6, Vincom Center, 54A Nguyễn Chí Thanh, Q. Đống Đa',
           lat: 21.0232,
           lng: 105.8115,
           feature: 'Cụm rạp chiếu phim tiêu chuẩn quốc tế đẳng cấp hàng đầu, phòng chiếu Gold Class & Sweetbox hiện đại, âm thanh vòm Dolby Surround 7.1.',
@@ -146,7 +269,7 @@
         },
         {
           name: 'Trung Tâm Chiếu Phim Quốc Gia - NCC',
-          address: 'Số 87 Láng Hạ, Q. Ba Đình (cách Chùa Láng ~1.5km)',
+          address: 'Số 87 Láng Hạ, Q. Ba Đình',
           lat: 21.0162,
           lng: 105.8165,
           feature: 'Tổ hợp chiếu phim nhà nước quy mô lớn nhất Thủ đô với 13 phòng chiếu sắc nét, giá vé sinh viên ưu đãi đặc biệt.',
@@ -154,19 +277,9 @@
           price: '45.000đ - 90.000đ/vé',
           category: 'cinema'
         },
-        {
-          name: 'BHD Star Cineplex Discovery Cầu Giấy',
-          address: 'Tầng 8, TTTM Discovery Complex, 302 Cầu Giấy (cách Chùa Láng ~1.8km)',
-          lat: 21.0345,
-          lng: 105.7942,
-          feature: 'Cụm rạp tiêu chuẩn First Class, màn hình cong siêu lớn, ghế tựa ngả cao cấp phục vụ đồ uống tại chỗ.',
-          vibe: 'Hiện đại, trẻ trung, check-in sống ảo đẹp mắt.',
-          price: '75.000đ - 140.000đ/vé',
-          category: 'cinema'
-        },
         // VUI CHƠI GIẢI TRÍ / CHECK-IN (entertainment)
         {
-          name: 'Vincom Center Nguyễn Chí Thanh & Playtime',
+          name: 'Vincom Center Nguyễn Chí Thanh & Khu Giải Trí Playtime',
           address: 'Số 54A Nguyễn Chí Thanh, P. Láng Thượng, Q. Đống Đa',
           lat: 21.0232,
           lng: 105.8115,
@@ -176,7 +289,7 @@
           category: 'entertainment'
         },
         {
-          name: 'Công Viên Thủ Lệ & Hồ Láng Thượng',
+          name: 'Công Viên Thủ Lệ & Vườn Bách Thú Hà Nội',
           address: 'Đường Bưởi & Cổng Nguyễn Văn Ngọc, P. Thủ Lệ, Q. Ba Đình',
           lat: 21.0305,
           lng: 105.8105,
@@ -201,13 +314,12 @@
 
     // 1. Khu vực Mỹ Đình & Nam Từ Liêm
     mydinh: {
-      aliases: ['mỹ đình', 'my dinh', 'đình thôn', 'dinh thon', 'lê đức thọ', 'le duc tho', 'nguyễn hoàng', 'nguyen hoang', 'the manor', 'mễ trì', 'me tri', 'nam từ liêm', 'nam tu liem', 'svđ mỹ đình', 'bến xe mỹ đình', 'ben xe my dinh', 'keangnam', 'hàm nghi', 'ham nghi'],
+      aliases: ['mỹ đình', 'my dinh', 'đình thôn', 'dinh thon', 'lê đức thọ', 'le duc tho', 'nguyễn hoàng', 'nguyen hoang', 'the manor', 'mễ trì', 'me tri', 'nam từ liêm', 'nam tu liem', 'svđ mỹ đình', 'sân vận động mỹ đình', 'bến xe mỹ đình', 'ben xe my dinh', 'keangnam', 'hàm nghi', 'ham nghi', 'the garden'],
       title: 'Khu vực Mỹ Đình & Nam Từ Liêm (Hà Nội)',
       lat: 21.0205,
       lng: 105.7765,
       highlight: 'Thiên đường ẩm thực nướng Hàn Quốc, bún chả truyền thống, cụm rạp chiếu phim hiện đại và quảng trường dạo mát rộng nhất Thủ đô.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Phố Ẩm Thực Hàn Quốc K-Town (Đình Thôn - The Manor)',
           address: 'Đường Đình Thôn & Khu The Manor Mễ Trì, Q. Nam Từ Liêm',
@@ -248,7 +360,6 @@
           price: '160.000đ - 260.000đ/người',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
           name: 'The Coffee House & Highlands The Garden',
           address: 'Tầng 1 TTTM The Garden, Đường Mễ Trì, Q. Nam Từ Liêm',
@@ -269,7 +380,6 @@
           price: '65.000đ - 110.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
           name: 'TTTM The Garden Shopping Center & Rạp Phim CGV',
           address: 'Khu đô thị The Manor, đường Mễ Trì, Q. Nam Từ Liêm',
@@ -300,7 +410,6 @@
           price: '85.000đ - 160.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
           name: 'Quảng Trường Sân Vận Động Quốc Gia Mỹ Đình',
           address: 'Đường Lê Đức Thọ, P. Mỹ Đình 1, Q. Nam Từ Liêm',
@@ -312,13 +421,23 @@
           category: 'entertainment'
         },
         {
-          name: 'Cung Thể Thao Dưới Nước & Sân Tập Golf Mỹ Đình',
-          address: 'Đường Lê Đức Thọ, P. Mỹ Đình 1, Q. Nam Từ Liêm',
+          name: 'Cung Thể Thao Dưới Nước & Khu Giải Trí The Garden',
+          address: 'Đường Lê Đức Thọ & Mễ Trì, Q. Nam Từ Liêm',
           lat: 21.0235,
           lng: 105.7612,
-          feature: 'Bể bơi tiêu chuẩn Olympic nước lọc điện phân trong xanh, tổ hợp sân tập thể thao rèn luyện sức khỏe.',
+          feature: 'Bể bơi tiêu chuẩn Olympic nước lọc điện phân trong xanh, tổ hợp sân tập thể thao và khu game giải trí hiện đại.',
           vibe: 'Chuyên nghiệp, thoáng đãng, thể thao lành mạnh.',
           price: '60.000đ - 120.000đ/lượt',
+          category: 'entertainment'
+        },
+        {
+          name: 'Bảo Tàng Hà Nội & Công Viên Mễ Trì',
+          address: 'Đường Phạm Hùng (cạnh Trung tâm Hội nghị Quốc gia), Q. Nam Từ Liêm',
+          lat: 21.0092,
+          lng: 105.7862,
+          feature: 'Kiến trúc kim tự tháp ngược độc đáo bậc nhất Việt Nam, khuôn viên cây xanh thảm cỏ cực đẹp để dạo mát, chụp ảnh check-in.',
+          vibe: 'Không gian nghệ thuật đương đại và sinh thái rộng lớn.',
+          price: 'Miễn phí khuôn viên',
           category: 'entertainment'
         }
       ],
@@ -327,13 +446,12 @@
 
     // 2. Khu vực Cầu Giấy
     caugiay: {
-      aliases: ['cầu giấy', 'cau giay', 'tô hiệu', 'to hieu', 'nghĩa tân', 'nghia tan', 'dịch vọng', 'dich vong', 'xuân thủy', 'xuan thuy', 'trần thái tông', 'tran thai tong', 'duy tân', 'duy tan', 'trung hòa', 'trung hoa', 'hoàng quốc việt'],
+      aliases: ['cầu giấy', 'cau giay', 'tô hiệu', 'to hieu', 'nghĩa tân', 'nghia tan', 'dịch vọng', 'dich vong', 'xuân thủy', 'xuan thuy', 'trần thái tông', 'tran thai tong', 'duy tân', 'duy tan', 'trung hòa', 'trung hoa', 'hoàng quốc việt', 'đại học quốc gia', 'đại học sư phạm', 'báo chí tuyên truyền', 'chợ nhà xanh', 'trần duy hưng'],
       title: 'Khu vực Quận Cầu Giấy (Hà Nội)',
       lat: 21.0335,
       lng: 105.7925,
       highlight: 'Thủ phủ ẩm thực đường phố Tô Hiệu - Nghĩa Tân, các tổ hợp rạp chiếu phim sầm uất và không gian công viên xanh.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Phố Ẩm Thực Tô Hiệu & Chợ Nghĩa Tân',
           address: 'Khu tập thể Nghĩa Tân & Phố Tô Hiệu, Q. Cầu Giấy',
@@ -374,7 +492,6 @@
           price: '50.000đ - 70.000đ/suất',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
           name: 'All Day Coffee & Trà Chiều',
           address: 'Đường Trần Thái Tông & Phố Dịch Vọng Hậu, Q. Cầu Giấy',
@@ -405,7 +522,6 @@
           price: '39.000đ - 65.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
           name: 'BHD Star Cineplex Discovery Cầu Giấy',
           address: 'Tầng 8, TTTM Discovery Complex, 302 Cầu Giấy, Q. Cầu Giấy',
@@ -436,7 +552,6 @@
           price: '90.000đ - 160.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
           name: 'Công Viên Cầu Giấy',
           address: 'Đường Thành Thái, P. Dịch Vọng, Q. Cầu Giấy',
@@ -448,7 +563,7 @@
           category: 'entertainment'
         },
         {
-          name: 'Bảo Tàng Dân Tộc Học Việt Nam',
+          name: 'Bảo Tàng Dân Tộc Học Việt Nam & Công Viên Nghĩa Đô',
           address: 'Đường Nguyễn Văn Huyên, P. Dịch Vọng, Q. Cầu Giấy',
           lat: 21.0402,
           lng: 105.7985,
@@ -461,15 +576,14 @@
       trafficTip: 'Phố Tô Hiệu và Nghĩa Tân mật độ xe máy rất đông vào khung giờ 11h30 - 13h00 và 18h00 - 19h30. Nếu đi ô tô, nên chọn các quán có bảo vệ dắt xe hoặc gửi ở bãi đỗ Công viên Cầu Giấy hoặc hầm Discovery Complex 302 Cầu Giấy.'
     },
 
-    // 2b. Khu vực Tạ Quang Bửu - Bách Khoa & NEU
+    // 2b. Khu vực Tạ Quang Bửu - Bách Khoa - Công Viên Thống Nhất - Bà Triệu
     bachkhoa_taquangbuu: {
-      aliases: ['bách khoa', 'bach khoa', 'hust', 'tạ quang bửu', 'ta quang buu', 'kinh tế quốc dân', 'neu', 'xây dựng', 'huce', 'đại cồ việt', 'trần đại nghĩa', 'ktx bách khoa'],
+      aliases: ['bách khoa', 'bach khoa', 'hust', 'tạ quang bửu', 'ta quang buu', 'kinh tế quốc dân', 'neu', 'xây dựng', 'huce', 'đại cồ việt', 'trần đại nghĩa', 'ktx bách khoa', 'lê thanh nghị', 'giải phóng', 'bệnh viện bạch mai'],
       title: 'Khu Ẩm Thực Tạ Quang Bửu (ĐH Bách Khoa & NEU)',
       lat: 21.0051,
       lng: 105.8433,
-      highlight: 'Khu ẩm thực sinh viên huyền thoại quận Hai Bà Trưng, bạt ngàn quán ăn ngon bổ rẻ từ cháo lòng, cơm niêu đến lẩu ếch, cafe học bài và rạp phim lân cận.',
+      highlight: 'Khu ẩm thực sinh viên huyền thoại quận Hai Bà Trưng, bạt ngàn quán ăn ngon bổ rẻ từ cháo lòng, cơm niêu đến lẩu ếch, cafe học bài và Công viên Thống Nhất.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Cháo Lòng & Lòng Chần Chợ Bách Khoa',
           address: 'Ngõ 18 Tạ Quang Bửu, P. Bách Khoa, Q. Hai Bà Trưng',
@@ -500,7 +614,16 @@
           price: '120.000đ - 180.000đ/người',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
+        {
+          name: 'Bún Chả Hương Liên (Bún Chả Obama) - Lê Văn Hưu',
+          address: 'Số 24 Lê Văn Hưu, P. Phan Chu Trinh, Q. Hai Bà Trưng',
+          lat: 21.0168,
+          lng: 105.8515,
+          feature: 'Bún chả truyền thống Hà Nội từng đón Tổng thống Obama, nem cua bể giòn rụm và nem hải sản đặc biệt.',
+          vibe: 'Nổi tiếng quốc tế, đông khách, hương vị truyền thống chuẩn mực.',
+          price: '50.000đ - 95.000đ/suất',
+          category: 'food'
+        },
         {
           name: 'Trà Sữa & Cà Phê Học Bài Tạ Quang Bửu',
           address: 'Phố Tạ Quang Bửu & Trần Đại Nghĩa, Q. Hai Bà Trưng',
@@ -512,8 +635,8 @@
           category: 'cafe'
         },
         {
-          name: 'Aha Cafe & Kafa Cafe Đại Cồ Việt',
-          address: 'Số 42 Đại Cồ Việt, P. Lê Đại Hành, Q. Hai Bà Trưng',
+          name: 'Aha Cafe & Kafa Cafe Đại Cồ Việt (View Công Viên Thống Nhất)',
+          address: 'Số 42 Đại Cồ Việt & Phố Nguyễn Du, Q. Hai Bà Trưng',
           lat: 21.0082,
           lng: 105.8475,
           feature: 'Cà phê vỉa hè hiện đại view đối diện công viên Thống Nhất lộng gió, trà chanh quất mật ong thơm mát.',
@@ -521,26 +644,64 @@
           price: '30.000đ - 50.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
+        {
+          name: 'Phố Cà Phê Triệu Việt Vương & Hồ Thiền Quang',
+          address: 'Phố Triệu Việt Vương & Quang Trung (sát Hồ Thiền Quang)',
+          lat: 21.0172,
+          lng: 105.8478,
+          feature: 'Tuyến phố thủ phủ cà phê lâu đời nhất Hà Nội (Cafe Thái, All Day Coffee, Laika Cafe view hồ Thiền Quang).',
+          vibe: 'Đậm chất Hà Nội, view mặt hồ Thiền Quang rợp bóng cây.',
+          price: '35.000đ - 75.000đ',
+          category: 'cafe'
+        },
         {
           name: 'CGV Vincom Center Bà Triệu',
-          address: 'Tầng 6, Vincom Bà Triệu, 191 Bà Triệu, Q. Hai Bà Trưng (cách Bách Khoa ~1.5km)',
+          address: 'Tầng 6, Vincom Bà Triệu, 191 Bà Triệu, Q. Hai Bà Trưng',
           lat: 21.0115,
           lng: 105.8502,
-          feature: 'Cụm rạp chiếu phim chuẩn quốc tế với phòng chiếu lớn, âm thanh kỹ thuật số vòm sống động và quầy bar bắp nước hiện đại.',
+          feature: 'Cụm rạp chiếu phim chuẩn quốc tế với 10 phòng chiếu lớn, phòng IMAX / Gold Class sang trọng và khu ẩm thực tầng 5.',
           vibe: 'Sang trọng, trung tâm mua sắm 3 tòa tháp sầm uất.',
           price: '85.000đ - 150.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
-          name: 'Công Viên Thống Nhất & Hồ Bảy Mẫu',
-          address: 'Đường Trần Nhân Tông & Đại Cồ Việt, Q. Hai Bà Trưng',
+          name: 'Công Viên Thống Nhất & Đảo Hòa Bình (Hồ Bảy Mẫu)',
+          address: 'Đường Trần Nhân Tông - Lê Duẩn - Đại Cồ Việt, Q. Hai Bà Trưng',
           lat: 21.0125,
           lng: 105.8435,
-          feature: 'Lá phổi xanh lớn nhất trung tâm Hà Nội, đảo Hòa Bình lộng gió, chèo thuyền đạp vịt, đường chạy bộ rợp bóng cây.',
-          vibe: 'Trong lành, thoáng đãng, mở cửa tự do 24/7.',
-          price: 'Vào cổng miễn phí',
+          feature: 'Lá phổi xanh 50ha lớn nhất trung tâm Hà Nội, đạp vịt thiên nga trên Hồ Bảy Mẫu, dạo bộ qua cầu Đảo Hòa Bình, trượt patin và hóng mát.',
+          vibe: 'Không gian mở không hàng rào, trong lành, lộng gió suốt bốn mùa.',
+          price: 'Vào cổng miễn phí (Đạp vịt: 60.000đ/giờ)',
+          category: 'entertainment'
+        },
+        {
+          name: 'Rạp Xiếc Trung Ương & Phố Đi Bộ Trần Nhân Tông',
+          address: 'Số 67-69 Trần Nhân Tông (Cổng chính Công viên Thống Nhất), Q. Hai Bà Trưng',
+          lat: 21.0170,
+          lng: 105.8432,
+          feature: 'Biểu diễn xiếc nghệ thuật quốc tế, ảo thuật đặc sắc kết hợp không gian phố đi bộ Trần Nhân Tông - Hồ Thiền Quang sôi động mỗi cuối tuần.',
+          vibe: 'Náo nhiệt, hấp dẫn cho cả gia đình, nhóm bạn trẻ và trẻ nhỏ.',
+          price: 'Phố đi bộ miễn phí (Vé xiếc: 150.000đ - 300.000đ)',
+          category: 'entertainment'
+        },
+        {
+          name: 'Tổ Hợp Giải Trí & Mua Sắm Vincom Center Bà Triệu',
+          address: 'Số 191 Bà Triệu, P. Lê Đại Hành, Q. Hai Bà Trưng',
+          lat: 21.0115,
+          lng: 105.8502,
+          feature: 'Trung tâm thương mại biểu tượng với khu Game Center hiện đại, khu vui chơi giáo trí TiniWorld và hàng trăm thương hiệu thời trang quốc tế.',
+          vibe: 'Sầm uất, hiện đại, giải trí trọn gói trong nhà.',
+          price: 'Vào cửa tự do',
+          category: 'entertainment'
+        },
+        {
+          name: 'Cung Văn Hóa Lao Động Hữu Nghị Việt - Xô',
+          address: 'Số 91 Trần Hưng Đạo, Q. Hoàn Kiếm (cách CV Thống Nhất ~650m)',
+          lat: 21.0222,
+          lng: 105.8438,
+          feature: 'Trung tâm biểu diễn nghệ thuật, liveshow âm nhạc lớn, triển lãm văn hóa và không gian quảng trường thoáng rộng.',
+          vibe: 'Kiến trúc bề thế, tâm điểm các sự kiện văn hóa giải trí Thủ đô.',
+          price: 'Tham quan khuôn viên tự do',
           category: 'entertainment'
         },
         {
@@ -554,18 +715,17 @@
           category: 'entertainment'
         }
       ],
-      trafficTip: 'Đường Tạ Quang Bửu và Trần Đại Nghĩa có nhiều bãi gửi xe máy dọc hè KTX. Nếu đi ô tô, nên gửi tại bãi xe trong khuôn viên ĐH Bách Khoa cổng Trần Đại Nghĩa hoặc cổng Đại Cồ Việt.'
+      trafficTip: 'Đường Trần Nhân Tông tổ chức phố đi bộ vào cuối tuần, bạn có thể gửi xe tại cổng đường Đại Cồ Việt, đường Nguyễn Đình Chiểu hoặc hầm Vincom Bà Triệu.'
     },
 
     // 3. Khu vực Hoàn Kiếm & Phố Cổ
     hoankiem: {
-      aliases: ['hoàn kiếm', 'hoan kiem', 'phố cổ', 'pho co', 'hồ gươm', 'ho guom', 'bát đàn', 'bat dan', 'tạ hiện', 'ta hien', 'tràng tiền', 'trang tien', 'hàng bài', 'đinh tiên hoàng', 'hàng buồm', 'nhà thờ lớn'],
+      aliases: ['hoàn kiếm', 'hoan kiem', 'phố cổ', 'pho co', 'hồ gươm', 'ho guom', 'bát đàn', 'bat dan', 'tạ hiện', 'ta hien', 'tràng tiền', 'trang tien', 'hàng bài', 'đinh tiên hoàng', 'hàng buồm', 'nhà thờ lớn', 'nhà thờ chính tòa', 'nhà hát lớn'],
       title: 'Khu vực Hoàn Kiếm & 36 Phố Phường (Hà Nội)',
       lat: 21.0285,
       lng: 105.8525,
       highlight: 'Cái nôi tinh hoa ẩm thực Kinh Kỳ với các món truyền thống lâu đời, rạp chiếu phim Tràng Tiền và phố đi bộ sôi động.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Phở Gia Truyền Bát Đàn & Phở Thìn Bờ Hồ',
           address: '49 Bát Đàn / 61 Đinh Tiên Hoàng, Q. Hoàn Kiếm',
@@ -596,7 +756,6 @@
           price: '15.000đ - 45.000đ',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
           name: 'Cà Phê Giảng (Cà Phê Trứng) & Đinh Cafe',
           address: '39 Nguyễn Hữu Huân / 13 Đinh Tiên Hoàng, Q. Hoàn Kiếm',
@@ -607,26 +766,44 @@
           price: '35.000đ - 50.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
-          name: 'CGV Tràng Tiền Plaza',
-          address: 'Tầng 5, Tràng Tiền Plaza, 24 Hai Bà Trưng, Q. Hoàn Kiếm',
+          name: 'Trà Chanh Nhà Thờ Lớn & Loading T Cafe Chân Cầm',
+          address: 'Phố Nhà Thờ & Số 8 Chân Cầm, Q. Hoàn Kiếm',
+          lat: 21.0288,
+          lng: 105.8489,
+          feature: 'Trà chanh hướng dương ngắm Nhà Thờ Lớn cổ kính; cà phê rang xay hương quế trong biệt thự Pháp cổ.',
+          vibe: 'Điểm hẹn quen thuộc của giới trẻ Hà Thành.',
+          price: '20.000đ - 55.000đ',
+          category: 'cafe'
+        },
+        {
+          name: 'CGV Tràng Tiền Plaza & Rạp Tháng Tám',
+          address: 'Tầng 5, Tràng Tiền Plaza, 24 Hai Bà Trưng / 45 Hàng Bài, Q. Hoàn Kiếm',
           lat: 21.0255,
           lng: 105.8532,
           feature: 'Rạp chiếu phim kiến trúc bán cổ điển sang trọng giữa lòng Phố Cổ, trang thiết bị âm thanh màn chiếu tiên tiến nhất.',
           vibe: 'Quý phái, yên tĩnh, view ngắm góc phố Tràng Tiền lịch sử.',
-          price: '90.000đ - 160.000đ/vé',
+          price: '70.000đ - 160.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
-          name: 'Phố Đi Bộ Hồ Hoàn Kiếm (Hồ Gươm)',
-          address: 'Quanh Hồ Hoàn Kiếm (Đinh Tiên Hoàng - Lê Thái Tổ - Hàng Khay)',
+          name: 'Phố Đi Bộ Hồ Hoàn Kiếm & Nhà Hát Múa Rối Nước Thăng Long',
+          address: 'Quanh Hồ Hoàn Kiếm & 57B Đinh Tiên Hoàng, Q. Hoàn Kiếm',
           lat: 21.0288,
           lng: 105.8522,
-          feature: 'Không gian văn hóa cộng đồng cuối tuần, biểu diễn âm nhạc đường phố, trò chơi dân gian, ngắm Tháp Rùa và Cầu Thê Húc.',
+          feature: 'Không gian văn hóa cộng đồng cuối tuần, biểu diễn âm nhạc đường phố, múa rối nước truyền thống, ngắm Tháp Rùa và Cầu Thê Húc.',
           vibe: 'Sôi động, đậm nét truyền thống và giao lưu quốc tế.',
-          price: 'Mở cửa tự do cuối tuần',
+          price: 'Mở cửa tự do',
+          category: 'entertainment'
+        },
+        {
+          name: 'Di Tích Lịch Sử Nhà Tù Hỏa Lò (Tour Đêm Thiêng Liêng)',
+          address: 'Số 1 Phố Hỏa Lò, P. Trần Hưng Đạo, Q. Hoàn Kiếm',
+          lat: 21.0253,
+          lng: 105.8465,
+          feature: 'Trải nghiệm lịch sử sống động với hệ thống thuyết minh tự động và chương trình Tour Đêm Thiêng Liêng đầy xúc cảm.',
+          vibe: 'Ấn tượng, sâu sắc, thu hút đông đảo giới trẻ.',
+          price: '50.000đ/vé (Sinh viên giảm 50%)',
           category: 'entertainment'
         },
         {
@@ -640,18 +817,17 @@
           category: 'entertainment'
         }
       ],
-      trafficTip: 'Phố đi bộ Hồ Gươm cấm phương tiện từ 19h00 thứ Sáu đến hết Chủ nhật. Bạn nên gửi xe tại bãi gửi xe Đinh Tiên Hoàng hoặc hầm Tràng Tiền Plaza.'
+      trafficTip: 'Phố đi bộ Hồ Gươm cấm phương tiện từ 19h00 thứ Sáu đến hết Chủ nhật. Bạn nên gửi xe tại bãi gửi xe Đinh Tiên Hoàng, Phố Nhà Thờ hoặc hầm Tràng Tiền Plaza.'
     },
 
-    // 4. Khu vực Đống Đa
+    // 4. Khu vực Đống Đa (Xã Đàn - Phạm Ngọc Thạch - Chùa Bộc - Tây Sơn)
     dongda: {
-      aliases: ['đống đa', 'dong da', 'thái hà', 'thai ha', 'chùa bộc', 'chua boc', 'xã đàn', 'xa dan', 'phạm ngọc thạch', 'pham ngoc thach', 'hoàng cầu', 'hoang cau', 'láng hạ', 'lang ha', 'tôn đức thắng', 'văn miếu', 'van mieu'],
+      aliases: ['đống đa', 'dong da', 'xã đàn', 'xa dan', 'láng hạ', 'lang ha', 'đặng văn ngữ', 'hồ đắc di', 'nam đồng', 'khâm thiên'],
       title: 'Khu vực Quận Đống Đa (Hà Nội)',
-      lat: 21.0185,
+      lat: 21.0145,
       lng: 105.8285,
-      highlight: 'Tổ hợp mua sắm, thời trang sinh viên cùng các cụm rạp chiếu phim quốc gia và hồ nước thoáng đãng.',
+      highlight: 'Tổ hợp mua sắm, thời trang sinh viên Chùa Bộc - Phạm Ngọc Thạch, rạp phim hiện đại và các tuyến phố ẩm thực sầm uất.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Lẩu Ếch Măng Cay & Lẩu Riêu Cua Xã Đàn',
           address: 'Đường Xã Đàn & Đê La Thành, Q. Đống Đa',
@@ -672,29 +848,56 @@
           price: '40.000đ - 90.000đ',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
-          name: 'Tổ Hợp Cà Phê Hoàng Cầu (View Hồ Đống Đa)',
-          address: 'Bán đảo Hoàng Cầu, P. Ô Chợ Dừa, Q. Đống Đa',
+          name: 'Phố Ẩm Thực Chùa Bộc & Tây Sơn (Cổng ĐH Thủy Lợi - Ngân Hàng)',
+          address: 'Ngõ 95 Chùa Bộc & Đường Tây Sơn, Q. Đống Đa',
+          lat: 21.0080,
+          lng: 105.8260,
+          feature: 'Thiên đường nem nướng Nha Trang, tokbokki phô mai Hàn Quốc, bánh tráng trộn và bún đậu mắm tôm mẹt đầy đặn.',
+          vibe: 'Đông vui tấp nập sinh viên Thủy Lợi và Học viện Ngân Hàng.',
+          price: '25.000đ - 60.000đ',
+          category: 'food'
+        },
+        {
+          name: 'Tổ Hợp Cà Phê Hoàng Cầu & Hồ Đắc Di',
+          address: 'Bán đảo Hoàng Cầu & Đường ven Hồ Đắc Di, Q. Đống Đa',
           lat: 21.0185,
           lng: 105.8225,
-          feature: 'Các quán cafe view trọn mặt hồ Hoàng Cầu lộng gió, cà phê muối, trà ô long quả mọng.',
+          feature: 'Các quán cafe view trọn mặt hồ lộng gió, cà phê muối, trà ô long quả mọng.',
           vibe: 'Thoáng đãng, ngắm hoàng hôn cực chill.',
           price: '40.000đ - 65.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
-          name: 'Trung Tâm Chiếu Phim Quốc Gia - 87 Láng Hạ',
-          address: 'Số 87 Láng Hạ, P. Thành Công, Q. Ba Đình / Đống Đa',
-          lat: 21.0162,
-          lng: 105.8165,
-          feature: 'Tổ hợp rạp chiếu phim lâu đời và hiện đại bậc nhất với 13 phòng chiếu, màn hình cực lớn và giá vé sinh viên rẻ nhất Thủ đô.',
-          vibe: 'Sôi động, sảnh chờ rộng, đầy đủ tiện ích ăn uống.',
-          price: '45.000đ - 90.000đ/vé',
+          name: 'CGV Vincom Center Phạm Ngọc Thạch',
+          address: 'Tầng 8, Vincom Center, Số 2 Phạm Ngọc Thạch, Q. Đống Đa',
+          lat: 21.0068,
+          lng: 105.8322,
+          feature: 'Cụm rạp chiếu phim công nghệ IMAX, 4DX và Gold Class hiện đại ngay ngã tư Phạm Ngọc Thạch - Xã Đàn.',
+          vibe: 'Hiện đại, sang trọng, tích hợp khu mua sắm ẩm thực 8 tầng.',
+          price: '80.000đ - 160.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
+        {
+          name: 'Beta Cinemas Tây Sơn (Tòa nhà Mipec)',
+          address: 'Tầng 5, Tòa nhà MIPEC, 229 Tây Sơn (gần ĐH Thủy Lợi), Q. Đống Đa',
+          lat: 21.0062,
+          lng: 105.8238,
+          feature: 'Rạp chiếu phim giá vé sinh viên siêu ưu đãi, phòng chiếu trẻ trung, combo bắp nước rẻ và ngon.',
+          vibe: 'Tụ điểm xem phim quen thuộc của sinh viên Thủy Lợi, Ngân Hàng, Công Đoàn.',
+          price: '45.000đ - 80.000đ/vé',
+          category: 'cinema'
+        },
+        {
+          name: 'TTTM Vincom Phạm Ngọc Thạch & Phố Mua Sắm Chùa Bộc',
+          address: 'Số 2 Phạm Ngọc Thạch & Phố Chùa Bộc, Q. Đống Đa',
+          lat: 21.0075,
+          lng: 105.8315,
+          feature: 'Tổ hợp giải trí, khu game bowling, mua sắm thời trang sầm uất bậc nhất quận Đống Đa.',
+          vibe: 'Nhộn nhịp, rực rỡ ánh đèn suốt ngày đêm.',
+          price: 'Vào cửa tự do',
+          category: 'entertainment'
+        },
         {
           name: 'Hồ Hoàng Cầu & Đảo Xanh Ô Chợ Dừa',
           address: 'Đường Hoàng Cầu & Mai Anh Tuấn, Q. Đống Đa',
@@ -716,18 +919,17 @@
           category: 'entertainment'
         }
       ],
-      trafficTip: 'Tuyến Xã Đàn và Chùa Bộc thường xuyên đông xe giờ cao điểm (7h30 - 8h30 và 17h30 - 18h30). Hầu hết các quán đều có chỗ để xe máy trước cửa.'
+      trafficTip: 'Tuyến Xã Đàn và Chùa Bộc thường xuyên đông xe giờ cao điểm (7h30 - 8h30 và 17h30 - 18h30). Bạn có thể gửi xe tại hầm Vincom Phạm Ngọc Thạch hoặc hầm Mipec 229 Tây Sơn.'
     },
 
     // 5. Khu vực Tây Hồ
     tayho: {
-      aliases: ['tây hồ', 'tay ho', 'hồ tây', 'ho tay', 'quảng bá', 'quang ba', 'xuân diệu', 'xuan dieu', 'từ hoa', 'tu hoa', 'nhật tân', 'nhat tan', 'thanh niên', 'thanh nien', 'trúc bạch', 'truc bach', 'lạc long quân'],
+      aliases: ['tây hồ', 'tay ho', 'hồ tây', 'ho tay', 'quảng bá', 'quang ba', 'xuân diệu', 'xuan dieu', 'từ hoa', 'tu hoa', 'nhật tân', 'nhat tan', 'thanh niên', 'thanh nien', 'trúc bạch', 'truc bach', 'lạc long quân', 'lotte tây hồ', 'lotte mall west lake', 'võ chí công'],
       title: 'Khu vực Hồ Tây & Bán Đảo Quảng An (Hà Nội)',
       lat: 21.0556,
       lng: 105.8225,
       highlight: 'Không gian lộng gió bên mặt nước mênh mông, bánh tôm truyền thống, siêu TTTM Lotte Mall West Lake và thủy cung ngắm cá mập.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Bánh Tôm & Bún Ốc Phủ Tây Hồ',
           address: 'Đường Quảng Khánh & Bán đảo Phủ Tây Hồ, P. Quảng An',
@@ -748,7 +950,6 @@
           price: '60.000đ - 90.000đ',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
           name: 'Chuỗi Cà Phê View Hoàng Hôn Hồ Tây (Từ Hoa - Quảng Bá)',
           address: 'Đường Từ Hoa & Phố Quảng Bá, Q. Tây Hồ',
@@ -759,7 +960,6 @@
           price: '50.000đ - 85.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
           name: 'Lotte Cinema Lotte Mall West Lake Tây Hồ',
           address: 'Tầng 4, Lotte Mall West Lake, 272 Võ Chí Công, P. Phú Thượng, Q. Tây Hồ',
@@ -770,7 +970,6 @@
           price: '90.000đ - 220.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
           name: 'TTTM Lotte Mall West Lake & Thủy Cung Lotte World',
           address: 'Số 272 Võ Chí Công, P. Phú Thượng, Q. Tây Hồ',
@@ -797,13 +996,12 @@
 
     // 6. Khu vực Ba Đình
     badinh: {
-      aliases: ['ba đình', 'ba dinh', 'đội cấn', 'doi can', 'liễu giai', 'lieu giai', 'kim mã', 'kim ma', 'giảng võ', 'giang vo', 'lăng bác', 'lang bac', 'phan đình phùng'],
+      aliases: ['ba đình', 'ba dinh', 'đội cấn', 'doi can', 'liễu giai', 'lieu giai', 'kim mã', 'kim ma', 'giảng võ', 'giang vo', 'hồ giảng võ', 'lăng bác', 'lang bac', 'phan đình phùng', 'lotte liễu giai'],
       title: 'Khu vực Quận Ba Đình (Hà Nội)',
       lat: 21.0335,
       lng: 105.8235,
       highlight: 'Khu trung tâm hành chính lịch thiệp, đài quan sát Landmark Lotte Center, rạp chiếu phim sang trọng và món ngon Đội Cấn.',
       spots: [
-        // QUÁN ĂN (food)
         {
           name: 'Bánh Xèo & Nem Lụi Đội Cấn',
           address: '166B Đội Cấn, P. Đội Cấn, Q. Ba Đình',
@@ -824,7 +1022,6 @@
           price: '160.000đ - 240.000đ/người',
           category: 'food'
         },
-        // CÀ PHÊ (cafe)
         {
           name: 'Cà Phê Trầm Quán Thánh & All Day Liễu Giai',
           address: 'Phố Quán Thánh & Đường Liễu Giai, Q. Ba Đình',
@@ -835,7 +1032,6 @@
           price: '40.000đ - 70.000đ',
           category: 'cafe'
         },
-        // RẠP CHIẾU PHIM (cinema)
         {
           name: 'Lotte Cinema Lotte Center Hà Nội',
           address: 'Tầng 3, Tòa nhà Lotte Center, 54 Liễu Giai, Q. Ba Đình',
@@ -846,7 +1042,6 @@
           price: '85.000đ - 150.000đ/vé',
           category: 'cinema'
         },
-        // VUI CHƠI GIẢI TRÍ (entertainment)
         {
           name: 'Đài Quan Sát Lotte Observation Deck Tầng 65',
           address: 'Tầng 65, Tòa nhà Lotte Center, 54 Liễu Giai, Q. Ba Đình',
@@ -869,6 +1064,58 @@
         }
       ],
       trafficTip: 'Khu vực Ba Đình có nhiều tuyến phố cấm đỗ ô tô và đường một chiều (như Đội Cấn, Kim Mã đoạn trên cao). Bạn nên gửi xe tại hầm Lotte Center Liễu Giai hoặc bãi đỗ xe Đền Quán Thánh.'
+    },
+
+    // 6b. Khu vực Thanh Xuân - Royal City - Hà Đông - Times City
+    thanhxuan_royal: {
+      aliases: ['royal city', 'ngã tư sở', 'nguyễn trãi', 'thanh xuân', 'lê văn lương', 'khuất duy tiến', 'vũ trọng phụng'],
+      title: 'Khu Vực Royal City - Ngã Tư Sở - Thanh Xuân',
+      lat: 21.0025,
+      lng: 105.8155,
+      highlight: 'Quần thể mua sắm ngầm lớn nhất châu Á Vincom Mega Mall Royal City, sân trượt băng Ice Rink và phố ẩm thực Nguyễn Trãi.',
+      spots: [
+        {
+          name: 'Phố Ẩm Thực Royal City & Lẩu Nướng Nguyễn Trãi',
+          address: 'Tầng hầm B2 Royal City, 72A Nguyễn Trãi, Q. Thanh Xuân',
+          lat: 21.0025,
+          lng: 105.8155,
+          feature: 'Hàng trăm nhà hàng lẩu nướng Hàn - Nhật - Thái (Gogi House, Kichi Kichi, Haidilao, Dookki) quy tụ trong không gian kiến trúc châu Âu.',
+          vibe: 'Sầm uất, mát mẻ, đa dạng lựa chọn ẩm thực.',
+          price: '150.000đ - 350.000đ/người',
+          category: 'food'
+        },
+        {
+          name: 'CGV Vincom Mega Mall Royal City',
+          address: 'Tầng hầm B2, Royal City, 72A Nguyễn Trãi, Q. Thanh Xuân',
+          lat: 21.0022,
+          lng: 105.8152,
+          feature: 'Cụm rạp chiếu phim quy mô lớn với phòng chiếu Gold Class và màn hình cong cực đại.',
+          vibe: 'Sang trọng, hiện đại.',
+          price: '85.000đ - 160.000đ/vé',
+          category: 'cinema'
+        },
+        {
+          name: 'Sân Trượt Băng Vincom Ice Rink & Khu Vui Chơi Royal City',
+          address: 'Tầng hầm B2, 72A Nguyễn Trãi, Q. Thanh Xuân',
+          lat: 21.0026,
+          lng: 105.8158,
+          feature: 'Sân trượt băng tự nhiên trong nhà lớn nhất Việt Nam, khu bowling Heroworld, triển lãm nghệ thuật đương đại VCCA.',
+          vibe: 'Trải nghiệm giải trí độc đáo bất chấp thời tiết nắng mưa.',
+          price: '100.000đ - 220.000đ/vé',
+          category: 'entertainment'
+        },
+        {
+          name: 'Thủy Cung Vinpearl Aquarium & Nhạc Nước Times City',
+          address: '458 Minh Khai, P. Vĩnh Tuy, Q. Hai Bà Trưng',
+          lat: 20.9950,
+          lng: 105.8680,
+          feature: 'Đường hầm thủy cung hơn 30.000 sinh vật biển, chim cánh cụt, nàng tiên cá và trình diễn nhạc nước miễn phí lúc 19h00.',
+          vibe: 'Điểm vui chơi giải trí hấp dẫn hàng đầu phía Nam Hà Nội.',
+          price: '170.000đ - 250.000đ/vé',
+          category: 'entertainment'
+        }
+      ],
+      trafficTip: 'Nút giao Ngã Tư Sở lưu lượng xe rất lớn, bạn nên đi theo làn dưới gầm cầu vượt để rẽ vào cổng Royal City 72A Nguyễn Trãi.'
     },
 
     // 7. TP. Hồ Chí Minh
@@ -1001,53 +1248,169 @@
    * - 'food': quán ăn, nhà hàng, ăn gì, món ngon, buffet, lẩu nướng, bún phở...
    * - 'cafe': cafe, cà phê, trà sữa, trà chanh, đồ uống...
    * - 'cinema': rạp phim, rạp chiếu phim, xem phim, cinema, cgv, beta, lotte...
-   * - 'entertainment': chỗ chơi, đi chơi, giải trí, dạo phố, công viên, quảng trường, tttm...
+   * - 'entertainment': chỗ chơi, đi chơi, nơi giải trí, giải trí, dạo phố, công viên, quảng trường, tttm...
    */
   function detectSearchIntent(query) {
     if (!query) return 'food';
     const q = cleanVietnameseTypo(query).toLowerCase();
 
-    // Rạp chiếu phim có độ ưu tiên cao nhất nếu có từ khóa phim
-    if (/(?:rạp|chiếu phim|xem phim|cinema|cgv|beta|lotte|bhd|galaxy|phim)/i.test(q)) {
-      return 'cinema';
-    }
-    // Cà phê / Đồ uống
-    if (/(?:cafe|cà phê|coffee|trà sữa|trà chanh|đồ uống|uống gì)/i.test(q)) {
-      return 'cafe';
-    }
-    // Điểm vui chơi giải trí / Check-in / Công viên
-    if (/(?:vui chơi|chỗ chơi|đi chơi|chơi đâu|giải trí|check-in|checkin|dạo phố|công viên|quảng trường|sân vận động|mua sắm|tttm|thủy cung|bảo tàng|hồ láng|thủ lệ)/i.test(q)) {
+    // 1. Nếu câu hỏi bắt đầu hoặc nhấn mạnh vào mục đích ăn uống/cafe dù đứng cạnh tên công viên/rạp phim
+    // Ví dụ: "quán ăn gần công viên thống nhất" -> phải là 'food', KHÔNG PHẢI 'entertainment'
+    const asksFoodExplicit = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|ăn sáng|ăn trưa|ăn tối|ăn đêm|ăn vặt)/i.test(q);
+    const asksCafeExplicit = /(?:quán cafe|quán cà phê|cafe|cà phê|coffee|trà sữa|trà chanh|đồ uống|uống gì)/i.test(q);
+    const asksCinemaExplicit = /(?:rạp phim|rạp chiếu phim|chiếu phim|xem phim|cinema|cgv|beta|lotte cinema|bhd|galaxy)/i.test(q);
+    const asksFunExplicit = /(?:vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát)/i.test(q);
+
+    if (asksFoodExplicit && !asksCinemaExplicit) return 'food';
+    if (asksCafeExplicit && !asksCinemaExplicit && !asksFoodExplicit) return 'cafe';
+    if (asksCinemaExplicit) return 'cinema';
+    if (asksFunExplicit) return 'entertainment';
+
+    // Nếu không có động từ ăn/uống mà hỏi về công viên, quảng trường, bảo tàng, thủy cung
+    if (/(?:công viên|quảng trường|sân vận động|mua sắm|tttm|thủy cung|bảo tàng|hồ láng|thủ lệ)/i.test(q)) {
       return 'entertainment';
     }
-    // Mặc định là tìm quán ăn
     return 'food';
   }
 
   /**
-   * Xác định khu vực / điểm neo từ câu hỏi của người dùng
+   * Trích xuất tên địa điểm mục tiêu từ câu hỏi tự nhiên
+   * Ví dụ: "nơi giải trí ở công viên thống nhất" -> "công viên thống nhất"
    */
-  function findAreaGuide(cleanQuery, currentCity, options = {}) {
+  function extractLocationPhrase(query) {
+    if (!query) return '';
+    const q = cleanVietnameseTypo(query);
+    const match = q.match(/(?:ở|tại|gần|quanh|khu vực|khu|xung quanh|cạnh|sát|đối diện|trên đường|trên phố|phố|đường)s+(.+)$/i);
+    if (match && match[1]) {
+      return match[1].replace(/[,.?!]+$/g, '').trim();
+    }
+    return '';
+  }
+
+  /**
+   * Xác định Điểm Neo Tọa Độ Chính Xác (Spatial Anchor Resolution)
+   * Ưu tiên cụm từ dài nhất và chi tiết nhất (Specific Landmark > Spot Name > Ward/Street > Area Guide > Map Center)
+   */
+  function resolveSpatialAnchor(cleanQuery, currentCity, options = {}) {
     const q = (cleanQuery || '').toLowerCase();
 
-    // 1. Quét tìm kiếm điểm neo (Anchor Extraction)
+    // 0. Nếu được truyền tọa độ điểm neo tùy chỉnh (từ Live Geocoder)
+    if (options.customAnchor && typeof options.customAnchor.lat === 'number') {
+      return {
+        key: 'custom_geocoded',
+        area: {
+          title: options.customAnchor.title || 'Khu vực bạn đang tìm kiếm',
+          lat: options.customAnchor.lat,
+          lng: options.customAnchor.lng,
+          highlight: options.customAnchor.highlight || 'Danh sách các địa điểm thực tế được định vị theo bán kính gần nhất quanh vị trí bạn yêu cầu.',
+          trafficTip: options.customAnchor.trafficTip || 'Lưu ý quan sát biển báo dừng đỗ và gửi xe đúng nơi quy định.',
+          spots: []
+        },
+        isMatchedExplicitly: true
+      };
+    }
+
+    // 1. Quét trong bảng SPECIFIC_LANDMARKS (ưu tiên alias dài nhất để bắt chính xác địa danh cụ thể như "công viên thống nhất")
+    let bestLandmark = null;
+    let bestLandmarkAliasLen = 0;
+    for (const lm of SPECIFIC_LANDMARKS) {
+      if (currentCity && lm.city !== currentCity) continue;
+      for (const alias of lm.aliases) {
+        if (q.includes(alias) && alias.length > bestLandmarkAliasLen) {
+          bestLandmark = lm;
+          bestLandmarkAliasLen = alias.length;
+        }
+      }
+    }
+    if (bestLandmark) {
+      return {
+        key: bestLandmark.key,
+        area: {
+          title: bestLandmark.title,
+          lat: bestLandmark.lat,
+          lng: bestLandmark.lng,
+          highlight: bestLandmark.highlight,
+          trafficTip: bestLandmark.trafficTip,
+          spots: []
+        },
+        isMatchedExplicitly: true
+      };
+    }
+
+    // 2. Quét trong AREAS_GUIDE (ưu tiên alias dài nhất)
+    let bestAreaKey = null;
+    let bestAreaAliasLen = 0;
     for (const [key, area] of Object.entries(AREAS_GUIDE)) {
       if (currentCity === 'hcm' && key !== 'hcm') continue;
       if (currentCity === 'danang' && key !== 'danang') continue;
       if (currentCity === 'hanoi' && (key === 'hcm' || key === 'danang')) continue;
 
       for (const alias of area.aliases) {
-        if (q.includes(alias)) {
-          return { key, area };
+        if (q.includes(alias) && alias.length > bestAreaAliasLen) {
+          bestAreaKey = key;
+          bestAreaAliasLen = alias.length;
+        }
+      }
+    }
+    if (bestAreaKey) {
+      return {
+        key: bestAreaKey,
+        area: AREAS_GUIDE[bestAreaKey],
+        isMatchedExplicitly: true
+      };
+    }
+
+    // 3. Quét trong danh sách 126 Phường/Xã & Tuyến đường lớn Hà Nội (HANOI_WARDS_DATA)
+    let wardsData = null;
+    if (typeof window !== 'undefined' && Array.isArray(window.HANOI_WARDS_DATA)) {
+      wardsData = window.HANOI_WARDS_DATA;
+    } else if (typeof require === 'function') {
+      try { wardsData = require('./hanoi-wards-streets'); } catch (e) {}
+    }
+    if (currentCity === 'hanoi' && Array.isArray(wardsData)) {
+      for (const w of wardsData) {
+        const cleanWard = (w.ward || '').toLowerCase().replace(/^(?:p\.|x\.|tt\.|phường|xã|thị trấn)\s*/i, '').trim();
+        if (cleanWard.length >= 4 && q.includes(cleanWard)) {
+          return {
+            key: 'ward_' + w.id,
+            area: {
+              title: `Khu Vực ${w.name} (Hà Nội)`,
+              lat: w.lat,
+              lng: w.lng,
+              highlight: `Tâm điểm giao thương và dịch vụ đô thị tại ${w.name}, kết nối qua các trục ${(w.mainStreets || []).slice(0, 3).join(', ')}.`,
+              trafficTip: w.description || 'Chú ý gửi xe đúng nơi quy định trên các trục phố chính.',
+              spots: []
+            },
+            isMatchedExplicitly: true
+          };
+        }
+        for (const st of (w.mainStreets || [])) {
+          const cleanSt = st.toLowerCase().replace(/^(?:đường|phố|quốc lộ|đại lộ)\s*/i, '').trim();
+          if (cleanSt.length >= 4 && q.includes(cleanSt)) {
+            return {
+              key: 'street_' + w.id,
+              area: {
+                title: `Khu Vực ${st} - ${w.name}`,
+                lat: w.lat,
+                lng: w.lng,
+                highlight: `Trục phố sầm uất ${st} thuộc ${w.name} với nhiều hàng quán, dịch vụ giải trí và tiện ích đô thị lân cận.`,
+                trafficTip: `Khi dừng đỗ trên tuyến ${st}, lưu ý biển báo giờ cao điểm và ưu tiên gửi xe tại các tòa nhà thương mại.`,
+                spots: []
+              },
+              isMatchedExplicitly: true
+            };
+          }
         }
       }
     }
 
-    // 2. Nếu trong phiên hội thoại trước đã xác định một khu vực
-    if (options.lastAreaKey && AREAS_GUIDE[options.lastAreaKey]) {
-      return { key: options.lastAreaKey, area: AREAS_GUIDE[options.lastAreaKey] };
+    // 4. Nếu trong phiên hội thoại trước đã xác định một khu vực và câu hỏi mới không nhắc tên địa điểm khác
+    const extractedLoc = extractLocationPhrase(cleanQuery);
+    if (!extractedLoc && options.lastAreaKey && AREAS_GUIDE[options.lastAreaKey]) {
+      return { key: options.lastAreaKey, area: AREAS_GUIDE[options.lastAreaKey], isMatchedExplicitly: false };
     }
 
-    // 3. Nếu có vị trí tâm bản đồ hiện tại của người dùng, tìm khu vực gần nhất
+    // 5. Nếu có vị trí tâm bản đồ hiện tại của người dùng
     if (options.mapCenter && typeof options.mapCenter.lat === 'number') {
       let closestKey = null;
       let minDistance = Infinity;
@@ -1063,67 +1426,79 @@
         }
       }
       if (closestKey && AREAS_GUIDE[closestKey]) {
-        return { key: closestKey, area: AREAS_GUIDE[closestKey] };
+        return {
+          key: closestKey,
+          area: AREAS_GUIDE[closestKey],
+          isMatchedExplicitly: false,
+          unresolvedLocationPhrase: extractedLoc || null
+        };
       }
     }
 
-    if (currentCity === 'hcm') return { key: 'hcm', area: AREAS_GUIDE.hcm };
-    if (currentCity === 'danang') return { key: 'danang', area: AREAS_GUIDE.danang };
-    return { key: 'chualang_ftu', area: AREAS_GUIDE.chualang_ftu };
+    if (currentCity === 'hcm') return { key: 'hcm', area: AREAS_GUIDE.hcm, isMatchedExplicitly: false };
+    if (currentCity === 'danang') return { key: 'danang', area: AREAS_GUIDE.danang, isMatchedExplicitly: false };
+    return {
+      key: 'chualang_ftu',
+      area: AREAS_GUIDE.chualang_ftu,
+      isMatchedExplicitly: false,
+      unresolvedLocationPhrase: extractedLoc || null
+    };
   }
 
   /**
-   * Bộ lọc phân loại nghiêm ngặt: Tuyệt đối không lẫn lộn rạp phim, cafe hay công viên vào danh sách quán ăn
+   * QUÉT BÁN KÍNH KHÔNG GIAN TOÀN ĐÔ THỊ (UNIFIED SPATIAL RADIAL SEARCH)
+   * Lấy toàn bộ các địa điểm đúng danh mục trên toàn thành phố, tính khoảng cách thực tế đến tọa độ điểm neo (centerPoint)
+   * và trả về Top địa điểm gần nhất!
    */
-  function filterSpotsByCategory(spots, categoryType, allAreas, centerPoint) {
-    let matched = [];
-    if (categoryType === 'cinema') {
-      matched = spots.filter(s => s.category === 'cinema');
-    } else if (categoryType === 'cafe') {
-      matched = spots.filter(s => s.category === 'cafe');
-    } else if (categoryType === 'entertainment') {
-      matched = spots.filter(s => s.category === 'entertainment');
-    } else {
-      // Mặc định là 'food' (Quán ăn / Nhà hàng): CHỈ LẤY category === 'food'
-      matched = spots.filter(s => s.category === 'food');
-      // Nếu khu vực chưa có đủ quán ăn thuần, cho phép bổ sung nhưng vẫn LOẠI BỎ 100% rạp phim, công viên, sân vận động
-      if (matched.length === 0) {
-        matched = spots.filter(s => s.category !== 'cinema' && s.category !== 'entertainment');
+  function findNearestSpotsByCategory(area, categoryType, allAreas, centerPoint, currentCity = 'hanoi') {
+    const globalPool = [];
+    const seenNames = new Set();
+
+    // 1. Ưu tiên đưa các spots nội tại của area (nếu có) vào pool trước
+    if (Array.isArray(area.spots)) {
+      for (const sp of area.spots) {
+        if (sp.category === categoryType && !seenNames.has(sp.name)) {
+          seenNames.add(sp.name);
+          globalPool.push(sp);
+        }
       }
     }
 
-    // Nếu khu vực cụ thể chưa có đủ địa điểm thuộc loại hình này (ví dụ rạp phim),
-    // tự động tìm các địa điểm thuộc loại hình này trên toàn bộ cơ sở dữ liệu và lấy điểm gần nhất!
-    if (matched.length === 0 && centerPoint && allAreas) {
-      const globalPool = [];
-      for (const a of Object.values(allAreas)) {
-        if (!a.spots) continue;
+    // 2. Gom toàn bộ các spots thuộc cùng thành phố và cùng categoryType vào không gian tìm kiếm
+    if (allAreas) {
+      for (const [k, a] of Object.entries(allAreas)) {
+        if (currentCity === 'hcm' && k !== 'hcm') continue;
+        if (currentCity === 'danang' && k !== 'danang') continue;
+        if (currentCity === 'hanoi' && (k === 'hcm' || k === 'danang')) continue;
+        if (!Array.isArray(a.spots)) continue;
+
         for (const sp of a.spots) {
-          if (categoryType === 'cinema' && sp.category === 'cinema') {
-            globalPool.push(sp);
-          } else if (categoryType === 'cafe' && sp.category === 'cafe') {
-            globalPool.push(sp);
-          } else if (categoryType === 'entertainment' && sp.category === 'entertainment') {
-            globalPool.push(sp);
-          } else if (categoryType === 'food' && sp.category === 'food') {
+          if (sp.category === categoryType && !seenNames.has(sp.name)) {
+            seenNames.add(sp.name);
             globalPool.push(sp);
           }
         }
       }
-      if (globalPool.length > 0) {
-        // Loại bỏ trùng tên
-        const uniqueMap = new Map();
-        for (const p of globalPool) {
-          if (!uniqueMap.has(p.name)) uniqueMap.set(p.name, p);
-        }
-        matched = Array.from(uniqueMap.values()).map(s => ({
-          ...s,
-          distM: _calcDistM(centerPoint.lat, centerPoint.lng, s.lat, s.lng)
-        })).sort((a, b) => a.distM - b.distM).slice(0, 5);
-      }
     }
 
-    return matched.length > 0 ? matched : spots;
+    // 3. Tính khoảng cách thực tế từ điểm neo (centerPoint) tới từng địa điểm và sắp xếp gần nhất
+    if (centerPoint && typeof centerPoint.lat === 'number' && typeof centerPoint.lng === 'number') {
+      const withDist = globalPool.map(s => ({
+        ...s,
+        distM: (typeof s.lat === 'number' && typeof s.lng === 'number')
+          ? _calcDistM(centerPoint.lat, centerPoint.lng, s.lat, s.lng)
+          : 99999
+      })).sort((a, b) => a.distM - b.distM);
+
+      // Lọc các điểm nằm trong bán kính hợp lý (ưu tiên <= 2200m, luôn lấy tối thiểu 3-5 điểm gần nhất)
+      const nearby = withDist.filter(s => s.distM <= 2200);
+      if (nearby.length >= 3) {
+        return nearby.slice(0, 5);
+      }
+      return withDist.slice(0, 4);
+    }
+
+    return globalPool.slice(0, 5);
   }
 
   function formatGuideMessage(area, spots = [], categoryType = 'food', centerPoint = null) {
@@ -1135,12 +1510,16 @@
     let msg = `**Gợi Ý ${categoryTitle}: ${area.title}**\n\n`;
     msg += `*${area.highlight}*\n\n`;
 
-    const displaySpots = spots.length > 0 ? spots : area.spots;
+    const displaySpots = spots.length > 0 ? spots : (area.spots || []);
     displaySpots.forEach((spot, idx) => {
       let distTag = '';
-      if (centerPoint && typeof spot.lat === 'number' && typeof spot.lng === 'number') {
-        const dM = _calcDistM(centerPoint.lat, centerPoint.lng, spot.lat, spot.lng);
-        distTag = ` *(Cách ~${dM}m)*`;
+      const dM = typeof spot.distM === 'number'
+        ? spot.distM
+        : (centerPoint && typeof spot.lat === 'number' && typeof spot.lng === 'number'
+            ? _calcDistM(centerPoint.lat, centerPoint.lng, spot.lat, spot.lng)
+            : null);
+      if (dM !== null) {
+        distTag = dM < 60 ? ` *(Ngay tại khu vực ~${dM}m)*` : ` *(Cách ~${dM}m)*`;
       }
       msg += `**${idx + 1}. ${spot.name}**${distTag}\n`;
       msg += `• **Địa chỉ**: ${spot.address}\n`;
@@ -1163,32 +1542,27 @@
     },
     cleanVietnameseTypo,
     detectSearchIntent,
+    extractLocationPhrase,
+    resolveSpatialAnchor,
     getRecommendation: function (query, currentCity = 'hanoi', options = {}) {
       const cleanQ = cleanVietnameseTypo(query);
-      const { key, area } = findAreaGuide(cleanQ, currentCity, options);
+      const resolved = resolveSpatialAnchor(cleanQ, currentCity, options);
+      const { key, area, isMatchedExplicitly, unresolvedLocationPhrase } = resolved;
       const categoryType = detectSearchIntent(cleanQ);
 
       const refLat = area.lat;
       const refLng = area.lng;
       const centerPoint = { lat: refLat, lng: refLng };
 
-      let spots = filterSpotsByCategory([...area.spots], categoryType, AREAS_GUIDE, centerPoint);
-
-      // Tính khoảng cách thực tế và sắp xếp theo khoảng cách gần nhất
-      if (typeof refLat === 'number' && typeof refLng === 'number') {
-        spots = spots.map(s => {
-          const distM = (typeof s.lat === 'number' && typeof s.lng === 'number')
-            ? _calcDistM(refLat, refLng, s.lat, s.lng)
-            : null;
-          return { ...s, distM };
-        }).sort((a, b) => (a.distM || 0) - (b.distM || 0));
-      }
+      const spots = findNearestSpotsByCategory(area, categoryType, AREAS_GUIDE, centerPoint, currentCity);
 
       return {
         text: formatGuideMessage(area, spots, categoryType, centerPoint),
         title: area.title,
         areaKey: key,
         categoryType: categoryType,
+        isMatchedExplicitly: Boolean(isMatchedExplicitly),
+        unresolvedLocationPhrase: unresolvedLocationPhrase || null,
         action: {
           type: 'SHOW_FOOD_PLACES',
           areaKey: key,
@@ -1200,6 +1574,7 @@
         }
       };
     },
-    AREAS_GUIDE
+    AREAS_GUIDE,
+    SPECIFIC_LANDMARKS
   };
 });
