@@ -82,6 +82,12 @@ class CrowdsourceService {
 
       // Vẽ lại dữ liệu cho thành phố hiện tại & cập nhật bộ đếm
       window.appState.renderAllData();
+
+      // [LIVE RE-ROUTING]: Nếu người dùng đang mở bảng chỉ đường và đã có lộ trình, tự động tính lại đường vòng né sự cố mới
+      if (window.appState.isDirectionsOpen && window.appState.routeLocations?.origin && window.appState.routeLocations?.destination) {
+        window.appState.showToast(`Phát hiện báo cáo sự cố mới tại ${report.locationName || report.name || 'khu vực lân cận'} — Đang tự động cập nhật lại lộ trình an toàn!`, 'warning', 4000);
+        window.appState.calculateSmartRoute();
+      }
     }
   }
 

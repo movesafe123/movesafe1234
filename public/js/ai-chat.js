@@ -32,7 +32,10 @@ class AIChat {
         }
         if (chatInput) chatInput.value = transcript;
 
-        window.appState?.showToast?.(`Đã nhận diện: "${transcript}"`, 'info', 2500);
+        if (window.appState) {
+          window.appState._shouldAnnounceRouteVoice = true;
+          window.appState.showToast?.(`Đã nhận diện: "${transcript}"`, 'info', 2500);
+        }
         this.open();
         this.sendMessage(transcript);
         this.stopListening();

@@ -82,6 +82,12 @@ class CrowdsourceService {
 
       // Vẽ lại dữ liệu cho thành phố hiện tại & cập nhật bộ đếm
       window.appState.renderAllData();
+
+      // [LIVE RE-ROUTING]: Nếu người dùng đang mở bảng chỉ đường và đã có lộ trình, tự động tính lại đường vòng né sự cố mới
+      if (window.appState.isDirectionsOpen && window.appState.routeLocations?.origin && window.appState.routeLocations?.destination) {
+        window.appState.showToast(`Phát hiện báo cáo sự cố mới tại ${report.locationName || report.name || 'khu vực lân cận'} — Đang tự động cập nhật lại lộ trình an toàn!`, 'warning', 4000);
+        window.appState.calculateSmartRoute();
+      }
     }
   }
 
@@ -95,7 +101,12 @@ class CrowdsourceService {
       });
       const data = await res.json();
       if (data.status === 'success') {
-        alert(voteType === 'up' ? 'Cảm ơn bạn đã xác nhận tình trạng!' : 'Cảm ơn bạn đã báo đường thông thoáng!');
+        const msg = voteType === 'up' ? 'Cảm ơn bạn đã xác nhận tình trạng!' : 'Cảm ơn bạn đã báo đường thông thoáng!';
+        if (window.appState && typeof window.appState.showToast === 'function') {
+          window.appState.showToast(msg, 'success');
+        } else {
+          alert(msg);
+        }
         if (data.action === 'removed') {
           if (window.appState && window.appState.liveData) {
             window.appState.liveData.floodPoints = window.appState.liveData.floodPoints.filter(p => p.id !== reportId);
@@ -104,10 +115,19 @@ class CrowdsourceService {
           }
         }
       } else {
-        alert(data.message || 'Không thể gửi bình chọn');
+        const errMsg = data.message || 'Không thể gửi bình chọn';
+        if (window.appState && typeof window.appState.showToast === 'function') {
+          window.appState.showToast(errMsg, 'warning');
+        } else {
+          alert(errMsg);
+        }
       }
     } catch (err) {
-      alert('Đã ghi nhận ý kiến của bạn vào bộ nhớ cục bộ.');
+      if (window.appState && typeof window.appState.showToast === 'function') {
+        window.appState.showToast('Đã ghi nhận ý kiến của bạn vào bộ nhớ cục bộ.', 'info');
+      } else {
+        alert('Đã ghi nhận ý kiến của bạn vào bộ nhớ cục bộ.');
+      }
     }
   }
 

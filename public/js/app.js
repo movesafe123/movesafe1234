@@ -952,7 +952,7 @@ class GoogleMapsApp {
       }
       clearTimeout(mainSearchDebounce);
       if (val.length < 2) {
-        if (mainDropdown) mainDropdown.style.display = 'none';
+        this.renderQuickDiscoveryDropdown();
         return;
       }
       mainSearchDebounce = setTimeout(() => {
@@ -964,6 +964,15 @@ class GoogleMapsApp {
       const val = searchInput.value.trim();
       if (val.length >= 2) {
         this.renderMainSearchSuggestions(val);
+      } else {
+        this.renderQuickDiscoveryDropdown();
+      }
+    });
+
+    searchInput?.addEventListener('click', () => {
+      const val = searchInput.value.trim();
+      if (val.length < 2) {
+        this.renderQuickDiscoveryDropdown();
       }
     });
 
@@ -1140,14 +1149,22 @@ class GoogleMapsApp {
     });
 
     document.getElementById('btn-comfort-refresh')?.addEventListener('click', () => {
-      this.openCommuteComfortModal();
+      const lat = this._comfortTarget?.lat;
+      const lng = this._comfortTarget?.lng;
+      const name = this._comfortTarget?.name;
+      this.openCommuteComfortModal(lat, lng, name);
       this.showToast('Đang cập nhật chỉ số thoải mái & 15P Nowcasting...', 'info', 2000);
     });
 
     document.getElementById('btn-comfort-route')?.addEventListener('click', () => {
       document.getElementById('modal-commute-comfort')?.classList.remove('open');
       this.toggleDirectionsPanel(true);
-      this.showToast('Đã mở chỉ đường. Hãy chọn điểm đến để hệ thống tìm lộ trình râm mát & né ngập!', 'info', 3500);
+      if (this._comfortTarget && typeof this._comfortTarget.lat === 'number') {
+        this.routeToLocation(this._comfortTarget.lat, this._comfortTarget.lng, this._comfortTarget.name);
+        this.showToast(`Đang tìm lộ trình râm mát & né ngập đến ${this._comfortTarget.name}!`, 'info', 3500);
+      } else {
+        this.showToast('Đã mở chỉ đường. Hãy chọn điểm đến để hệ thống tìm lộ trình râm mát & né ngập!', 'info', 3500);
+      }
     });
 
     // 5. Nút tìm đường trong bảng Directions
@@ -1303,6 +1320,11 @@ class GoogleMapsApp {
       this.setSimulationMode(!this.isSimulationMode, true);
     });
 
+    // Nút [Demo Né ngập 1-Click] trên Floating Banner
+    document.getElementById('btn-demo-flood-route')?.addEventListener('click', () => {
+      this.triggerOneClickFloodDemo();
+    });
+
     // Nút [Đổi kịch bản] trên Floating Banner
     document.getElementById('btn-reroll-simulation')?.addEventListener('click', () => {
       this.rerollSimulation();
@@ -1356,19 +1378,32 @@ class GoogleMapsApp {
 
         try {
             const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
+            const safeTitle = (addrInfo.title || 'Vị trí đã chọn').replace(/'/g, "\\'");
+            const safeFull = (addrInfo.fullAddress || addrInfo.title || '').replace(/'/g, "\\'");
             
-            // Xây dựng popup chuẩn Google Maps
+            // Xây dựng popup Trạm điều khiển 5-trong-1 chuẩn Google Maps
             const popupContent = `
               <div class="gm-poi-popup">
                 <div class="gm-poi-title">${addrInfo.title}</div>
                 <div class="gm-poi-address">${addrInfo.subtitle}</div>
                 <div class="gm-poi-coords">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
                 <div class="gm-poi-actions">
-                  <button class="gm-btn-dir from" onclick="window.appState.setRouteFromPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
+                  <button class="gm-btn-dir from" onclick="window.appState.setRouteFromPOI(${lat}, ${lng}, '${safeTitle}', '${safeFull}')">
                     Từ đây
                   </button>
-                  <button class="gm-btn-dir to" onclick="window.appState.setRouteToPOI(${lat}, ${lng}, '${addrInfo.title.replace(/'/g, "\\'")}', '${addrInfo.fullAddress.replace(/'/g, "\\'")}')">
+                  <button class="gm-btn-dir to" onclick="window.appState.setRouteToPOI(${lat}, ${lng}, '${safeTitle}', '${safeFull}')">
                     Tới đây
+                  </button>
+                </div>
+                <div class="gm-poi-actions-grid">
+                  <button class="gm-poi-sub-btn" style="border-color:#a7f3d0; background:#ecfdf5; color:#065f46;" onclick="window.appState.openPropertyAnalyzerModal(${lat}, ${lng}, '${safeTitle}')">
+                    Chấm điểm An cư / Trọ
+                  </button>
+                  <button class="gm-poi-sub-btn" style="border-color:#fde68a; background:#fffbeb; color:#92400e;" onclick="window.appState.openReportAtPOI(${lat}, ${lng}, '${safeTitle}')">
+                    Báo ngập / tắc tại đây
+                  </button>
+                  <button class="gm-poi-sub-btn" style="grid-column: span 2; border-color:#fecaca; background:#fef2f2; color:#b91c1c;" onclick="window.appState.openSosRescueModal(${lat}, ${lng}, '${safeTitle}')">
+                    Tìm Điểm Trú Mưa Cao Ráo & Cứu Hộ SOS Gần Đây
                   </button>
                 </div>
               </div>
@@ -1377,7 +1412,7 @@ class GoogleMapsApp {
             this._tempClickMarker.bindPopup(popupContent, {
                 closeButton: true,
                 className: 'gm-poi-popup-container',
-                minWidth: 260
+                minWidth: 270
             }).openPopup();
             
         } catch (err) {
@@ -1736,15 +1771,25 @@ class GoogleMapsApp {
           <div class="ward-card-footer">
             <button class="btn-card-map" 
                     onclick="window.appState && window.appState.flyToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
-              Xem Trên Bản Đồ
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 8"></polygon></svg>
+              Bản Đồ
             </button>
-            <button class="btn-card-ai" 
-                    onclick="window.appState && window.appState.askAiAboutWard('${ward.name.replace(/'/g, "\\'")}', '${ward.district.replace(/'/g, "\\'")}')">
-              Hỏi AI Về Phường
+            <button class="btn-card-weather" 
+                    title="Xem dự báo thời tiết 15P và nhiệt độ mặt đường tại ${ward.name}"
+                    onclick="window.appState && window.appState.openCommuteComfortModal(${ward.lat}, ${ward.lng}, 'Phường ${ward.name.replace(/'/g, "\\'")}')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+              Dự Báo 15P
+            </button>
+            <button class="btn-card-property" 
+                    title="Chấm điểm an cư, nguy cơ ngập lụt và hạ tầng tại ${ward.name}"
+                    onclick="window.appState && window.appState.openPropertyAnalyzerModal(${ward.lat}, ${ward.lng}, 'Phường ${ward.name.replace(/'/g, "\\'")}')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+              Khảo Sát An Cư
             </button>
             <button class="btn-card-route" 
                     title="Chỉ đường đến ${ward.name}"
                     onclick="window.appState && window.appState.routeToWardFromCard(${ward.lat}, ${ward.lng}, '${ward.name.replace(/'/g, "\\'")}')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
               Đến Đây
             </button>
           </div>
@@ -1788,9 +1833,71 @@ class GoogleMapsApp {
 
   searchStreetFromWard(streetName, wardName) {
     this.closeHanoiStreetsModal();
-    this.showToast(`Tuyến đường lớn: ${streetName} (${wardName})`, 'info', 4000);
+    const ward = (window.HANOI_WARDS_DATA || []).find(w => w.name === wardName);
+    if (ward && window.mapEngine?.map) {
+      window.mapEngine.map.flyTo([ward.lat, ward.lng], 15, { duration: 1.0 });
+    }
+    const searchInput = document.getElementById('gm-search-input');
+    if (searchInput) searchInput.value = `${streetName}, ${wardName}`;
+    this.showToast(`Đã định vị trục đường: ${streetName} (${wardName})`, 'info', 4000);
     window.aiChat.open();
     window.aiChat.sendMessage(`Tình hình giao thông, ngập nước và lộ trình lưu thông trên đường ${streetName} qua khu vực ${wardName} như thế nào?`);
+  }
+
+  detectHotspotCoords(text) {
+    if (!text) return null;
+    const lower = text.toLowerCase();
+    const HOTSPOTS = [
+      { keys: ['ngã tư sở', 'nga tu so'], name: 'Nút giao Ngã Tư Sở', lat: 21.0015, lng: 105.8197 },
+      { keys: ['cầu giấy', 'cau giay', 'xuân thủy', 'xuan thuy'], name: 'Trục Cầu Giấy - Xuân Thủy', lat: 21.0335, lng: 105.7942 },
+      { keys: ['nguyễn trãi', 'nguyen trai', 'khuất duy tiến'], name: 'Nút giao Nguyễn Trãi - Khuất Duy Tiến', lat: 20.9982, lng: 105.8115 },
+      { keys: ['vành đai 3', 'vanh dai 3', 'phạm hùng', 'pham hung'], name: 'Đường Vành Đai 3 - Phạm Hùng', lat: 21.0175, lng: 105.7838 },
+      { keys: ['thái hà', 'thai ha', 'chùa bộc', 'chua boc'], name: 'Nút giao Thái Hà - Chùa Bộc', lat: 21.0089, lng: 105.8245 },
+      { keys: ['giải phóng', 'giai phong', 'bến xe giáp bát'], name: 'Trục Giải Phóng - Bến xe Giáp Bát', lat: 20.9812, lng: 105.8423 },
+      { keys: ['kim mã', 'kim ma', 'liễu giai'], name: 'Nút giao Liễu Giai - Kim Mã', lat: 21.0321, lng: 105.8127 },
+      { keys: ['trần duy hưng', 'tran duy hung', 'hoàng minh giám'], name: 'Trần Duy Hưng - Trung Hòa', lat: 21.0063, lng: 105.7955 },
+      { keys: ['phạm văn đồng', 'pham van dong', 'cổ nhuế'], name: 'Trục Phạm Văn Đồng - Cổ Nhuế', lat: 21.0505, lng: 105.7812 },
+      { keys: ['tố hữu', 'to huu', 'lê văn lương', 'le van luong'], name: 'Trục Lê Văn Lương - Tố Hữu', lat: 20.9985, lng: 105.7925 },
+      { keys: ['định công', 'dinh cong', 'hoàng mai'], name: 'Cầu Định Công - Hoàng Mai', lat: 20.9855, lng: 105.8362 },
+      { keys: ['mỹ đình', 'my dinh', 'lê đức thọ'], name: 'Khu vực Sân Vận Động Mỹ Đình', lat: 21.0204, lng: 105.7639 },
+      { keys: ['long biên', 'long bien', 'cổ linh'], name: 'Cổ Linh - Cầu Vĩnh Tuy', lat: 21.0268, lng: 105.8992 }
+    ];
+
+    for (const h of HOTSPOTS) {
+      if (h.keys.some(k => lower.includes(k))) {
+        return h;
+      }
+    }
+    return null;
+  }
+
+  focusHotspotFromVov(lat, lng, label) {
+    const modal = document.getElementById('modal-urban-insights');
+    if (modal) modal.classList.remove('open');
+    if (window.mapEngine && window.mapEngine.map) {
+      window.mapEngine.map.flyTo([lat, lng], 16, { animate: true, duration: 1.0 });
+      if (this.searchResultMarker) {
+        window.mapEngine.map.removeLayer(this.searchResultMarker);
+      }
+      const icon = L.divIcon({
+        className: 'gm-marker-container',
+        html: `<div class="gm-route-pin pin-origin" style="background: #d93025; box-shadow: 0 0 14px rgba(217,48,37,0.6); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px;">!</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      this.searchResultMarker = L.marker([lat, lng], { icon }).addTo(window.mapEngine.map);
+      this.searchResultMarker.bindPopup(`
+        <div style="font-family: var(--font-family); min-width: 220px; padding: 4px;">
+          <div style="font-size: 11px; font-weight: 700; color: #d93025; text-transform: uppercase;">Điểm nóng VOV Giao Thông</div>
+          <div style="font-weight: 700; font-size: 13.5px; color: #0f172a; margin: 4px 0;">${label}</div>
+          <button onclick="window.appState && window.appState.routeToLocation(${lat}, ${lng}, '${label.replace(/'/g, "\\'")}')" 
+            style="margin-top: 6px; width: 100%; padding: 6px 10px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+            Tìm đường tránh né điểm này
+          </button>
+        </div>
+      `).openPopup();
+      this.showToast(`Đã định vị điểm nóng VOV: ${label}`, 'warning', 4000);
+    }
   }
 
   async openUrbanInsightsModal() {
@@ -1809,6 +1916,17 @@ class GoogleMapsApp {
           const title = item.title || 'Tin giao thông';
           const content = item.summary || item.content || '';
           const fullText = `${title}. ${content}`;
+          const hotspot = this.detectHotspotCoords(fullText);
+          const mapBtn = hotspot ? `
+            <button class="gm-btn-tts" 
+                    style="flex-shrink: 0; margin-top: 2px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;"
+                    onclick="window.appState && window.appState.focusHotspotFromVov(${hotspot.lat}, ${hotspot.lng}, '${hotspot.name.replace(/'/g, "\\'")}')"
+                    title="Xem điểm nóng giao thông này trên bản đồ">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>Bản đồ</span>
+            </button>
+          ` : '';
+
           return `
             <div style="border-bottom: 1px solid #e8eaed; padding: 8px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
               <div style="flex: 1;">
@@ -1816,13 +1934,16 @@ class GoogleMapsApp {
                 <div style="color: #5f6368; font-size: 11px; margin-top: 2px;">${content}</div>
                 <div style="color: #1a73e8; font-size: 10px; margin-top: 3px;">Nguồn: VOV Giao thông 91MHz</div>
               </div>
-              <button class="gm-btn-tts" 
-                      style="flex-shrink: 0; margin-top: 2px;"
-                      onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(fullText)}'))"
-                      title="Đọc bằng giọng nói tiếng Việt">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                <span>Đọc tin</span>
-              </button>
+              <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                ${mapBtn}
+                <button class="gm-btn-tts" 
+                        style="flex-shrink: 0; margin-top: 2px;"
+                        onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(fullText)}'))"
+                        title="Đọc bằng giọng nói tiếng Việt">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  <span>Đọc tin</span>
+                </button>
+              </div>
             </div>
           `;
         }).join('');
@@ -1876,6 +1997,7 @@ class GoogleMapsApp {
     const lat = typeof targetLat === 'number' ? targetLat : city.lat;
     const lng = typeof targetLng === 'number' ? targetLng : city.lng;
     const cityName = targetName || city.name;
+    this._comfortTarget = { lat, lng, name: cityName };
 
     const subTitle = document.getElementById('comfort-location-subtitle');
     if (subTitle) {
@@ -1981,6 +2103,42 @@ class GoogleMapsApp {
             </div>
           `).join('');
         }
+      }
+
+      // 5. Gợi ý điểm dừng chân & sinh hoạt phù hợp thời tiết (MoveSafe Smart Lifestyle)
+      const lifestyleContainer = document.getElementById('comfort-lifestyle-container');
+      if (lifestyleContainer) {
+        const isRainy = (data.timeline15 || []).some(t => t.rain > 0) || (data.humidity >= 85);
+        const isHot = (data.roadRealFeel >= 35);
+
+        let lifestylePills = [];
+        if (isRainy) {
+          lifestylePills = [
+            { title: 'Trú mưa & Xem phim: TTTM The Garden', note: 'Hầm gửi xe cao ráo, CGV & cafe', lat: 21.0141, lng: 105.7764 },
+            { title: 'Tổ hợp mua sắm hầm cao: Aeon Mall Long Biên', note: 'Bãi xe nổi không ngập', lat: 21.0268, lng: 105.8992 },
+            { title: 'Cafe tránh mưa & sạc xe: Lotte Center Liễu Giai', note: 'Khu vực cốt nền cao', lat: 21.0321, lng: 105.8127 }
+          ];
+        } else if (isHot) {
+          lifestylePills = [
+            { title: 'Cafe máy lạnh tránh nắng: K-Town Mễ Trì', note: 'Không gian mát mẻ, đồ uống ngon', lat: 21.0145, lng: 105.7782 },
+            { title: 'TTTM tránh nóng & sạc EV: Vincom Smart City', note: 'Điều hòa trung tâm & hầm rộng', lat: 20.9942, lng: 105.7482 },
+            { title: 'Cafe máy lạnh ngắm hồ: Lotte Keangnam 72', note: 'Tầng cao thoáng đãng', lat: 21.0175, lng: 105.7838 }
+          ];
+        } else {
+          lifestylePills = [
+            { title: 'Hóng mát & Trà chanh: SVĐ Quốc Gia Mỹ Đình', note: 'Quảng trường lộng gió chiều tối', lat: 21.0204, lng: 105.7639 },
+            { title: 'Cafe ngoài trời thoáng đãng: Bán đảo Quảng An', note: 'Gió hồ Tây dịu mát', lat: 21.0625, lng: 105.8285 },
+            { title: 'Ẩm thực Phố Cổ: Bún chả & Phở Bát Đàn', note: 'Thời tiết lý tưởng để dạo phố', lat: 21.0345, lng: 105.8495 }
+          ];
+        }
+
+        lifestyleContainer.innerHTML = lifestylePills.map(p => `
+          <button type="button" class="comfort-lifestyle-pill" onclick="window.appState.routeToLocation(${p.lat}, ${p.lng}, '${p.title.replace(/'/g, "\\'")}'); document.getElementById('modal-commute-comfort')?.classList.remove('open');" title="Chỉ đường né ngập đến ${p.title}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+            <span>${p.title}</span>
+            <span style="font-size: 10.5px; color: #64748b; font-weight: 400;">(${p.note})</span>
+          </button>
+        `).join('');
       }
     } catch (e) {
       console.error('Lỗi hiển thị Commute Comfort modal:', e);
@@ -2504,6 +2662,118 @@ class GoogleMapsApp {
     }
   }
 
+  // Khám phá nhanh 1-chạm khi ô tìm kiếm chưa nhập
+  renderQuickDiscoveryDropdown() {
+    const dropdown = document.getElementById('dropdown-main-search');
+    if (!dropdown) return;
+
+    dropdown.innerHTML = `
+      <div class="gm-quick-discovery-panel">
+        <div class="gm-quick-discovery-header">
+          <span>Khám phá nhanh MoveSafe VN</span>
+          <span style="font-size: 10.5px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 1px 6px; border-radius: 4px;">1-Chạm</span>
+        </div>
+        <div class="gm-quick-discovery-grid">
+          <div class="gm-quick-discovery-card" data-action="ev" title="Xem 153 trạm sạc xe điện & đổi pin VinFast/Selex">
+            <div class="gm-qd-icon" style="background: #f0fdf4; color: #16a34a;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Trạm sạc VinFast & EV</div>
+              <div class="gm-qd-desc">153 trạm sạc & đổi pin</div>
+            </div>
+          </div>
+
+          <div class="gm-quick-discovery-card" data-action="comfort" title="Kiểm tra cảm nhận nhiệt mặt đường & dự báo mưa 15P">
+            <div class="gm-qd-icon" style="background: #eff6ff; color: #2563eb;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Thời tiết 15P Mặt đường</div>
+              <div class="gm-qd-desc">Nhiệt độ, UV & mưa tức thời</div>
+            </div>
+          </div>
+
+          <div class="gm-quick-discovery-card" data-action="shelter" title="Tìm điểm đỗ xe cao ráo tránh thủy kích & cứu hộ SOS">
+            <div class="gm-qd-icon" style="background: #fef2f2; color: #dc2626;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Cứu hộ SOS & Điểm trú</div>
+              <div class="gm-qd-desc">Ga Metro, TTTM cao ráo</div>
+            </div>
+          </div>
+
+          <div class="gm-quick-discovery-card" data-action="food" title="Đề xuất quán ăn, cafe ngon, điểm giải trí tránh ngập">
+            <div class="gm-qd-icon" style="background: #fff7ed; color: #ea580c;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Ẩm thực & Giải trí</div>
+              <div class="gm-qd-desc">45 tụ điểm nổi tiếng</div>
+            </div>
+          </div>
+
+          <div class="gm-quick-discovery-card" data-action="property" title="Đánh giá cao độ cốt nền, ngập lụt & tiện ích khu trọ/nhà ở">
+            <div class="gm-qd-icon" style="background: #f5f3ff; color: #7c3aed;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Chấm điểm An cư & Trọ</div>
+              <div class="gm-qd-desc">Độ cao DEM & ngập lụt</div>
+            </div>
+          </div>
+
+          <div class="gm-quick-discovery-card" data-action="commute" title="Mở bảng chỉ đường tìm lộ trình né ngập thông minh">
+            <div class="gm-qd-icon" style="background: #ecfeff; color: #0891b2;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            </div>
+            <div class="gm-qd-text">
+              <div class="gm-qd-title">Lộ trình Đi làm / Về nhà</div>
+              <div class="gm-qd-desc">Né ngập thông minh 1-chạm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    dropdown.style.display = 'block';
+
+    dropdown.querySelectorAll('.gm-quick-discovery-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const action = card.getAttribute('data-action');
+        dropdown.style.display = 'none';
+
+        if (action === 'ev') {
+          if (window.mapEngine && window.mapEngine.toggleEV) {
+            window.mapEngine.toggleEV(true);
+          }
+          const chipEv = document.getElementById('chip-ev-stations');
+          if (chipEv) chipEv.classList.add('active');
+          const chkEv = document.getElementById('chk-layer-ev');
+          if (chkEv) chkEv.checked = true;
+          this.showToast('Đã kích hoạt mạng lưới 153 trạm sạc & đổi pin trên bản đồ', 'info', 3500);
+        } else if (action === 'comfort') {
+          this.openCommuteComfortModal();
+        } else if (action === 'shelter') {
+          this.openSosRescueModal();
+        } else if (action === 'food') {
+          const topSpots = this.getAllFoodSpots().slice(0, 10);
+          if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+            window.mapEngine.renderFoodPlaces(topSpots);
+          }
+          this.showToast(`Đã ghim ${topSpots.length} địa điểm ẩm thực & giải trí tiêu biểu lên bản đồ`, 'info', 3500);
+        } else if (action === 'property') {
+          const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
+          this.openPropertyAnalyzerModal(cityCenter.lat, cityCenter.lng, cityCenter.name);
+        } else if (action === 'commute') {
+          this.toggleDirectionsPanel(true);
+          this.showToast('Hãy nhập điểm đi và đến để tìm lộ trình an toàn nhất!', 'info', 3000);
+        }
+      });
+    });
+  }
+
   // Hiển thị gợi ý tự động cho ô tìm kiếm chính (Địa điểm, Phường/Đường, Quán ăn, Trạm sạc)
   async renderMainSearchSuggestions(query) {
     const dropdown = document.getElementById('dropdown-main-search');
@@ -2511,7 +2781,7 @@ class GoogleMapsApp {
 
     const clean = (query || '').trim();
     if (clean.length < 2) {
-      dropdown.style.display = 'none';
+      this.renderQuickDiscoveryDropdown();
       return;
     }
 
@@ -2528,28 +2798,46 @@ class GoogleMapsApp {
       });
     }
 
-    // 2. Gợi ý các quán ăn / điểm vui chơi khớp tên trực tiếp trong CSDL
-    if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.areas) {
-      for (const area of window.FOOD_ENTERTAINMENT_DATA.areas) {
-        if (area.city && area.city !== this.currentCity) continue;
-        const allSpots = [...(area.food || []), ...(area.entertainment || [])];
-        for (const spot of allSpots) {
-          if (
-            spot.name.toLowerCase().includes(lower) ||
-            spot.specialty.toLowerCase().includes(lower) ||
-            spot.address.toLowerCase().includes(lower)
-          ) {
-            suggestions.push({
-              type: 'spot',
-              title: spot.name,
-              subtitle: `${spot.address} • ${spot.specialty}`,
-              lat: spot.lat || area.lat,
-              lng: spot.lng || area.lng
-            });
-            if (suggestions.length >= 4) break;
-          }
-        }
+    // 2. Gợi ý các quán ăn / điểm vui chơi khớp tên trực tiếp từ toàn bộ CSDL
+    const allFoodSpots = this.getAllFoodSpots();
+    for (const spot of allFoodSpots) {
+      if (spot.city && spot.city !== this.currentCity) continue;
+      if (
+        spot.name.toLowerCase().includes(lower) ||
+        (spot.specialty && spot.specialty.toLowerCase().includes(lower)) ||
+        (spot.address && spot.address.toLowerCase().includes(lower))
+      ) {
+        suggestions.push({
+          type: 'spot',
+          title: spot.name,
+          subtitle: `${spot.address} • ${spot.price || spot.specialty || 'Điểm ẩm thực'}`,
+          lat: spot.lat,
+          lng: spot.lng
+        });
         if (suggestions.length >= 4) break;
+      }
+    }
+
+    // 2b. Gợi ý Trạm sạc Xe điện khớp tên / thương hiệu (VinFast, Selex, v.v.)
+    const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const isEVQuery = lower.includes('sạc') || lower.includes('sac') || lower.includes('vinfast') || lower.includes('selex') || lower.includes('đổi pin') || lower.includes('doi pin') || lower.includes('ev');
+    if (isEVQuery || lower.length >= 3) {
+      for (const st of allEV) {
+        if (st.city && st.city !== this.currentCity) continue;
+        const nameLower = (st.name || '').toLowerCase();
+        const addrLower = (st.address || '').toLowerCase();
+        const opLower = (st.operator || '').toLowerCase();
+        if (isEVQuery || nameLower.includes(lower) || addrLower.includes(lower) || opLower.includes(lower)) {
+          suggestions.push({
+            type: 'ev',
+            title: st.name,
+            subtitle: `${st.address} • ${st.operator || 'EV'} (${st.maxPowerKw || 60}kW)`,
+            lat: st.lat,
+            lng: st.lng,
+            stationId: st.id
+          });
+          if (suggestions.length >= 5) break;
+        }
       }
     }
 
@@ -2616,6 +2904,8 @@ class GoogleMapsApp {
     dropdown.innerHTML = suggestions.map((item, idx) => {
       const iconSvg = item.type === 'ai-food'
         ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`
+        : item.type === 'ev'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`
         : item.type === 'spot'
         ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>`
         : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
@@ -2663,6 +2953,25 @@ class GoogleMapsApp {
         if (item.type === 'ai-food') {
           window.aiChat.open();
           window.aiChat.sendMessage(item.query);
+          return;
+        }
+        if (item.type === 'ev') {
+          if (window.mapEngine && window.mapEngine.toggleEV) {
+            window.mapEngine.toggleEV(true);
+          }
+          if (window.mapEngine && typeof window.mapEngine.focusEVStation === 'function') {
+            window.mapEngine.focusEVStation(item.stationId || item.title);
+          } else if (item.lat && item.lng) {
+            window.mapEngine.map.flyTo([item.lat, item.lng], 16, { duration: 1.0 });
+          }
+          this.showToast(`Đã định vị trạm sạc: ${item.title}`, 'info');
+          return;
+        }
+        if (item.type === 'spot') {
+          if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+            window.mapEngine.renderFoodPlaces([item], item.lat, item.lng);
+          }
+          this.showToast(`Đã định vị địa điểm: ${item.title}`, 'info');
           return;
         }
         if (item.wardName) {
@@ -2821,6 +3130,7 @@ class GoogleMapsApp {
 
   // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công)
   async triggerChatRoute(originStr, destStr, avoidLevel = 1, timeOffsetHours = 0) {
+    this._shouldAnnounceRouteVoice = true;
     this.toggleDirectionsPanel(true);
     const originInput = document.getElementById('gm-route-origin');
     const destInput = document.getElementById('gm-route-dest');
@@ -2868,72 +3178,59 @@ class GoogleMapsApp {
     await this.calculateSmartRoute();
   }
 
-  // Áp dụng độ lệch dự báo AI tương lai (+1h, +2h, +3h) lên bản đồ
+  // Áp dụng độ lệch dự báo AI tương lai (+1h, +2h, +3h) lên bản đồ & tự động tính lại lộ trình
   async applyPredictionOffset(offset) {
     this.currentPredictionOffset = offset;
-    if (offset > 0 && window.supabaseService) {
+    if (offset > 0) {
       try {
-        const [predictions, floodPreds] = await Promise.all([
-          window.supabaseService.getTrafficPrediction(offset, this.currentCity),
-          window.supabaseService.getFloodPredictions(offset, this.currentCity)
-        ]);
+        let aiFloods = [];
+        let aiTraffics = [];
 
-        const aiFloods = (floodPreds || []).map(f => ({
-          id: `ai-flood-${f.id || f.location_name}`,
-          lat: f.lat,
-          lng: f.lng,
-          city: this.currentCity,
-          depth_cm: f.predicted_depth_cm || 25,
-          danger_level: (f.predicted_depth_cm || 25) > 30 ? 'critical' : 'medium',
-          passable_motorbike: (f.predicted_depth_cm || 25) < 20,
-          passable_car: (f.predicted_depth_cm || 25) < 35,
-          name: `[AI DỰ BÁO +${offset}h] ${f.location_name}`,
-          source: 'Mô hình AI dự báo ngập lụt',
-          advice: `Nguy cơ ngập úng trong ${offset}h tới. Cân nhắc chọn lộ trình thay thế.`,
-          updated_at: new Date().toISOString()
-        }));
+        // 1. Thử lấy từ API Dự báo Tương lai (/api/predictions) của Backend
+        try {
+          const res = await fetch(`/api/predictions?city=${this.currentCity}&offset=${offset}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.status === 'success') {
+              aiFloods = data.floodPoints || [];
+              aiTraffics = data.trafficIncidents || [];
+            }
+          }
+        } catch {}
 
-        const aiTraffics = (predictions || [])
-          .filter(p => {
-            const lvl = p.level || p.predicted_level || (p.isJam ? 3 : 1);
-            return lvl >= 3 || p.type === 'roadwork' || p.type === 'road_closure';
-          })
-          .map((p, idx) => {
-            const lvl = p.level || p.predicted_level || 3;
-            const isWork = p.type === 'roadwork' || p.type === 'road_closure';
+        // 2. Dự phòng nội suy Spatio-Temporal trực tiếp trên Client (khi chạy tĩnh trên GitHub Pages hoặc đang bật Giả lập)
+        if (aiFloods.length === 0 && aiTraffics.length === 0) {
+          let baseFloods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
+          if (this.isSimulationMode) {
+            baseFloods = [...this.getSimulatedFloods(this.currentCity), ...baseFloods];
+          }
+          const decayFactor = Math.max(0.35, 1 - offset * 0.22);
+          aiFloods = baseFloods.map(f => {
+            const newDepth = Math.max(0, Math.round((f.depth_cm || 0) * decayFactor));
             return {
-              id: p.id || `ai-traffic-${idx}`,
-              lat: p.lat,
-              lng: p.lng,
-              city: this.currentCity,
-              type: p.type || 'traffic_jam',
-              categoryName: isWork ? (p.categoryName || 'Công trường thi công') : `AI Dự báo kẹt xe +${offset}h`,
-              icon: p.icon || '',
-              isJam: !isWork && lvl >= 3,
-              level: lvl,
-              speedKmh: p.speedKmh || (lvl >= 4 ? 8 : (lvl === 3 ? 15 : 35)),
-              delaySeconds: p.delaySeconds || (lvl >= 4 ? 600 : (lvl === 3 ? 300 : 0)),
-              confidence: p.confidence || 0.88,
-              description: p.description || `AI dự báo ùn tắc mức ${lvl}/5 sau +${offset}h`,
-              source: p.source || 'Mô hình AI Spatio-Temporal',
-              updated_at: new Date().toISOString()
+              ...f,
+              depth_cm: newDepth,
+              danger_level: newDepth > 30 ? 'critical' : (newDepth >= 15 ? 'medium' : 'low'),
+              passable_motorbike: newDepth < 20,
+              passable_car: newDepth < 35,
+              name: f.name.startsWith('[DỰ BÁO') ? f.name : `[DỰ BÁO +${offset}h] ${f.name}`,
+              advice: newDepth > 0
+                ? `Dự báo sau +${offset}h mức nước giảm còn ~${newDepth}cm do trạm bơm đang vận hành.`
+                : `Dự báo sau +${offset}h nước đã rút hết, mặt đường khô ráo.`
             };
-          });
+          }).filter(f => f.depth_cm > 0);
+
+          const baseTraffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
+          aiTraffics = baseTraffics.filter((t, idx) => t.type === 'roadwork' || t.type === 'road_closure' || (idx % (offset + 1) === 0));
+        }
 
         this.predictionOverlay = { floodPoints: aiFloods, trafficIncidents: aiTraffics };
         this.renderAllData();
 
         if (aiFloods.length > 0) {
-          this.showToast(`AI: Phát hiện ${aiFloods.length} điểm có nguy cơ ngập lụt sau +${offset}h tới!`, 'warning', 4500);
-        }
-        if (aiTraffics.length > 0) {
-          const jamCount = aiTraffics.filter(t => t.isJam).length;
-          const roadworkCount = aiTraffics.filter(t => !t.isJam).length;
-          let msg = `AI: Dự báo sau +${offset}h ghi nhận ${jamCount} điểm ùn tắc`;
-          if (roadworkCount > 0) msg += ` và ${roadworkCount} điểm công trường`;
-          this.showToast(msg, 'info', 4000);
+          this.showToast(`Dự báo +${offset}h tới: Ghi nhận ${aiFloods.length} điểm ngập còn tồn đọng. Đã cập nhật bản đồ & lộ trình!`, 'warning', 3800);
         } else {
-          this.showToast(`AI: Dự báo sau +${offset}h đường phố thông thoáng, không phát hiện ùn tắc lớn!`, 'info', 4000);
+          this.showToast(`Dự báo +${offset}h tới: Nước rút an toàn, giao thông thông thoáng hơn!`, 'info', 3500);
         }
       } catch (err) {
         console.warn('Lỗi khi nạp dữ liệu dự báo AI:', err);
@@ -3096,6 +3393,18 @@ class GoogleMapsApp {
 
       // GỢI Ý THÔNG MINH TỰ ĐỘNG (Passive AI - Không tốn lượt API request)
       this.generateSmartSuggestion(result);
+
+      // Tự động phát âm thanh tóm tắt nếu tìm đường từ giọng nói / AI
+      if (this._shouldAnnounceRouteVoice && result.routes && result.routes[0]) {
+        this._shouldAnnounceRouteVoice = false;
+        const bestRoute = result.routes.find(r => r.isRecommended) || result.routes[0];
+        const spoken = `MoveSafe đã tìm thấy lộ trình an toàn nhất dài ${bestRoute.distanceKm} ki lô mét, thời gian dự kiến ${bestRoute.estimatedMinutes} phút, chỉ số an toàn ${bestRoute.safetyScore} trên 100, đã né toàn bộ các rốn ngập sâu.`;
+        if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
+          setTimeout(() => {
+            window.aiChat.toggleSpeakText(spoken, null);
+          }, 500);
+        }
+      }
 
     } catch (e) {
       console.error('[Routing Error]', e);
@@ -3288,6 +3597,17 @@ class GoogleMapsApp {
       { text: `${cityJams.length} điểm tắc` }
     ];
 
+    const destLoc = this.routeLocations?.destination;
+    const destLat = destLoc ? Number(destLoc.lat) : (this.citiesConfig[this.currentCity]?.lat || 21.0285);
+    const destLng = destLoc ? Number(destLoc.lng) : (this.citiesConfig[this.currentCity]?.lng || 105.8542);
+    const safeDestName = ((destLoc && destLoc.title) || document.getElementById('gm-route-dest')?.value || 'Điểm đến').replace(/'/g, "\\'");
+
+    const goldenHourBtn = ((hasRouteFlood || hasRouteJam || cityFloods.length > 0) && this.currentPredictionOffset === 0)
+      ? `<button type="button" class="gm-poi-sub-btn" style="background:#fffbeb; border-color:#fcd34d; color:#92400e;" onclick="const s=document.getElementById('traffic-prediction-slider'); if(s){s.value=1; s.dispatchEvent(new Event('input')); s.dispatchEvent(new Event('change'));}">
+           Thử lùi giờ khởi hành (+1h nước rút)
+         </button>`
+      : '';
+
     box.innerHTML = `
       <div class="gm-suggestion-header">
         <span>Gợi ý thông minh</span>
@@ -3298,6 +3618,15 @@ class GoogleMapsApp {
         <ul class="sug-detail-list">
           ${details.map(d => `<li><span>•</span><span>${d.text}</span></li>`).join('')}
         </ul>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+          <button type="button" class="gm-poi-sub-btn" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" onclick="window.appState.openCommuteComfortModal()">
+            Dự báo 15P & Nhiệt mặt đường
+          </button>
+          <button type="button" class="gm-poi-sub-btn" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;" onclick="window.appState.openPropertyAnalyzerModal(${destLat}, ${destLng}, '${safeDestName}')">
+            Chấm điểm An cư Điểm đến
+          </button>
+          ${goldenHourBtn}
+        </div>
       </div>
       <div class="gm-suggestion-context">
         ${contextTags.map(t => `<span class="ctx-tag">${t.text}</span>`).join('')}
@@ -3601,6 +3930,11 @@ class GoogleMapsApp {
       }
     }
 
+    let pitStopsBarHtml = '';
+    if (routeCoords && routeCoords.length > 0) {
+      pitStopsBarHtml = this.renderAlongRoutePitStopsHtml(routeCoords);
+    }
+
     container.innerHTML = `
       <div style="display: flex; flex-direction: column; width: 100%;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
@@ -3618,6 +3952,7 @@ class GoogleMapsApp {
         </div>
         ${avoidedNotice}
         ${diffHtml}
+        ${pitStopsBarHtml}
         ${evSuggestionsHtml}
       </div>
     `;
@@ -3793,6 +4128,7 @@ class GoogleMapsApp {
           </div>
 
           <div class="gm-route-tag ${route.tagClass}" style="margin-top: 6px;">${route.tagText}</div>
+          ${this.renderTripEconomicsHtml(route, routes, blockedRoutes)}
           ${warningsHtml}
 
           <!-- Cụm nút Dẫn đường Giọng nói (Turn-by-Turn) & Chia sẻ Link Lộ trình An toàn -->
@@ -4036,6 +4372,7 @@ class GoogleMapsApp {
     params.set('veh', this.currentVehicle || 'motorbike');
     params.set('avoid', String(this.currentAvoidLevel || 1));
     params.set('offset', String(this.currentPredictionOffset || 0));
+    params.set('sim', this.isSimulationMode ? '1' : '0');
     params.set('rIdx', String(routeIndex || 0));
 
     const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -4047,7 +4384,7 @@ class GoogleMapsApp {
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        this.showToast('Đã sao chép Link lộ trình an toàn vào bộ nhớ tạm! Hãy dán gửi cho người thân.', 'success', 4000);
+        this.showToast('Đã sao chép Link lộ trình an toàn (kèm kịch bản ngập & dự báo) vào bộ nhớ tạm!', 'success', 4000);
       }).catch(() => {
         prompt('Sao chép link lộ trình an toàn bên dưới:', shareSummary);
       });
@@ -4074,6 +4411,10 @@ class GoogleMapsApp {
         window.mapEngine.flyToCity(city);
       }
 
+      if (params.get('sim') === '1') {
+        this.setSimulationMode(true, false);
+      }
+
       const veh = params.get('veh');
       if (veh) {
         this.currentVehicle = veh;
@@ -4093,6 +4434,7 @@ class GoogleMapsApp {
         });
       }
 
+      const offset = parseInt(params.get('offset'), 10);
       const fromName = params.get('fromName') || 'Điểm xuất phát đã chia sẻ';
       const toName = params.get('toName') || 'Điểm đến đã chia sẻ';
       const originInput = document.getElementById('gm-route-origin');
@@ -4108,8 +4450,16 @@ class GoogleMapsApp {
         destInput.dataset.lng = String(toLng);
         this.routeLocations.destination = { title: toName, fullAddress: toName, lat: toLat, lng: toLng };
 
-        setTimeout(() => {
+        setTimeout(async () => {
           this.toggleDirectionsPanel(true);
+          if (!isNaN(offset) && offset > 0) {
+            const slider = document.getElementById('traffic-prediction-slider');
+            const labelEl = document.getElementById('prediction-time-label');
+            const labels = ['Hiện tại', '+1 Giờ tới', '+2 Giờ tới', '+3 Giờ tới'];
+            if (slider) slider.value = offset;
+            if (labelEl) labelEl.textContent = labels[offset] || 'Hiện tại';
+            await this.applyPredictionOffset(offset);
+          }
           this.showToast('Đã tải lộ trình an toàn được chia sẻ qua liên kết!', 'info', 3500);
           this.calculateSmartRoute();
         }, 500);
@@ -4173,17 +4523,36 @@ class GoogleMapsApp {
     }
 
     // Ước lượng vị trí bước đi dọc theo geometry của route để flyTo
+    let stepCoord = null;
     if (route.geometry && route.geometry.length > 1 && window.mapEngine && window.mapEngine.map) {
       const ratio = stepIndex / Math.max(1, route.steps.length - 1);
       const geoIdx = Math.min(route.geometry.length - 1, Math.floor(ratio * route.geometry.length));
-      const coord = route.geometry[geoIdx];
-      if (coord) {
-        window.mapEngine.map.flyTo(coord, 16, { duration: 0.8 });
+      stepCoord = route.geometry[geoIdx];
+      if (stepCoord) {
+        window.mapEngine.map.flyTo(stepCoord, 16, { duration: 0.8 });
       }
     }
 
-    const textToSpeak = `Chặng ${stepIndex + 1}: ${step.instruction}${step.distance > 0 ? `, đi tiếp ${step.distanceText}` : ''}.`;
-    this.showToast(textToSpeak, 'info', 2500);
+    // Kiểm tra an toàn: quét điểm ngập hoặc ùn tắc trong bán kính 250m quanh chặng này
+    let warningVoice = '';
+    if (stepCoord) {
+      const sLat = stepCoord[0];
+      const sLng = stepCoord[1];
+      const floods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
+      const traffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
+
+      const nearbyFlood = floods.find(f => this._calcDistanceKm(sLat, sLng, f.lat, f.lng) <= 0.25);
+      const nearbyJam = traffics.find(t => (t.isJam || t.type === 'accident' || t.type === 'road_closure') && this._calcDistanceKm(sLat, sLng, t.lat, t.lng) <= 0.25);
+
+      if (nearbyFlood) {
+        warningVoice = ` Cảnh báo: Cách khoảng 200 mét phía trước có điểm ngập sâu ${nearbyFlood.depth_cm || 20} xăng ti mét tại ${nearbyFlood.name}. Bạn hãy đi chậm hoặc rẽ theo chỉ dẫn an toàn.`;
+      } else if (nearbyJam) {
+        warningVoice = ` Chú ý: Phía trước có điểm ùn tắc giao thông, hãy chú ý quan sát và giữ khoảng cách an toàn.`;
+      }
+    }
+
+    const textToSpeak = `Chặng ${stepIndex + 1}: ${step.instruction}${step.distance > 0 ? `, đi tiếp ${step.distanceText}` : ''}.${warningVoice}`;
+    this.showToast(textToSpeak, warningVoice ? 'warning' : 'info', 3500);
     if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
       window.aiChat.toggleSpeakText(textToSpeak, null);
     }
@@ -4268,7 +4637,7 @@ class GoogleMapsApp {
       }
     }
 
-    const subtitleEl = document.getElementById('sos-modal-subtitle');
+    const subtitleEl = document.getElementById('sos-location-subtitle') || document.getElementById('sos-modal-subtitle');
     if (subtitleEl) {
       subtitleEl.textContent = `Đang sắp xếp theo khoảng cách gần nhất từ: ${this._sosRefLocation.name}`;
     }
@@ -4296,7 +4665,7 @@ class GoogleMapsApp {
   }
 
   renderSosContent(tabName = 'shelters') {
-    const bodyEl = document.getElementById('sos-modal-body');
+    const bodyEl = document.getElementById('sos-modal-content') || document.getElementById('sos-modal-body');
     if (!bodyEl) return;
 
     const ref = this._sosRefLocation || { lat: 21.0285, lng: 105.8542, name: 'Vị trí hiện tại' };
@@ -4440,6 +4809,539 @@ class GoogleMapsApp {
     } else {
       prompt('Sao chép tọa độ GPS cứu hộ:', text);
     }
+  }
+
+  // =========================================================================
+  // 14. ĐỢT 1: BỘ TÍNH KINH TẾ CHUYẾN ĐI, ĐIỂM DỪNG DỌC TUYẾN, CHẤM ĐIỂM AN CƯ & DEMO 1-CLICK
+  // =========================================================================
+
+  /**
+   * Mục 1: Bộ Tính toán Kinh tế Chuyến đi & Tiền Tự Bảo Vệ Ví khỏi Thủy kích (Trip Economics Engine)
+   */
+  renderTripEconomicsHtml(route, allRoutes = [], blockedRoutes = []) {
+    const distKm = parseFloat(route.distanceKm) || 1;
+    const delayMin = Number(route.delayMin) || 0;
+    const veh = this.currentVehicle || 'motorbike';
+
+    // Định mức chi phí cơ bản (VNĐ/km) + hệ số đốt nhiên liệu khi dừng chờ kẹt xe (VNĐ/phút trễ)
+    const rates = {
+      motorbike: { perKm: 480, perDelayMin: 110, label: 'xăng', evAltPerKm: 95, evAltLabel: 'Xe máy điện' },
+      ebike:     { perKm: 95,  perDelayMin: 18,  label: 'điện', gasAltPerKm: 480, gasAltLabel: 'Xe máy xăng' },
+      car:       { perKm: 1950, perDelayMin: 420, label: 'xăng', evAltPerKm: 560, evAltLabel: 'Ô tô điện' },
+      ecar:      { perKm: 560,  perDelayMin: 85,  label: 'điện', gasAltPerKm: 1950, gasAltLabel: 'Ô tô xăng' }
+    };
+    const cfg = rates[veh] || rates.motorbike;
+    const totalCost = Math.max(100, Math.round((distKm * cfg.perKm + delayMin * cfg.perDelayMin) / 100) * 100);
+    const fmt = (n) => n.toLocaleString('vi-VN') + 'đ';
+
+    let compareBadge = '';
+    if (cfg.evAltPerKm) {
+      const evCost = Math.max(100, Math.round((distKm * cfg.evAltPerKm + delayMin * 25) / 100) * 100);
+      const savePct = Math.round((1 - evCost / totalCost) * 100);
+      compareBadge = `<span class="gm-econ-ev-compare" title="So sánh chi phí chuyển đổi xanh">Đi ${cfg.evAltLabel}: ~${fmt(evCost)} (Tiết kiệm ${savePct}%)</span>`;
+    } else if (cfg.gasAltPerKm) {
+      const gasCost = Math.round((distKm * cfg.gasAltPerKm + delayMin * 150) / 100) * 100;
+      const savedVnd = Math.max(100, gasCost - totalCost);
+      compareBadge = `<span class="gm-econ-ev-compare">Rẻ hơn ${cfg.gasAltLabel} ~${fmt(savedVnd)}</span>`;
+    }
+
+    // Kiểm tra xem lộ trình này có giúp né ngập / bảo vệ ví khỏi thủy kích hay không
+    const activeFloods = this.getCurrentFloods().filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
+    let shieldHtml = '';
+    if ((blockedRoutes && blockedRoutes.length > 0) || (activeFloods.length > 0 && (!route.warnings || !route.warnings.some(w => w.hazardType === 'flood')))) {
+      const riskSavedText = (veh === 'car' || veh === 'ecar')
+        ? '15 – 40 triệu đ (Rủi ro thủy kích / ngập gầm ô tô)'
+        : '150.000đ – 500.000đ (Rủi ro chết máy, thay dầu láp & bugi)';
+      shieldHtml = `
+        <div class="gm-econ-shield-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          <span>Bảo vệ ví: Tránh thiệt hại ${riskSavedText}</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="gm-trip-econ-box">
+        <div class="gm-trip-econ-row">
+          <span class="gm-econ-cost-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Chi phí nhiên liệu: ~${fmt(totalCost)} ${cfg.label}${delayMin > 0 ? ` (Gồm hao phí kẹt xe +${delayMin}p)` : ''}
+          </span>
+          ${compareBadge}
+        </div>
+        ${shieldHtml}
+      </div>
+    `;
+  }
+
+  /**
+   * Helper chuẩn hóa danh mục địa điểm ăn uống, giải trí từ CSDL
+   */
+  getAllFoodSpots() {
+    const result = [];
+    const fe = window.FOOD_ENTERTAINMENT_DATA;
+    if (!fe) return result;
+
+    if (fe.AREAS_GUIDE) {
+      Object.entries(fe.AREAS_GUIDE).forEach(([key, area]) => {
+        const areaCity = (key === 'hcm') ? 'hcm' : (key === 'danang' ? 'danang' : 'hanoi');
+        if (Array.isArray(area.spots)) {
+          area.spots.forEach(sp => {
+            result.push({
+              name: sp.name,
+              address: sp.address || area.title || '',
+              lat: sp.lat || area.lat,
+              lng: sp.lng || area.lng,
+              feature: sp.feature || sp.vibe || '',
+              specialty: sp.feature || sp.vibe || '',
+              price: sp.price || '',
+              city: areaCity,
+              areaTitle: area.title || ''
+            });
+          });
+        }
+      });
+    }
+
+    if (Array.isArray(fe.areas)) {
+      fe.areas.forEach(area => {
+        const spots = [...(area.spots || []), ...(area.places || []), ...(area.food || []), ...(area.entertainment || [])];
+        spots.forEach(sp => {
+          result.push({
+            name: sp.name,
+            address: sp.address || area.areaName || '',
+            lat: sp.lat || area.lat,
+            lng: sp.lng || area.lng,
+            feature: sp.feature || sp.specialty || '',
+            specialty: sp.specialty || sp.feature || '',
+            price: sp.price || '',
+            city: area.city || 'hanoi',
+            areaTitle: area.areaName || ''
+          });
+        });
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Tìm và ghim các quán cafe, ăn uống giải trí gần trạm sạc xe điện trong lúc chờ sạc
+   */
+  showNearbyFoodForEV(lat, lng, name) {
+    const allSpots = this.getAllFoodSpots().filter(sp => !sp.city || sp.city === this.currentCity);
+    if (allSpots.length === 0) {
+      this.showToast('Chưa có dữ liệu địa điểm ẩm thực quanh trạm sạc này.', 'info');
+      return;
+    }
+
+    const sorted = allSpots.map(sp => {
+      const distKm = this._calcDistanceKm(lat, lng, sp.lat, sp.lng);
+      return { ...sp, distKm };
+    }).sort((a, b) => a.distKm - b.distKm);
+
+    const closest = sorted.slice(0, 5);
+    if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+      window.mapEngine.renderFoodPlaces(closest, lat, lng);
+    }
+    this.showToast(`Đã tìm thấy ${closest.length} điểm ăn uống, cafe nghỉ ngơi gần trạm sạc ${name}!`, 'info', 4000);
+  }
+
+  /**
+   * Mục 2: Quét Điểm Dừng Sát Lộ Trình Nhất (Zero-Detour Smart Pit-Stop: Trạm sạc EV, Điểm Trú mưa, Ẩm thực sát tuyến)
+   */
+  renderAlongRoutePitStopsHtml(routeCoords) {
+    if (!routeCoords || routeCoords.length < 2) return '';
+
+    const sampleStep = Math.max(1, Math.floor(routeCoords.length / 25));
+    const sampled = [];
+    for (let i = 0; i < routeCoords.length; i += sampleStep) {
+      sampled.push(routeCoords[i]);
+    }
+    sampled.push(routeCoords[routeCoords.length - 1]);
+
+    const minDistToRouteM = (lat, lng) => {
+      let minD = Infinity;
+      for (const p of sampled) {
+        const d = this.getCoordDistanceMeters(p[0], p[1], lat, lng);
+        if (d < minD) minD = d;
+      }
+      return Math.round(minD);
+    };
+
+    // 1. Tìm Trạm sạc EV sát lộ trình nhất
+    const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const cityEV = allEV.filter(s => (!s.city || s.city === this.currentCity) && Number.isFinite(s.lat) && Number.isFinite(s.lng));
+    let closestEV = null;
+    for (const s of cityEV) {
+      const d = minDistToRouteM(s.lat, s.lng);
+      if (!closestEV || d < closestEV.distM) {
+        closestEV = { ...s, distM: d };
+      }
+    }
+
+    // 2. Tìm Điểm Trú mưa Cao ráo sát lộ trình nhất
+    const shelters = this.getSafeSheltersByCity(this.currentCity);
+    let closestShelter = null;
+    shelters.forEach((sh, idx) => {
+      const d = minDistToRouteM(sh.lat, sh.lng);
+      if (!closestShelter || d < closestShelter.distM) {
+        closestShelter = { ...sh, idx, distM: d };
+      }
+    });
+
+    // 3. Tìm Điểm Ẩm thực / TTTM sát lộ trình nhất
+    let closestFood = null;
+    const allFood = this.getAllFoodSpots();
+    for (const sp of allFood) {
+      if (sp.city && sp.city !== this.currentCity) continue;
+      if (!Number.isFinite(sp.lat) || !Number.isFinite(sp.lng)) continue;
+      const d = minDistToRouteM(sp.lat, sp.lng);
+      if (!closestFood || d < closestFood.distM) {
+        closestFood = { name: sp.name, lat: sp.lat, lng: sp.lng, specialty: sp.specialty || sp.feature, distM: d };
+      }
+    }
+
+    this._lastPitStops = { closestEV, closestShelter, closestFood };
+    const chips = [];
+
+    if (closestEV && closestEV.distM <= 2500) {
+      const dLabel = closestEV.distM < 1000 ? `${closestEV.distM}m` : `${(closestEV.distM / 1000).toFixed(1)}km`;
+      chips.push(`
+        <button type="button" class="gm-pitstop-chip" onclick="window.appState.focusPitStopOnMap('ev')" title="Trạm sạc EV nằm sát lộ trình nhất (${closestEV.name})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Sạc EV sát tuyến: ${closestEV.name.slice(0, 22)} (${dLabel})</span>
+        </button>
+      `);
+    }
+
+    if (closestShelter && closestShelter.distM <= 3500) {
+      const dLabel = closestShelter.distM < 1000 ? `${closestShelter.distM}m` : `${(closestShelter.distM / 1000).toFixed(1)}km`;
+      chips.push(`
+        <button type="button" class="gm-pitstop-chip" onclick="window.appState.focusPitStopOnMap('shelter')" title="Điểm gửi xe & trú mưa cao ráo sát tuyến đường này (${closestShelter.name})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Trú mưa cao ráo: ${closestShelter.name.slice(0, 22)} (${dLabel})</span>
+        </button>
+      `);
+    }
+
+    if (closestFood && closestFood.distM <= 2000) {
+      const dLabel = closestFood.distM < 1000 ? `${closestFood.distM}m` : `${(closestFood.distM / 1000).toFixed(1)}km`;
+      chips.push(`
+        <button type="button" class="gm-pitstop-chip" onclick="window.appState.focusPitStopOnMap('food')" title="Điểm dừng ăn uống / TTTM ngay dọc đường đi (${closestFood.name})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.3"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+          <span>Dừng nghỉ dọc đường: ${closestFood.name.slice(0, 20)} (${dLabel})</span>
+        </button>
+      `);
+    }
+
+    if (chips.length === 0) return '';
+
+    return `
+      <div class="gm-pitstop-bar">
+        <div class="gm-pitstop-title">
+          <span>Điểm dừng tiện đường sát lộ trình (Không cần đi vòng xa):</span>
+        </div>
+        <div class="gm-pitstop-chips">
+          ${chips.join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  focusPitStopOnMap(type) {
+    const ps = this._lastPitStops || {};
+    if (type === 'ev' && ps.closestEV) {
+      if (window.mapEngine && window.mapEngine.focusEVStation && ps.closestEV.id) {
+        window.mapEngine.focusEVStation(ps.closestEV.id);
+      } else if (window.mapEngine?.map) {
+        window.mapEngine.map.flyTo([ps.closestEV.lat, ps.closestEV.lng], 16);
+      }
+      this.showToast(`Trạm sạc tiện đường: ${ps.closestEV.name} (Cách lộ trình ${ps.closestEV.distM}m)`, 'info', 3500);
+    } else if (type === 'shelter' && ps.closestShelter) {
+      if (window.mapEngine && typeof window.mapEngine.focusShelterOnMap === 'function') {
+        window.mapEngine.focusShelterOnMap(ps.closestShelter);
+      }
+      this.showToast(`Điểm trú mưa cao ráo sát tuyến: ${ps.closestShelter.name}`, 'info', 3500);
+    } else if (type === 'food' && ps.closestFood) {
+      if (window.mapEngine?.map) {
+        window.mapEngine.map.flyTo([ps.closestFood.lat, ps.closestFood.lng], 16);
+      }
+      this.showToast(`Điểm dừng nghỉ dọc tuyến: ${ps.closestFood.name} (${ps.closestFood.specialty || ''})`, 'info', 3500);
+    }
+  }
+
+  /**
+   * Mục 3: Chấm điểm An Cư & Khảo sát Thuê Trọ / Mặt bằng Chống ngập (6 nguồn dữ liệu + Open-Meteo DEM Elevation API)
+   */
+  async openPropertyAnalyzerModal(lat, lng, title = 'Vị trí đang khảo sát') {
+    const modal = document.getElementById('modal-property-score');
+    const bodyEl = document.getElementById('prop-score-body');
+    const subEl = document.getElementById('prop-score-subtitle');
+    if (!modal || !bodyEl) return;
+
+    const targetLat = Number(lat) || (this.citiesConfig[this.currentCity]?.lat || 21.0285);
+    const targetLng = Number(lng) || (this.citiesConfig[this.currentCity]?.lng || 105.8542);
+    const targetName = title || `Tọa độ [${targetLat.toFixed(4)}, ${targetLng.toFixed(4)}]`;
+
+    if (subEl) {
+      subEl.textContent = `Đang phân tích địa hình vệ tinh & 6 lớp hạ tầng tại: ${targetName} (${targetLat.toFixed(4)}, ${targetLng.toFixed(4)})`;
+    }
+
+    const routeHereBtn = document.getElementById('btn-prop-route-here');
+    if (routeHereBtn) {
+      routeHereBtn.onclick = () => {
+        modal.classList.remove('open');
+        this.routeToLocation(targetLat, targetLng, targetName);
+      };
+    }
+
+    bodyEl.innerHTML = `
+      <div style="padding: 24px; text-align: center; color: #047857; font-weight: 600;">
+        Đang đo cốt nền vệ tinh NASA/Open-Meteo và quét dữ liệu rốn ngập lịch sử quanh bán kính 1.5km...
+      </div>
+    `;
+    modal.classList.add('open');
+
+    // 1. Lấy độ cao địa hình vệ tinh thực tế (Open-Meteo Elevation API - Miễn phí 100%)
+    let elevationM = this.currentCity === 'hcm' ? 4.5 : (this.currentCity === 'danang' ? 7.5 : 9.5);
+    try {
+      const elRes = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${targetLat}&longitude=${targetLng}`);
+      if (elRes.ok) {
+        const elData = await elRes.json();
+        if (Array.isArray(elData.elevation) && typeof elData.elevation[0] === 'number') {
+          elevationM = elData.elevation[0];
+        }
+      }
+    } catch {}
+
+    // 2. Khoảng cách tới Rốn ngập lịch sử (SIMULATION_FLOOD_POOLS) + Ngập thực tế (liveData.floodPoints)
+    const histPool = (typeof SIMULATION_FLOOD_POOLS !== 'undefined' && SIMULATION_FLOOD_POOLS[this.currentCity]) || [];
+    const liveFloods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
+    const allFloodSpots = [...histPool, ...liveFloods];
+
+    let nearestFlood = null;
+    let floodWithin800m = 0;
+    for (const f of allFloodSpots) {
+      if (!Number.isFinite(f.lat) || !Number.isFinite(f.lng)) continue;
+      const dKm = this._calcDistanceKm(targetLat, targetLng, f.lat, f.lng);
+      if (dKm <= 0.8) floodWithin800m++;
+      if (!nearestFlood || dKm < nearestFlood.distKm) {
+        nearestFlood = { name: f.name, distKm: dKm, depth: f.depth_cm || 30 };
+      }
+    }
+
+    // Chấm điểm Chống ngập & Cốt nền (Tối đa 40 điểm)
+    let floodScore = 40;
+    const minDistM = nearestFlood ? Math.round(nearestFlood.distKm * 1000) : 2500;
+    if (minDistM < 250) floodScore -= 22;
+    else if (minDistM < 500) floodScore -= 13;
+    else if (minDistM < 850) floodScore -= 6;
+    if (elevationM < 5) floodScore -= 6;
+    else if (elevationM >= 10) floodScore = Math.min(40, floodScore + 3);
+    floodScore = Math.max(10, Math.min(40, floodScore));
+
+    // 3. Điểm nghẽn Giao thông & Công trường trong bán kính 1.2km (Tối đa 25 điểm)
+    const cityTraffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
+    let jamsNear = 0;
+    let worksNear = 0;
+    for (const t of cityTraffics) {
+      if (!Number.isFinite(t.lat) || !Number.isFinite(t.lng)) continue;
+      const dKm = this._calcDistanceKm(targetLat, targetLng, t.lat, t.lng);
+      if (dKm <= 1.2) {
+        if (t.isJam) jamsNear++;
+        else if (t.type === 'roadwork' || t.type === 'road_closure') worksNear++;
+      }
+    }
+    const mobilityScore = Math.max(8, Math.min(25, 25 - jamsNear * 4 - worksNear * 3));
+
+    // 4. Mật độ Trạm sạc EV & Điểm Trú mưa Cao ráo trong bán kính 1.5km (Tối đa 20 điểm)
+    const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const evNearCount = allEV.filter(s => (!s.city || s.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 1.5).length;
+    const sheltersNear = this.getSafeSheltersByCity(this.currentCity).filter(s => this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 2.5);
+    const infraScore = Math.min(20, 10 + Math.min(6, evNearCount * 2) + Math.min(4, sheltersNear.length * 2));
+
+    // 5. Mật độ Tiện ích Đời sống (Ẩm thực/TTTM) & Tiếp cận Đường lớn trong 1.8km (Tối đa 15 điểm)
+    const foodNearCount = this.getAllFoodSpots().filter(sp => {
+      return (!sp.city || sp.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, sp.lat, sp.lng) <= 1.8;
+    }).length;
+    const lifestyleScore = Math.min(15, 8 + Math.min(7, foodNearCount));
+
+    const totalScore = Math.round(floodScore + mobilityScore + infraScore + lifestyleScore);
+    let grade = 'A+';
+    let gradeColor = '#059669';
+    let verdict = 'Khu vực An cư & Kinh doanh Lý tưởng (Cao ráo, hạ tầng đồng bộ)';
+    if (totalScore < 65) {
+      grade = 'C';
+      gradeColor = '#dc2626';
+      verdict = 'Khu vực Trũng / Gần Rốn Ngập — Cần kiểm tra kỹ cốt nền tầng 1 trước khi thuê';
+    } else if (totalScore < 78) {
+      grade = 'B';
+      gradeColor = '#d97706';
+      verdict = 'Khu vực Khá — Đầy đủ tiện ích nhưng cần lưu ý đường ra vào khi mưa lớn >50mm';
+    } else if (totalScore < 88) {
+      grade = 'A';
+      gradeColor = '#0d9488';
+      verdict = 'Khu vực Tốt — Thoát nước ổn định, thuận tiện đi làm & sinh hoạt';
+    }
+
+    const rentalAdvice = minDistM < 400
+      ? `<strong>Lưu ý quan trọng khi đi thuê trọ / mặt bằng tại đây:</strong> Vị trí này cách rốn ngập lịch sử <em>${nearestFlood?.name}</em> chỉ <strong>${minDistM}m</strong>. Hãy kiểm tra dấu vết ngấn nước ở chân tường tầng 1, ưu tiên nhà có bậc tam cấp cao >30cm và hỏi chủ nhà về tình trạng hầm để xe khi mưa lớn.`
+      : `<strong>Đánh giá thực địa tốt:</strong> Vị trí nằm cách xa rốn ngập gần nhất tới <strong>${(minDistM / 1000).toFixed(2)} km</strong> (${nearestFlood?.name || 'An toàn'}), cốt nền vệ tinh đạt <strong>+${elevationM}m</strong>. Bán kính 1.5km có sẵn <strong>${evNearCount} trạm sạc EV</strong> và <strong>${foodNearCount} điểm dịch vụ/ẩm thực</strong> — Rất thuận lợi để thuê ở lâu dài hoặc mở cửa hàng.`;
+
+    this._lastPropertyReportText = `[PHIẾU KHẢO SÁT AN CƯ & MẶT BẰNG - MOVESAFE VN]\n- Địa điểm: ${targetName} (${targetLat.toFixed(5)}, ${targetLng.toFixed(5)})\n- Tổng điểm: ${totalScore}/100 (Hạng ${grade} - ${verdict})\n- Cốt nền vệ tinh: +${elevationM}m so với mực nước biển\n- Khoảng cách tới rốn ngập lịch sử gần nhất: ${minDistM}m (${nearestFlood?.name || 'Không có'})\n- Bán kính 1.5km: ${evNearCount} Trạm sạc EV, ${sheltersNear.length} Điểm gửi xe cao ráo, ${foodNearCount} Tiện ích ẩm thực/TTTM.`;
+
+    bodyEl.innerHTML = `
+      <div class="prop-score-hero">
+        <div class="prop-score-circle" style="background: ${gradeColor};">
+          <span class="prop-score-num">${totalScore}</span>
+          <span class="prop-score-grade">HẠNG ${grade}</span>
+        </div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">${targetName}</div>
+          <div style="font-size: 13px; font-weight: 700; color: ${gradeColor}; margin-bottom: 4px;">${verdict}</div>
+          <div style="font-size: 12px; color: #475569;">
+            Cốt nền vệ tinh (DEM NASA): <strong>+${elevationM}m</strong> • Cách rốn ngập gần nhất: <strong>${minDistM < 1000 ? minDistM + 'm' : (minDistM / 1000).toFixed(2) + ' km'}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-score-grid">
+        <div class="prop-metric-card">
+          <div class="prop-metric-head">
+            <span>1. An toàn Chống ngập & Cốt nền</span>
+            <span class="prop-metric-pts">${floodScore}/40 đ</span>
+          </div>
+          <div class="prop-metric-desc">
+            Độ cao địa hình đạt <strong>+${elevationM}m</strong>. Rốn ngập lịch sử gần nhất là <em>${nearestFlood ? nearestFlood.name : 'Không có'}</em> (cách <strong>${minDistM}m</strong>).
+          </div>
+        </div>
+
+        <div class="prop-metric-card">
+          <div class="prop-metric-head">
+            <span>2. Độ Thông thoáng Giao thông</span>
+            <span class="prop-metric-pts">${mobilityScore}/25 đ</span>
+          </div>
+          <div class="prop-metric-desc">
+            Quét bán kính 1.2km hiện có <strong>${jamsNear} điểm ùn tắc</strong> và <strong>${worksNear} công trường/rào chắn</strong>. Kết nối thuận lợi ra trục đường chính.
+          </div>
+        </div>
+
+        <div class="prop-metric-card">
+          <div class="prop-metric-head">
+            <span>3. Hạ tầng Trạm sạc EV & Trú mưa</span>
+            <span class="prop-metric-pts">${infraScore}/20 đ</span>
+          </div>
+          <div class="prop-metric-desc">
+            Bán kính 1.5km có <strong>${evNearCount} trạm sạc/đổi pin xe điện</strong> (thuận tiện nếu nhà trọ cấm sạc tầng 1) và <strong>${sheltersNear.length} bãi đỗ xe cao ráo</strong>.
+          </div>
+        </div>
+
+        <div class="prop-metric-card">
+          <div class="prop-metric-head">
+            <span>4. Tiện ích Đời sống & Kinh doanh</span>
+            <span class="prop-metric-pts">${lifestyleScore}/15 đ</span>
+          </div>
+          <div class="prop-metric-desc">
+            Ghi nhận <strong>${foodNearCount} điểm ẩm thực, TTTM, giải trí</strong> lân cận. Đáp ứng tốt nhu cầu sinh hoạt hoặc lưu lượng khách vãng lai.
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-advice-box">
+        ${rentalAdvice}
+      </div>
+    `;
+  }
+
+  copyPropertyScoreReport() {
+    const text = this._lastPropertyReportText || 'Phiếu khảo sát An cư MoveSafe VN';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showToast('Đã sao chép Phiếu Khảo Sát An Cư! Bạn có thể dán vào ghi chú để so sánh các nhà trọ/mặt bằng.', 'success', 4000);
+      }).catch(() => {
+        prompt('Sao chép phiếu khảo sát:', text);
+      });
+    } else {
+      prompt('Sao chép phiếu khảo sát:', text);
+    }
+  }
+
+  /**
+   * Mục 13: Mở form Báo cáo Cộng đồng và tự động điền sẵn tọa độ + tên đường vừa click trên bản đồ
+   */
+  openReportAtPOI(lat, lng, title) {
+    if (this._tempClickMarker && window.mapEngine?.map) {
+      window.mapEngine.map.closePopup();
+    }
+    const reportModal = document.getElementById('modal-report');
+    const locInput = document.getElementById('report-location-name');
+    const latInput = document.getElementById('report-lat');
+    const lngInput = document.getElementById('report-lng');
+    const coordDisplay = document.getElementById('report-coord-display');
+
+    if (locInput) locInput.value = title || '';
+    if (latInput) latInput.value = lat;
+    if (lngInput) lngInput.value = lng;
+    if (coordDisplay) {
+      coordDisplay.textContent = `Đã ghim tọa độ từ bản đồ: ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}`;
+      coordDisplay.style.display = 'block';
+    }
+    reportModal?.classList.add('open');
+    this.showToast(`Đã điền sẵn vị trí "${title}" vào biểu mẫu báo cáo!`, 'info', 3000);
+  }
+
+  /**
+   * Mục 15: Nút "Demo Né ngập 1-Click" ngay trên Thanh Giả lập (#gm-simulation-banner)
+   * Tự động lấy rốn ngập sâu nhất đang giả lập, tạo Điểm Đi (A) và Điểm Đến (B) ở 2 đầu rốn ngập để trình diễn thuật toán
+   */
+  async triggerOneClickFloodDemo() {
+    if (!this.isSimulationMode) {
+      this.setSimulationMode(true, false);
+    }
+    const simFloods = this.getSimulatedFloods(this.currentCity);
+    if (!simFloods || simFloods.length === 0) return;
+
+    // Chọn rốn ngập sâu nhất (đảm bảo >= 35cm để cả xe máy & ô tô đều phải bẻ lái né ngập)
+    const deepest = simFloods.reduce((max, f) => (f.depth_cm > max.depth_cm ? f : max), simFloods[0]);
+    if (deepest.depth_cm < 35) {
+      deepest.depth_cm = 42;
+      deepest.danger_level = 'critical';
+      deepest.passable_motorbike = false;
+      deepest.passable_car = false;
+      this.renderAllData();
+    }
+
+    // Đặt Điểm đi (A) và Điểm đến (B) cách rốn ngập ~900m ở hai phía đối diện để tuyến ngắn nhất cắt ngang qua rốn ngập
+    const deltaLat = 0.0065;
+    const deltaLng = 0.0065;
+    const originLat = Number((deepest.lat - deltaLat).toFixed(5));
+    const originLng = Number((deepest.lng - deltaLng).toFixed(5));
+    const destLat = Number((deepest.lat + deltaLat).toFixed(5));
+    const destLng = Number((deepest.lng + deltaLng).toFixed(5));
+
+    const shortFloodName = deepest.name.split('(')[0].trim();
+    const originTitle = `Điểm xuất phát A (Trước ${shortFloodName})`;
+    const destTitle = `Điểm đích B (Sau ${shortFloodName})`;
+
+    this.toggleDirectionsPanel(true);
+
+    const originInput = document.getElementById('gm-route-origin');
+    const destInput = document.getElementById('gm-route-dest');
+    if (originInput && destInput) {
+      originInput.value = originTitle;
+      originInput.dataset.lat = String(originLat);
+      originInput.dataset.lng = String(originLng);
+      this.routeLocations.origin = { title: originTitle, fullAddress: originTitle, lat: originLat, lng: originLng };
+
+      destInput.value = destTitle;
+      destInput.dataset.lat = String(destLat);
+      destInput.dataset.lng = String(destLng);
+      this.routeLocations.destination = { title: destTitle, fullAddress: destTitle, lat: destLat, lng: destLng };
+    }
+
+    this.showToast(`Đang trình diễn Demo Né ngập qua "${shortFloodName}" (Ngập sâu ${deepest.depth_cm}cm)...`, 'warning', 4500);
+    await this.calculateSmartRoute();
   }
 }
 

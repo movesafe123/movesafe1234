@@ -674,6 +674,20 @@ class MapEngine {
             Nguồn: ${safeSource}
           </div>
           ${verifyButtons}
+          <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px solid #f1f5f9; padding-top: 6px;">
+            <button 
+              style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+              onclick="window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Tuyến đường tại ${safeDesc.replace(/'/g, "\\'")} đang gặp sự cố/ùn tắc, bạn hãy phân tích và tư vấn giúp tôi các tuyến đường tránh né điểm nghẽn này an toàn nhất?'))">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+              Hỏi AI đường vòng
+            </button>
+            <button 
+              style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+              onclick="window.appState && window.appState.openSosRescueModal && window.appState.openSosRescueModal(${inc.lat}, ${inc.lng}, '${safeDesc.replace(/'/g, "\\'")}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              Trú mưa / SOS
+            </button>
+          </div>
         </div>
       `;
 
@@ -976,14 +990,23 @@ class MapEngine {
 
         ${connectorsHtml}
 
-        <div style="display: flex; gap: 6px; margin-top: 10px;">
+        <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;">
           <button 
-            style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+            style="flex: 1; min-width: 120px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
             onmouseover="this.style.background='#1d4ed8'"
             onmouseout="this.style.background='#2563eb'"
             onclick="window.appState && window.appState.routeToLocation(${st.lat}, ${st.lng}, '${safeName.replace(/'/g, "\\'")}')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3" transform="rotate(45 12 12)"></rect><path d="M9.5 14.5v-3a1 1 0 0 1 1-1h4"></path><polyline points="12.5 8.5 14.5 10.5 12.5 12.5"></polyline></svg>
             Chỉ đường né ngập
+          </button>
+          <button 
+            style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+            onmouseover="this.style.background='#ffedd5'"
+            onmouseout="this.style.background='#fff7ed'"
+            onclick="window.appState && window.appState.showNearbyFoodForEV(${st.lat}, ${st.lng}, '${safeName.replace(/'/g, "\\'")}')"
+            title="Tìm quán cafe, ăn uống giải trí gần trạm trong lúc chờ sạc pin">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+            Cafe / Chờ sạc
           </button>
           <button 
             style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
@@ -1109,11 +1132,21 @@ class MapEngine {
           <div style="font-size: 11.5px; color: #15803d; font-weight: 600; margin-bottom: 8px;">
             Mức giá: ${safePrice}
           </div>
-          <button
-            style="width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer;"
-            onclick="window.appState && window.appState.routeToLocation(${spot.lat}, ${spot.lng}, '${safeName.replace(/'/g, "\\'")}')">
-            Chỉ đường an toàn đến đây
-          </button>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button
+              style="flex: 1; background: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
+              onclick="window.appState && window.appState.routeToLocation(${spot.lat}, ${spot.lng}, '${safeName.replace(/'/g, "\\'")}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+              Chỉ đường an toàn
+            </button>
+            <button
+              style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;"
+              onclick="window.appState && window.appState.openCommuteComfortModal(${spot.lat}, ${spot.lng}, '${safeName.replace(/'/g, "\\'")}')"
+              title="Xem nhiệt độ mặt đường, dự báo mưa 15P và chỉ số di chuyển">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+              Thời tiết 15P
+            </button>
+          </div>
         </div>
       `;
 
