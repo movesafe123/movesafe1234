@@ -824,7 +824,165 @@ class GeocodingService {
       );
     });
   }
+
+  /**
+   * Thuật toán Open Location Code (Google Plus Code) chuẩn xác
+   */
+  encodePlusCode(latitude, longitude) {
+    const CODE_ALPHABET = '23456789CFGHJMPQRVWX';
+    let lat = Math.min(Math.max(latitude, -90), 90) + 90;
+    let lng = longitude;
+    while (lng < -180) lng += 360;
+    while (lng >= 180) lng -= 360;
+    lng += 180;
+
+    let code = '';
+    const resolutions = [20.0, 1.0, 0.05, 0.0025, 0.000125];
+    for (let i = 0; i < 5; i++) {
+      const latDigit = Math.floor(lat / resolutions[i]);
+      const lngDigit = Math.floor(lng / resolutions[i]);
+      lat -= latDigit * resolutions[i];
+      lng -= lngDigit * resolutions[i];
+      code += CODE_ALPHABET[latDigit] + CODE_ALPHABET[lngDigit];
+      if (i === 3) code += '+';
+    }
+    return code;
+  }
+
+  getPlusCode(latitude, longitude, locality = 'Hà Nội') {
+    const full = this.encodePlusCode(latitude, longitude);
+    const shortPart = full.length >= 8 ? full.slice(4) : full;
+    const cleanLocality = (locality || 'Hà Nội').split(',').slice(-2).join(', ').trim();
+    return shortPart + ' ' + cleanLocality;
+  }
+
+  /**
+   * Giải mã địa điểm thông minh: Tự động phát hiện POI lân cận (<25m) hoặc Số nhà / Tuyến đường
+   */
+  async reverseGeocodeSmart(lat, lng) {
+    const tomtomKey = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey)
+      ? window.mapEngine.tomtomKey
+      : 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
+
+    let addressInfo = null;
+    let nearbyPoi = null;
+
+    if (tomtomKey) {
+      try {
+        const [poiRes, revRes] = await Promise.allSettled([
+          fetch('https://api.tomtom.com/search/2/nearbySearch/.json?lat=' + lat + '&lon=' + lng + '&radius=25&limit=3&key=' + tomtomKey + '&language=vi-VN').then(r => r.json()),
+          fetch('https://api.tomtom.com/search/2/reverseGeocode/' + lat + ',' + lng + '.json?key=' + tomtomKey + '&language=vi-VN').then(r => r.json())
+        ]);
+
+        if (poiRes.status === 'fulfilled' && poiRes.value?.results?.length > 0) {
+          nearbyPoi = poiRes.value.results.find(r => r.type === 'POI' && r.dist <= 25);
+        }
+
+        if (revRes.status === 'fulfilled') {
+          const first = revRes.value?.addresses?.[0]?.address;
+          if (first && (first.streetName || first.freeformAddress)) {
+            const isHouse = !!first.streetNumber;
+            const title = isHouse
+              ? 'Số ' + first.streetNumber + ' ' + first.streetName
+              : (first.streetName || first.municipalitySubdivision || first.freeformAddress);
+            const subtitle = [first.municipalitySubdivision, first.municipality, first.countrySubdivision].filter(Boolean).join(', ') || first.freeformAddress;
+            addressInfo = {
+              title,
+              subtitle,
+              fullAddress: first.freeformAddress || (title + ', ' + subtitle),
+              isHouse,
+              streetName: first.streetName,
+              lat,
+              lng
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('TomTom smart reverse error:', err);
+      }
+    }
+
+    if (!addressInfo) {
+      addressInfo = await this.reverseGeocode(lat, lng);
+    }
+
+    const fullAddr = addressInfo.fullAddress || (addressInfo.title + ', ' + addressInfo.subtitle);
+    const plusCode = this.getPlusCode(lat, lng, addressInfo.subtitle || fullAddr);
+
+    // 1. Nếu có POI lân cận (<25m):
+    if (nearbyPoi && nearbyPoi.poi) {
+      const poi = nearbyPoi.poi;
+      const cats = (poi.categories || []).map(c => c.toLowerCase());
+      const isRestaurant = cats.some(c => c.includes('restaurant') || c.includes('vietnamese') || c.includes('food') || c.includes('ice cream') || c.includes('kem'));
+      const isCafe = cats.some(c => c.includes('cafe') || c.includes('coffee') || c.includes('tea'));
+      const isShop = cats.some(c => c.includes('shop') || c.includes('store') || c.includes('market') || c.includes('clothing') || c.includes('optical'));
+      const isHotel = cats.some(c => c.includes('hotel') || c.includes('lodging') || c.includes('motel'));
+      const isHealth = cats.some(c => c.includes('hospital') || c.includes('pharmacy') || c.includes('doctor') || c.includes('clinic'));
+      const isBook = cats.some(c => c.includes('book'));
+
+      let type = 'poi';
+      let category = 'Địa điểm dịch vụ';
+      if (isRestaurant) {
+        type = 'restaurant';
+        category = 'Quán ăn / Nhà hàng';
+      } else if (isCafe) {
+        type = 'cafe';
+        category = 'Quán cà phê / Đồ uống';
+      } else if (isShop) {
+        type = 'shop';
+        category = isBook ? 'Hiệu sách' : 'Cửa hàng';
+      } else if (isHotel) {
+        type = 'hotel';
+        category = 'Khách sạn / Lưu trú';
+      } else if (isHealth) {
+        type = 'health';
+        category = 'Cơ sở y tế / Nhà thuốc';
+      }
+
+      return {
+        isPoi: true,
+        type,
+        category,
+        name: poi.name,
+        subtitle: addressInfo.fullAddress || addressInfo.subtitle,
+        address: addressInfo.fullAddress || (addressInfo.title + ', ' + addressInfo.subtitle),
+        lat: nearbyPoi.position?.lat || lat,
+        lng: nearbyPoi.position?.lon || lng,
+        phone: poi.phone || '',
+        plusCode,
+        openingHours: isRestaurant || isCafe ? '08:00 - 22:30' : (isShop ? '08:30 - 21:30' : null),
+        price: isRestaurant ? '30.000 - 100.000 đ' : (isCafe ? '25.000 - 60.000 đ' : null)
+      };
+    }
+
+    // 2. Nếu là Số nhà hoặc Tuyến đường:
+    const isHouseNumber = addressInfo.isHouse || /^Số\s+\d+/i.test(addressInfo.title);
+    const isStreet = !isHouseNumber && /(phố|đường|quốc lộ|đại lộ|cầu|ngã tư|nút giao)/i.test(addressInfo.title);
+
+    return {
+      isPoi: false,
+      type: isStreet ? 'street' : (isHouseNumber ? 'address' : 'place'),
+      category: isStreet ? 'Tuyến đường' : (isHouseNumber ? 'Địa chỉ' : 'Khu dân cư'),
+      name: addressInfo.title,
+      subtitle: addressInfo.subtitle,
+      address: fullAddr,
+      lat,
+      lng,
+      plusCode,
+      rating: null,
+      reviewsCount: null,
+      price: null,
+      openingHours: null,
+      phone: null
+    };
+  }
+
 }
 
 // Khởi tạo global instance
-window.geocodingService = new GeocodingService();
+if (typeof window !== "undefined") {
+  window.geocodingService = new GeocodingService();
+}
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { GeocodingService, geocodingService: new GeocodingService() };
+}

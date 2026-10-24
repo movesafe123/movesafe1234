@@ -1495,13 +1495,13 @@ class GoogleMapsApp {
           });
         }
       } else {
-        // Click chọn địa điểm tự do như Google Maps -> Mở Bảng thông tin địa điểm chi tiết (Place Details Card)
+        // Click chọn địa điểm tự do như Google Maps -> Mở Bảng thông tin địa điểm chi tiết linh hoạt theo loại địa điểm
         if (this._tempClickMarker) window.mapEngine.map.removeLayer(this._tempClickMarker);
 
-        // 1. Kiểm tra xem tọa độ click có sát với địa điểm ẩm thực / POI nào trong CSDL không (< 80 mét)
+        // 1. Kiểm tra xem tọa độ click có sát với địa điểm ẩm thực / POI trong CSDL nội bộ không (< 35 mét)
         const allSpots = this.getAllFoodSpots();
         let matchedSpot = null;
-        let minD = 0.08; // 80 mét
+        let minD = 0.035; // 35 mét
         for (const sp of allSpots) {
           if (sp.lat && sp.lng) {
             const d = this._calcDistanceKm(lat, lng, sp.lat, sp.lng);
@@ -1527,34 +1527,15 @@ class GoogleMapsApp {
           return;
         }
 
-        // 2. Nếu là vị trí tự do, đặt marker xoay nhẹ và reverse-geocode địa chỉ
+        // 2. Nếu là vị trí tự do, đặt marker xoay nhẹ và gọi reverseGeocodeSmart (tự động nhận diện POI lân cận <25m hoặc Số nhà / Tuyến đường)
         this._tempClickMarker = L.marker([lat, lng], {
           icon: L.divIcon({ className: 'gm-temp-click-icon', html: '<div class="spinner"></div>' })
         }).addTo(window.mapEngine.map);
 
         try {
-          const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
-          const name = addrInfo.title || 'Địa điểm đã chọn';
-          const address = addrInfo.fullAddress || addrInfo.subtitle || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-          const plusCode = addrInfo.plusCode || `3P3P+${Math.floor(Math.abs(lat) * 100) % 100}${Math.floor(Math.abs(lng) * 100) % 100} ${addrInfo.subtitle || 'Hà Nội'}`;
-
-          const placeData = {
-            name,
-            address,
-            lat,
-            lng,
-            category: addrInfo.typeName || 'Địa điểm công cộng',
-            vibe: addrInfo.subtitle || 'Khu vực kết nối giao thông đô thị',
-            rating: 4.5,
-            reviewsCount: 16,
-            price: '',
-            openingHours: 'Mở cửa cả ngày (24/7)',
-            phone: '',
-            plusCode,
-            image: (addrInfo.typeName && addrInfo.typeName.includes('Đường'))
-              ? 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=720&auto=format&fit=crop&q=80'
-              : 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=720&auto=format&fit=crop&q=80'
-          };
+          const smartPlace = (window.geocodingService && typeof window.geocodingService.reverseGeocodeSmart === 'function')
+            ? await window.geocodingService.reverseGeocodeSmart(lat, lng)
+            : await window.geocodingService.reverseGeocode(lat, lng);
 
           // Thay thế icon spinner bằng pin đỏ Google Maps
           if (this._tempClickMarker) window.mapEngine.map.removeLayer(this._tempClickMarker);
@@ -1564,22 +1545,24 @@ class GoogleMapsApp {
             iconSize: [30, 30],
             iconAnchor: [15, 15]
           });
-          this._tempClickMarker = L.marker([lat, lng], { icon }).addTo(window.mapEngine.map);
-          this._tempClickMarker.on('click', () => this.openPlaceDetailsCard(placeData));
+          this._tempClickMarker = L.marker([smartPlace.lat || lat, smartPlace.lng || lng], { icon }).addTo(window.mapEngine.map);
+          this._tempClickMarker.on('click', () => this.openPlaceDetailsCard(smartPlace));
 
-          this.openPlaceDetailsCard(placeData);
+          this.openPlaceDetailsCard(smartPlace);
         } catch (err) {
           const fallbackData = {
             name: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
             address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
             lat,
             lng,
-            category: 'Vị trí bản đồ',
-            vibe: 'Khu vực đô thị',
-            rating: 4.5,
-            reviewsCount: 10,
-            plusCode: `3P3P+${Math.floor(Math.abs(lat) * 100) % 100}${Math.floor(Math.abs(lng) * 100) % 100} Hà Nội`,
-            openingHours: 'Mở cửa cả ngày (24/7)'
+            type: 'address',
+            category: 'Địa chỉ',
+            subtitle: 'Khu vực đô thị',
+            plusCode: window.geocodingService ? window.geocodingService.getPlusCode(lat, lng) : `7PH7+${Math.floor(lat * 100) % 100} Hà Nội`,
+            rating: null,
+            reviewsCount: null,
+            price: null,
+            openingHours: null
           };
           this.openPlaceDetailsCard(fallbackData);
         }
@@ -5311,54 +5294,100 @@ class GoogleMapsApp {
     const lng = Number(data.lng);
     const name = data.name || data.title || 'Địa điểm đã chọn';
 
-    if (titleEl) titleEl.textContent = name;
-    if (subtitleEl) subtitleEl.textContent = data.vibe || data.subtitle || 'Khu vực kết nối giao thông đô thị';
-    if (badgeCategory) badgeCategory.textContent = data.category || data.typeName || 'Nhà hàng ăn nhanh';
-
-    // Banner ảnh thực tế
-    if (imgEl) {
-      imgEl.src = data.image || (
-        (data.category && data.category.includes('Nhà hàng')) || data.type === 'restaurant'
-          ? 'https://images.unsplash.com/photo-1544025162-d76694265947?w=720&auto=format&fit=crop&q=80'
-          : 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=720&auto=format&fit=crop&q=80'
-      );
-    }
-
-    // Đánh giá sao & Giá
-    const rating = data.rating ? Number(data.rating) : 4.3;
-    if (ratingNum) ratingNum.textContent = rating.toFixed(1);
-    if (starsEl) {
-      const fullStars = Math.floor(rating);
-      starsEl.textContent = '★'.repeat(fullStars) + (rating % 1 >= 0.5 ? '★' : '☆') + '☆'.repeat(Math.max(0, 4 - fullStars));
-    }
-    if (reviewsCount) reviewsCount.textContent = `(${data.reviewsCount || 12})`;
-    if (priceRange) priceRange.textContent = data.price || '1 - 100.000 đ';
-
-    // Địa chỉ & Plus Code
-    const fullAddr = data.address || data.fullAddress || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-    if (addressEl) addressEl.textContent = fullAddr;
-    if (pluscodeEl) {
-      pluscodeEl.textContent = data.plusCode || `3P3P+GPP ${fullAddr.split(',').slice(-3).join(',').trim()}`;
-    }
-
-    // Giờ mở cửa
-    if (hoursEl) hoursEl.textContent = data.openingHours ? `• ${data.openingHours}` : '• Đóng cửa vào 22:30';
-
-    // Mức giá chi tiết & Số điện thoại & Tùy chọn dịch vụ
-    const servicesRow = document.getElementById('gm-place-services');
-    const priceRow = document.getElementById('gm-place-price-item');
-    const phoneRow = document.getElementById('gm-place-phone-item');
-
-    const isFood = (data.category && /(nhà hàng|quán|ăn|uống|buffet|cafe|cà phê|tiệm|phở|bún|bánh mì|ẩm thực)/i.test(data.category))
+    // Xác định phân loại địa điểm để hiển thị giao diện linh hoạt
+    const isFood = (data.category && /(nhà hàng|quán|ăn|uống|buffet|cafe|cà phê|tiệm|phở|bún|bánh mì|ẩm thực|lẩu|nướng|cơm|kem|cháo)/i.test(data.category))
       || (data.feature && /(ăn|uống|món|nem|thịt|nướng|lẩu|cafe|ẩm thực)/i.test(data.feature))
-      || (data.name && /(bunenu|quán|nhà hàng|buffet|cà phê|cafe|phở|bún|ẩm thực)/i.test(data.name));
+      || (data.name && /(bunenu|quán|nhà hàng|buffet|cà phê|cafe|phở|bún|ẩm thực|lẩu|nướng|cơm|kem|cháo)/i.test(data.name));
 
+    const isPoi = !!data.isPoi || isFood || !!data.rating || !!data.openingHours || (data.type && data.type !== 'address' && data.type !== 'street' && data.type !== 'alley');
+    const isStreet = data.type === 'street' || (data.category && /(phố|đường|quốc lộ|đại lộ|cầu|nút giao)/i.test(data.category));
+    const isAddressOrStreet = !isPoi && (data.type === 'address' || data.type === 'alley' || isStreet || (!data.rating && !isFood));
+
+    if (titleEl) titleEl.textContent = name;
+    if (subtitleEl) subtitleEl.textContent = data.subtitle || data.vibe || (isAddressOrStreet ? 'Vị trí địa chỉ đô thị' : 'Khu vực hoạt động & dịch vụ');
+
+    // Huy hiệu danh mục (Badge Category) linh hoạt theo từng loại
+    let catLabel = data.category || data.typeName;
+    if (!catLabel || catLabel === 'Địa điểm công cộng') {
+      if (isStreet) catLabel = 'Tuyến đường';
+      else if (data.type === 'alley') catLabel = 'Ngõ / Ngách';
+      else if (isFood) catLabel = 'Nhà hàng / Quán ăn';
+      else if (isAddressOrStreet) catLabel = 'Địa chỉ';
+      else catLabel = 'Địa điểm';
+    }
+    if (badgeCategory) badgeCategory.textContent = catLabel;
+
+    // Banner ảnh thực tế phù hợp
+    if (imgEl) {
+      if (data.image) {
+        imgEl.src = data.image;
+      } else if (isFood) {
+        imgEl.src = 'https://images.unsplash.com/photo-1544025162-d76694265947?w=720&auto=format&fit=crop&q=80';
+      } else if (isStreet) {
+        imgEl.src = 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=720&auto=format&fit=crop&q=80';
+      } else {
+        // Ảnh nhà ở / ngõ phố thanh lịch
+        imgEl.src = 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=720&auto=format&fit=crop&q=80';
+      }
+    }
+
+    // Đánh giá sao & Giá: CHỈ HIỂN THỊ KHI CÓ ĐÁNH GIÁ THỰC HOẶC LÀ QUÁN ĂN / POI
+    const ratingRow = document.getElementById('gm-place-rating-row');
+    const dotEl = document.querySelector('.gm-place-rating-row .gm-place-dot');
+    if (isAddressOrStreet || (!data.rating && !isFood)) {
+      if (ratingRow) ratingRow.style.display = 'none';
+    } else {
+      if (ratingRow) ratingRow.style.display = 'flex';
+      const rating = data.rating ? Number(data.rating) : 4.3;
+      if (ratingNum) ratingNum.textContent = rating.toFixed(1);
+      if (starsEl) {
+        const fullStars = Math.floor(rating);
+        starsEl.textContent = '★'.repeat(fullStars) + (rating % 1 >= 0.5 ? '★' : '☆') + '☆'.repeat(Math.max(0, 4 - fullStars));
+      }
+      if (reviewsCount) reviewsCount.textContent = `(${data.reviewsCount || 12})`;
+      if (data.price) {
+        if (dotEl) dotEl.style.display = 'inline';
+        if (priceRange) {
+          priceRange.style.display = 'inline';
+          priceRange.textContent = data.price;
+        }
+      } else {
+        if (dotEl) dotEl.style.display = 'none';
+        if (priceRange) priceRange.style.display = 'none';
+      }
+    }
+
+    // Tùy chọn dịch vụ (Ăn tại chỗ · Đồ ăn mang đi): CHỈ HIỂN THỊ CHO ẨM THỰC
+    const servicesRow = document.getElementById('gm-place-services');
     if (servicesRow) {
       servicesRow.style.display = isFood ? 'flex' : 'none';
     }
 
+    // Địa chỉ & Plus Code chuẩn Google
+    const fullAddr = data.address || data.fullAddress || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    if (addressEl) addressEl.textContent = fullAddr;
+    if (pluscodeEl) {
+      const genPlusCode = (window.geocodingService && typeof window.geocodingService.getPlusCode === 'function')
+        ? window.geocodingService.getPlusCode(lat, lng, fullAddr)
+        : `7PH7+${Math.floor(lat * 100) % 100} Hà Nội`;
+      pluscodeEl.textContent = data.plusCode || genPlusCode;
+    }
+
+    // Giờ mở cửa: CHỈ HIỂN THỊ CHO POI / QUÁN ĂN / DOANH NGHIỆP CÓ GIỜ HOẠT ĐỘNG
+    const hoursItem = document.getElementById('gm-place-hours-item');
+    if (hoursItem) {
+      if (isAddressOrStreet || (!data.openingHours && !isFood && !data.isPoi)) {
+        hoursItem.style.display = 'none';
+      } else {
+        hoursItem.style.display = 'flex';
+        if (hoursEl) hoursEl.textContent = data.openingHours ? `• ${data.openingHours}` : '• Đóng cửa vào 22:30';
+      }
+    }
+
+    // Mức giá chi tiết: CHỈ HIỂN THỊ KHI CÓ GIÁ
+    const priceRow = document.getElementById('gm-place-price-item');
     if (priceRow) {
-      if (data.price) {
+      if (data.price && isFood) {
         priceRow.style.display = 'flex';
         if (priceDetail) priceDetail.textContent = data.price.includes('/người') ? data.price : `${data.price}/người`;
       } else {
@@ -5366,6 +5395,8 @@ class GoogleMapsApp {
       }
     }
 
+    // Số điện thoại: CHỈ HIỂN THỊ KHI CÓ SỐ THẬT
+    const phoneRow = document.getElementById('gm-place-phone-item');
     if (phoneRow) {
       if (data.phone) {
         phoneRow.style.display = 'flex';
