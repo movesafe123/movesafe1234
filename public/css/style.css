@@ -5421,21 +5421,27 @@ body {
 /* ==================== GOOGLE MAPS PLACE DETAILS CARD ==================== */
 .gm-place-card {
   position: absolute;
-  top: 14px;
+  top: 72px;
   left: 16px;
-  width: 410px;
+  width: 420px;
   max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 28px);
+  max-height: calc(100vh - 86px);
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 14px 40px rgba(15, 23, 42, 0.2);
   border: 1px solid rgba(218, 220, 224, 0.85);
-  z-index: 1050;
+  z-index: 1100;
   display: none;
   flex-direction: column;
   overflow: hidden;
   animation: slideDown 0.25s cubic-bezier(0, 0, 0.2, 1);
   font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+@media (min-width: 769px) {
+  body.place-card-open .gm-chips-scroll {
+    display: none !important;
+  }
 }
 
 .gm-place-card.open {

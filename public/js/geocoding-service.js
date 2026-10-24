@@ -40,45 +40,85 @@ class GeocodingService {
     };
 
     // Kho địa danh trọng điểm 3 miền (Trường ĐH, Bệnh viện, Bến xe, Cầu, Hồ, Địa danh hay gõ tắt)
+    // Kho địa danh trọng điểm 3 miền (Đại sứ quán, Bệnh viện, Trường ĐH, Bến xe, Ga tàu, Công viên, Khách sạn lớn)
     this.builtinLandmarks = [
-      // Hà Nội
-      { title: 'Hồ Hoàn Kiếm (Bờ Hồ / Hồ Gươm)', subtitle: 'Quận Hoàn Kiếm, Hà Nội', lat: 21.0285, lng: 105.8525, city: 'hanoi', aliases: ['ho guom', 'bo ho', 'ho hoan kiem', ' phố đi bộ hồ gươm'] },
-      { title: 'Quảng trường Ba Đình (Lăng Chủ tịch Hồ Chí Minh)', subtitle: 'Hùng Vương, Ba Đình, Hà Nội', lat: 21.0368, lng: 105.8347, city: 'hanoi', aliases: ['lang bac', 'quang truong ba dinh', 'chua mot cot'] },
-      { title: 'Đại học Bách Khoa Hà Nội (HUST)', subtitle: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', lat: 21.0051, lng: 105.8433, city: 'hanoi', aliases: ['dh bach khoa', 'bach khoa ha noi', 'hust', 'dai hoc bach khoa'] },
-      { title: 'Đại học Quốc gia Hà Nội (Cầu Giấy)', subtitle: '144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0376, lng: 105.7816, city: 'hanoi', aliases: ['dh quoc gia', 'vnu', 'dh su pham', '144 xuan thuy'] },
-      { title: 'Đại học Kinh tế Quốc dân (NEU)', subtitle: '207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội', lat: 21.0001, lng: 105.8425, city: 'hanoi', aliases: ['neu', 'dh kinh te quoc dan', 'kinh te quoc dan'] },
-      { title: 'Đại học Giao thông Vận tải (UTC)', subtitle: 'Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0289, lng: 105.8031, city: 'hanoi', aliases: ['dh giao thong', 'utc', 'giao thong van tai'] },
-      { title: 'Đại học FPT Hà Nội (Hòa Lạc)', subtitle: 'Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội', lat: 21.0124, lng: 105.5253, city: 'hanoi', aliases: ['dh fpt', 'fpt hoa lac', 'dai hoc fpt'] },
-      { title: 'Bệnh viện Bạch Mai', subtitle: '78 Giải Phóng, Phương Mai, Đống Đa, Hà Nội', lat: 21.0031, lng: 105.8407, city: 'hanoi', aliases: ['bv bach mai', 'benh vien bach mai'] },
-      { title: 'Bệnh viện Trung ương Quân đội 108', subtitle: 'Số 1 Trần Hưng Đạo, Hai Bà Trưng, Hà Nội', lat: 21.0191, lng: 105.8602, city: 'hanoi', aliases: ['bv 108', 'benh vien 108', 'vien 108'] },
-      { title: 'Bệnh viện Hữu nghị Việt Đức', subtitle: '40 Tràng Thi, Hàng Bông, Hoàn Kiếm, Hà Nội', lat: 21.0273, lng: 105.8458, city: 'hanoi', aliases: ['bv viet duc', 'benh vien viet duc'] },
-      { title: 'Bến xe Mỹ Đình', subtitle: '20 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội', lat: 21.0286, lng: 105.7783, city: 'hanoi', aliases: ['bx my dinh', 'ben xe my dinh'] },
-      { title: 'Bến xe Giáp Bát', subtitle: 'Giải Phóng, Giáp Bát, Hoàng Mai, Hà Nội', lat: 20.9806, lng: 105.8415, city: 'hanoi', aliases: ['bx giap bat', 'ben xe giap bat'] },
-      { title: 'Bến xe Nước Ngầm', subtitle: 'Số 1 Ngọc Hồi, Hoàng Liệt, Hoàng Mai, Hà Nội', lat: 20.9635, lng: 105.8419, city: 'hanoi', aliases: ['bx nuoc ngam', 'ben xe nuoc ngam'] },
-      { title: 'Tòa nhà Keangnam Landmark 72', subtitle: 'Phạm Hùng, Mễ Trì, Nam Từ Liêm, Hà Nội', lat: 21.0168, lng: 105.7841, city: 'hanoi', aliases: ['keangnam', 'landmark 72'] },
-      { title: 'Sân vận động Quốc gia Mỹ Đình', subtitle: 'Lê Đức Thọ, Mỹ Đình, Nam Từ Liêm, Hà Nội', lat: 21.0204, lng: 105.7639, city: 'hanoi', aliases: ['svd my dinh', 'san van dong my dinh'] },
-      { title: 'Sân bay Quốc tế Nội Bài', subtitle: 'Phú Minh, Sóc Sơn, Hà Nội', lat: 21.2187, lng: 105.8042, city: 'hanoi', aliases: ['san bay noi bai', 'noi bai airport'] },
-      { title: 'Hồ Tây (Phố Quảng An / Trích Sài)', subtitle: 'Quận Tây Hồ, Hà Nội', lat: 21.0556, lng: 105.8225, city: 'hanoi', aliases: ['ho tay', 'tay ho', 'phu tay ho'] },
-      { title: 'Royal City (Vincom Mega Mall Royal City)', subtitle: '72A Nguyễn Trãi, Thanh Xuân, Hà Nội', lat: 21.0026, lng: 105.8152, city: 'hanoi', aliases: ['royal city', '72 nguyen trai'] },
-      { title: 'Times City (KĐT Vinhomes Times City)', subtitle: '458 Minh Khai, Hai Bà Trưng, Hà Nội', lat: 20.9951, lng: 105.8682, city: 'hanoi', aliases: ['times city', '458 minh khai'] },
+      // Hà Nội - Ngoại giao & Đại sứ quán
+      { title: 'Đại Sứ Quán Liên Bang Nga', subtitle: 'Số 191 Đường La Thành / Đường Cầu Giấy, Láng Thượng, Ba Đình, Hà Nội', lat: 21.026513, lng: 105.804921, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 180, aliases: ['dai su quan nga', 'dsq nga', 'dai su quan lien bang nga', 'russian embassy', '191 la thanh'] },
+      { title: 'Đại Sứ Quán Hoa Kỳ', subtitle: 'Số 7 Láng Hạ, Thành Công, Ba Đình, Hà Nội', lat: 21.0195, lng: 105.8160, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 160, aliases: ['dsq hoa ky', 'dsq my', 'dai su quan my', 'us embassy'] },
+      { title: 'Đại Sứ Quán Nhật Bản', subtitle: 'Số 27 Liễu Giai, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0325, lng: 105.8145, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 160, aliases: ['dsq nhat ban', 'dai su quan nhat ban', 'japan embassy'] },
+      { title: 'Đại Sứ Quán Hàn Quốc', subtitle: 'Lô SQ4 Khu Ngoại Giao Đoàn, Bắc Từ Liêm, Hà Nội', lat: 21.0545, lng: 105.7975, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 180, aliases: ['dsq han quoc', 'dai su quan han quoc', 'korean embassy'] },
+      { title: 'Đại Sứ Quán Cộng Hòa Pháp', subtitle: '57 Trần Hưng Đạo, Hàng Bài, Hoàn Kiếm, Hà Nội', lat: 21.0235, lng: 105.8520, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 160, aliases: ['dsq phap', 'dai su quan phap', 'french embassy'] },
+      { title: 'Đại Sứ Quán Trung Quốc', subtitle: '46 Hoàng Diệu, Điện Biên, Ba Đình, Hà Nội', lat: 21.0330, lng: 105.8320, city: 'hanoi', category: 'Đại sứ quán / Ngoại giao', type: 'embassy', radiusM: 160, aliases: ['dsq trung quoc', 'dai su quan trung quoc', 'chinese embassy'] },
+
+      // Hà Nội - Cơ quan & Truyền hình
+      { title: 'Đài Truyền Hình Việt Nam (VTV)', subtitle: '43 Nguyễn Chí Thanh, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0245, lng: 105.8140, city: 'hanoi', category: 'Cơ quan truyền thông / Đài TH', type: 'government', radiusM: 160, aliases: ['vtv', 'dai truyen hinh viet nam', '43 nguyen chi thanh'] },
+      { title: 'Quảng trường Ba Đình (Lăng Chủ tịch Hồ Chí Minh)', subtitle: 'Hùng Vương, Ba Đình, Hà Nội', lat: 21.0368, lng: 105.8347, city: 'hanoi', category: 'Di tích lịch sử / Quảng trường', type: 'landmark', radiusM: 250, aliases: ['lang bac', 'quang truong ba dinh', 'chua mot cot'] },
+      { title: 'Trung Tâm Hội Nghị Quốc Gia', subtitle: 'Đại lộ Thăng Long, Mễ Trì, Nam Từ Liêm, Hà Nội', lat: 21.0065, lng: 105.7865, city: 'hanoi', category: 'Trung tâm hội nghị quốc tế', type: 'landmark', radiusM: 250, aliases: ['trung tam hoi nghi quoc gia', 'ncc'] },
+
+      // Hà Nội - Trường Đại học & Học viện
+      { title: 'Trường Đại Học Giao Thông Vận Tải (UTC)', subtitle: 'Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0289, lng: 105.8031, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 180, aliases: ['dh giao thong', 'utc', 'giao thong van tai', 'dh gtvt'] },
+      { title: 'Trường Đại Học Ngoại Thương (FTU)', subtitle: '91 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0225, lng: 105.8055, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 160, aliases: ['ftu', 'dh ngoai thuong', 'dai hoc ngoai thuong', 'ngoai thuong'] },
+      { title: 'Trường Đại Học Luật Hà Nội (HLU)', subtitle: '87 Nguyễn Chí Thanh, Láng Hạ, Đống Đa, Hà Nội', lat: 21.0185, lng: 105.8095, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 150, aliases: ['hlu', 'dh luat', 'dai hoc luat ha noi', 'dh luat ha noi'] },
+      { title: 'Học Viện Ngoại Giao (DAV)', subtitle: '69 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0210, lng: 105.8060, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 140, aliases: ['dav', 'hoc vien ngoai giao'] },
+      { title: 'Học Viện Báo Chí & Tuyên Truyền (AJC)', subtitle: '36 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0360, lng: 105.7885, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 150, aliases: ['ajc', 'hoc vien bao chi', 'dh bao chi'] },
+      { title: 'Trường Đại Học Sư Phạm Hà Nội (HNUE)', subtitle: '136 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0370, lng: 105.7820, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 160, aliases: ['hnue', 'dh su pham ha noi', 'su pham'] },
+      { title: 'Đại Học Quốc Gia Hà Nội (Cầu Giấy)', subtitle: '144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0376, lng: 105.7816, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 180, aliases: ['dh quoc gia', 'vnu', 'dh cong nghe'] },
+      { title: 'Đại Học Bách Khoa Hà Nội (HUST)', subtitle: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', lat: 21.0051, lng: 105.8433, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 250, aliases: ['dh bach khoa', 'bach khoa ha noi', 'hust', 'dai hoc bach khoa'] },
+      { title: 'Đại Học Kinh Tế Quốc Dân (NEU)', subtitle: '207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội', lat: 21.0001, lng: 105.8425, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 180, aliases: ['neu', 'dh kinh te quoc dan', 'kinh te quoc dan'] },
+      { title: 'Đại Học Xây Dựng Hà Nội (HUCE)', subtitle: '55 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội', lat: 21.0035, lng: 105.8420, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 150, aliases: ['huce', 'dh xay dung'] },
+      { title: 'Đại Học Y Hà Nội (HMU)', subtitle: 'Số 1 Tôn Thất Tùng, Trung Tự, Đống Đa, Hà Nội', lat: 21.0030, lng: 105.8315, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 180, aliases: ['hmu', 'dh y ha noi', 'dai hoc y'] },
+      { title: 'Học Viện Ngân Hàng (BA)', subtitle: '12 Chùa Bộc, Quang Trung, Đống Đa, Hà Nội', lat: 21.0090, lng: 105.8285, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 160, aliases: ['ba', 'hoc vien ngan hang'] },
+      { title: 'Đại Học FPT Hà Nội (Hòa Lạc)', subtitle: 'Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội', lat: 21.0124, lng: 105.5253, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 300, aliases: ['dh fpt', 'fpt hoa lac', 'dai hoc fpt'] },
+
+      // Hà Nội - Bệnh viện & Cơ sở y tế
+      { title: 'Bệnh Viện Giao Thông Vận Tải', subtitle: 'Ngõ 84 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0253, lng: 105.8028, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 150, aliases: ['bv gtvt', 'benh vien gtvt', 'benh vien giao thong van tai'] },
+      { title: 'Bệnh Viện Nhi Trung Ương', subtitle: '18/879 La Thành, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0240, lng: 105.8090, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 160, aliases: ['bv nhi tw', 'benh vien nhi trung uong', 'vien nhi'] },
+      { title: 'Bệnh Viện Phụ Sản Hà Nội', subtitle: '929 La Thành, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0260, lng: 105.8080, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 150, aliases: ['bv phu san ha noi', 'benh vien phu san ha noi'] },
+      { title: 'Bệnh Viện Bạch Mai', subtitle: '78 Giải Phóng, Phương Mai, Đống Đa, Hà Nội', lat: 21.0031, lng: 105.8407, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 250, aliases: ['bv bach mai', 'benh vien bach mai'] },
+      { title: 'Bệnh Viện Trung Ương Quân Đội 108', subtitle: 'Số 1 Trần Hưng Đạo, Hai Bà Trưng, Hà Nội', lat: 21.0191, lng: 105.8602, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 200, aliases: ['bv 108', 'benh vien 108', 'vien 108'] },
+      { title: 'Bệnh Viện Hữu Nghị Việt Đức', subtitle: '40 Tràng Thi, Hàng Bông, Hoàn Kiếm, Hà Nội', lat: 21.0273, lng: 105.8458, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 180, aliases: ['bv viet duc', 'benh vien viet duc'] },
+      { title: 'Bệnh Viện E Hà Nội', subtitle: '89 Trần Cung, Nghĩa Tân, Cầu Giấy, Hà Nội', lat: 21.0485, lng: 105.7895, city: 'hanoi', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 180, aliases: ['bv e', 'benh vien e'] },
+
+      // Hà Nội - Công viên, Vườn thú & Danh lam
+      { title: 'Công Viên Thủ Lệ (Vườn Thú Hà Nội)', subtitle: 'Đường Bưởi / Kim Mã, Thủ Lệ, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0315, lng: 105.8065, city: 'hanoi', category: 'Công viên / Vườn thú', type: 'park', radiusM: 280, aliases: ['vuon thu ha noi', 'cong vien thu le', 'thu le', 'dao khi'] },
+      { title: 'Công Viên Cầu Giấy', subtitle: 'Duy Tân, Dịch Vọng, Cầu Giấy, Hà Nội', lat: 21.0285, lng: 105.7895, city: 'hanoi', category: 'Công viên / Khu vui chơi', type: 'park', radiusM: 250, aliases: ['cong vien cau giay', 'cv cau giay'] },
+      { title: 'Hồ Hoàn Kiếm (Bờ Hồ / Hồ Gươm)', subtitle: 'Quận Hoàn Kiếm, Hà Nội', lat: 21.0285, lng: 105.8525, city: 'hanoi', category: 'Danh lam thắng cảnh / Di tích', type: 'park', radiusM: 300, aliases: ['ho guom', 'bo ho', 'ho hoan kiem', 'pho di bo ho guom'] },
+      { title: 'Hồ Tây (Phố Quảng An / Trích Sài)', subtitle: 'Quận Tây Hồ, Hà Nội', lat: 21.0556, lng: 105.8225, city: 'hanoi', category: 'Danh lam thắng cảnh / Hồ nước', type: 'park', radiusM: 400, aliases: ['ho tay', 'tay ho', 'phu tay ho'] },
+      { title: 'Hồ Ngọc Khánh', subtitle: 'Phố Phạm Huy Thông, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0270, lng: 105.8155, city: 'hanoi', category: 'Công viên / Hồ cảnh quan', type: 'park', radiusM: 180, aliases: ['ho ngoc khanh', 'pham huy thong'] },
+      { title: 'Hồ Giảng Võ', subtitle: 'Phố Trần Huy Liệu, Giảng Võ, Ba Đình, Hà Nội', lat: 21.0280, lng: 105.8200, city: 'hanoi', category: 'Công viên / Hồ cảnh quan', type: 'park', radiusM: 180, aliases: ['ho giang vo', 'tran huy lieu'] },
+
+      // Hà Nội - Giao thông & Nhà ga
+      { title: 'Nhà Ga Cầu Giấy (Tuyến Metro Nhổn - Ga Hà Nội)', subtitle: 'Cầu Giấy / Kim Mã, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0298, lng: 105.8038, city: 'hanoi', category: 'Nhà ga / Tuyến Metro', type: 'transit', radiusM: 150, aliases: ['ga cau giay', 'nha ga cau giay', 'metro cau giay'] },
+      { title: 'Bến Xe Mỹ Đình', subtitle: '20 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội', lat: 21.0286, lng: 105.7783, city: 'hanoi', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx my dinh', 'ben xe my dinh'] },
+      { title: 'Bến Xe Giáp Bát', subtitle: 'Giải Phóng, Giáp Bát, Hoàng Mai, Hà Nội', lat: 20.9806, lng: 105.8415, city: 'hanoi', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx giap bat', 'ben xe giap bat'] },
+      { title: 'Bến Xe Nước Ngầm', subtitle: 'Số 1 Ngọc Hồi, Hoàng Liệt, Hoàng Mai, Hà Nội', lat: 20.9635, lng: 105.8419, city: 'hanoi', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx nuoc ngam', 'ben xe nuoc ngam'] },
+      { title: 'Sân Bay Quốc Tế Nội Bài', subtitle: 'Phú Minh, Sóc Sơn, Hà Nội', lat: 21.2187, lng: 105.8042, city: 'hanoi', category: 'Sân bay quốc tế', type: 'transit', radiusM: 800, aliases: ['san bay noi bai', 'noi bai airport'] },
+
+      // Hà Nội - Khách sạn & TTTM
+      { title: 'Khách Sạn Hà Nội Daewoo', subtitle: '360 Kim Mã, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0305, lng: 105.8125, city: 'hanoi', category: 'Khách sạn 5 sao / Lưu trú', type: 'hotel', radiusM: 160, aliases: ['khach san daewoo', 'daewoo hotel', 'daewoo'] },
+      { title: 'Tòa Nhà Lotte Center Hà Nội', subtitle: '54 Liễu Giai, Cống Vị, Ba Đình, Hà Nội', lat: 21.0322, lng: 105.8122, city: 'hanoi', category: 'TTTM & Khách sạn 5 sao', type: 'hotel', radiusM: 180, aliases: ['lotte center', 'lotte lieu giai', 'khach san lotte'] },
+      { title: 'Tòa Nhà Keangnam Landmark 72', subtitle: 'Phạm Hùng, Mễ Trì, Nam Từ Liêm, Hà Nội', lat: 21.0168, lng: 105.7841, city: 'hanoi', category: 'Tòa nhà cao tầng / TTTM', type: 'hotel', radiusM: 200, aliases: ['keangnam', 'landmark 72'] },
+      { title: 'Royal City (Vincom Mega Mall)', subtitle: '72A Nguyễn Trãi, Thanh Xuân, Hà Nội', lat: 21.0026, lng: 105.8152, city: 'hanoi', category: 'Trung tâm thương mại', type: 'mall', radiusM: 250, aliases: ['royal city', '72 nguyen trai'] },
+      { title: 'Times City (Vinhomes Times City)', subtitle: '458 Minh Khai, Hai Bà Trưng, Hà Nội', lat: 20.9951, lng: 105.8682, city: 'hanoi', category: 'Trung tâm thương mại & Đô thị', type: 'mall', radiusM: 250, aliases: ['times city', '458 minh khai'] },
+      { title: 'Vincom Center Metropolis Liễu Giai', subtitle: '29 Liễu Giai, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0325, lng: 105.8130, city: 'hanoi', category: 'Trung tâm thương mại', type: 'mall', radiusM: 150, aliases: ['vincom metropolis', 'vincom lieu giai', 'metropolis'] },
 
       // TP.HCM
-      { title: 'Chợ Bến Thành', subtitle: 'Lê Lợi, Phường Bến Thành, Quận 1, TP.HCM', lat: 10.7725, lng: 106.6980, city: 'hcm', aliases: ['cho ben thanh', 'ben thanh'] },
-      { title: 'Phố đi bộ Nguyễn Huệ', subtitle: 'Nguyễn Huệ, Bến Nghé, Quận 1, TP.HCM', lat: 10.7744, lng: 106.7035, city: 'hcm', aliases: ['pho di bo nguyen hue', 'ben bach dang'] },
-      { title: 'Landmark 81 (Vinhomes Central Park)', subtitle: '720A Điện Biên Phủ, Bình Thạnh, TP.HCM', lat: 10.7950, lng: 106.7218, city: 'hcm', aliases: ['landmark 81', 'vinhomes tan cang'] },
-      { title: 'Sân bay Quốc tế Tân Sơn Nhất', subtitle: 'Trường Sơn, Phường 2, Tân Bình, TP.HCM', lat: 10.8185, lng: 106.6588, city: 'hcm', aliases: ['san bay tan son nhat', 'tan son nhat'] },
-      { title: 'Bến xe Miền Đông', subtitle: '292 Đinh Bộ Lĩnh, Phường 26, Bình Thạnh, TP.HCM', lat: 10.8142, lng: 106.7112, city: 'hcm', aliases: ['bx mien dong', 'ben xe mien dong'] },
-      { title: 'Bến xe Miền Tây', subtitle: '395 Kinh Dương Vương, An Lạc, Bình Tân, TP.HCM', lat: 10.7411, lng: 106.6186, city: 'hcm', aliases: ['bx mien tay', 'ben xe mien tay'] },
-      { title: 'Bệnh viện Chợ Rẫy', subtitle: '201B Nguyễn Chí Thanh, Phường 12, Quận 5, TP.HCM', lat: 10.7578, lng: 106.6596, city: 'hcm', aliases: ['bv cho ray', 'benh vien cho ray'] },
-      { title: 'Đại học Bách Khoa TP.HCM', subtitle: '268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM', lat: 10.7726, lng: 106.6577, city: 'hcm', aliases: ['dh bach khoa hcm', 'bach khoa q10'] },
-      { title: 'Dinh Độc Lập (Hội trường Thống Nhất)', subtitle: '135 Nam Kỳ Khởi Nghĩa, Quận 1, TP.HCM', lat: 10.7770, lng: 106.6953, city: 'hcm', aliases: ['dinh doc lap', 'nha tho duc ba'] },
+      { title: 'Chợ Bến Thành', subtitle: 'Lê Lợi, Phường Bến Thành, Quận 1, TP.HCM', lat: 10.7725, lng: 106.6980, city: 'hcm', category: 'Chợ truyền thống / Du lịch', type: 'landmark', radiusM: 200, aliases: ['cho ben thanh', 'ben thanh'] },
+      { title: 'Phố Đi Bộ Nguyễn Huệ', subtitle: 'Nguyễn Huệ, Bến Nghé, Quận 1, TP.HCM', lat: 10.7744, lng: 106.7035, city: 'hcm', category: 'Phố đi bộ / Du lịch', type: 'park', radiusM: 250, aliases: ['pho di bo nguyen hue', 'ben bach dang'] },
+      { title: 'Landmark 81 (Vinhomes Central Park)', subtitle: '720A Điện Biên Phủ, Bình Thạnh, TP.HCM', lat: 10.7950, lng: 106.7218, city: 'hcm', category: 'Tòa nhà cao nhất Việt Nam', type: 'landmark', radiusM: 250, aliases: ['landmark 81', 'vinhomes tan cang'] },
+      { title: 'Sân Bay Quốc Tế Tân Sơn Nhất', subtitle: 'Trường Sơn, Phường 2, Tân Bình, TP.HCM', lat: 10.8185, lng: 106.6588, city: 'hcm', category: 'Sân bay quốc tế', type: 'transit', radiusM: 800, aliases: ['san bay tan son nhat', 'tan son nhat'] },
+      { title: 'Bến Xe Miền Đông', subtitle: '292 Đinh Bộ Lĩnh, Phường 26, Bình Thạnh, TP.HCM', lat: 10.8142, lng: 106.7112, city: 'hcm', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx mien dong', 'ben xe mien dong'] },
+      { title: 'Bến Xe Miền Tây', subtitle: '395 Kinh Dương Vương, An Lạc, Bình Tân, TP.HCM', lat: 10.7411, lng: 106.6186, city: 'hcm', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx mien tay', 'ben xe mien tay'] },
+      { title: 'Bệnh Viện Chợ Rẫy', subtitle: '201B Nguyễn Chí Thanh, Phường 12, Quận 5, TP.HCM', lat: 10.7578, lng: 106.6596, city: 'hcm', category: 'Bệnh viện / Cơ sở y tế', type: 'hospital', radiusM: 250, aliases: ['bv cho ray', 'benh vien cho ray'] },
+      { title: 'Đại Học Bách Khoa TP.HCM', subtitle: '268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM', lat: 10.7726, lng: 106.6577, city: 'hcm', category: 'Trường đại học / Học viện', type: 'university', radiusM: 250, aliases: ['dh bach khoa hcm', 'bach khoa q10'] },
+      { title: 'Dinh Độc Lập (Hội trường Thống Nhất)', subtitle: '135 Nam Kỳ Khởi Nghĩa, Quận 1, TP.HCM', lat: 10.7770, lng: 106.6953, city: 'hcm', category: 'Di tích lịch sử quốc gia', type: 'landmark', radiusM: 250, aliases: ['dinh doc lap', 'nha tho duc ba'] },
 
       // Đà Nẵng
-      { title: 'Cầu Rồng Đà Nẵng', subtitle: 'Nguyễn Văn Linh, Hải Châu / Sơn Trà, Đà Nẵng', lat: 16.0611, lng: 108.2274, city: 'danang', aliases: ['cau rong', 'cau song han'] },
-      { title: 'Biển Mỹ Khê', subtitle: 'Võ Nguyên Giáp, Phước Mỹ, Sơn Trà, Đà Nẵng', lat: 16.0642, lng: 108.2458, city: 'danang', aliases: ['bien my khe', 'bai bien my khe'] },
-      { title: 'Sân bay Quốc tế Đà Nẵng', subtitle: 'Nguyễn Văn Linh, Hòa Thuận Tây, Hải Châu, Đà Nẵng', lat: 16.0538, lng: 108.2045, city: 'danang', aliases: ['san bay da nang'] },
-      { title: 'Đại học Bách Khoa Đà Nẵng', subtitle: '54 Nguyễn Lương Bằng, Hòa Khánh Bắc, Liên Chiểu, Đà Nẵng', lat: 16.0738, lng: 108.1499, city: 'danang', aliases: ['dh bach khoa da nang', '54 nguyen luong bang'] },
-      { title: 'Chợ Hàn Đà Nẵng', subtitle: '119 Trần Phú, Hải Châu 1, Hải Châu, Đà Nẵng', lat: 16.0681, lng: 108.2244, city: 'danang', aliases: ['cho han', 'cho con'] }
+      { title: 'Cầu Rồng Đà Nẵng', subtitle: 'Nguyễn Văn Linh, Hải Châu / Sơn Trà, Đà Nẵng', lat: 16.0611, lng: 108.2274, city: 'danang', category: 'Cầu / Biểu tượng kiến trúc', type: 'landmark', radiusM: 250, aliases: ['cau rong', 'cau song han'] },
+      { title: 'Biển Mỹ Khê', subtitle: 'Võ Nguyên Giáp, Phước Mỹ, Sơn Trà, Đà Nẵng', lat: 16.0642, lng: 108.2458, city: 'danang', category: 'Bãi biển / Du lịch', type: 'park', radiusM: 400, aliases: ['bien my khe', 'bai bien my khe'] },
+      { title: 'Sân Bay Quốc Tế Đà Nẵng', subtitle: 'Nguyễn Văn Linh, Hòa Thuận Tây, Hải Châu, Đà Nẵng', lat: 16.0538, lng: 108.2045, city: 'danang', category: 'Sân bay quốc tế', type: 'transit', radiusM: 800, aliases: ['san bay da nang'] },
+      { title: 'Đại Học Bách Khoa Đà Nẵng', subtitle: '54 Nguyễn Lương Bằng, Hòa Khánh Bắc, Liên Chiểu, Đà Nẵng', lat: 16.0738, lng: 108.1499, city: 'danang', category: 'Trường đại học / Học viện', type: 'university', radiusM: 250, aliases: ['dh bach khoa da nang', '54 nguyen luong bang'] },
+      { title: 'Chợ Hàn Đà Nẵng', subtitle: '119 Trần Phú, Hải Châu 1, Hải Châu, Đà Nẵng', lat: 16.0681, lng: 108.2244, city: 'danang', category: 'Chợ truyền thống / Du lịch', type: 'landmark', radiusM: 180, aliases: ['cho han', 'cho con'] }
     ];
 
     // Bộ nhớ đệm tìm kiếm
@@ -859,7 +899,56 @@ class GeocodingService {
   /**
    * Giải mã địa điểm thông minh: Tự động phát hiện POI lân cận (<25m) hoặc Số nhà / Tuyến đường
    */
+    /**
+   * Tính khoảng cách mét giữa 2 tọa độ GPS
+   */
+  _calcDistanceM(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  /**
+   * Giải mã địa điểm thông minh: Tự động phát hiện Địa danh trọng điểm, POI lân cận (<75m), hoặc Số nhà / Tuyến đường
+   */
   async reverseGeocodeSmart(lat, lng) {
+    // 0. Quét kiểm tra Địa danh / Cơ quan / Trường học / Bệnh viện / Đại sứ quán trọng điểm trong CSDL (tìm điểm gần nhất trong bán kính)
+    let closestLm = null;
+    let minLmDist = Infinity;
+    for (const lm of this.builtinLandmarks) {
+      if (lm.lat && lm.lng) {
+        const dM = this._calcDistanceM(lat, lng, lm.lat, lm.lng);
+        const maxRadius = lm.radiusM || 150;
+        if (dM <= maxRadius && dM < minLmDist) {
+          minLmDist = dM;
+          closestLm = lm;
+        }
+      }
+    }
+
+    if (closestLm) {
+      const plusCode = this.getPlusCode(lat, lng, closestLm.subtitle);
+      return {
+        isPoi: true,
+        type: closestLm.type || 'landmark',
+        category: closestLm.category || 'Địa danh trọng điểm',
+        name: closestLm.title,
+        subtitle: closestLm.subtitle,
+        address: closestLm.subtitle,
+        lat: closestLm.lat,
+        lng: closestLm.lng,
+        phone: closestLm.phone || '',
+        image: closestLm.image || null,
+        openingHours: closestLm.openingHours || (closestLm.type === 'embassy' ? '08:30 - 17:00 (Thứ 2 - Thứ 6)' : (closestLm.type === 'hospital' ? 'Cấp cứu & Khám bệnh 24/7' : (closestLm.type === 'park' ? 'Mở cửa: 06:00 - 22:00' : '07:30 - 17:30'))),
+        plusCode,
+        rating: closestLm.rating || 4.6,
+        reviewsCount: closestLm.reviewsCount || 128,
+        price: null
+      };
+    }
+
     const tomtomKey = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey)
       ? window.mapEngine.tomtomKey
       : 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
@@ -870,12 +959,12 @@ class GeocodingService {
     if (tomtomKey) {
       try {
         const [poiRes, revRes] = await Promise.allSettled([
-          fetch('https://api.tomtom.com/search/2/nearbySearch/.json?lat=' + lat + '&lon=' + lng + '&radius=25&limit=3&key=' + tomtomKey + '&language=vi-VN').then(r => r.json()),
+          fetch('https://api.tomtom.com/search/2/nearbySearch/.json?lat=' + lat + '&lon=' + lng + '&radius=75&limit=5&key=' + tomtomKey + '&language=vi-VN').then(r => r.json()),
           fetch('https://api.tomtom.com/search/2/reverseGeocode/' + lat + ',' + lng + '.json?key=' + tomtomKey + '&language=vi-VN').then(r => r.json())
         ]);
 
         if (poiRes.status === 'fulfilled' && poiRes.value?.results?.length > 0) {
-          nearbyPoi = poiRes.value.results.find(r => r.type === 'POI' && r.dist <= 25);
+          nearbyPoi = poiRes.value.results.find(r => r.type === 'POI' && r.dist <= 75);
         }
 
         if (revRes.status === 'fulfilled') {
@@ -909,35 +998,63 @@ class GeocodingService {
     const fullAddr = addressInfo.fullAddress || (addressInfo.title + ', ' + addressInfo.subtitle);
     const plusCode = this.getPlusCode(lat, lng, addressInfo.subtitle || fullAddr);
 
-    // 1. Nếu có POI lân cận (<25m):
+    // 1. Nếu có POI lân cận (<75m):
     if (nearbyPoi && nearbyPoi.poi) {
       const poi = nearbyPoi.poi;
       const cats = (poi.categories || []).map(c => c.toLowerCase());
-      const isRestaurant = cats.some(c => c.includes('restaurant') || c.includes('vietnamese') || c.includes('food') || c.includes('ice cream') || c.includes('kem'));
-      const isCafe = cats.some(c => c.includes('cafe') || c.includes('coffee') || c.includes('tea'));
-      const isShop = cats.some(c => c.includes('shop') || c.includes('store') || c.includes('market') || c.includes('clothing') || c.includes('optical'));
-      const isHotel = cats.some(c => c.includes('hotel') || c.includes('lodging') || c.includes('motel'));
-      const isHealth = cats.some(c => c.includes('hospital') || c.includes('pharmacy') || c.includes('doctor') || c.includes('clinic'));
-      const isBook = cats.some(c => c.includes('book'));
+      const classCodes = (poi.classifications || []).map(cl => (cl.code || '').toLowerCase());
 
       let type = 'poi';
       let category = 'Địa điểm dịch vụ';
-      if (isRestaurant) {
-        type = 'restaurant';
-        category = 'Quán ăn / Nhà hàng';
-      } else if (isCafe) {
-        type = 'cafe';
-        category = 'Quán cà phê / Đồ uống';
-      } else if (isShop) {
-        type = 'shop';
-        category = isBook ? 'Hiệu sách' : 'Cửa hàng';
-      } else if (isHotel) {
+
+      if (cats.some(c => c.includes('embassy')) || classCodes.includes('embassy')) {
+        type = 'embassy';
+        category = 'Đại sứ quán / Ngoại giao';
+      } else if (cats.some(c => c.includes('college') || c.includes('university')) || classCodes.includes('college/university')) {
+        type = 'university';
+        category = 'Trường đại học / Học viện';
+      } else if (cats.some(c => c.includes('hospital') || c.includes('clinic')) || classCodes.includes('hospital')) {
+        type = 'hospital';
+        category = 'Bệnh viện / Cơ sở y tế';
+      } else if (cats.some(c => c.includes('doctor') || c.includes('pharmacy'))) {
+        type = 'health';
+        category = 'Nhà thuốc / Phòng khám';
+      } else if (cats.some(c => c.includes('park') || c.includes('zoo'))) {
+        type = 'park';
+        category = 'Công viên / Vườn thú';
+      } else if (cats.some(c => c.includes('hotel') || c.includes('lodging') || c.includes('motel'))) {
         type = 'hotel';
         category = 'Khách sạn / Lưu trú';
-      } else if (isHealth) {
-        type = 'health';
-        category = 'Cơ sở y tế / Nhà thuốc';
+      } else if (cats.some(c => c.includes('bank') || c.includes('atm'))) {
+        type = 'bank';
+        category = 'Ngân hàng / Tài chính';
+      } else if (cats.some(c => c.includes('station') || c.includes('transit') || c.includes('subway') || c.includes('railway'))) {
+        type = 'transit';
+        category = 'Nhà ga / Trạm dừng';
+      } else if (cats.some(c => c.includes('parking'))) {
+        type = 'parking';
+        category = 'Bãi đỗ xe';
+      } else if (cats.some(c => c.includes('book'))) {
+        type = 'book';
+        category = 'Hiệu sách';
+      } else if (cats.some(c => c.includes('restaurant') || c.includes('vietnamese') || c.includes('food') || c.includes('fast food') || c.includes('noodle') || c.includes('ice cream') || c.includes('kem') || c.includes('cháo'))) {
+        type = 'restaurant';
+        category = 'Quán ăn / Nhà hàng';
+      } else if (cats.some(c => c.includes('cafe') || c.includes('coffee') || c.includes('tea'))) {
+        type = 'cafe';
+        category = 'Quán cà phê / Đồ uống';
+      } else if (cats.some(c => c.includes('shop') || c.includes('store') || c.includes('market') || c.includes('clothing') || c.includes('supermarket'))) {
+        type = 'shop';
+        category = 'Cửa hàng / Siêu thị';
+      } else if (cats.some(c => c.includes('company'))) {
+        type = 'company';
+        category = 'Công ty / Tòa nhà văn phòng';
+      } else if (cats.some(c => c.includes('school'))) {
+        type = 'school';
+        category = 'Trường học';
       }
+
+      const isFoodPoi = type === 'restaurant' || type === 'cafe';
 
       return {
         isPoi: true,
@@ -950,8 +1067,8 @@ class GeocodingService {
         lng: nearbyPoi.position?.lon || lng,
         phone: poi.phone || '',
         plusCode,
-        openingHours: isRestaurant || isCafe ? '08:00 - 22:30' : (isShop ? '08:30 - 21:30' : null),
-        price: isRestaurant ? '30.000 - 100.000 đ' : (isCafe ? '25.000 - 60.000 đ' : null)
+        openingHours: isFoodPoi ? '08:00 - 22:30' : (type === 'embassy' ? '08:30 - 17:00 (Thứ 2 - Thứ 6)' : (type === 'hospital' ? 'Cấp cứu 24/7' : (type === 'shop' ? '08:30 - 21:30' : null))),
+        price: type === 'restaurant' ? '30.000 - 100.000 đ' : (type === 'cafe' ? '25.000 - 60.000 đ' : null)
       };
     }
 
@@ -976,6 +1093,76 @@ class GeocodingService {
       phone: null
     };
   }
+
+  async getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Trình duyệt không hỗ trợ định vị GPS'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          try {
+            const addrInfo = await this.reverseGeocode(lat, lng);
+            resolve({
+              lat,
+              lng,
+              title: 'Vị trí của bạn',
+              subtitle: addrInfo.fullAddress,
+              fullAddress: addrInfo.fullAddress
+            });
+          } catch {
+            resolve({
+              lat,
+              lng,
+              title: 'Vị trí của bạn',
+              subtitle: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+              fullAddress: 'Vị trí GPS hiện tại'
+            });
+          }
+        },
+        (err) => {
+          reject(new Error(err.message || 'Không thể lấy tọa độ vị trí'));
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+      );
+    });
+  }
+
+  /**
+   * Thuật toán Open Location Code (Google Plus Code) chuẩn xác
+   */
+  encodePlusCode(latitude, longitude) {
+    const CODE_ALPHABET = '23456789CFGHJMPQRVWX';
+    let lat = Math.min(Math.max(latitude, -90), 90) + 90;
+    let lng = longitude;
+    while (lng < -180) lng += 360;
+    while (lng >= 180) lng -= 360;
+    lng += 180;
+
+    let code = '';
+    const resolutions = [20.0, 1.0, 0.05, 0.0025, 0.000125];
+    for (let i = 0; i < 5; i++) {
+      const latDigit = Math.floor(lat / resolutions[i]);
+      const lngDigit = Math.floor(lng / resolutions[i]);
+      lat -= latDigit * resolutions[i];
+      lng -= lngDigit * resolutions[i];
+      code += CODE_ALPHABET[latDigit] + CODE_ALPHABET[lngDigit];
+      if (i === 3) code += '+';
+    }
+    return code;
+  }
+
+  getPlusCode(latitude, longitude, locality = 'Hà Nội') {
+    const full = this.encodePlusCode(latitude, longitude);
+    const shortPart = full.length >= 8 ? full.slice(4) : full;
+    const cleanLocality = (locality || 'Hà Nội').split(',').slice(-2).join(', ').trim();
+    return shortPart + ' ' + cleanLocality;
+  }
+
 
 }
 
