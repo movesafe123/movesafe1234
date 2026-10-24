@@ -5444,6 +5444,12 @@ body {
   }
 }
 
+@media (max-width: 1200px) {
+  body.place-card-open .gm-ai-drawer.open {
+    display: none !important;
+  }
+}
+
 .gm-place-card.open {
   display: flex !important;
 }

@@ -88,6 +88,10 @@ class AIChat {
     this.isOpen = true;
     const win = document.getElementById('ai-chat-window');
     if (win) win.classList.add('open');
+    if (window.appState && typeof window.appState.closePlaceDetailsCard === 'function') {
+      window.appState.closePlaceDetailsCard();
+    }
+    document.body.classList.remove('place-card-open');
     if (this.messages.length === 0) {
       this.addBotMessage(`Xin chào! Tôi là **Trợ lý AI MoveSafe**.\nTôi theo dõi trực tiếp mực nước các trạm đo HSDC, UDi Maps và lưu lượng giao thông TomTom.\nBạn cần tư vấn lộ trình di chuyển hay kiểm tra tình trạng ngập úng, kẹt xe tại khu vực nào?`);
     }
@@ -775,16 +779,16 @@ class AIChat {
 3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else if (isAskingFoodOrEntertainment) {
       const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
-      dynamicContext += `Cơ sở dữ liệu ẩm thực & vui chơi tại ${cityName}:
+      const catName = rec.categoryType === 'cinema' ? 'rạp chiếu phim' : (rec.categoryType === 'cafe' ? 'quán cà phê' : (rec.categoryType === 'entertainment' ? 'điểm vui chơi giải trí' : 'quán ăn/món ngon'));
+      dynamicContext += `Cơ sở dữ liệu ẩm thực & vui chơi thực tế tại ${cityName} (${rec.title}):
 ${rec.text}`;
 
       instructions = `YÊU CẦU TRẢ LỜI ĐẶC BIỆT:
-1. Người dùng đang hỏi về ĐỊA ĐIỂM ĂN UỐNG, MÓN NGON, QUÁN CAFE HOẶC ĐIỂM VUI CHƠI GIẢI TRÍ tại khu vực này.
+1. Người dùng đang hỏi về ${catName.toUpperCase()} tại khu vực này.
 2. Bạn là Chuyên gia Bản địa sành sỏi, am hiểu sâu sắc về ẩm thực và điểm vui chơi giải trí tại ${cityName}.
-3. Đề xuất cụ thể từ 3 đến 5 địa điểm ẩm thực hoặc vui chơi THỰC TẾ, NỔI TIẾNG, ĐƯỢC ĐÁNH GIÁ CAO NHẤT quanh khu vực người dùng hỏi:
-   - Tên quán/địa điểm & Địa chỉ cụ thể hoặc tên phố
-   - Món đặc sản / điểm hấp dẫn nhất
-   - Không gian / mức giá tham khảo
+3. Hãy dựa trên danh sách các địa điểm thực tế đã được định vị ở trên (${rec.title}):
+   - Giới thiệu cụ thể các ${catName} sát khu vực người dùng hỏi theo đúng danh sách trên.
+   - Nêu rõ đặc sản / điểm nổi bật, khoảng cách thực tế (ví dụ cách ~120m, ~210m) và mức giá tham khảo.
 4. Kèm theo mẹo giao thông & đỗ xe thực tế: chỗ để xe máy/ô tô có thuận tiện không, khung giờ nên ghé để tránh tắc đường hoặc chờ bàn.
 5. Trả lời đúng trọng tâm câu hỏi, văn phong thông minh, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon) màu mè. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.`;
     } else {

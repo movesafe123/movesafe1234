@@ -5329,6 +5329,11 @@ class GoogleMapsApp {
     const dirPanel = document.getElementById('gm-directions-panel');
     if (dirPanel) dirPanel.classList.remove('open');
 
+    // Đóng AI Drawer nếu đang mở trên màn hình vừa/nhỏ để tránh hai khung lớn đè lên nhau và che khuất bản đồ
+    if (window.innerWidth < 1280 && window.aiChat && window.aiChat.isOpen) {
+      window.aiChat.close();
+    }
+
     // Thêm class lên body và ẩn thanh chips để chống đè giao diện trên Desktop
     document.body.classList.add('place-card-open');
     const chipsEl = document.getElementById('gm-chips-scroll');
