@@ -1151,6 +1151,11 @@ class MapEngine {
       `;
 
       marker.bindPopup(popupHtml);
+      marker.on('click', () => {
+        if (window.appState && typeof window.appState.openPlaceDetailsCard === 'function') {
+          window.appState.openPlaceDetailsCard(spot);
+        }
+      });
       this.layers.foodMarkers.addLayer(marker);
     });
 

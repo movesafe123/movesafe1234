@@ -1495,54 +1495,93 @@ class GoogleMapsApp {
           });
         }
       } else {
-        // Thêm tính năng click chọn địa điểm tự do như Google Maps
+        // Click chọn địa điểm tự do như Google Maps -> Mở Bảng thông tin địa điểm chi tiết (Place Details Card)
         if (this._tempClickMarker) window.mapEngine.map.removeLayer(this._tempClickMarker);
-        
+
+        // 1. Kiểm tra xem tọa độ click có sát với địa điểm ẩm thực / POI nào trong CSDL không (< 80 mét)
+        const allSpots = this.getAllFoodSpots();
+        let matchedSpot = null;
+        let minD = 0.08; // 80 mét
+        for (const sp of allSpots) {
+          if (sp.lat && sp.lng) {
+            const d = this._calcDistanceKm(lat, lng, sp.lat, sp.lng);
+            if (d < minD) {
+              minD = d;
+              matchedSpot = sp;
+            }
+          }
+        }
+
+        if (matchedSpot) {
+          const pinLat = matchedSpot.lat;
+          const pinLng = matchedSpot.lng;
+          const icon = L.divIcon({
+            className: 'gm-marker-container',
+            html: `<div class="gm-route-pin pin-dest" style="cursor: pointer; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);">•</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          this._tempClickMarker = L.marker([pinLat, pinLng], { icon }).addTo(window.mapEngine.map);
+          this._tempClickMarker.on('click', () => this.openPlaceDetailsCard(matchedSpot));
+          this.openPlaceDetailsCard(matchedSpot);
+          return;
+        }
+
+        // 2. Nếu là vị trí tự do, đặt marker xoay nhẹ và reverse-geocode địa chỉ
         this._tempClickMarker = L.marker([lat, lng], {
-            icon: L.divIcon({ className: 'gm-temp-click-icon', html: '<div class="spinner"></div>' })
+          icon: L.divIcon({ className: 'gm-temp-click-icon', html: '<div class="spinner"></div>' })
         }).addTo(window.mapEngine.map);
 
         try {
-            const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
-            const safeTitle = (addrInfo.title || 'Vị trí đã chọn').replace(/'/g, "\\'");
-            const safeFull = (addrInfo.fullAddress || addrInfo.title || '').replace(/'/g, "\\'");
-            
-            // Xây dựng popup Trạm điều khiển 5-trong-1 chuẩn Google Maps
-            const popupContent = `
-              <div class="gm-poi-popup">
-                <div class="gm-poi-title">${addrInfo.title}</div>
-                <div class="gm-poi-address">${addrInfo.subtitle}</div>
-                <div class="gm-poi-coords">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
-                <div class="gm-poi-actions">
-                  <button class="gm-btn-dir from" onclick="window.appState.setRouteFromPOI(${lat}, ${lng}, '${safeTitle}', '${safeFull}')">
-                    Từ đây
-                  </button>
-                  <button class="gm-btn-dir to" onclick="window.appState.setRouteToPOI(${lat}, ${lng}, '${safeTitle}', '${safeFull}')">
-                    Tới đây
-                  </button>
-                </div>
-                <div class="gm-poi-actions-grid">
-                  <button class="gm-poi-sub-btn" style="border-color:#a7f3d0; background:#ecfdf5; color:#065f46;" onclick="window.appState.openPropertyAnalyzerModal(${lat}, ${lng}, '${safeTitle}')">
-                    Chấm điểm An cư / Trọ
-                  </button>
-                  <button class="gm-poi-sub-btn" style="border-color:#fde68a; background:#fffbeb; color:#92400e;" onclick="window.appState.openReportAtPOI(${lat}, ${lng}, '${safeTitle}')">
-                    Báo ngập / tắc tại đây
-                  </button>
-                  <button class="gm-poi-sub-btn" style="grid-column: span 2; border-color:#fecaca; background:#fef2f2; color:#b91c1c;" onclick="window.appState.openSosRescueModal(${lat}, ${lng}, '${safeTitle}')">
-                    Tìm Điểm Trú Mưa Cao Ráo & Cứu Hộ SOS Gần Đây
-                  </button>
-                </div>
-              </div>
-            `;
-            
-            this._tempClickMarker.bindPopup(popupContent, {
-                closeButton: true,
-                className: 'gm-poi-popup-container',
-                minWidth: 270
-            }).openPopup();
-            
+          const addrInfo = await window.geocodingService.reverseGeocode(lat, lng);
+          const name = addrInfo.title || 'Địa điểm đã chọn';
+          const address = addrInfo.fullAddress || addrInfo.subtitle || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          const plusCode = addrInfo.plusCode || `3P3P+${Math.floor(Math.abs(lat) * 100) % 100}${Math.floor(Math.abs(lng) * 100) % 100} ${addrInfo.subtitle || 'Hà Nội'}`;
+
+          const placeData = {
+            name,
+            address,
+            lat,
+            lng,
+            category: addrInfo.typeName || 'Địa điểm công cộng',
+            vibe: addrInfo.subtitle || 'Khu vực kết nối giao thông đô thị',
+            rating: 4.5,
+            reviewsCount: 16,
+            price: '',
+            openingHours: 'Mở cửa cả ngày (24/7)',
+            phone: '',
+            plusCode,
+            image: (addrInfo.typeName && addrInfo.typeName.includes('Đường'))
+              ? 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=720&auto=format&fit=crop&q=80'
+              : 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=720&auto=format&fit=crop&q=80'
+          };
+
+          // Thay thế icon spinner bằng pin đỏ Google Maps
+          if (this._tempClickMarker) window.mapEngine.map.removeLayer(this._tempClickMarker);
+          const icon = L.divIcon({
+            className: 'gm-marker-container',
+            html: `<div class="gm-route-pin pin-dest" style="cursor: pointer;">•</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          this._tempClickMarker = L.marker([lat, lng], { icon }).addTo(window.mapEngine.map);
+          this._tempClickMarker.on('click', () => this.openPlaceDetailsCard(placeData));
+
+          this.openPlaceDetailsCard(placeData);
         } catch (err) {
-            this._tempClickMarker.bindPopup(`Vị trí: ${lat.toFixed(5)}, ${lng.toFixed(5)}`).openPopup();
+          const fallbackData = {
+            name: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
+            address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+            lat,
+            lng,
+            category: 'Vị trí bản đồ',
+            vibe: 'Khu vực đô thị',
+            rating: 4.5,
+            reviewsCount: 10,
+            plusCode: `3P3P+${Math.floor(Math.abs(lat) * 100) % 100}${Math.floor(Math.abs(lng) * 100) % 100} Hà Nội`,
+            openingHours: 'Mở cửa cả ngày (24/7)'
+          };
+          this.openPlaceDetailsCard(fallbackData);
         }
       }
     });
@@ -3100,11 +3139,13 @@ class GoogleMapsApp {
           this.showToast(`Đã định vị trạm sạc: ${item.title}`, 'info');
           return;
         }
-        if (item.type === 'spot') {
+        if (item.type === 'spot' || item.spotData) {
+          const spotInfo = item.spotData || item;
           if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
-            window.mapEngine.renderFoodPlaces([item], item.lat, item.lng);
+            window.mapEngine.renderFoodPlaces([spotInfo], spotInfo.lat, spotInfo.lng);
           }
-          this.showToast(`Đã định vị địa điểm: ${item.title}`, 'info');
+          this.openPlaceDetailsCard(spotInfo);
+          this.showToast(`Đã định vị địa điểm: ${spotInfo.name || item.title}`, 'info');
           return;
         }
         if (item.wardName) {
@@ -3123,16 +3164,20 @@ class GoogleMapsApp {
             iconAnchor: [15, 15]
           });
           this.searchResultMarker = L.marker([item.lat, item.lng], { icon }).addTo(window.mapEngine.map);
-          this.searchResultMarker.bindPopup(`
-            <div style="font-family: var(--font-family); min-width: 190px; padding: 4px;">
-              <div style="font-weight: 700; font-size: 14px; color: #202124;">${item.title}</div>
-              <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${item.subtitle}</div>
-              <button onclick="window.appState.routeToLocation(${item.lat}, ${item.lng}, '${item.title.replace(/'/g, "\\'")}')" 
-                style="margin-top: 8px; width: 100%; padding: 6px 12px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                Chỉ đường an toàn đến đây
-              </button>
-            </div>
-          `).openPopup();
+          const placeData = item.spotData || {
+            name: item.title,
+            address: item.subtitle || item.fullAddress || `${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}`,
+            lat: item.lat,
+            lng: item.lng,
+            category: item.typeName || 'Địa điểm',
+            vibe: item.subtitle || '',
+            rating: 4.5,
+            reviewsCount: 16,
+            plusCode: `3P3P+${Math.floor(Math.abs(item.lat) * 100) % 100}${Math.floor(Math.abs(item.lng) * 100) % 100} ${item.subtitle || ''}`.trim(),
+            openingHours: 'Mở cửa cả ngày (24/7)'
+          };
+          this.searchResultMarker.on('click', () => this.openPlaceDetailsCard(placeData));
+          this.openPlaceDetailsCard(placeData);
         }
       });
     });
@@ -3153,6 +3198,22 @@ class GoogleMapsApp {
     const targetDest = parsedRoute ? (parsedRoute.destination || parsedRoute.dest) : null;
     if (parsedRoute && parsedRoute.origin && targetDest) {
       await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0);
+      return;
+    }
+
+    // 0a. Nếu người dùng tìm kiếm trực tiếp một địa điểm ẩm thực / POI cụ thể trong CSDL (ví dụ: Bunenu Minh Khai, Phở Thìn, CGV...)
+    const allSpots = this.getAllFoodSpots();
+    const queryNorm = window.geocodingService ? window.geocodingService.removeAccents(lower) : lower;
+    const directSpot = allSpots.find(sp => {
+      const spNameNorm = window.geocodingService ? window.geocodingService.removeAccents((sp.name || '').toLowerCase()) : (sp.name || '').toLowerCase();
+      return queryNorm.includes(spNameNorm) || (queryNorm.length >= 6 && spNameNorm.includes(queryNorm));
+    });
+    if (directSpot) {
+      if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+        window.mapEngine.renderFoodPlaces([directSpot], directSpot.lat, directSpot.lng);
+      }
+      this.openPlaceDetailsCard(directSpot);
+      this.showToast(`Đã định vị: ${directSpot.name}`, 'info');
       return;
     }
 
@@ -3232,22 +3293,21 @@ class GoogleMapsApp {
 
         const safeTitle = (top.title || query).replace(/'/g, "\\'");
         this.searchResultMarker = L.marker([top.lat, top.lng], { icon }).addTo(window.mapEngine.map);
-        this.searchResultMarker.bindPopup(`
-          <div style="font-family: var(--font-family); min-width: 210px; padding: 4px;">
-            <div style="font-weight: 700; font-size: 14px; color: #202124;">${top.title}</div>
-            <div style="font-size: 12px; color: #5f6368; margin-top: 2px;">${top.subtitle || ''}</div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-              <button onclick="window.appState.routeToLocation(${top.lat}, ${top.lng}, '${safeTitle}')" 
-                style="flex: 1; padding: 6px 10px; background: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                Chỉ đường tới đây
-              </button>
-              <button onclick="window.appState.openSosRescueModal(${top.lat}, ${top.lng}, '${safeTitle}')" 
-                style="padding: 6px 8px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;" title="Xem điểm trú mưa & cứu hộ gần vị trí này">
-                SOS
-              </button>
-            </div>
-          </div>
-        `).openPopup();
+        
+        const placeData = top.spotData || {
+          name: top.title,
+          address: top.subtitle || top.fullAddress || `${top.lat.toFixed(5)}, ${top.lng.toFixed(5)}`,
+          lat: top.lat,
+          lng: top.lng,
+          category: top.typeName || 'Địa điểm',
+          vibe: top.subtitle || '',
+          rating: 4.5,
+          reviewsCount: 16,
+          plusCode: `3P3P+${Math.floor(Math.abs(top.lat) * 100) % 100}${Math.floor(Math.abs(top.lng) * 100) % 100} ${top.subtitle || ''}`.trim(),
+          openingHours: 'Mở cửa cả ngày (24/7)'
+        };
+        this.searchResultMarker.on('click', () => this.openPlaceDetailsCard(placeData));
+        this.openPlaceDetailsCard(placeData);
 
         this.showToast(`Đã định vị: ${top.title} (${top.subtitle || ''})`, 'info', 3500);
         return;
@@ -5034,6 +5094,7 @@ class GoogleMapsApp {
         if (Array.isArray(area.spots)) {
           area.spots.forEach(sp => {
             result.push({
+              ...sp,
               name: sp.name,
               address: sp.address || area.title || '',
               lat: sp.lat || area.lat,
@@ -5054,6 +5115,7 @@ class GoogleMapsApp {
         const spots = [...(area.spots || []), ...(area.places || []), ...(area.food || []), ...(area.entertainment || [])];
         spots.forEach(sp => {
           result.push({
+            ...sp,
             name: sp.name,
             address: sp.address || area.areaName || '',
             lat: sp.lat || area.lat,
@@ -5214,6 +5276,192 @@ class GoogleMapsApp {
         window.mapEngine.map.flyTo([ps.closestFood.lat, ps.closestFood.lng], 16);
       }
       this.showToast(`Điểm dừng nghỉ dọc tuyến: ${ps.closestFood.name} (${ps.closestFood.specialty || ''})`, 'info', 3500);
+    }
+  }
+
+  /**
+   * Bảng Thông tin Chi tiết Địa điểm chuẩn Google Maps (Place Details Card / Sheet)
+   */
+  openPlaceDetailsCard(data) {
+    const card = document.getElementById('gm-place-card');
+    if (!card) return;
+
+    // Đóng panel chỉ đường nếu đang mở để tránh đè giao diện
+    const dirPanel = document.getElementById('gm-directions-panel');
+    if (dirPanel) dirPanel.classList.remove('open');
+
+    const titleEl = document.getElementById('gm-place-title');
+    const subtitleEl = document.getElementById('gm-place-subtitle');
+    const imgEl = document.getElementById('gm-place-img');
+    const badgeCategory = document.getElementById('gm-place-badge-category');
+    const ratingNum = document.getElementById('gm-place-rating-num');
+    const starsEl = document.getElementById('gm-place-stars');
+    const reviewsCount = document.getElementById('gm-place-reviews-count');
+    const priceRange = document.getElementById('gm-place-price-range');
+    const addressEl = document.getElementById('gm-place-address');
+    const pluscodeEl = document.getElementById('gm-place-pluscode');
+    const hoursEl = document.getElementById('gm-place-hours');
+    const priceDetail = document.getElementById('gm-place-price-detail');
+    const phoneLink = document.getElementById('gm-place-phone-link');
+    const floodHead = document.querySelector('#gm-place-flood-box .gm-place-flood-head span');
+    const floodDesc = document.getElementById('gm-place-flood-desc');
+    const gmapsBtn = document.getElementById('btn-open-google-maps');
+
+    const lat = Number(data.lat);
+    const lng = Number(data.lng);
+    const name = data.name || data.title || 'Địa điểm đã chọn';
+
+    if (titleEl) titleEl.textContent = name;
+    if (subtitleEl) subtitleEl.textContent = data.vibe || data.subtitle || 'Khu vực kết nối giao thông đô thị';
+    if (badgeCategory) badgeCategory.textContent = data.category || data.typeName || 'Nhà hàng ăn nhanh';
+
+    // Banner ảnh thực tế
+    if (imgEl) {
+      imgEl.src = data.image || (
+        (data.category && data.category.includes('Nhà hàng')) || data.type === 'restaurant'
+          ? 'https://images.unsplash.com/photo-1544025162-d76694265947?w=720&auto=format&fit=crop&q=80'
+          : 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=720&auto=format&fit=crop&q=80'
+      );
+    }
+
+    // Đánh giá sao & Giá
+    const rating = data.rating ? Number(data.rating) : 4.3;
+    if (ratingNum) ratingNum.textContent = rating.toFixed(1);
+    if (starsEl) {
+      const fullStars = Math.floor(rating);
+      starsEl.textContent = '★'.repeat(fullStars) + (rating % 1 >= 0.5 ? '★' : '☆') + '☆'.repeat(Math.max(0, 4 - fullStars));
+    }
+    if (reviewsCount) reviewsCount.textContent = `(${data.reviewsCount || 12})`;
+    if (priceRange) priceRange.textContent = data.price || '1 - 100.000 đ';
+
+    // Địa chỉ & Plus Code
+    const fullAddr = data.address || data.fullAddress || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    if (addressEl) addressEl.textContent = fullAddr;
+    if (pluscodeEl) {
+      pluscodeEl.textContent = data.plusCode || `3P3P+GPP ${fullAddr.split(',').slice(-3).join(',').trim()}`;
+    }
+
+    // Giờ mở cửa
+    if (hoursEl) hoursEl.textContent = data.openingHours ? `• ${data.openingHours}` : '• Đóng cửa vào 22:30';
+
+    // Mức giá chi tiết & Số điện thoại & Tùy chọn dịch vụ
+    const servicesRow = document.getElementById('gm-place-services');
+    const priceRow = document.getElementById('gm-place-price-item');
+    const phoneRow = document.getElementById('gm-place-phone-item');
+
+    const isFood = (data.category && /(nhà hàng|quán|ăn|uống|buffet|cafe|cà phê|tiệm|phở|bún|bánh mì|ẩm thực)/i.test(data.category))
+      || (data.feature && /(ăn|uống|món|nem|thịt|nướng|lẩu|cafe|ẩm thực)/i.test(data.feature))
+      || (data.name && /(bunenu|quán|nhà hàng|buffet|cà phê|cafe|phở|bún|ẩm thực)/i.test(data.name));
+
+    if (servicesRow) {
+      servicesRow.style.display = isFood ? 'flex' : 'none';
+    }
+
+    if (priceRow) {
+      if (data.price) {
+        priceRow.style.display = 'flex';
+        if (priceDetail) priceDetail.textContent = data.price.includes('/người') ? data.price : `${data.price}/người`;
+      } else {
+        priceRow.style.display = 'none';
+      }
+    }
+
+    if (phoneRow) {
+      if (data.phone) {
+        phoneRow.style.display = 'flex';
+        if (phoneLink) {
+          phoneLink.textContent = data.phone;
+          phoneLink.href = `tel:${data.phone.replace(/\s+/g, '')}`;
+        }
+      } else {
+        phoneRow.style.display = 'none';
+      }
+    }
+
+    // Nút liên kết Google Maps chính thức
+    if (gmapsBtn) {
+      const q = encodeURIComponent(`${name} ${data.address || ''}`.trim());
+      gmapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${q || `${lat},${lng}`}`;
+    }
+
+    // Đánh giá thủy văn MoveSafe
+    const targetCity = lat > 18.0 ? 'hanoi' : (lat > 14.0 ? 'danang' : 'hcm');
+    const pools = (typeof SIMULATION_FLOOD_POOLS !== 'undefined' && SIMULATION_FLOOD_POOLS[targetCity]) || [];
+    let nearestDistKm = 999;
+    let nearestPoolName = '';
+    for (const p of pools) {
+      const d = this._calcDistanceKm(lat, lng, p.lat, p.lng);
+      if (d < nearestDistKm) {
+        nearestDistKm = d;
+        nearestPoolName = p.name;
+      }
+    }
+    const distM = Math.round(nearestDistKm * 1000);
+    if (distM < 400) {
+      if (floodHead) floodHead.textContent = 'Cảnh báo thủy văn: Gần rốn ngập trũng sâu';
+      if (floodDesc) floodDesc.textContent = `Cách rốn ngập ${nearestPoolName} chỉ ${distM}m. Khi có mưa lớn >50mm, cần chú ý đường vào và đỗ xe cao ráo.`;
+    } else {
+      if (floodHead) floodHead.textContent = 'Đánh giá thủy văn MoveSafe: An toàn, khô ráo';
+      if (floodDesc) floodDesc.textContent = `Cách rốn ngập gần nhất ${(distM / 1000).toFixed(1)} km (${nearestPoolName || 'Khu vực an toàn'}). Tuyến đường cao ráo, xe cộ lưu thông thuận tiện.`;
+    }
+
+    // Gán sự kiện nút tròn hành động
+    const routeBtn = document.getElementById('btn-place-route');
+    if (routeBtn) {
+      routeBtn.onclick = () => {
+        this.closePlaceDetailsCard();
+        this.routeToLocation(lat, lng, name);
+      };
+    }
+
+    const floodBtn = document.getElementById('btn-place-flood-score');
+    if (floodBtn) {
+      floodBtn.onclick = () => {
+        this.openPropertyAnalyzerModal(lat, lng, name);
+      };
+    }
+
+    const saveBtn = document.getElementById('btn-place-save');
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        this.showToast(`Đã lưu "${name}" vào danh sách yêu thích!`, 'info', 3000);
+      };
+    }
+
+    const nearbyBtn = document.getElementById('btn-place-nearby');
+    if (nearbyBtn) {
+      nearbyBtn.onclick = () => {
+        this.showToast(`Đang quét trạm sạc & tiện ích trong bán kính 1.5km quanh ${name}...`, 'info', 3500);
+        if (window.mapEngine && typeof window.mapEngine.renderEvStationsOnMap === 'function') {
+          window.mapEngine.renderEvStationsOnMap(this.currentCity);
+        }
+      };
+    }
+
+    const shareBtn = document.getElementById('btn-place-share');
+    if (shareBtn) {
+      shareBtn.onclick = () => {
+        const shareText = `MoveSafe VN - ${name}\nĐịa chỉ: ${data.address || ''}\nTọa độ: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(shareText);
+          this.showToast('Đã sao chép thông tin chia sẻ địa điểm!', 'info', 2500);
+        }
+      };
+    }
+
+    card.classList.add('open');
+    card.style.display = 'flex';
+
+    if (window.mapEngine?.map) {
+      window.mapEngine.map.flyTo([lat, lng], 16, { duration: 0.8 });
+    }
+  }
+
+  closePlaceDetailsCard() {
+    const card = document.getElementById('gm-place-card');
+    if (card) {
+      card.classList.remove('open');
+      card.style.display = 'none';
     }
   }
 

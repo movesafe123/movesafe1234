@@ -389,6 +389,22 @@
       highlight: 'Hồ điều hòa Thành phố Giao Lưu mát rượi, phố ẩm thực sinh viên Cổ Nhuế - Nhổn và Công viên Hòa Bình.',
       spots: [
         {
+          name: 'Bunenu Minh Khai ( Buffet Nem Nướng Nha Trang – Anh Tuấn )',
+          address: '3P3P+GPP Khu ăn uống cạnh KTX đại học Công Nghiệp, Tây Tựu, Bắc Từ Liêm, Hà Nội',
+          lat: 21.0545,
+          lng: 105.7352,
+          rating: 4.3,
+          reviewsCount: 12,
+          category: 'Nhà hàng ăn nhanh',
+          feature: 'Buffet nem nướng Nha Trang thơm nức mũi, chả ram tôm giòn rụm, bánh tráng cuốn rau sống dưa leo xoài xanh dứa thanh mát, nước chấm thịt băm béo bùi số 1.',
+          vibe: 'Quán ăn sinh viên rộng rãi, sạch sẽ, đồ ăn lên liên tục.',
+          price: '1 - 100.000 đ/người',
+          phone: '+84 965 818 393',
+          openingHours: 'Đang mở cửa · Đóng cửa vào 22:30',
+          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=720&auto=format&fit=crop&q=80',
+          plusCode: '3P3P+GPP Khu ăn uống cạnh KTX đại học Công Nghiệp, Tây Tựu, Hà Nội'
+        },
+        {
           name: 'Tổ Hợp Ẩm Thực & Cafe Hồ Thành Phố Giao Lưu',
           address: '232 Phạm Văn Đồng, P. Cổ Nhuế 1',
           lat: 21.0492,

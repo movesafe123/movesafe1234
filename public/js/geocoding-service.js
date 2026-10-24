@@ -279,25 +279,28 @@ class GeocodingService {
     }
 
     // 1d. Tìm trong cơ sở dữ liệu Ẩm thực, TTTM, Rạp phim (FOOD_ENTERTAINMENT_DATA)
-    if (typeof window !== 'undefined' && window.FOOD_ENTERTAINMENT_DATA && Array.isArray(window.FOOD_ENTERTAINMENT_DATA.areas)) {
-      for (const area of window.FOOD_ENTERTAINMENT_DATA.areas) {
+    if (typeof window !== 'undefined' && window.FOOD_ENTERTAINMENT_DATA) {
+      const guideObj = window.FOOD_ENTERTAINMENT_DATA.AREAS_GUIDE || {};
+      const areaList = Array.isArray(window.FOOD_ENTERTAINMENT_DATA.areas) ? window.FOOD_ENTERTAINMENT_DATA.areas : Object.values(guideObj);
+      for (const area of areaList) {
         if (area.city && area.city !== cityKey) continue;
-        const allSpots = [...(area.food || []), ...(area.entertainment || [])];
+        const allSpots = area.spots || [...(area.food || []), ...(area.entertainment || [])];
         for (const spot of allSpots) {
           const sName = this.removeAccents(spot.name || '');
           const sAddr = this.removeAccents(spot.address || '');
-          const sSpec = this.removeAccents(spot.specialty || '');
+          const sSpec = this.removeAccents(spot.feature || spot.specialty || '');
           if (sName.includes(qNoAccent) || sAddr.includes(qNoAccent) || (qNoAccent.length >= 4 && sSpec.includes(qNoAccent))) {
             pushUnique({
               title: spot.name,
-              subtitle: `${spot.address} • ${spot.specialty}`,
+              subtitle: `${spot.address}${spot.price ? ` • ${spot.price}` : ''}`,
               fullAddress: `${spot.name}, ${spot.address}`,
               lat: spot.lat || area.lat,
               lng: spot.lng || area.lng,
               icon: '',
               type: 'shopping',
-              typeName: 'Ẩm thực & Giải trí',
-              score: 84
+              typeName: spot.category || 'Ẩm thực & Giải trí',
+              score: 92,
+              spotData: spot
             });
           }
         }

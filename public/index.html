@@ -419,6 +419,134 @@
     </div> <!-- /gm-directions-body -->
   </div> <!-- /gm-directions-panel -->
 
+  <!-- ==================== BẢNG THÔNG TIN CHI TIẾT ĐỊA ĐIỂM CHUẨN GOOGLE MAPS ==================== -->
+  <div class="gm-place-card" id="gm-place-card" style="display: none;">
+    <!-- Handle vuốt kéo trên điện thoại -->
+    <div class="mobile-sheet-handle-bar" id="place-card-sheet-handle">
+      <div class="mobile-sheet-pill"></div>
+    </div>
+
+    <!-- Header ảnh thực tế & Nút đóng -->
+    <div class="gm-place-hero" id="gm-place-hero">
+      <img id="gm-place-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=720&auto=format&fit=crop&q=80" alt="Ảnh địa điểm" class="gm-place-cover-img" />
+      <div class="gm-place-img-overlay"></div>
+      <button type="button" class="gm-place-btn-close" id="btn-close-place-card" onclick="window.appState && window.appState.closePlaceDetailsCard()" title="Đóng bảng chi tiết" aria-label="Đóng">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="gm-place-badge-category" id="gm-place-badge-category">Nhà hàng ăn nhanh</div>
+    </div>
+
+    <!-- Thân nội dung chi tiết -->
+    <div class="gm-place-body">
+      <!-- Tiêu đề & Đánh giá sao -->
+      <div class="gm-place-header-section">
+        <h2 class="gm-place-title" id="gm-place-title">Tên địa điểm</h2>
+        <div class="gm-place-rating-row" id="gm-place-rating-row">
+          <span class="gm-place-rating-num" id="gm-place-rating-num">4.3</span>
+          <div class="gm-place-stars" id="gm-place-stars">★★★★☆</div>
+          <span class="gm-place-reviews-count" id="gm-place-reviews-count">(12)</span>
+          <span class="gm-place-dot">•</span>
+          <span class="gm-place-price-range" id="gm-place-price-range">1-100.000 đ</span>
+        </div>
+        <div class="gm-place-subtitle" id="gm-place-subtitle">Khu ăn uống sinh viên</div>
+      </div>
+
+      <!-- 5 Cụm Nút Tròn Hành Động chuẩn Google Maps -->
+      <div class="gm-place-actions-row">
+        <button type="button" class="gm-place-circle-action primary" id="btn-place-route" title="Chỉ đường né ngập tới đây">
+          <div class="gm-place-circle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+          </div>
+          <span>Đường đi</span>
+        </button>
+
+        <button type="button" class="gm-place-circle-action" id="btn-place-save" title="Lưu địa điểm">
+          <div class="gm-place-circle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+          </div>
+          <span>Lưu</span>
+        </button>
+
+        <button type="button" class="gm-place-circle-action" id="btn-place-nearby" title="Khám phá tiện ích xung quanh">
+          <div class="gm-place-circle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <span>Gần đó</span>
+        </button>
+
+        <button type="button" class="gm-place-circle-action flood-score" id="btn-place-flood-score" title="Khảo sát an cư & Chấm điểm chống ngập">
+          <div class="gm-place-circle-icon" style="background:#ecfdf5;color:#059669;border-color:#a7f3d0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span>Chống ngập</span>
+        </button>
+
+        <button type="button" class="gm-place-circle-action" id="btn-place-share" title="Chia sẻ tọa độ">
+          <div class="gm-place-circle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <span>Chia sẻ</span>
+        </button>
+      </div>
+
+      <!-- Danh sách thuộc tính chi tiết với Icon chuẩn Google Maps -->
+      <div class="gm-place-info-list">
+        <!-- Ăn tại chỗ / Đồ mang đi -->
+        <div class="gm-place-info-item service-options" id="gm-place-services">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Ăn tại chỗ • Đồ ăn mang đi</span>
+        </div>
+
+        <!-- Địa chỉ & Plus Code -->
+        <div class="gm-place-info-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div class="gm-place-info-content">
+            <div id="gm-place-address">Địa chỉ</div>
+            <div class="gm-place-pluscode" id="gm-place-pluscode">Mã vị trí</div>
+          </div>
+        </div>
+
+        <!-- Giờ mở cửa -->
+        <div class="gm-place-info-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="gm-place-info-content">
+            <span class="gm-place-open-badge" id="gm-place-open-status">Đang mở cửa</span>
+            <span id="gm-place-hours">• Đóng cửa vào 22:30</span>
+          </div>
+        </div>
+
+        <!-- Mức giá -->
+        <div class="gm-place-info-item" id="gm-place-price-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+          <span id="gm-place-price-detail">1 - 100.000 đ/người</span>
+        </div>
+
+        <!-- Số điện thoại -->
+        <div class="gm-place-info-item" id="gm-place-phone-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a href="#" id="gm-place-phone-link" class="gm-place-link">+84 965 818 393</a>
+        </div>
+
+        <!-- MoveSafe An toàn ngập lụt & Cốt nền vệ tinh -->
+        <div class="gm-place-flood-box" id="gm-place-flood-box">
+          <div class="gm-place-flood-head">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Đánh giá thủy văn MoveSafe: An toàn</span>
+          </div>
+          <div class="gm-place-flood-desc" id="gm-place-flood-desc">
+            Cốt nền vệ tinh NASA đạt +12m. Tuyến đường khô ráo, xe cộ lưu thông thuận tiện.
+          </div>
+        </div>
+
+        <!-- Nút mở trực tiếp Google Maps chính thức -->
+        <a href="#" target="_blank" rel="noopener noreferrer" class="btn-open-in-google-maps" id="btn-open-google-maps">
+          <span>Xem đánh giá & ảnh đầy đủ trên Google Maps</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
   </div>
 
   <!-- Banner trạng thái Kịch bản Giả lập khi được bật -->
