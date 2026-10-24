@@ -76,10 +76,10 @@ class AIAssistantService {
       }
     }
 
-    return this.generateSmartLocalResponse(query, city, activeFloodPoints, allCityFloods, trafficIncidents, weatherAlerts, cityStations, context);
+    return await this.generateSmartLocalResponse(query, city, activeFloodPoints, allCityFloods, trafficIncidents, weatherAlerts, cityStations, context);
   }
 
-  generateSmartLocalResponse(query, city, activeFloods, allFloods, traffics, alerts, cityStations = [], context = {}) {
+  async generateSmartLocalResponse(query, city, activeFloods, allFloods, traffics, alerts, cityStations = [], context = {}) {
     const lower = query.toLowerCase();
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const parsedRoute = this.parseRouteQuery(query);
@@ -114,7 +114,9 @@ class AIAssistantService {
 
     // 0b. Nếu người dùng hỏi về ăn uống, quán ngon, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
     if (FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
-      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context);
+      const rec = typeof FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
+        ? await FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, city, context)
+        : FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context);
       return {
         text: rec.text,
         action: rec.action
@@ -362,6 +364,7 @@ class AIAssistantService {
     let dynamicContext = wardContext;
     let instructions = '';
 
+    let cachedFoodRec = null;
     if (isAskingTrafficOnly) {
       dynamicContext += `Dữ liệu giao thông thời gian thực từ TomTom & VOV tại ${cityName}:
 - Sự cố / tình hình ùn tắc: ${JSON.stringify(trafficIncidents.slice(0, 6).map(t => ({ description: t.description, delay_min: Math.round((t.delaySeconds || 60) / 60) })))}`;
@@ -391,7 +394,10 @@ class AIAssistantService {
 2. Tư vấn các trạm sạc phù hợp nhất, công suất (kW), sạc nhanh hay sạc chậm, lưu ý đường đi an toàn né ngập.
 3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else if (isAskingFoodOrEntertainment) {
-      const rec = FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city);
+      const rec = typeof FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
+        ? await FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, city, context)
+        : FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context);
+      cachedFoodRec = rec;
       const catName = rec.categoryType === 'cinema' ? 'rạp chiếu phim' : (rec.categoryType === 'cafe' ? 'quán cà phê' : (rec.categoryType === 'entertainment' ? 'điểm vui chơi giải trí' : 'quán ăn/món ngon'));
       dynamicContext += `Cơ sở dữ liệu địa phương chọn lọc tại ${cityName} (${rec.title}):
 ${rec.text}`;
@@ -440,7 +446,7 @@ ${instructions}`;
         let reply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply && reply.trim().length > 0) {
           let action = isAskingFoodOrEntertainment
-            ? FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city).action
+            ? (cachedFoodRec ? cachedFoodRec.action : FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context).action)
             : (isAskingTrafficOnly
               ? { type: 'SHOW_TRAFFIC_LAYER' }
               : (isAskingEV ? { type: 'SHOW_EV_LAYER' } : (lower.includes('thời tiết') || lower.includes('mưa') ? { type: 'SHOW_WEATHER_LAYER' } : { type: 'SHOW_FLOOD_LAYER' })));

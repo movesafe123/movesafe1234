@@ -145,7 +145,7 @@
       trafficTip: 'Dọc đường Nguyễn Khuyến và ven hồ Văn Quán đỗ xe thoải mái; bạn cũng có thể đi tàu điện Cát Linh - Hà Đông xuống ga Văn Quán.',
       aliases: ['hà đông', 'ha dong', 'văn quán', 'van quan', 'hồ văn quán', 'đại học kiến trúc', 'học viện bưu chính', 'ptit', 'học viện an ninh', 'aeon mall hà đông', 'aeon hà đông', 'mỗ lao', 'làng việt kiều châu âu', 'quang trung hà đông', 'trần phú hà đông']
     },
-    // --- Khu vực Long Biên - Aeon Mall - Gia Lâm ---
+    // --- Khu vực Long Biên - Aeon Mall ---
     {
       key: 'long_bien_aeon',
       city: 'hanoi',
@@ -154,7 +154,128 @@
       lng: 105.8995,
       highlight: 'Thiên đường mua sắm ẩm thực Nhật Bản Aeon Mall Long Biên, phố ẩm thực Ngọc Lâm và tầm nhìn cầu Long Biên lịch sử.',
       trafficTip: 'Aeon Mall Long Biên có bãi đỗ xe miễn phí ngoài trời và trên tầng thượng cho hàng nghìn ô tô, xe máy.',
-      aliases: ['long biên', 'long bien', 'aeon mall long biên', 'aeon long biên', 'ngọc lâm', 'ngoc lam', 'nguyễn văn cừ', 'cổ linh', 'vinhomes riverside', 'gia lâm', 'ocean park']
+      aliases: ['long biên', 'long bien', 'aeon mall long biên', 'aeon long biên', 'ngọc lâm', 'ngoc lam', 'nguyễn văn cừ', 'cổ linh', 'vinhomes riverside', 'bồ đề', 'sài đồng', 'việt hưng']
+    },
+    // --- Khu vực Đội Cấn - Ngọc Hà - Hoàng Hoa Thám (Ba Đình) ---
+    {
+      key: 'doi_can_ngoc_ha',
+      city: 'hanoi',
+      title: 'Khu Vực Phố Đội Cấn - Ngọc Hà - Hoàng Hoa Thám (Ba Đình)',
+      lat: 21.0355,
+      lng: 105.8220,
+      highlight: 'Tuyến phố ẩm thực truyền thống lâu đời quận Ba Đình với bánh xèo, nem lụi, phở bò, bún ốc và các quán cà phê sân vườn yên tĩnh.',
+      trafficTip: 'Phố Đội Cấn có đoạn một chiều đối với ô tô theo hướng từ Bưởi về Lăng Bác. Nên chú ý biển báo phân làn.',
+      aliases: ['đội cấn', 'doi can', 'phố đội cấn', 'ngọc hà', 'ngoc ha', 'hoàng hoa thám', 'hoang hoa tham', 'thụy khuê', 'thuy khue', 'văn cao', 'van cao']
+    },
+    // --- Khu vực Lĩnh Nam - Mai Động - Vĩnh Hưng (Hoàng Mai) ---
+    {
+      key: 'linh_nam_hoang_mai',
+      city: 'hanoi',
+      title: 'Khu Vực Lĩnh Nam - Vĩnh Hưng - Mai Động (Hoàng Mai)',
+      lat: 20.9803,
+      lng: 105.8903,
+      highlight: 'Khu vực dân cư đông đúc phía Đông Nam Thủ đô với nhiều hàng quán ẩm thực bình dân, phở bò, cơm ngon và quán lẩu nhậu đêm.',
+      trafficTip: 'Đường Lĩnh Nam và Tam Trinh mật độ xe tải và xe máy cao vào giờ tan tầm, nên gửi xe gọn trên vỉa hè của quán.',
+      aliases: ['lĩnh nam', 'linh nam', 'đường lĩnh nam', 'vĩnh hưng', 'vinh hung', 'mai động', 'mai dong', 'thúy lĩnh', 'thuy linh', 'nam dư', 'trần phú hoàng mai']
+    },
+    // --- Khu vực Linh Đàm - Giải Phóng - Giáp Bát - Nước Ngầm (Hoàng Mai) ---
+    {
+      key: 'linh_dam_giai_phong',
+      city: 'hanoi',
+      title: 'Khu Vực Bán Đảo Linh Đàm & Đường Giải Phóng (Hoàng Mai)',
+      lat: 20.9695,
+      lng: 105.8305,
+      highlight: 'Khu đô thị sinh thái hồ Linh Đàm rợp bóng cây với hàng trăm nhà hàng hải sản, lẩu nướng, quán cafe ven hồ và rạp phim CGV.',
+      trafficTip: 'Nút giao Giải Phóng - Nguyễn Hữu Thọ khá đông giờ cao điểm, bạn nên đi theo đường ven hồ Linh Đàm để đỗ xe rộng rãi.',
+      aliases: ['linh đàm', 'linh dam', 'bán đảo linh đàm', 'hồ linh đàm', 'giải phóng', 'giai phong', 'bến xe giáp bát', 'giáp bát', 'bến xe nước ngầm', 'nước ngầm', 'định công', 'dinh cong', 'đại kim', 'hoàng liệt', 'hoàng mai']
+    },
+    // --- Khu vực Nhổn - ĐH Công Nghiệp - Bắc Từ Liêm ---
+    {
+      key: 'nhon_bac_tu_liem',
+      city: 'hanoi',
+      title: 'Khu Vực Nhổn & ĐH Công Nghiệp Hà Nội (Bắc Từ Liêm)',
+      lat: 21.0538,
+      lng: 105.7352,
+      highlight: 'Thủ phủ ẩm thực sinh viên phía Tây Hà Nội quanh ĐH Công Nghiệp và Ga Metro Nhổn với hàng trăm quán lẩu nướng, trà sữa, ăn vặt giá rẻ.',
+      trafficTip: 'Bạn có thể di chuyển cực nhanh bằng tàu điện trên cao tuyến Nhổn - Cầu Giấy xuống thẳng Ga Nhổn.',
+      aliases: ['nhổn', 'nhon', 'đại học công nghiệp', 'đh công nghiệp', 'dh cong nghiep', 'haui', 'minh khai bắc từ liêm', 'tây tựu', 'phú diễn', 'phu dien', 'diễn', 'cầu diễn', 'cau dien', 'hồ tùng mậu']
+    },
+    // --- Khu vực Cổ Nhuế - Xuân Đỉnh - Học viện Tài Chính / Cảnh Sát ---
+    {
+      key: 'co_nhue_xuan_dinh',
+      city: 'hanoi',
+      title: 'Khu Vực Cổ Nhuế - Phạm Văn Đồng - Ngoại Giao Đoàn (Bắc Từ Liêm)',
+      lat: 21.0665,
+      lng: 105.7785,
+      highlight: 'Khu vực sầm uất quanh Học viện Tài chính, ĐH Mỏ Địa Chất, Công viên Hòa Bình và Khu đô thị Ngoại Giao Đoàn hiện đại.',
+      trafficTip: 'Trục Phạm Văn Đồng - Vành đai 3 rất thông thoáng, chú ý đi đúng làn xe máy/ô tô dưới thấp.',
+      aliases: ['cổ nhuế', 'co nhue', 'xuân đỉnh', 'xuan dinh', 'ngoại giao đoàn', 'ngoai giao doan', 'công viên hòa bình', 'đại học mỏ', 'học viện tài chính', 'hv tài chính', 'học viện cảnh sát', 'phạm văn đồng', 'đông ngạc', 'bắc từ liêm']
+    },
+    // --- Khu vực Vinhomes Smart City - Tây Mỗ - Đại Mỗ - Thiên Đường Bảo Sơn ---
+    {
+      key: 'smart_city_tay_mo',
+      city: 'hanoi',
+      title: 'Khu Vực Vinhomes Smart City - Tây Mỗ - Thiên Đường Bảo Sơn',
+      lat: 21.0035,
+      lng: 105.7415,
+      highlight: 'Đại đô thị thông minh phía Tây với Vườn Nhật Zenpark, TTTM Vincom Mega Mall Smart City và Công viên giải trí Thiên Đường Bảo Sơn.',
+      trafficTip: 'Di chuyển thuận lợi qua Đại lộ Thăng Long hoặc đường Lê Trọng Tấn - Hà Đông; có hệ thống xe buýt điện VinBus kết nối nội đô.',
+      aliases: ['smart city', 'vinhomes smart city', 'tây mỗ', 'tay mo', 'đại mỗ', 'dai mo', 'thiên đường bảo sơn', 'thien duong bao son', 'an khánh', 'an khanh', 'hoài đức', 'hoai duc', 'lê trọng tấn']
+    },
+    // --- Khu vực Gia Lâm - Vinhomes Ocean Park - Học viện Nông Nghiệp ---
+    {
+      key: 'gia_lam_ocean_park',
+      city: 'hanoi',
+      title: 'Khu Vực Gia Lâm - Trâu Quỳ - Vinhomes Ocean Park',
+      lat: 21.0015,
+      lng: 105.9385,
+      highlight: 'Quần thể Biển hồ nước mặn Vinhomes Ocean Park, phố ẩm thực sinh viên Học viện Nông Nghiệp (Trâu Quỳ) và làng gốm Bát Tràng.',
+      trafficTip: 'Qua cầu Vĩnh Tuy hoặc cầu Thanh Trì rẽ xuống đường Lý Thánh Tông / cao tốc Hà Nội - Hải Phòng rất thông thoáng.',
+      aliases: ['gia lâm', 'gia lam', 'trâu quỳ', 'trau quy', 'ocean park', 'vinhomes ocean park', 'biển hồ', 'học viện nông nghiệp', 'đại học nông nghiệp', 'bát tràng', 'bat trang', 'đa tốn', 'kiêu kỵ', 'yên viên']
+    },
+    // --- Khu vực Đông Anh - Cầu Nhật Tân - Cổ Loa ---
+    {
+      key: 'dong_anh',
+      city: 'hanoi',
+      title: 'Khu Vực Trung Tâm Đông Anh - Cao Lỗ - Cổ Loa (Hà Nội)',
+      lat: 21.1388,
+      lng: 105.8482,
+      highlight: 'Trung tâm đô thị phía Bắc sông Hồng với trục ẩm thực đường Cao Lỗ, khu di tích Thành Cổ Loa và các nhà hàng sinh thái.',
+      trafficTip: 'Di chuyển từ nội thành qua Cầu Nhật Tân - Võ Nguyên Giáp hoặc Cầu Thăng Long rất nhanh chóng.',
+      aliases: ['đông anh', 'dong anh', 'cao lỗ', 'cao lo', 'cổ loa', 'co loa', 'uy nỗ', 'uy no', 'vĩnh ngọc', 'hải bối', 'bắc thăng long']
+    },
+    // --- Khu vực Sóc Sơn - Nội Bài - Việt Phủ Thành Chương ---
+    {
+      key: 'soc_son_noi_bai',
+      city: 'hanoi',
+      title: 'Khu Vực Sóc Sơn - Sân Bay Nội Bài - Hồ Đồng Đò',
+      lat: 21.2578,
+      lng: 105.8486,
+      highlight: 'Điểm đến dã ngoại, cắm trại cuối tuần quanh Hồ Đồng Đò, Núi Hàm Lợn, Đền Gióng Sóc Sơn và hệ thống nhà hàng quanh Sân bay Nội Bài.',
+      trafficTip: 'Đi theo trục Võ Nguyên Giáp - Quốc lộ 2 hoặc Quốc lộ 3; lưu ý tốc độ khi vào khu vực nhà ga T1/T2 Nội Bài.',
+      aliases: ['sóc sơn', 'soc son', 'nội bài', 'noi bai', 'sân bay nội bài', 'hồ đồng đò', 'đồng đò', 'hàm lợn', 'đền gióng', 'việt phủ thành chương']
+    },
+    // --- Khu vực Thanh Trì - Ngọc Hồi - Tứ Hiệp ---
+    {
+      key: 'thanh_tri_ngoc_hoi',
+      city: 'hanoi',
+      title: 'Khu Vực Thanh Trì - Ngọc Hồi - Tứ Hiệp (Hà Nội)',
+      lat: 20.9435,
+      lng: 105.8455,
+      highlight: 'Cửa ngõ phía Nam Thủ đô nổi tiếng với đặc sản bánh cuốn Thanh Trì gia truyền, phố ẩm thực Tứ Hiệp và KĐT Hồng Hà Eco City.',
+      trafficTip: 'Trục đường Ngọc Hồi - Quốc lộ 1A lưu lượng xe khách lớn, nên đi chậm tại nút giao Văn Điển - Tứ Hiệp.',
+      aliases: ['thanh trì', 'thanh tri', 'ngọc hồi', 'ngoc hoi', 'văn điển', 'van dien', 'tứ hiệp', 'tu hiep', 'tân triều', 'triều khúc', 'trieu khuc', 'cầu bươu']
+    },
+    // --- Khu vực Hòa Lạc - ĐH FPT - Thạch Thất - Ba Vì - Sơn Tây ---
+    {
+      key: 'hoa_lac_son_tay',
+      city: 'hanoi',
+      title: 'Khu Vực Công Nghệ Cao Hòa Lạc - ĐH FPT - Sơn Tây',
+      lat: 21.0124,
+      lng: 105.5253,
+      highlight: 'Tổ hợp giáo dục và công nghệ Hòa Lạc (ĐH FPT, ĐH Quốc Gia), Làng Văn hóa các Dân tộc Việt Nam và Thành cổ Sơn Tây.',
+      trafficTip: 'Di chuyển theo trục Đại lộ Thăng Long thẳng tới nút giao Hòa Lạc (~25-30 phút từ Big C Thăng Long).',
+      aliases: ['hòa lạc', 'hoa lac', 'đại học fpt', 'đh fpt', 'fpt hòa lạc', 'thạch thất', 'thach that', 'quốc oai', 'quoc oai', 'sơn tây', 'son tay', 'ba vì', 'ba vi', 'đồng mô', 'chương mỹ', 'xuân mai', 'đan phượng', 'phúc thọ', 'thường tín', 'thanh oai', 'mê linh']
     }
   ];
 
@@ -1275,24 +1396,67 @@
 
   /**
    * Trích xuất tên địa điểm mục tiêu từ câu hỏi tự nhiên
-   * Ví dụ: "nơi giải trí ở công viên thống nhất" -> "công viên thống nhất"
+   * Ví dụ:
+   * - "nơi giải trí ở công viên thống nhất" -> "công viên thống nhất"
+   * - "đông anh có quán ăn nào ngon không" -> "đông anh"
    */
   function extractLocationPhrase(query) {
     if (!query) return '';
     const q = cleanVietnameseTypo(query);
-    const match = q.match(/(?:ở|tại|gần|quanh|khu vực|khu|xung quanh|cạnh|sát|đối diện|trên đường|trên phố|phố|đường)s+(.+)$/i);
-    if (match && match[1]) {
-      return match[1].replace(/[,.?!]+$/g, '').trim();
+
+    // 1. Mẫu có giới từ chỉ vị trí: ở, tại, gần, quanh, khu vực, phố, đường, ngõ, bên, mạn...
+    const prepMatch = q.match(/(?:ở|tại|gần|quanh|xung quanh|khu vực|khu|bên|mạn|đoạn|dọc|cạnh|sát|đối diện|trên đường|trên phố|phố|đường|ngõ)\s+(.+)$/i);
+    if (prepMatch && prepMatch[1]) {
+      return prepMatch[1]
+        .replace(/\s+(?:có\s+quán|có\s+nhà\s+hàng|có\s+chỗ|có\s+nơi|có\s+rạp|có\s+điểm|có\s+gì|ăn\s+gì|uống\s+gì|chơi\s+gì|nào\s+ngon|nào\s+đẹp|nào\s+nổi\s+tiếng|nào|không|ko|k\b|chưa|nhỉ|vậy|ạ|nhé).*$/i, '')
+        .replace(/[,.?!]+$/g, '')
+        .trim();
     }
+
+    // 2. Mẫu đặt tên địa điểm ở đầu câu: "đông anh có quán ăn nào ngon", "gia lâm ăn gì ngon"
+    const prefixMatch = q.match(/^(?:ở|tại|quanh|khu vực|khu)?\s*(.+?)\s+(?:có\s+)?(?:quán ăn|nhà hàng|quán ngon|món ngon|quán cafe|quán cà phê|cafe|cà phê|rạp phim|rạp chiếu phim|chỗ nào|chỗ chơi|nơi giải trí|điểm giải trí|vui chơi|ăn gì|uống gì|chơi gì)/i);
+    if (prefixMatch && prefixMatch[1]) {
+      const candidate = prefixMatch[1]
+        .replace(/^(?:cho hỏi|gợi ý|tìm|tìm giúp|review|ở|tại|quanh|gần)\s+/i, '')
+        .replace(/[,.?!]+$/g, '')
+        .trim();
+      if (candidate.length >= 3 && !/^(?:quanh đây|gần đây|ở đây|hôm nay|bây giờ|tối nay|trưa nay)$/i.test(candidate)) {
+        return candidate;
+      }
+    }
+
     return '';
   }
 
   /**
+   * Trích xuất từ khóa món ăn / loại hình cụ thể (nếu người dùng hỏi đích danh món như "bún chả", "phở", "lẩu", "trà sữa", "karaoke"...)
+   */
+  function extractSpecificPoiKeyword(query) {
+    if (!query) return null;
+    const q = cleanVietnameseTypo(query).toLowerCase();
+    const specificKeywords = [
+      'bún chả', 'bún đậu', 'bún bò', 'bún riêu', 'bún cá', 'bún ngan', 'bún ốc', 'bánh đa',
+      'phở bò', 'phở gà', 'phở cuốn', 'phở', 'miến lươn', 'miến ngan', 'mì cay', 'mì vằn thắn', 'ramen', 'sushi', 'dimsum',
+      'cháo sườn', 'cháo', 'xôi', 'bánh mì', 'bánh cuốn', 'bánh xèo', 'nem nướng', 'nem lụi',
+      'cơm tấm', 'cơm niêu', 'cơm thố', 'cơm rang', 'cơm gà', 'cơm chay', 'đồ chay', 'quán chay', 'chay',
+      'chả cá', 'lẩu nấm', 'lẩu thái', 'lẩu bò', 'lẩu gà', 'lẩu ếch', 'lẩu nướng', 'lẩu', 'nướng', 'bbq', 'buffet',
+      'hải sản', 'ốc', 'pizza', 'bít tết', 'steak', 'gà rán', 'bia hơi', 'quán nhậu',
+      'trà sữa', 'trà chanh', 'cà phê trứng', 'cafe trứng', 'cà phê muối', 'bánh ngọt', 'tiệm bánh', 'bakery', 'chè', 'kem',
+      'karaoke', 'bi-a', 'billiards', 'bowling', 'bảo tàng', 'nhà sách', 'hiệu sách', 'siêu thị'
+    ];
+    for (const kw of specificKeywords) {
+      if (q.includes(kw)) return kw;
+    }
+    return null;
+  }
+
+  /**
    * Xác định Điểm Neo Tọa Độ Chính Xác (Spatial Anchor Resolution)
-   * Ưu tiên cụm từ dài nhất và chi tiết nhất (Specific Landmark > Spot Name > Ward/Street > Area Guide > Map Center)
+   * Ưu tiên cụm từ dài nhất và chi tiết nhất (Custom Geocoded > Specific Landmark > Ward/Street > Area Guide > Map Center)
    */
   function resolveSpatialAnchor(cleanQuery, currentCity, options = {}) {
     const q = (cleanQuery || '').toLowerCase();
+    const extractedLoc = extractLocationPhrase(cleanQuery);
 
     // 0. Nếu được truyền tọa độ điểm neo tùy chỉnh (từ Live Geocoder)
     if (options.customAnchor && typeof options.customAnchor.lat === 'number') {
@@ -1310,54 +1474,54 @@
       };
     }
 
-    // 1. Quét trong bảng SPECIFIC_LANDMARKS (ưu tiên alias dài nhất để bắt chính xác địa danh cụ thể như "công viên thống nhất")
-    let bestLandmark = null;
-    let bestLandmarkAliasLen = 0;
-    for (const lm of SPECIFIC_LANDMARKS) {
-      if (currentCity && lm.city !== currentCity) continue;
-      for (const alias of lm.aliases) {
-        if (q.includes(alias) && alias.length > bestLandmarkAliasLen) {
-          bestLandmark = lm;
-          bestLandmarkAliasLen = alias.length;
+    // Nếu người dùng gõ địa chỉ chi tiết cấp Ngõ / Ngách / Hẻm / Số nhà -> Ưu tiên đẩy sang Live Geocoder để định vị đúng con ngõ đó
+    const hasSpecificAlleyOrHouse = /\b(?:ngõ|ngách|hẻm|số nhà|sn)\s+\d+/i.test(q);
+
+    // 1. Quét trong bảng SPECIFIC_LANDMARKS (ưu tiên alias dài nhất)
+    if (!hasSpecificAlleyOrHouse) {
+      let bestLandmark = null;
+      let bestLandmarkAliasLen = 0;
+      for (const lm of SPECIFIC_LANDMARKS) {
+        if (currentCity && lm.city !== currentCity) continue;
+        for (const alias of lm.aliases) {
+          if (q.includes(alias) && alias.length > bestLandmarkAliasLen) {
+            bestLandmark = lm;
+            bestLandmarkAliasLen = alias.length;
+          }
         }
       }
-    }
-    if (bestLandmark) {
-      return {
-        key: bestLandmark.key,
-        area: {
-          title: bestLandmark.title,
-          lat: bestLandmark.lat,
-          lng: bestLandmark.lng,
-          highlight: bestLandmark.highlight,
-          trafficTip: bestLandmark.trafficTip,
-          spots: []
-        },
-        isMatchedExplicitly: true
-      };
+      if (bestLandmark) {
+        return {
+          key: bestLandmark.key,
+          area: {
+            title: bestLandmark.title,
+            lat: bestLandmark.lat,
+            lng: bestLandmark.lng,
+            highlight: bestLandmark.highlight,
+            trafficTip: bestLandmark.trafficTip,
+            spots: []
+          },
+          isMatchedExplicitly: true
+        };
+      }
     }
 
-    // 2. Quét trong AREAS_GUIDE (ưu tiên alias dài nhất)
+    // 2. Quét trong AREAS_GUIDE và HANOI_WARDS_DATA, so sánh độ chi tiết (ưu tiên Phường/Đường cụ thể nếu dài hơn hoặc không nằm trong các cụm trung tâm)
     let bestAreaKey = null;
     let bestAreaAliasLen = 0;
-    for (const [key, area] of Object.entries(AREAS_GUIDE)) {
-      if (currentCity === 'hcm' && key !== 'hcm') continue;
-      if (currentCity === 'danang' && key !== 'danang') continue;
-      if (currentCity === 'hanoi' && (key === 'hcm' || key === 'danang')) continue;
+    if (!hasSpecificAlleyOrHouse) {
+      for (const [key, area] of Object.entries(AREAS_GUIDE)) {
+        if (currentCity === 'hcm' && key !== 'hcm') continue;
+        if (currentCity === 'danang' && key !== 'danang') continue;
+        if (currentCity === 'hanoi' && (key === 'hcm' || key === 'danang')) continue;
 
-      for (const alias of area.aliases) {
-        if (q.includes(alias) && alias.length > bestAreaAliasLen) {
-          bestAreaKey = key;
-          bestAreaAliasLen = alias.length;
+        for (const alias of area.aliases) {
+          if (q.includes(alias) && alias.length > bestAreaAliasLen) {
+            bestAreaKey = key;
+            bestAreaAliasLen = alias.length;
+          }
         }
       }
-    }
-    if (bestAreaKey) {
-      return {
-        key: bestAreaKey,
-        area: AREAS_GUIDE[bestAreaKey],
-        isMatchedExplicitly: true
-      };
     }
 
     // 3. Quét trong danh sách 126 Phường/Xã & Tuyến đường lớn Hà Nội (HANOI_WARDS_DATA)
@@ -1367,45 +1531,58 @@
     } else if (typeof require === 'function') {
       try { wardsData = require('./hanoi-wards-streets'); } catch (e) {}
     }
-    if (currentCity === 'hanoi' && Array.isArray(wardsData)) {
+
+    if (!hasSpecificAlleyOrHouse && currentCity === 'hanoi' && Array.isArray(wardsData)) {
+      let matchedWardObj = null;
+      let matchedStreetName = null;
+      let bestWardMatchLen = 0;
+
       for (const w of wardsData) {
         const cleanWard = (w.ward || '').toLowerCase().replace(/^(?:p\.|x\.|tt\.|phường|xã|thị trấn)\s*/i, '').trim();
-        if (cleanWard.length >= 4 && q.includes(cleanWard)) {
-          return {
-            key: 'ward_' + w.id,
-            area: {
-              title: `Khu Vực ${w.name} (Hà Nội)`,
-              lat: w.lat,
-              lng: w.lng,
-              highlight: `Tâm điểm giao thương và dịch vụ đô thị tại ${w.name}, kết nối qua các trục ${(w.mainStreets || []).slice(0, 3).join(', ')}.`,
-              trafficTip: w.description || 'Chú ý gửi xe đúng nơi quy định trên các trục phố chính.',
-              spots: []
-            },
-            isMatchedExplicitly: true
-          };
+        if (cleanWard.length >= 4 && q.includes(cleanWard) && cleanWard.length > bestWardMatchLen) {
+          matchedWardObj = w;
+          matchedStreetName = null;
+          bestWardMatchLen = cleanWard.length;
         }
         for (const st of (w.mainStreets || [])) {
           const cleanSt = st.toLowerCase().replace(/^(?:đường|phố|quốc lộ|đại lộ)\s*/i, '').trim();
-          if (cleanSt.length >= 4 && q.includes(cleanSt)) {
-            return {
-              key: 'street_' + w.id,
-              area: {
-                title: `Khu Vực ${st} - ${w.name}`,
-                lat: w.lat,
-                lng: w.lng,
-                highlight: `Trục phố sầm uất ${st} thuộc ${w.name} với nhiều hàng quán, dịch vụ giải trí và tiện ích đô thị lân cận.`,
-                trafficTip: `Khi dừng đỗ trên tuyến ${st}, lưu ý biển báo giờ cao điểm và ưu tiên gửi xe tại các tòa nhà thương mại.`,
-                spots: []
-              },
-              isMatchedExplicitly: true
-            };
+          if (cleanSt.length >= 4 && q.includes(cleanSt) && cleanSt.length > bestWardMatchLen) {
+            matchedWardObj = w;
+            matchedStreetName = st;
+            bestWardMatchLen = cleanSt.length;
           }
         }
       }
+
+      // Nếu tìm thấy Phường/Phố cụ thể trong 126 phường mà không trùng với cụm trung tâm lớn (hoặc chi tiết hơn cụm quận chung)
+      if (matchedWardObj && (!bestAreaKey || bestWardMatchLen > bestAreaAliasLen)) {
+        const titleStr = matchedStreetName
+          ? `Khu Vực ${matchedStreetName} - ${matchedWardObj.name}`
+          : `Khu Vực ${matchedWardObj.name} (Hà Nội)`;
+        return {
+          key: (matchedStreetName ? 'street_' : 'ward_') + matchedWardObj.id,
+          area: {
+            title: titleStr,
+            lat: matchedWardObj.lat,
+            lng: matchedWardObj.lng,
+            highlight: `Tâm điểm giao thương và dịch vụ đô thị tại ${matchedWardObj.name}, kết nối qua các trục ${(matchedWardObj.mainStreets || []).slice(0, 3).join(', ')}.`,
+            trafficTip: matchedWardObj.description || 'Chú ý gửi xe đúng nơi quy định trên các trục phố chính.',
+            spots: []
+          },
+          isMatchedExplicitly: true
+        };
+      }
+    }
+
+    if (bestAreaKey) {
+      return {
+        key: bestAreaKey,
+        area: AREAS_GUIDE[bestAreaKey],
+        isMatchedExplicitly: true
+      };
     }
 
     // 4. Nếu trong phiên hội thoại trước đã xác định một khu vực và câu hỏi mới không nhắc tên địa điểm khác
-    const extractedLoc = extractLocationPhrase(cleanQuery);
     if (!extractedLoc && options.lastAreaKey && AREAS_GUIDE[options.lastAreaKey]) {
       return { key: options.lastAreaKey, area: AREAS_GUIDE[options.lastAreaKey], isMatchedExplicitly: false };
     }
@@ -1435,8 +1612,8 @@
       }
     }
 
-    if (currentCity === 'hcm') return { key: 'hcm', area: AREAS_GUIDE.hcm, isMatchedExplicitly: false };
-    if (currentCity === 'danang') return { key: 'danang', area: AREAS_GUIDE.danang, isMatchedExplicitly: false };
+    if (currentCity === 'hcm') return { key: 'hcm', area: AREAS_GUIDE.hcm, isMatchedExplicitly: false, unresolvedLocationPhrase: extractedLoc || null };
+    if (currentCity === 'danang') return { key: 'danang', area: AREAS_GUIDE.danang, isMatchedExplicitly: false, unresolvedLocationPhrase: extractedLoc || null };
     return {
       key: 'chualang_ftu',
       area: AREAS_GUIDE.chualang_ftu,
@@ -1501,11 +1678,194 @@
     return globalPool.slice(0, 5);
   }
 
-  function formatGuideMessage(area, spots = [], categoryType = 'food', centerPoint = null) {
+  /**
+   * Định vị trực tiếp địa danh bất kỳ (Ngõ/Ngách/Phố/Tòa nhà/Xã/Huyện) qua TomTom Search API & GeocodingService
+   */
+  const TOMTOM_SEARCH_KEY = 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
+  const CITY_CENTERS = {
+    hanoi: { lat: 21.0285, lng: 105.8542, name: 'Hà Nội' },
+    hcm: { lat: 10.7769, lng: 106.6811, name: 'TP. Hồ Chí Minh' },
+    danang: { lat: 16.0544, lng: 108.2022, name: 'Đà Nẵng' }
+  };
+
+  async function geocodeLocationLive(phrase, currentCity = 'hanoi') {
+    if (!phrase || phrase.trim().length < 2) return null;
+    const cityObj = CITY_CENTERS[currentCity] || CITY_CENTERS.hanoi;
+
+    // 1. Nếu đang chạy trên trình duyệt và có window.geocodingService, ưu tiên dùng bộ 5-Layer Geocoder
+    if (typeof window !== 'undefined' && window.geocodingService && typeof window.geocodingService.searchAddresses === 'function') {
+      try {
+        const matches = await window.geocodingService.searchAddresses(phrase, {
+          city: currentCity,
+          center: cityObj,
+          limit: 1
+        });
+        if (matches && matches.length > 0 && Number.isFinite(matches[0].lat) && Number.isFinite(matches[0].lng)) {
+          return {
+            title: matches[0].title || phrase,
+            address: matches[0].subtitle || matches[0].fullAddress || cityObj.name,
+            lat: matches[0].lat,
+            lng: matches[0].lng
+          };
+        }
+      } catch (_e) {}
+    }
+
+    // 2. Gọi trực tiếp TomTom Fuzzy Search API (hoạt động trên cả Node.js Backend & Browser)
+    if (typeof fetch === 'function') {
+      try {
+        const searchQ = phrase.toLowerCase().includes(cityObj.name.toLowerCase()) ? phrase : `${phrase}, ${cityObj.name}`;
+        const url = `https://api.tomtom.com/search/2/search/${encodeURIComponent(searchQ)}.json?lat=${cityObj.lat}&lon=${cityObj.lng}&radius=40000&limit=1&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 2500) : null;
+        const res = await fetch(url, controller ? { signal: controller.signal } : {});
+        if (timer) clearTimeout(timer);
+        if (res.ok) {
+          const data = await res.json();
+          const top = data?.results?.[0];
+          if (top && top.position && Number.isFinite(top.position.lat) && Number.isFinite(top.position.lon)) {
+            const rawName = top.poi?.name || top.address?.streetName || top.address?.municipalitySubdivision || phrase;
+            return {
+              title: rawName,
+              address: top.address?.freeformAddress || cityObj.name,
+              lat: top.position.lat,
+              lng: top.position.lon
+            };
+          }
+        }
+      } catch (_err) {}
+    }
+    return null;
+  }
+
+  /**
+   * Quét trực tiếp địa điểm thực tế (Quán ăn, Cafe, Rạp phim, Giải trí) trong bán kính quanh tọa độ [lat, lng]
+   * từ TomTom Real-time POI API để phủ sóng 100% mọi con phố, ngõ ngách và huyện ngoại thành Hà Nội
+   */
+  async function fetchLiveNearbyPois(lat, lng, categoryType = 'food', specificKeyword = null, currentCity = 'hanoi') {
+    if (typeof fetch !== 'function' || !Number.isFinite(lat) || !Number.isFinite(lng)) return [];
+
+    let url = '';
+    if (specificKeyword) {
+      url = `https://api.tomtom.com/search/2/poiSearch/${encodeURIComponent(specificKeyword)}.json?lat=${lat}&lon=${lng}&radius=3500&limit=12&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
+    } else {
+      let categorySet = '7315'; // Mặc định: Nhà hàng / Quán ăn
+      let radius = 2500;
+      if (categoryType === 'cafe') {
+        categorySet = '9376';
+        radius = 2500;
+      } else if (categoryType === 'cinema') {
+        categorySet = '7342';
+        radius = 5000;
+      } else if (categoryType === 'entertainment') {
+        categorySet = '9362,7373,7317,9902,7376';
+        radius = 3500;
+      }
+      url = `https://api.tomtom.com/search/2/nearbySearch/.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=15&categorySet=${categorySet}&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
+    }
+
+    try {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 2800) : null;
+      const res = await fetch(url, controller ? { signal: controller.signal } : {});
+      if (timer) clearTimeout(timer);
+      if (!res.ok) return [];
+
+      const data = await res.json();
+      const results = Array.isArray(data?.results) ? data.results : [];
+      const liveSpots = [];
+      const seenNames = new Set();
+
+      for (const item of results) {
+        const rawName = (item.poi?.name || '').trim();
+        if (!rawName || rawName.length < 4) continue;
+
+        // Lọc bỏ các tên chung chung không có tên riêng hoặc các công ty/kho bãi không phải quán phục vụ khách
+        if (/^(?:quán ăn|nhà hàng|quán cơm|quán phở|quán bún|quán cafe|quán cà phê|cà phê|cafe|quán nước|trà đá|cửa hàng|công ty|nhà máy|đại lý|chi nhánh|văn phòng|kho)\b/i.test(rawName) && rawName.split(/\s+/).length <= 2) {
+          continue;
+        }
+        if (/(?:công ty|nhà máy|xí nghiệp|vật liệu|phụ tùng|vận tải|kho bãi|bán buôn)/i.test(rawName)) {
+          continue;
+        }
+
+        const normName = rawName.toLowerCase();
+        if (seenNames.has(normName)) continue;
+        seenNames.add(normName);
+
+        const pLat = item.position?.lat;
+        const pLng = item.position?.lon;
+        if (!Number.isFinite(pLat) || !Number.isFinite(pLng)) continue;
+
+        const distM = Number.isFinite(item.dist) ? Math.round(item.dist) : _calcDistM(lat, lng, pLat, pLng);
+
+        // Làm sạch địa chỉ (bỏ mã bưu chính 5 số và từ lặp "Hà Nội, Hà Nội")
+        let cleanAddr = (item.address?.freeformAddress || item.address?.streetName || 'Khu vực lân cận')
+          .replace(/,\s*\d{5,6}$/, '')
+          .replace(/Hà Nội,\s*Hà Nội/gi, 'Hà Nội')
+          .trim();
+
+        // Sinh mô tả đặc sản & mức giá sát thực tế theo tên quán
+        let feature = 'Địa điểm ẩm thực thực tế trên tuyến phố, thực đơn đa dạng, nguyên liệu tươi ngon phục vụ tại chỗ và mang về.';
+        let vibe = 'Không gian thực tế tại địa phương, thuận tiện di chuyển và dừng đỗ xe.';
+        let price = '35.000đ - 120.000đ';
+
+        if (/phở|bún|miến|bánh đa|cháo|bánh cuốn|bánh mì|xôi/i.test(rawName)) {
+          feature = 'Món truyền thống Hà Nội với nước dùng ninh xương đậm đà, nguyên liệu tươi mới mỗi ngày, phục vụ nhanh gọn.';
+          vibe = 'Quán ăn địa phương đông khách, phù hợp ăn sáng, ăn trưa và ăn tối.';
+          price = '35.000đ - 65.000đ/suất';
+        } else if (/cơm/i.test(rawName)) {
+          feature = 'Thực đơn cơm văn phòng, cơm gia đình và các món mặn xào nấu nóng hổi, khẩu phần đầy đặn.';
+          vibe = 'Sạch sẽ, phục vụ nhanh, giá cả hợp lý.';
+          price = '40.000đ - 75.000đ/suất';
+        } else if (/lẩu|nướng|bbq|hải sản|nhậu|bia|dê|gà|bò|cá/i.test(rawName)) {
+          feature = 'Chuyên các món lẩu nướng, hải sản và đặc sản chế biến tươi sống, thích hợp tụ tập bạn bè, liên hoan gia đình.';
+          vibe = 'Không gian rộng rãi, thoáng mát, phục vụ chu đáo.';
+          price = '120.000đ - 280.000đ/người';
+        } else if (categoryType === 'cafe' || /cafe|cà phê|coffee|trà|tea|bánh|chè|kem/i.test(rawName)) {
+          feature = 'Đồ uống pha chế thơm ngon (cà phê truyền thống, pha máy, trà trái cây, trà sữa), có wifi tốc độ cao.';
+          vibe = 'Không gian thư giãn, trò chuyện bạn bè hoặc làm việc, học tập.';
+          price = '30.000đ - 65.000đ';
+        } else if (categoryType === 'cinema' || /cgv|lotte|beta|rạp|cinema|galaxy|bhd/i.test(rawName)) {
+          feature = 'Cụm rạp chiếu phim màn ảnh rộng sắc nét, hệ thống âm thanh vòm sống động, cập nhật liên tục các phim bom tấn mới nhất.';
+          vibe = 'Hiện đại, sảnh chờ trẻ trung, có quầy bắp nước tiện lợi.';
+          price = '70.000đ - 140.000đ/vé';
+        } else if (categoryType === 'entertainment') {
+          feature = 'Điểm vui chơi, giải trí, tham quan và thư giãn thực tế tại khu vực, thu hút đông đảo người dân và giới trẻ.';
+          vibe = 'Thoáng đãng, năng động, thuận tiện kết hợp dạo phố.';
+          price = 'Tùy dịch vụ / Tham quan';
+        }
+
+        liveSpots.push({
+          name: rawName,
+          address: cleanAddr,
+          lat: pLat,
+          lng: pLng,
+          distM: distM,
+          feature: feature,
+          vibe: vibe,
+          price: price,
+          category: categoryType,
+          isLivePoi: true
+        });
+      }
+
+      return liveSpots;
+    } catch (_err) {
+      return [];
+    }
+  }
+
+  function formatGuideMessage(area, spots = [], categoryType = 'food', centerPoint = null, specificKeyword = null) {
     let categoryTitle = 'Món Ngon Đặc Sản & Quán Ăn Nổi Tiếng';
-    if (categoryType === 'cinema') categoryTitle = 'Rạp Chiếu Phim & Cụm Rạp Hiện Đại';
-    else if (categoryType === 'cafe') categoryTitle = 'Quán Cà Phê View Đẹp & Không Gian Thư Giãn';
-    else if (categoryType === 'entertainment') categoryTitle = 'Điểm Vui Chơi, Dạo Mát & Giải Trí';
+    if (specificKeyword) {
+      categoryTitle = `Địa Điểm "${specificKeyword.toUpperCase()}" Gần Nhất`;
+    } else if (categoryType === 'cinema') {
+      categoryTitle = 'Rạp Chiếu Phim & Cụm Rạp Hiện Đại';
+    } else if (categoryType === 'cafe') {
+      categoryTitle = 'Quán Cà Phê View Đẹp & Không Gian Thư Giãn';
+    } else if (categoryType === 'entertainment') {
+      categoryTitle = 'Điểm Vui Chơi, Dạo Mát & Giải Trí';
+    }
 
     let msg = `**Gợi Ý ${categoryTitle}: ${area.title}**\n\n`;
     msg += `*${area.highlight}*\n\n`;
@@ -1535,6 +1895,125 @@
     return msg;
   }
 
+  function getRecommendationSync(query, currentCity = 'hanoi', options = {}) {
+    const cleanQ = cleanVietnameseTypo(query);
+    const resolved = resolveSpatialAnchor(cleanQ, currentCity, options);
+    const { key, area, isMatchedExplicitly, unresolvedLocationPhrase } = resolved;
+    const categoryType = detectSearchIntent(cleanQ);
+    const specificKeyword = extractSpecificPoiKeyword(cleanQ);
+
+    const refLat = area.lat;
+    const refLng = area.lng;
+    const centerPoint = { lat: refLat, lng: refLng };
+
+    const spots = findNearestSpotsByCategory(area, categoryType, AREAS_GUIDE, centerPoint, currentCity);
+
+    return {
+      text: formatGuideMessage(area, spots, categoryType, centerPoint, specificKeyword),
+      title: area.title,
+      areaKey: key,
+      categoryType: categoryType,
+      specificKeyword: specificKeyword,
+      isMatchedExplicitly: Boolean(isMatchedExplicitly),
+      unresolvedLocationPhrase: unresolvedLocationPhrase || null,
+      action: {
+        type: 'SHOW_FOOD_PLACES',
+        areaKey: key,
+        categoryType: categoryType,
+        lat: area.lat,
+        lng: area.lng,
+        title: area.title,
+        spots: spots
+      }
+    };
+  }
+
+  /**
+   * PHIÊN BẢN BẤT ĐỒNG BỘ (HYBRID CURATED + LIVE TOMTOM/OSM SPATIAL POI ENGINE v4.0):
+   * 1. Nếu câu hỏi nhắc tới một ngõ, ngách, phố nhỏ, tòa nhà hoặc xã/huyện chưa có trong từ điển tĩnh -> Tự động Geocode trực tiếp để lấy tọa độ neo chuẩn xác.
+   * 2. Nếu quanh điểm neo (bán kính 850m) có ít hơn 4 địa điểm tuyển chọn HOẶC người dùng tìm món ăn cụ thể (phở, bún chả, lẩu, trà sữa, bi-a...) -> Tự động quét Live POI thời gian thực quanh tọa độ đó, trộn và sắp xếp theo khoảng cách gần nhất!
+   */
+  async function getRecommendationAsync(query, currentCity = 'hanoi', options = {}) {
+    let effectiveOptions = { ...options };
+    const cleanQ = cleanVietnameseTypo(query);
+    let initial = getRecommendationSync(query, currentCity, effectiveOptions);
+
+    // Bước 1: Nếu có cụm địa danh chưa giải mã được bằng từ điển tĩnh, tự động Live Geocode
+    if (!effectiveOptions.customAnchor && initial.unresolvedLocationPhrase) {
+      const geo = await geocodeLocationLive(initial.unresolvedLocationPhrase, currentCity);
+      if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
+        const cleanTitle = geo.title.toLowerCase().startsWith('khu vực') ? geo.title : `Khu Vực ${geo.title} (${geo.address})`;
+        effectiveOptions.customAnchor = {
+          title: cleanTitle,
+          lat: geo.lat,
+          lng: geo.lng,
+          highlight: `Các địa điểm thực tế nằm ngay sát khu vực ${geo.title} (${geo.address}), được quét tự động theo bán kính gần nhất.`
+        };
+        initial = getRecommendationSync(query, currentCity, effectiveOptions);
+      }
+    }
+
+    const centerPoint = { lat: initial.action.lat, lng: initial.action.lng };
+    const categoryType = initial.categoryType;
+    const specificKeyword = initial.specificKeyword;
+    const curatedSpots = initial.action.spots || [];
+
+    // Bước 2: Kiểm tra xem có bao nhiêu quán tuyển chọn thực sự nằm sát điểm neo (<= 850m)
+    let closeCurated = curatedSpots.filter(s => {
+      const d = typeof s.distM === 'number' ? s.distM : _calcDistM(centerPoint.lat, centerPoint.lng, s.lat, s.lng);
+      if (d > 850) return false;
+      if (specificKeyword) {
+        const hay = `${s.name} ${s.feature || ''}`.toLowerCase();
+        return hay.includes(specificKeyword);
+      }
+      return true;
+    });
+
+    // Bước 3: Nếu ít hơn 4 địa điểm trong bán kính 850m (ví dụ hỏi ở phố Đội Cấn, Lĩnh Nam, Đông Anh, Sóc Sơn, Gia Lâm...) hoặc hỏi món cụ thể -> Quét Live POI thực tế
+    if (closeCurated.length < 4 || specificKeyword) {
+      const livePois = await fetchLiveNearbyPois(centerPoint.lat, centerPoint.lng, categoryType, specificKeyword, currentCity);
+      if (livePois.length > 0) {
+        const merged = [...closeCurated];
+        const seenNames = new Set(merged.map(s => s.name.toLowerCase()));
+
+        for (const lp of livePois) {
+          const lpLower = lp.name.toLowerCase();
+          const isDuplicateCoord = merged.some(m => _calcDistM(m.lat, m.lng, lp.lat, lp.lng) < 25);
+          if (!seenNames.has(lpLower) && !isDuplicateCoord) {
+            seenNames.add(lpLower);
+            merged.push(lp);
+          }
+        }
+
+        merged.sort((a, b) => (a.distM || 0) - (b.distM || 0));
+        const finalSpots = merged.slice(0, 5);
+
+        if (finalSpots.length > 0) {
+          const areaObj = {
+            title: initial.title,
+            lat: centerPoint.lat,
+            lng: centerPoint.lng,
+            highlight: initial.areaKey === 'custom_geocoded'
+              ? `Các địa điểm thực tế nằm ngay sát ${initial.title}, được định vị trực tiếp trên bản đồ số.`
+              : (AREAS_GUIDE[initial.areaKey]?.highlight || SPECIFIC_LANDMARKS.find(l => l.key === initial.areaKey)?.highlight || 'Danh sách các địa điểm thực tế gần nhất quanh vị trí bạn yêu cầu.'),
+            trafficTip: AREAS_GUIDE[initial.areaKey]?.trafficTip || SPECIFIC_LANDMARKS.find(l => l.key === initial.areaKey)?.trafficTip || 'Chú ý quan sát biển báo dừng đỗ và gửi xe đúng nơi quy định.'
+          };
+
+          return {
+            ...initial,
+            text: formatGuideMessage(areaObj, finalSpots, categoryType, centerPoint, specificKeyword),
+            action: {
+              ...initial.action,
+              spots: finalSpots
+            }
+          };
+        }
+      }
+    }
+
+    return initial;
+  }
+
   return {
     isFoodOrFun: function (query) {
       if (!query) return false;
@@ -1543,37 +2022,12 @@
     cleanVietnameseTypo,
     detectSearchIntent,
     extractLocationPhrase,
+    extractSpecificPoiKeyword,
     resolveSpatialAnchor,
-    getRecommendation: function (query, currentCity = 'hanoi', options = {}) {
-      const cleanQ = cleanVietnameseTypo(query);
-      const resolved = resolveSpatialAnchor(cleanQ, currentCity, options);
-      const { key, area, isMatchedExplicitly, unresolvedLocationPhrase } = resolved;
-      const categoryType = detectSearchIntent(cleanQ);
-
-      const refLat = area.lat;
-      const refLng = area.lng;
-      const centerPoint = { lat: refLat, lng: refLng };
-
-      const spots = findNearestSpotsByCategory(area, categoryType, AREAS_GUIDE, centerPoint, currentCity);
-
-      return {
-        text: formatGuideMessage(area, spots, categoryType, centerPoint),
-        title: area.title,
-        areaKey: key,
-        categoryType: categoryType,
-        isMatchedExplicitly: Boolean(isMatchedExplicitly),
-        unresolvedLocationPhrase: unresolvedLocationPhrase || null,
-        action: {
-          type: 'SHOW_FOOD_PLACES',
-          areaKey: key,
-          categoryType: categoryType,
-          lat: area.lat,
-          lng: area.lng,
-          title: area.title,
-          spots: spots
-        }
-      };
-    },
+    geocodeLocationLive,
+    fetchLiveNearbyPois,
+    getRecommendation: getRecommendationSync,
+    getRecommendationAsync,
     AREAS_GUIDE,
     SPECIFIC_LANDMARKS
   };

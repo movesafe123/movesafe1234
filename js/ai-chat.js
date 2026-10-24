@@ -471,13 +471,13 @@ class AIChat {
 
     // Nếu câu hỏi ẩm thực/giải trí chứa địa danh bất kỳ chưa có trong từ điển tĩnh (landmarks/wards/streets),
     // tự động geocode trực tiếp địa danh đó để lấy tọa độ neo (customAnchor) cho bộ lọc bán kính Haversine
-    if (isFoodQuery && window.FOOD_ENTERTAINMENT_DATA && window.routingService && typeof window.routingService.geocode === 'function') {
+    if (isFoodQuery && window.FOOD_ENTERTAINMENT_DATA && typeof window.FOOD_ENTERTAINMENT_DATA.geocodeLocationLive === 'function') {
       try {
         const probeRec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
         if (probeRec && probeRec.unresolvedLocationPhrase) {
-          const geo = await window.routingService.geocode(probeRec.unresolvedLocationPhrase, currentCity);
+          const geo = await window.FOOD_ENTERTAINMENT_DATA.geocodeLocationLive(probeRec.unresolvedLocationPhrase, currentCity);
           if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
-            const shortTitle = (geo.name || probeRec.unresolvedLocationPhrase).split(',')[0].trim();
+            const shortTitle = (geo.title || probeRec.unresolvedLocationPhrase).split(',')[0].trim();
             chatContext.customAnchor = {
               title: shortTitle.toLowerCase().startsWith('khu vực') ? shortTitle : `Khu Vực ${shortTitle}`,
               lat: geo.lat,
@@ -552,7 +552,11 @@ class AIChat {
         }
 
         const isFoodQ = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
-        const foodRec = isFoodQ ? window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext) : null;
+        const foodRec = isFoodQ
+          ? (typeof window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
+              ? await window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, currentCity, chatContext)
+              : window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext))
+          : null;
 
         this.addBotMessage(geminiReply, {
           spots: foodRec?.action?.spots || null
@@ -611,7 +615,9 @@ class AIChat {
 
     // 3a1. Đề xuất địa điểm ăn uống, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
     if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
-      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
+      const rec = typeof window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
+        ? await window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, currentCity, chatContext)
+        : window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
       this.addBotMessage(rec.text, { spots: rec.action?.spots || null });
       if (rec.action) {
         this.handleMapAction(rec.action);
