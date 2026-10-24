@@ -3,43 +3,78 @@
  * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi, điều hướng né ngập & Vòng lặp cập nhật 24/24 trên Cloud
  */
 
-// Kho dữ liệu các rốn ngập trọng điểm đô thị phục vụ Chế độ Giả lập ngẫu nhiên (Simulation Pool)
+// Kho dữ liệu các rốn ngập trọng điểm đô thị phục vụ Chế độ Giả lập ngẫu nhiên (Simulation Pool) & Chấm điểm Bất động sản
 const SIMULATION_FLOOD_POOLS = {
   hanoi: [
     {
-      name: 'Phố Nguyễn Khuyến (Khu vực trước THCS Lý Thường Kiệt)',
-      lat: 21.0280,
-      lng: 105.8340,
-      source: 'Rốn ngập HSDC Văn Miếu',
+      name: 'Khu vực Triều Khúc - Tân Triều ("Vịnh Triều Khúc")',
+      lat: 20.9820,
+      lng: 105.8015,
+      source: 'Rốn ngập trũng sâu Triều Khúc - Tân Triều',
+      pump_status: 'Thoát nước qua mương Tân Triều bị quá tải'
+    },
+    {
+      name: 'Đường Phùng Khoang - Chợ Phùng Khoang',
+      lat: 20.9915,
+      lng: 105.7915,
+      source: 'Rốn ngập trũng thấp Nam Từ Liêm',
+      pump_status: 'Cống tràn hồ Phùng Khoang'
+    },
+    {
+      name: 'Phố Bùi Xương Trạch (Khương Đình - Định Công)',
+      lat: 20.9912,
+      lng: 105.8195,
+      source: 'Vùng trũng thoát nước ven sông Tô Lịch',
       pump_status: 'Trạm bơm dã chiến đang xả'
     },
     {
-      name: 'Ngã tư Phan Bội Châu - Lý Thường Kiệt',
-      lat: 21.0245,
-      lng: 105.8450,
-      source: 'Rốn ngập HSDC Hoàn Kiếm',
-      pump_status: 'Trạm bơm Yên Sở đang vận hành'
+      name: 'Khu vực Định Công (Phố Định Công - Cầu Định Công)',
+      lat: 20.9835,
+      lng: 105.8360,
+      source: 'Rốn ngập trũng Hoàng Mai',
+      pump_status: 'Nước sông Lừ dâng cao'
     },
     {
-      name: 'Ngã tư Thái Hà - Chùa Bộc',
-      lat: 21.0075,
-      lng: 105.8245,
-      source: 'Rốn trũng ngập Đống Đa',
-      pump_status: 'Đang điều tiết thoát nước mương Chùa Bộc'
+      name: 'Đường Chiến Thắng (Hà Đông - Thanh Xuân)',
+      lat: 20.9805,
+      lng: 105.7955,
+      source: 'Rốn ngập Văn Quán - Chiến Thắng',
+      pump_status: 'Đang mở cửa xả hồ Văn Quán'
     },
     {
-      name: 'Phố Thụy Khuê (Đoạn dốc La Pho - Tam Đa)',
-      lat: 21.0435,
-      lng: 105.8260,
-      source: 'Rốn ngập ven Hồ Tây',
-      pump_status: 'Trạm bơm Thụy Khuê đang vận hành'
+      name: 'Đường Nguyễn Trãi (Trước ĐH KHXH&NV & ĐH Hà Nội)',
+      lat: 20.9935,
+      lng: 105.8010,
+      source: 'Trục hướng tâm Thanh Xuân',
+      pump_status: 'Cửa xả đang mở'
     },
     {
-      name: 'Hầm chui Đại lộ Thăng Long (Số 3 & Km9+656)',
+      name: 'Khu vực Cầu Trắng - Phố Tô Hiệu (Hà Đông)',
+      lat: 20.9705,
+      lng: 105.7725,
+      source: 'Rốn ngập trung tâm Hà Đông',
+      pump_status: 'Trạm bơm Hà Đông vận hành'
+    },
+    {
+      name: 'Đường Tố Hữu (Đoạn Lương Thế Vinh - Trung Văn)',
+      lat: 20.9942,
+      lng: 105.7892,
+      source: 'Trục hướng tâm Nam Từ Liêm',
+      pump_status: 'Cửa cống thoát nước đang xả'
+    },
+    {
+      name: 'Hầm chui Đại lộ Thăng Long (Số 3, 5, 6 & KĐT Geleximco)',
       lat: 20.9965,
       lng: 105.7485,
-      source: 'Hầm chui ngập sâu Nam Từ Liêm',
+      source: 'Hầm chui ngập sâu Nam Từ Liêm - Hoài Đức',
       pump_status: 'Máy bơm công suất lớn hầm chui đang xả'
+    },
+    {
+      name: 'KĐT Resco Cổ Nhuế (Đường Phạm Văn Đồng rẽ vào)',
+      lat: 21.0664,
+      lng: 105.7828,
+      source: 'Vùng trũng Bắc Từ Liêm',
+      pump_status: 'Trạm bơm Cổ Nhuế vận hành 100%'
     },
     {
       name: 'Phố Hoa Bằng (Đoạn qua ngõ 99)',
@@ -56,27 +91,6 @@ const SIMULATION_FLOOD_POOLS = {
       pump_status: 'Cống hộp đang xả'
     },
     {
-      name: 'Phố Minh Khai (Chân cầu Vĩnh Tuy)',
-      lat: 20.9992,
-      lng: 105.8678,
-      source: 'Trục giao thông Hai Bà Trưng',
-      pump_status: 'Máy bơm đang hoạt động'
-    },
-    {
-      name: 'Phố Vương Thừa Vũ - Hoàng Văn Thái',
-      lat: 20.9995,
-      lng: 105.8235,
-      source: 'Vùng trũng Thanh Xuân',
-      pump_status: 'Đang bơm xả ra sông Tô Lịch'
-    },
-    {
-      name: 'Ngã tư Lê Văn Lương - Hoàng Đạo Thúy',
-      lat: 21.0052,
-      lng: 105.8028,
-      source: 'Nút giao ngập Thanh Xuân',
-      pump_status: 'Cửa van hồ điều hòa đang mở'
-    },
-    {
       name: 'Phố Trần Bình (Sau Bến xe Mỹ Đình)',
       lat: 21.0335,
       lng: 105.7760,
@@ -91,11 +105,53 @@ const SIMULATION_FLOOD_POOLS = {
       pump_status: 'Đang vận hành trạm bơm Cầu Bươu'
     },
     {
-      name: 'Đường Tố Hữu (Đoạn Lương Thế Vinh - Trung Văn)',
-      lat: 20.9942,
-      lng: 105.7892,
-      source: 'Trục hướng tâm Nam Từ Liêm',
-      pump_status: 'Cửa cống thoát nước đang xả'
+      name: 'Ngã tư Thái Hà - Chùa Bộc',
+      lat: 21.0075,
+      lng: 105.8245,
+      source: 'Rốn trũng ngập Đống Đa',
+      pump_status: 'Đang điều tiết thoát nước mương Chùa Bộc'
+    },
+    {
+      name: 'Phố Nguyễn Khuyến (Khu vực trước THCS Lý Thường Kiệt)',
+      lat: 21.0280,
+      lng: 105.8340,
+      source: 'Rốn ngập HSDC Văn Miếu',
+      pump_status: 'Trạm bơm dã chiến đang xả'
+    },
+    {
+      name: 'Phố Thụy Khuê (Đoạn dốc La Pho - Tam Đa)',
+      lat: 21.0435,
+      lng: 105.8260,
+      source: 'Rốn ngập ven Hồ Tây',
+      pump_status: 'Trạm bơm Thụy Khuê đang vận hành'
+    },
+    {
+      name: 'Ngã tư Phan Bội Châu - Lý Thường Kiệt',
+      lat: 21.0245,
+      lng: 105.8450,
+      source: 'Rốn ngập HSDC Hoàn Kiếm',
+      pump_status: 'Trạm bơm Yên Sở đang vận hành'
+    },
+    {
+      name: 'Phố Minh Khai (Chân cầu Vĩnh Tuy)',
+      lat: 20.9992,
+      lng: 105.8678,
+      source: 'Trục giao thông Hai Bà Trưng',
+      pump_status: 'Máy bơm đang hoạt động'
+    },
+    {
+      name: 'Phố Vương Thừa Vũ - Hoàng Văn Thái',
+      lat: 20.9995,
+      lng: 105.8235,
+      source: 'Vùng trũng Thanh Xuân',
+      pump_status: 'Đang bơm xả ra sông Tô Lịch'
+    },
+    {
+      name: 'Phố Đội Cấn (Đoạn ngõ 209 Đội Cấn)',
+      lat: 21.0345,
+      lng: 105.8235,
+      source: 'Vùng trũng Ba Đình',
+      pump_status: 'Đang mở cống ngầm thoát nước'
     },
     {
       name: 'Đường Giải Phóng (Trước cổng Bến xe Giáp Bát)',
@@ -103,9 +159,30 @@ const SIMULATION_FLOOD_POOLS = {
       lng: 105.8425,
       source: 'Cửa ngõ phía Nam Hoàng Mai',
       pump_status: 'Trạm bơm Yên Sở đang xả hết công suất'
+    },
+    {
+      name: 'Đường Ngọc Hồi (Đoạn trước BV Nông Nghiệp)',
+      lat: 20.9635,
+      lng: 105.8445,
+      source: 'Vùng trũng Thanh Trì',
+      pump_status: 'Mở cửa xả đầm Linh Đàm'
+    },
+    {
+      name: 'Vành đai 3 - Bán đảo Linh Đàm',
+      lat: 20.9755,
+      lng: 105.8225,
+      source: 'Nút giao ngập úng Hoàng Mai',
+      pump_status: 'Trạm bơm Linh Đàm đang vận hành'
     }
   ],
   hcm: [
+    {
+      name: 'Đường Quốc Hương - Thảo Điền ("Rốn ngập Thảo Điền", TP. Thủ Đức)',
+      lat: 10.8052,
+      lng: 106.7351,
+      source: 'Rốn ngập bán đảo Thảo Điền',
+      pump_status: 'Máy bơm dã chiến công suất lớn đang hút'
+    },
     {
       name: 'Đường Huỳnh Tấn Phát (Quận 7 - Gần cầu Phú Mỹ)',
       lat: 10.7412,
@@ -114,25 +191,18 @@ const SIMULATION_FLOOD_POOLS = {
       pump_status: 'Trạm bơm Phú Xuân đang xả'
     },
     {
-      name: 'Đường Quốc Hương - Thảo Điền (TP. Thủ Đức)',
-      lat: 10.8052,
-      lng: 106.7351,
-      source: 'Rốn ngập bán đảo Thảo Điền',
-      pump_status: 'Máy bơm dã chiến công suất lớn đang hút'
+      name: 'Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)',
+      lat: 10.7558,
+      lng: 106.7082,
+      source: 'Điểm tràn bờ kênh Tẻ triều dâng',
+      pump_status: 'Van ngăn triều đang đóng'
     },
     {
-      name: 'Đường Nguyễn Văn Quá (Quận 12)',
+      name: 'Đường Nguyễn Văn Quá (Quận 12 - Chợ Cầu)',
       lat: 10.8421,
       lng: 106.6289,
       source: 'Vùng trũng Quận 12',
       pump_status: 'Cống hộp đang xả tối đa'
-    },
-    {
-      name: 'Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)',
-      lat: 10.7558,
-      lng: 106.7082,
-      source: 'Điểm tràn bờ kênh Tẻ',
-      pump_status: 'Van ngăn triều đang đóng'
     },
     {
       name: 'Đường Ung Văn Khiêm (Bình Thạnh - Gần Bến xe Miền Đông)',
@@ -140,6 +210,34 @@ const SIMULATION_FLOOD_POOLS = {
       lng: 106.7198,
       source: 'Rốn ngập Bình Thạnh',
       pump_status: 'Trạm bơm Thanh Đa đang vận hành'
+    },
+    {
+      name: 'Đường Nguyễn Hữu Cảnh (Bình Thạnh - Chân cầu Sài Gòn)',
+      lat: 10.7925,
+      lng: 106.7145,
+      source: 'Rốn trũng Nguyễn Hữu Cảnh',
+      pump_status: 'Máy bơm chống ngập siêu công suất đang hoạt động'
+    },
+    {
+      name: 'Đường Kha Vạn Cân - Tô Ngọc Vân (Chợ Thủ Đức)',
+      lat: 10.8512,
+      lng: 106.7582,
+      source: 'Rốn trũng Chợ Thủ Đức',
+      pump_status: 'Cửa xả rạch Cầu Ngang đang mở'
+    },
+    {
+      name: 'Đường Lê Văn Việt - Lã Xuân Oai (TP. Thủ Đức)',
+      lat: 10.8355,
+      lng: 106.7785,
+      source: 'Vùng trũng Tăng Nhơn Phú',
+      pump_status: 'Hệ thống rạch Trau Trảu đang tiêu thoát'
+    },
+    {
+      name: 'Đường Phan Huy Ích (Gò Vấp - Tân Bình)',
+      lat: 10.8295,
+      lng: 106.6345,
+      source: 'Vùng trũng rạch Tham Lương',
+      pump_status: 'Trạm bơm Tham Lương đang xả'
     },
     {
       name: 'Đường Lê Đức Thọ (Gò Vấp)',
@@ -156,7 +254,14 @@ const SIMULATION_FLOOD_POOLS = {
       pump_status: 'Cống thoát dốc đang dẫn nước'
     },
     {
-      name: 'Vòng xoay An Lạc (Bình Tân)',
+      name: 'Đường An Dương Vương - Bến Phú Định (Quận 8)',
+      lat: 10.7285,
+      lng: 106.6215,
+      source: 'Vùng trũng ven sông Chợ Đệm',
+      pump_status: 'Cửa van ngăn triều đang đóng'
+    },
+    {
+      name: 'Vòng xoay An Lạc - Hồ Học Lãm (Bình Tân)',
       lat: 10.7242,
       lng: 106.6115,
       source: 'Cửa ngõ miền Tây',
@@ -165,18 +270,39 @@ const SIMULATION_FLOOD_POOLS = {
   ],
   danang: [
     {
-      name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)',
+      name: 'Đường Mẹ Suốt ("Rốn ngập Mẹ Suốt", Liên Chiểu)',
+      lat: 16.0592,
+      lng: 108.1583,
+      source: 'Vùng trũng chân đồi Mẹ Suốt',
+      pump_status: 'Lực lượng chức năng đang chốt chặn cảnh báo'
+    },
+    {
+      name: 'Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê - Khe Cạn)',
       lat: 16.0615,
       lng: 108.2140,
       source: 'Rốn trũng trung tâm Đà Nẵng',
       pump_status: 'Trạm bơm Hồ Thạc Gián xả nước'
     },
     {
-      name: 'Đường Mẹ Suốt (Liên Chiểu)',
-      lat: 16.0592,
-      lng: 108.1583,
-      source: 'Vùng trũng chân đồi Mẹ Suốt',
-      pump_status: 'Lực lượng chức năng đang chốt chặn cảnh báo'
+      name: 'Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)',
+      lat: 16.0595,
+      lng: 108.1725,
+      source: 'Vùng trũng Hòa An - Bến xe',
+      pump_status: 'Trạm bơm Đa Cô đang vận hành'
+    },
+    {
+      name: 'Khu vực Trưng Nữ Vương - Núi Thành (Hải Châu)',
+      lat: 16.0515,
+      lng: 108.2215,
+      source: 'Trục nội thành Hải Châu',
+      pump_status: 'Trạm bơm Đảo Xanh đang xả nước'
+    },
+    {
+      name: 'Đường Hùng Vương - Lý Thái Tổ (Thanh Khê - Hải Châu)',
+      lat: 16.0682,
+      lng: 108.2145,
+      source: 'Khu phố thương mại trung tâm',
+      pump_status: 'Cống ngầm đang điều tiết'
     },
     {
       name: 'Đường Nguyễn Văn Thoại (Ngũ Hành Sơn - Gần biển)',
@@ -186,18 +312,18 @@ const SIMULATION_FLOOD_POOLS = {
       pump_status: 'Cửa xả biển đang mở'
     },
     {
-      name: 'Nút giao Lê Duẩn - Chi Lăng (Hải Châu)',
+      name: 'Nút giao Lê Duẩn - Chi Lăng / Ông Ích Khiêm (Hải Châu)',
       lat: 16.0695,
       lng: 108.2185,
       source: 'Khu vực trung tâm Hải Châu',
       pump_status: 'Cống ngầm đang điều tiết'
     },
     {
-      name: 'Đường Trưng Nữ Vương (Hải Châu)',
-      lat: 16.0535,
-      lng: 108.2192,
-      source: 'Trục nội thành Hải Châu',
-      pump_status: 'Trạm bơm đang dẫn dòng'
+      name: 'Khu vực Đảo Xanh - Chân cầu Trần Thị Lý',
+      lat: 16.0485,
+      lng: 108.2265,
+      source: 'Ven sông Hàn trũng thấp',
+      pump_status: 'Trạm bơm Đảo Xanh đang vận hành'
     }
   ]
 };
@@ -4617,6 +4743,15 @@ class GoogleMapsApp {
     return [...(byCity[city] || byCity.hanoi), ...common];
   }
 
+  getCityName(cityKey = this.currentCity) {
+    const map = {
+      hanoi: 'Hà Nội',
+      hcm: 'TP. Hồ Chí Minh',
+      danang: 'Đà Nẵng'
+    };
+    return map[cityKey] || this.citiesConfig?.[cityKey]?.name || 'Hà Nội';
+  }
+
   openSosRescueModal(targetLat = null, targetLng = null, targetName = null) {
     const modal = document.getElementById('modal-sos-rescue');
     if (!modal) return;
@@ -5095,6 +5230,9 @@ class GoogleMapsApp {
     const targetLng = Number(lng) || (this.citiesConfig[this.currentCity]?.lng || 105.8542);
     const targetName = title || `Tọa độ [${targetLat.toFixed(4)}, ${targetLng.toFixed(4)}]`;
 
+    // Tự động nhận diện đô thị từ vĩ độ thực tế của tọa độ
+    const targetCity = targetLat > 18.0 ? 'hanoi' : (targetLat > 14.0 ? 'danang' : 'hcm');
+
     if (subEl) {
       subEl.textContent = `Đang phân tích địa hình vệ tinh & 6 lớp hạ tầng tại: ${targetName} (${targetLat.toFixed(4)}, ${targetLng.toFixed(4)})`;
     }
@@ -5115,7 +5253,7 @@ class GoogleMapsApp {
     modal.classList.add('open');
 
     // 1. Lấy độ cao địa hình vệ tinh thực tế (Open-Meteo Elevation API - Miễn phí 100%)
-    let elevationM = this.currentCity === 'hcm' ? 4.5 : (this.currentCity === 'danang' ? 7.5 : 9.5);
+    let elevationM = targetCity === 'hcm' ? 4.5 : (targetCity === 'danang' ? 7.5 : 9.5);
     try {
       const elRes = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${targetLat}&longitude=${targetLng}`);
       if (elRes.ok) {
@@ -5126,34 +5264,76 @@ class GoogleMapsApp {
       }
     } catch {}
 
-    // 2. Khoảng cách tới Rốn ngập lịch sử (SIMULATION_FLOOD_POOLS) + Ngập thực tế (liveData.floodPoints)
-    const histPool = (typeof SIMULATION_FLOOD_POOLS !== 'undefined' && SIMULATION_FLOOD_POOLS[this.currentCity]) || [];
-    const liveFloods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
-    const allFloodSpots = [...histPool, ...liveFloods];
+    // 2. Quét toàn diện các rốn ngập lịch sử (SIMULATION_FLOOD_POOLS) & cảm biến đo đạc (liveData.floodPoints)
+    const histPoolTarget = (typeof SIMULATION_FLOOD_POOLS !== 'undefined' && SIMULATION_FLOOD_POOLS[targetCity]) || [];
+    const histPoolCurrent = (typeof SIMULATION_FLOOD_POOLS !== 'undefined' && SIMULATION_FLOOD_POOLS[this.currentCity]) || [];
+    const liveFloods = (this.liveData.floodPoints || []);
+    const allFloodSpots = [...histPoolTarget, ...histPoolCurrent, ...liveFloods];
 
     let nearestFlood = null;
     let floodWithin800m = 0;
+    const seenFloodNames = new Set();
     for (const f of allFloodSpots) {
       if (!Number.isFinite(f.lat) || !Number.isFinite(f.lng)) continue;
       const dKm = this._calcDistanceKm(targetLat, targetLng, f.lat, f.lng);
-      if (dKm <= 0.8) floodWithin800m++;
+      if (dKm <= 0.85 && !seenFloodNames.has(f.name)) {
+        floodWithin800m++;
+        seenFloodNames.add(f.name);
+      }
       if (!nearestFlood || dKm < nearestFlood.distKm) {
-        nearestFlood = { name: f.name, distKm: dKm, depth: f.depth_cm || 30 };
+        nearestFlood = { name: f.name, distKm: dKm, depth: f.depth_cm || 35, source: f.source };
       }
     }
 
     // Chấm điểm Chống ngập & Cốt nền (Tối đa 40 điểm)
     let floodScore = 40;
-    const minDistM = nearestFlood ? Math.round(nearestFlood.distKm * 1000) : 2500;
-    if (minDistM < 250) floodScore -= 22;
-    else if (minDistM < 500) floodScore -= 13;
-    else if (minDistM < 850) floodScore -= 6;
-    if (elevationM < 5) floodScore -= 6;
-    else if (elevationM >= 10) floodScore = Math.min(40, floodScore + 3);
-    floodScore = Math.max(10, Math.min(40, floodScore));
+    const minDistM = nearestFlood ? Math.round(nearestFlood.distKm * 1000) : 3000;
+    const isElevated = (targetCity === 'hanoi' && elevationM >= 14) ||
+                       (targetCity === 'hcm' && elevationM >= 6) ||
+                       (targetCity === 'danang' && elevationM >= 12);
+    const isVeryLow = (targetCity === 'hanoi' && elevationM < 9.5) ||
+                      (targetCity === 'hcm' && elevationM < 3.5) ||
+                      (targetCity === 'danang' && elevationM < 5.0);
+
+    if (minDistM < 350) {
+      // Vùng tâm lòng chảo rốn ngập nguy cơ ngập sâu trực diện
+      floodScore -= 32;
+    } else if (minDistM < 600) {
+      if (isElevated) {
+        // Địa hình gò đồi/cốt cao hơn rốn ngập lân cận
+        floodScore -= 8;
+      } else {
+        // Vùng trũng sát mép rốn ngập
+        floodScore -= 22;
+      }
+    } else if (minDistM < 1000) {
+      if (isElevated) {
+        floodScore -= 3;
+      } else {
+        floodScore -= 12;
+      }
+    } else if (minDistM < 1600) {
+      floodScore -= (isElevated ? 0 : 5);
+    } else if (minDistM < 2500) {
+      floodScore -= (isElevated ? 0 : 2);
+    }
+
+    if (floodWithin800m >= 2 && !isElevated) {
+      floodScore -= 4;
+    }
+
+    // Điểm thưởng/phạt cốt nền địa hình DEM
+    if (minDistM >= 1000) {
+      if (isElevated) floodScore = Math.min(40, floodScore + 3);
+    }
+    if (isVeryLow) {
+      floodScore -= 6;
+    }
+
+    floodScore = Math.max(5, Math.min(40, floodScore));
 
     // 3. Điểm nghẽn Giao thông & Công trường trong bán kính 1.2km (Tối đa 25 điểm)
-    const cityTraffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
+    const cityTraffics = (this.liveData.trafficIncidents || []).filter(t => !t.city || t.city === targetCity || t.city === this.currentCity);
     let jamsNear = 0;
     let worksNear = 0;
     for (const t of cityTraffics) {
@@ -5168,37 +5348,90 @@ class GoogleMapsApp {
 
     // 4. Mật độ Trạm sạc EV & Điểm Trú mưa Cao ráo trong bán kính 1.5km (Tối đa 20 điểm)
     const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
-    const evNearCount = allEV.filter(s => (!s.city || s.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 1.5).length;
-    const sheltersNear = this.getSafeSheltersByCity(this.currentCity).filter(s => this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 2.5);
+    const evNearCount = allEV.filter(s => (!s.city || s.city === targetCity || s.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 1.5).length;
+    const sheltersNear = this.getSafeSheltersByCity(targetCity).filter(s => this._calcDistanceKm(targetLat, targetLng, s.lat, s.lng) <= 2.5);
     const infraScore = Math.min(20, 10 + Math.min(6, evNearCount * 2) + Math.min(4, sheltersNear.length * 2));
 
     // 5. Mật độ Tiện ích Đời sống (Ẩm thực/TTTM) & Tiếp cận Đường lớn trong 1.8km (Tối đa 15 điểm)
     const foodNearCount = this.getAllFoodSpots().filter(sp => {
-      return (!sp.city || sp.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, sp.lat, sp.lng) <= 1.8;
+      return (!sp.city || sp.city === targetCity || sp.city === this.currentCity) && this._calcDistanceKm(targetLat, targetLng, sp.lat, sp.lng) <= 1.8;
     }).length;
     const lifestyleScore = Math.min(15, 8 + Math.min(7, foodNearCount));
 
-    const totalScore = Math.round(floodScore + mobilityScore + infraScore + lifestyleScore);
+    let totalScore = Math.round(floodScore + mobilityScore + infraScore + lifestyleScore);
+
+    // KHỐNG CHẾ TRẦN ĐIỂM NGẬP (Hard Ceilings):
+    // Khu vực nằm trong lòng chảo rốn ngập lịch sử không thể được xếp Hạng A hoặc B cao
+    if (minDistM < 350) {
+      totalScore = Math.min(totalScore, 54); // Tuyệt đối HẠNG C (Rốn ngập sâu)
+    } else if (minDistM < 600 && !isElevated) {
+      totalScore = Math.min(totalScore, 63); // Tối đa HẠNG C / B thấp
+    } else if (minDistM < 1000 && isVeryLow) {
+      totalScore = Math.min(totalScore, 72); // Tối đa HẠNG B
+    }
+
     let grade = 'A+';
     let gradeColor = '#059669';
     let verdict = 'Khu vực An cư & Kinh doanh Lý tưởng (Cao ráo, hạ tầng đồng bộ)';
-    if (totalScore < 65) {
+    if (totalScore < 60) {
       grade = 'C';
       gradeColor = '#dc2626';
-      verdict = 'Khu vực Trũng / Gần Rốn Ngập — Cần kiểm tra kỹ cốt nền tầng 1 trước khi thuê';
-    } else if (totalScore < 78) {
+      verdict = 'Khu vực Trũng Sâu / Rốn Ngập Lịch Sử — Cảnh báo ngập úng tầng 1 khi mưa to';
+    } else if (totalScore < 75) {
       grade = 'B';
       gradeColor = '#d97706';
-      verdict = 'Khu vực Khá — Đầy đủ tiện ích nhưng cần lưu ý đường ra vào khi mưa lớn >50mm';
+      verdict = 'Khu vực Khá — Tiện ích tốt nhưng cần lưu ý đường sá xung quanh khi mưa lớn';
     } else if (totalScore < 88) {
       grade = 'A';
       gradeColor = '#0d9488';
       verdict = 'Khu vực Tốt — Thoát nước ổn định, thuận tiện đi làm & sinh hoạt';
     }
 
-    const rentalAdvice = minDistM < 400
-      ? `<strong>Lưu ý quan trọng khi đi thuê trọ / mặt bằng tại đây:</strong> Vị trí này cách rốn ngập lịch sử <em>${nearestFlood?.name}</em> chỉ <strong>${minDistM}m</strong>. Hãy kiểm tra dấu vết ngấn nước ở chân tường tầng 1, ưu tiên nhà có bậc tam cấp cao >30cm và hỏi chủ nhà về tình trạng hầm để xe khi mưa lớn.`
-      : `<strong>Đánh giá thực địa tốt:</strong> Vị trí nằm cách xa rốn ngập gần nhất tới <strong>${(minDistM / 1000).toFixed(2)} km</strong> (${nearestFlood?.name || 'An toàn'}), cốt nền vệ tinh đạt <strong>+${elevationM}m</strong>. Bán kính 1.5km có sẵn <strong>${evNearCount} trạm sạc EV</strong> và <strong>${foodNearCount} điểm dịch vụ/ẩm thực</strong> — Rất thuận lợi để thuê ở lâu dài hoặc mở cửa hàng.`;
+    // Đánh giá chi tiết thực địa chuyên sâu theo từng điểm nóng
+    let rentalAdvice = '';
+    const isTrieuKhuc = /triều khúc|tân triều/i.test(targetName) || /triều khúc|tân triều/i.test(nearestFlood?.name || '');
+    const isThaoDien = /thảo điền|quốc hương/i.test(targetName) || /thảo điền|quốc hương/i.test(nearestFlood?.name || '');
+    const isMeSuot = /mẹ suốt/i.test(targetName) || /mẹ suốt/i.test(nearestFlood?.name || '');
+    const isPhungKhoang = /phùng khoang/i.test(targetName) || /phùng khoang/i.test(nearestFlood?.name || '');
+    const isBuiXuongTrach = /bùi xương trạch|định công/i.test(targetName) || /bùi xương trạch|định công/i.test(nearestFlood?.name || '');
+
+    if (minDistM < 450 || (minDistM < 700 && !isElevated)) {
+      if (isTrieuKhuc) {
+        rentalAdvice = `
+          <strong style="color: #dc2626;">CẢNH BÁO ĐẶC BIỆT RỐN NGẬP ("Vịnh Triều Khúc"):</strong> Vị trí này nằm ngay trong tâm lòng chảo trũng sâu khét tiếng của khu vực Triều Khúc - Tân Triều (cách rốn ngập chỉ <strong>${minDistM}m</strong>).
+          Nơi đây hệ thống cống nhỏ và trũng sâu so với trục Nguyễn Trãi, mỗi khi mưa rào >50mm là biến thành "biển nước" ngập từ <strong>40cm đến trên 70cm</strong>, nước tràn vào nhà và cô lập ngõ ngách nhiều ngày.<br>
+          <strong style="color: #0f172a;">Khuyến nghị sống còn khi thuê trọ / mặt bằng:</strong> Tuyệt đối tránh phòng trọ tầng 1 nếu nền nhà không cao hơn mặt ngõ tối thiểu 50cm; kiểm tra ngấn nước chân tường và bắt buộc phải có phương án gửi xe máy/ô tô ở bãi cao ráo phía ngoài đường lớn.
+        `;
+      } else if (isThaoDien) {
+        rentalAdvice = `
+          <strong style="color: #dc2626;">CẢNH BÁO RỐN NGẬP & TRIỀU CƯỜNG (Bán đảo Thảo Điền):</strong> Vị trí này nằm sát rốn ngập <em>${nearestFlood?.name}</em> (cách <strong>${minDistM}m</strong>).
+          Khu vực chịu tác động kép của triều cường sông Sài Gòn và mưa lớn, thường xuyên ngập sâu 30-50cm làm chết máy xe và tê liệt giao thông.<br>
+          <strong style="color: #0f172a;">Khuyến nghị:</strong> Tránh các mặt bằng trệt không có đê bao van ngăn triều và kiểm tra lịch triều cường rằm/mùng một hàng tháng.
+        `;
+      } else if (isMeSuot) {
+        rentalAdvice = `
+          <strong style="color: #dc2626;">CẢNH BÁO RỐN NGẬP LỊCH SỬ (Đường Mẹ Suốt, Đà Nẵng):</strong> Vị trí này nằm trong vùng trũng nguy hiểm chân đồi Mẹ Suốt (cách rốn ngập <strong>${minDistM}m</strong>).
+          Khi mưa bão lớn, nước dồn từ đồi xuống không kịp thoát ra kênh, độ ngập có thể lên tới <strong>0.8m - 1.5m</strong>.<br>
+          <strong style="color: #0f172a;">Khuyến nghị:</strong> Không thuê phòng trọ cấp 4 hoặc tầng 1 không có gác lửng kiên cố thoát hiểm khi mùa mưa lũ đến.
+        `;
+      } else {
+        rentalAdvice = `
+          <strong style="color: #dc2626;">CẢNH BÁO RỐN NGẬP TRỌNG ĐIỂM (${nearestFlood?.name}):</strong> Vị trí này nằm sát rốn ngập úng lịch sử (cách chỉ <strong>${minDistM}m</strong>).
+          Khi có mưa dông đô thị kéo dài, nước thoát chậm và có nguy cơ ngập sâu 25-50cm mép đường và ngõ trũng.<br>
+          <strong style="color: #0f172a;">Khuyến nghị:</strong> Kiểm tra kỹ ngấn nước ố trên tường tầng 1, ưu tiên nhà có bậc tam cấp cao và hỏi rõ hàng xóm xung quanh về tình trạng ngập hầm xe.
+        `;
+      }
+    } else if (minDistM < 1100 && !isElevated) {
+      rentalAdvice = `
+        <strong style="color: #d97706;">LƯU Ý VÙNG ẢNH HƯỞNG RỐN TRŨNG:</strong> Vị trí nằm cách rốn ngập <em>${nearestFlood?.name}</em> khoảng <strong>${minDistM}m</strong>.
+        Mặt bằng tại đây có thể cao hơn lòng chảo rốn ngập, tuy nhiên các ngả đường ra vào chính rất dễ bị chia cắt hoặc ùn tắc cục bộ khi có mưa lớn >50mm. Cần khảo sát kỹ lộ trình kết nối ra trục đường lớn.
+      `;
+    } else {
+      rentalAdvice = `
+        <strong style="color: #059669;">Đánh giá thực địa tốt:</strong> Vị trí nằm cách xa các rốn ngập lịch sử trọng điểm (gần nhất là <em>${nearestFlood?.name || 'Khu vực an toàn'}</em> cách <strong>${(minDistM / 1000).toFixed(2)} km</strong>), cốt nền vệ tinh đạt <strong>+${elevationM}m</strong>.
+        Bán kính 1.5km có sẵn <strong>${evNearCount} trạm sạc EV</strong> và <strong>${foodNearCount} điểm dịch vụ ẩm thực/tiện ích</strong> — Rất an tâm để an cư lâu dài hoặc kinh doanh mặt bằng.
+      `;
+    }
 
     this._lastPropertyReportText = `[PHIẾU KHẢO SÁT AN CƯ & MẶT BẰNG - MOVESAFE VN]\n- Địa điểm: ${targetName} (${targetLat.toFixed(5)}, ${targetLng.toFixed(5)})\n- Tổng điểm: ${totalScore}/100 (Hạng ${grade} - ${verdict})\n- Cốt nền vệ tinh: +${elevationM}m so với mực nước biển\n- Khoảng cách tới rốn ngập lịch sử gần nhất: ${minDistM}m (${nearestFlood?.name || 'Không có'})\n- Bán kính 1.5km: ${evNearCount} Trạm sạc EV, ${sheltersNear.length} Điểm gửi xe cao ráo, ${foodNearCount} Tiện ích ẩm thực/TTTM.`;
 

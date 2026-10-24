@@ -185,6 +185,81 @@ const LOCAL_FLOOD_STATIONS = [
     advice: 'Ngập lút nửa bánh xe, người dân nên đi vòng qua phố Yên Hòa.',
     updated_at: new Date().toISOString()
   },
+  {
+    id: 'hsdc-07',
+    name: 'Khu vực Triều Khúc - Tân Triều ("Vịnh Triều Khúc")',
+    city: 'hanoi',
+    lat: 20.9820,
+    lng: 105.8015,
+    depth_cm: 45,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: false,
+    source: 'HSDC Hà Nội (Rốn trũng Tân Triều)',
+    pump_status: 'Trạm bơm dã chiến mương Tân Triều hoạt động',
+    advice: 'Rốn ngập lòng chảo cực sâu ("Vịnh Triều Khúc"), nước tràn vào nhà dân và ngập 40-70cm.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'hsdc-08',
+    name: 'Đường Phùng Khoang - Chợ Phùng Khoang',
+    city: 'hanoi',
+    lat: 20.9915,
+    lng: 105.7915,
+    depth_cm: 35,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: false,
+    source: 'HSDC Hà Nội (Vùng trũng Phùng Khoang)',
+    pump_status: 'Cửa xả hồ Phùng Khoang đang mở',
+    advice: 'Vùng trũng chợ Phùng Khoang ngập lút bánh xe, hạn chế di chuyển.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'hsdc-09',
+    name: 'Phố Bùi Xương Trạch (Khương Đình)',
+    city: 'hanoi',
+    lat: 20.9912,
+    lng: 105.8195,
+    depth_cm: 32,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'HSDC Hà Nội (Vùng trũng sông Tô Lịch)',
+    pump_status: 'Trạm bơm dã chiến đang xả ra sông Tô Lịch',
+    advice: 'Nước ngập sâu dọc ngõ và mặt phố Bùi Xương Trạch, di chuyển thận trọng.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'hsdc-10',
+    name: 'Khu vực Định Công (Phố Định Công - Cầu Định Công)',
+    city: 'hanoi',
+    lat: 20.9835,
+    lng: 105.8360,
+    depth_cm: 30,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'HSDC Hà Nội (Trạm quan trắc sông Lừ)',
+    pump_status: 'Cống ngầm Định Công đang xả',
+    advice: 'Nước dâng nhanh từ sông Lừ, ngập tràn đường Định Công.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'hsdc-11',
+    name: 'Đường Tố Hữu (Đoạn Lương Thế Vinh - Trung Văn)',
+    city: 'hanoi',
+    lat: 20.9942,
+    lng: 105.7892,
+    depth_cm: 30,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'HSDC Hà Nội (Trục hướng tâm Nam Từ Liêm)',
+    pump_status: 'Trạm bơm đang dẫn dòng',
+    advice: 'Ngập sâu làn xe máy trước các tòa nhà chung cư Tố Hữu.',
+    updated_at: new Date().toISOString()
+  },
 
   // UDi Maps TP.HCM (Thoát nước đô thị TP.HCM)
   {
@@ -262,6 +337,51 @@ const LOCAL_FLOOD_STATIONS = [
     advice: 'Ngập cục bộ mép đường, di chuyển chậm an toàn.',
     updated_at: new Date().toISOString()
   },
+  {
+    id: 'udi-06',
+    name: 'Đường Nguyễn Hữu Cảnh (Bình Thạnh - Chân cầu Sài Gòn)',
+    city: 'hcm',
+    lat: 10.7925,
+    lng: 106.7145,
+    depth_cm: 35,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'UDi Maps TP.HCM (Rốn trũng Nguyễn Hữu Cảnh)',
+    pump_status: 'Máy bơm công suất lớn đang hoạt động',
+    advice: 'Vùng trũng chân cầu Sài Gòn ngập sâu, phương tiện gầm thấp không nên lưu thông.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'udi-07',
+    name: 'Đường Kha Vạn Cân - Tô Ngọc Vân (Chợ Thủ Đức)',
+    city: 'hcm',
+    lat: 10.8512,
+    lng: 106.7582,
+    depth_cm: 38,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: false,
+    source: 'UDi Maps TP.HCM (Rốn trũng Chợ Thủ Đức)',
+    pump_status: 'Cửa xả rạch Cầu Ngang đang mở',
+    advice: 'Khu vực chợ Thủ Đức trũng sâu, nước chảy xiết khi mưa dồn dập.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'udi-08',
+    name: 'Đường Phan Huy Ích (Gò Vấp - Tân Bình)',
+    city: 'hcm',
+    lat: 10.8295,
+    lng: 106.6345,
+    depth_cm: 30,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'UDi Maps TP.HCM (Trạm quan trắc Tham Lương)',
+    pump_status: 'Trạm bơm Tham Lương đang xả',
+    advice: 'Nước thoát chậm do rạch Tham Lương quá tải, tránh di chuyển giờ cao điểm mưa.',
+    updated_at: new Date().toISOString()
+  },
 
   // Trạm đo ngập đô thị Đà Nẵng
   {
@@ -291,7 +411,7 @@ const LOCAL_FLOOD_STATIONS = [
     passable_car: false,
     source: 'Cảm biến thoát nước Liên Chiểu',
     pump_status: 'Lực lượng chức năng trực điều tiết',
-    advice: 'Rốn ngập trũng thấp, tuyệt đối không đi qua khi có mưa lớn.',
+    advice: 'Rốn ngập trũng thấp chân đồi, nguy cơ ngập sâu 1m-1.5m, tuyệt đối không đi qua khi có mưa lớn.',
     updated_at: new Date().toISOString()
   },
   {
@@ -307,6 +427,21 @@ const LOCAL_FLOOD_STATIONS = [
     source: 'Trạm quan trắc Hải Châu',
     pump_status: 'Cống thoát nước trung tâm đang xả',
     advice: 'Nước đọng cục bộ tại giao lộ, xe máy chú ý giảm tốc độ.',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'dn-04',
+    name: 'Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)',
+    city: 'danang',
+    lat: 16.0595,
+    lng: 108.1725,
+    depth_cm: 32,
+    danger_level: 'critical',
+    passable_motorbike: false,
+    passable_car: true,
+    source: 'Trạm đo ngập Hòa An - Bến xe',
+    pump_status: 'Trạm bơm Đa Cô đang vận hành',
+    advice: 'Đoạn trước bến xe trũng thấp ngập tràn vỉa hè, xe gầm thấp di chuyển chậm.',
     updated_at: new Date().toISOString()
   }
 ];
