@@ -1524,7 +1524,14 @@ class GoogleMapsApp {
           reportModal?.classList.remove('open');
           const form = document.getElementById('form-report');
           if (form) form.reset();
-          this.showToast('Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
+          if (type === 'flood' && parseInt(depth, 10) >= 20) {
+            this.showToast('Đã ghim điểm ngập sâu! Đang gợi ý điểm gửi xe cao ráo & cứu hộ gần bạn nhất...', 'warning', 4500);
+            setTimeout(() => {
+              this.openSosRescueModal(targetLat, targetLng, name);
+            }, 600);
+          } else {
+            this.showToast('Báo cáo của bạn đã được xác thực và ghim lên bản đồ!', 'info');
+          }
         } else {
           this.showToast('Không thể gửi báo cáo: ' + (res?.message || 'Lỗi không xác định'), 'warning');
         }
@@ -3619,7 +3626,7 @@ class GoogleMapsApp {
           ${details.map(d => `<li><span>•</span><span>${d.text}</span></li>`).join('')}
         </ul>
         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
-          <button type="button" class="gm-poi-sub-btn" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" onclick="window.appState.openCommuteComfortModal()">
+          <button type="button" class="gm-poi-sub-btn" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" onclick="window.appState.openCommuteComfortModal(${destLat}, ${destLng}, '${safeDestName}')">
             Dự báo 15P & Nhiệt mặt đường
           </button>
           <button type="button" class="gm-poi-sub-btn" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;" onclick="window.appState.openPropertyAnalyzerModal(${destLat}, ${destLng}, '${safeDestName}')">
@@ -4671,9 +4678,12 @@ class GoogleMapsApp {
     const ref = this._sosRefLocation || { lat: 21.0285, lng: 105.8542, name: 'Vị trí hiện tại' };
 
     if (tabName === 'shelters') {
+      const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
       const shelters = this.getSafeSheltersByCity(this.currentCity).map((s, idx) => {
         const distKm = this._calcDistanceKm(ref.lat, ref.lng, s.lat, s.lng);
-        return { ...s, originalIdx: idx, distKm };
+        const hasEV = (s.capacity && s.capacity.toLowerCase().includes('sạc')) ||
+          allEV.some(ev => this._calcDistanceKm(s.lat, s.lng, ev.lat, ev.lng) <= 0.6);
+        return { ...s, originalIdx: idx, distKm, hasEV };
       }).sort((a, b) => a.distKm - b.distKm);
 
       this._sortedSheltersCache = shelters;
@@ -4687,6 +4697,7 @@ class GoogleMapsApp {
                   ${idx === 0 ? '<span class="sos-shelter-badge" style="background:#dcfce7;color:#15803d;">GẦN NHẤT</span>' : ''}
                   ${s.name}
                   <span class="sos-shelter-badge">Cách ${s.distKm.toFixed(1)} km</span>
+                  ${s.hasEV ? '<span class="sos-shelter-badge" style="background:#f0fdf4;color:#059669;border:1px solid #a7f3d0;">Có Trạm sạc EV</span>' : ''}
                 </h4>
                 <div class="sos-shelter-meta">
                   <span>Cốt nền: <strong>${s.elevation}</strong></span>
