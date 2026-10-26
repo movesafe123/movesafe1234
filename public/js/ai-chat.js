@@ -344,55 +344,123 @@ class AIChat {
 
   /**
    * Phân tích câu hỏi tìm đường tự nhiên tiếng Việt
-   * Xử lý chính xác các câu như: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không"
+   * Xử lý chính xác:
+   * 1. Lộ trình xuôi: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không"
+   * 2. Lộ trình ngược (Điểm đến trước, điểm đi sau): "cuối thứ 7 tuần này tôi muốn nghe nhạc tại cafe cộng đối diện sân vận động mỹ đình đi từ an TRAI RA đường nào đư tác"
+   * 3. Tình huống giả định né / cấm đường: "giả sử đường trịnh văn bô cấm đường tôi đi từ khu đô thị vân canh ra bến xe mỹ đình đi đường nào"
    */
   parseRouteQuery(query) {
     if (!query) return null;
 
-    // 1. Trích xuất mốc thời gian dự báo nếu có (VD: "trong 2h tới", "sau 1 giờ nữa", "3 tiếng tới")
+    // 1. Trích xuất điều kiện giả định cấm đường / né đường (Hypothetical Road Closure / Avoidance)
+    let avoidRoad = null;
+    const avoidPatterns = [
+      /giả\s+sử(?:\s+như)?\s+(?:đường\s+|tuyến\s+)?(.+?)\s+(?:bị\s+)?(?:cấm\s+đường|cấm|đóng\s+đường|ngập\s+sâu|ngập|tắc\s+cứng|kẹt\s+xe|không\s+đi\s+được)/i,
+      /nếu(?:\s+như)?\s+(?:đường\s+|tuyến\s+)?(.+?)\s+(?:bị\s+)?(?:cấm\s+đường|cấm|đóng\s+đường|ngập\s+sâu|ngập|tắc)/i,
+      /(?:tránh|né|không\s+đi\s+qua|không\s+muốn\s+đi\s+qua)\s+(?:đường\s+|tuyến\s+)?(.+?)(?:\s+(?:thì|tôi|mình|đi|bạn|nhé)|[,.]|$)/i
+    ];
+
+    for (const pat of avoidPatterns) {
+      const m = query.match(pat);
+      if (m && m[1]) {
+        const candidate = m[1].replace(/^(?:đường|phố|tuyến)\s+/i, '').trim();
+        if (candidate.length >= 2 && !candidate.match(/^(?:tôi|mình|bạn|gì|nào)$/i)) {
+          avoidRoad = candidate;
+          break;
+        }
+      }
+    }
+
+    // 2. Trích xuất mốc thời gian dự báo nếu có (VD: "trong 2h tới", "sau 1 giờ nữa", "3 tiếng tới")
     let timeOffsetHours = 0;
     const timeMatch = query.match(/(?:trong|sau|khoảng)?\s*(\d+)\s*(?:h|giờ|tiếng)\s*(?:tới|nữa|sau)?/i);
     if (timeMatch && timeMatch[1]) {
       timeOffsetHours = Math.min(3, Math.max(0, parseInt(timeMatch[1], 10)));
     }
 
-    // 2. Làm sạch phần đuôi câu hỏi (thời gian, câu hỏi tắc đường/ngập nước) trước khi tách điểm đi - điểm đến
-    let cleaned = query
+    // 3. Tách câu hỏi làm sạch để tìm điểm đi / điểm đến
+    let cleanQuery = query;
+    for (const pat of avoidPatterns) {
+      cleanQuery = cleanQuery.replace(pat, ' ');
+    }
+
+    // Xóa các câu hỏi phụ ở đuôi (ưu tiên xóa cụm dài trước cụm ngắn)
+    let cleaned = cleanQuery
       .replace(/(?:trong|sau|khoảng)\s*\d+\s*(?:h|giờ|tiếng|phút|p)\s*(?:tới|nữa|sau)?.*$/i, '')
       .replace(/\s+\d+\s*(?:h|giờ|tiếng)\s*(?:tới|nữa).*$/i, '')
-      .replace(/\s+(?:hiện tại|bây giờ|lúc này|hôm nay|chiều nay|tối nay|sáng nay)?\s*(?:có bị|có đang|có|bị|đang)?\s*(?:tắc đường|kẹt xe|ùn tắc|tắc|kẹt|ngập nước|ngập úng|ngập|mưa|thông thoáng|đi được).*$/i, '')
-      .replace(/\s+(?:đi đường nào|đường nào|như thế nào|thế nào|ra sao|không|chưa|nhỉ|vậy|ạ|nhé|\?|\.|!)+$/i, '')
+      .replace(/\s+(?:đi\s+đường\s+nào|đường\s+nào\s+đư\s+tác|đường\s+nào\s+đỡ\s+tắc|đường\s+nào\s+đỡ\s+ngập|đường\s+nào\s+thông\s+thoáng|đường\s+nào\s+nhanh\s+nhất|đường\s+nào|như\s+thế\s+nào|thế\s+nào|ra\s+sao|hết\s+bao\s+lâu).*$/i, '')
+      .replace(/\s+(?:hiện tại|bây giờ|lúc này|hôm nay|chiều nay|tối nay|sáng nay|cuối tuần này|thứ \d+ này)?\s*(?:có bị|có đang|có|bị|đang)?\s*(?:tắc đường|kẹt xe|ùn tắc|tắc|kẹt|ngập nước|ngập úng|ngập|mưa|thông thoáng|đi được).*$/i, '')
+      .replace(/\s+(?:không|chưa|nhỉ|vậy|ạ|nhé|\?|\.|!)+$/i, '')
       .trim();
 
-    // 3. Tách Điểm đi và Điểm đến với các giới từ chỉ hướng phổ biến (đến, về, sang, qua, tới, ra, vào, lên, xuống)
+    // Pattern A: Điểm đến trước, điểm đi sau
+    // Ví dụ: "cuối thứ 7 tuần này tôi muốn nghe nhạc tại cafe cộng đối diện sân vận động mỹ đình đi từ an TRAI RA đường nào đư tác"
+    // Ví dụ 2: "muốn đến viện 103 đi từ ngã tư sở đường nào đỡ ngập"
+    const destFirstRegex = /(?:tôi\s+)?(?:muốn|cần|định|thích)?\s*(?:nghe\s+nhạc|uống\s+cafe|cafe|ăn\s+uống|xem\s+phim|đi\s+chơi|đến|tới|ghé|về|ở|đi)?\s*(?:tại|ở|đến|tới)\s+(.+?)\s+(?:đi\s+)?từ\s+(.+?)(?:\s+(?:ra|vào|đến|theo|qua)\s+.*|\s*$)/i;
+    const matchA = cleaned.match(destFirstRegex);
+    if (matchA && matchA[1] && matchA[2]) {
+      const rawDest = matchA[1].replace(/^(?:tôi|mình|bạn)\s+/i, '').trim();
+      let rawOrig = matchA[2]
+        .replace(/\s+(?:ra|vào|đến|theo|qua)\s+.*$/i, '')
+        .replace(/\s+(?:đường\s+nào.*|đường\s+.*|thế\s+nào.*|ra\s+sao.*)$/i, '')
+        .replace(/\s+(?:ra|vào|đến|theo|qua)$/i, '')
+        .trim();
+
+      if (rawDest.length >= 2 && rawOrig.length >= 2 && !rawDest.match(/^(?:đường|đường nào)$/i)) {
+        return {
+          origin: rawOrig,
+          destination: rawDest,
+          timeOffsetHours,
+          avoidRoad
+        };
+      }
+    }
+
+    // Pattern B: Điểm đi trước, điểm đến sau thông thường
+    // "đi từ A đến/ra/về B"
     const routeRegex = /(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới|ra|vào|lên|xuống)\s+(.+)$/i;
-    const match = cleaned.match(routeRegex);
-    if (!match || !match[1] || !match[2]) return null;
+    const matchB = cleaned.match(routeRegex);
+    if (matchB && matchB[1] && matchB[2]) {
+      const orig = matchB[1]
+        .replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi)\s+/i, '')
+        .replace(/[,.?!]+$/g, '')
+        .trim();
 
-    const orig = match[1]
-      .replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi)\s+/i, '')
-      .replace(/[,.?!]+$/g, '')
-      .trim();
+      let dest = matchB[2]
+        .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
+        .replace(/\s+(?:đường\s+nào\s+.*|đường\s+nào)$/i, '')
+        .replace(/[,.?!]+$/g, '')
+        .trim();
 
-    const dest = match[2]
-      .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
-      .replace(/[,.?!]+$/g, '')
-      .trim();
+      // Nếu điểm đến bị cắt cụt thành chữ "đường" hoặc quá ngắn, tìm xem có điểm đến ở vế trước không
+      if (dest.toLowerCase() === 'đường' || dest.toLowerCase() === 'đường nào' || dest.length < 2) {
+        const priorDestMatch = query.match(/(?:tại|đến|tới|ở)\s+([^,]+?)\s+(?:đi\s+)?từ/i);
+        if (priorDestMatch && priorDestMatch[1]) {
+          dest = priorDestMatch[1].trim();
+        } else {
+          return null;
+        }
+      }
 
-    if (orig.length < 2 || dest.length < 2) return null;
+      if (orig.length >= 2 && dest.length >= 2) {
+        return {
+          origin: orig,
+          destination: dest,
+          timeOffsetHours,
+          avoidRoad
+        };
+      }
+    }
 
-    return {
-      origin: orig,
-      destination: dest,
-      timeOffsetHours
-    };
+    return null;
   }
 
   handleMapAction(act) {
     if (!act || !window.mapEngine) return;
     if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
       if (window.appState && window.appState.triggerChatRoute) {
-        window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0);
+        const avoidList = act.avoidRoads || (act.avoidRoad ? [act.avoidRoad] : []);
+        window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0, avoidList);
       }
     } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
       window.mapEngine.map?.flyTo([act.lat, act.lng], 16);
@@ -469,8 +537,6 @@ class AIChat {
       mapCenter: mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null
     };
 
-    // Nếu câu hỏi ẩm thực/giải trí chứa địa danh bất kỳ chưa có trong từ điển tĩnh (landmarks/wards/streets),
-    // tự động geocode trực tiếp địa danh đó để lấy tọa độ neo (customAnchor) cho bộ lọc bán kính Haversine
     if (isFoodQuery && window.FOOD_ENTERTAINMENT_DATA && typeof window.FOOD_ENTERTAINMENT_DATA.geocodeLocationLive === 'function') {
       try {
         const probeRec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
@@ -485,9 +551,7 @@ class AIChat {
             };
           }
         }
-      } catch (_geoErr) {
-        // Fallback an toàn nếu geocode ngoại tuyến
-      }
+      } catch (_geoErr) {}
     }
 
     let responded = false;
@@ -505,28 +569,25 @@ class AIChat {
         if (data.status === 'success' && data.response?.text) {
           this.messages.pop();
 
-          // Nếu câu hỏi là lộ trình từ A đến B nhưng backend trả kết quả bị tách sai, ưu tiên bộ phân tích chuẩn
-          if (parsedRoute && data.response.action?.type === 'AUTO_ROUTE') {
-            data.response.action.origin = parsedRoute.origin;
-            data.response.action.destination = parsedRoute.destination;
-            data.response.action.timeOffsetHours = parsedRoute.timeOffsetHours;
-          }
-
           this.addBotMessage(data.response.text, {
             spots: data.response.action?.spots || null
           });
           responded = true;
 
-          if (parsedRoute) {
+          if (data.response.action) {
+            if (parsedRoute?.avoidRoad && !data.response.action.avoidRoads) {
+              data.response.action.avoidRoads = [parsedRoute.avoidRoad];
+            }
+            this.handleMapAction(data.response.action);
+          } else if (parsedRoute) {
             this.handleMapAction({
               type: 'AUTO_ROUTE',
               origin: parsedRoute.origin,
               destination: parsedRoute.destination,
               avoidLevel: 1,
-              timeOffsetHours: parsedRoute.timeOffsetHours
+              timeOffsetHours: parsedRoute.timeOffsetHours,
+              avoidRoads: parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []
             });
-          } else if (data.response.action) {
-            this.handleMapAction(data.response.action);
           }
         }
       }
@@ -536,19 +597,26 @@ class AIChat {
 
     if (responded) return;
 
-    // 2. Thử gọi trực tiếp Google Gemini API qua Client
+    // 2. Thử gọi trực tiếp Google Gemini API qua Client (sử dụng model thế hệ mới nhất)
     if (geminiKey) {
       try {
         let geminiReply = await this.callDirectGemini(query, currentCity, geminiKey);
         this.messages.pop();
 
-        let autoOrigin = parsedRoute ? parsedRoute.origin : null;
-        let autoDest = parsedRoute ? parsedRoute.destination : null;
-        const routeMatch = geminiReply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)\]/i);
+        let autoOrigin = null;
+        let autoDest = null;
+        let autoAvoid = null;
+
+        const routeMatch = geminiReply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)(?:\s*\|\s*AVOID:\s*(.*?))?\]/i);
         if (routeMatch) {
-          if (!autoOrigin) autoOrigin = routeMatch[1].trim();
-          if (!autoDest) autoDest = routeMatch[2].trim();
-          geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*->\s*.*?\]/i, '').trim();
+          autoOrigin = routeMatch[1].trim();
+          autoDest = routeMatch[2].trim();
+          if (routeMatch[3]) autoAvoid = routeMatch[3].trim();
+          geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*\]/i, '').trim();
+        } else if (parsedRoute) {
+          autoOrigin = parsedRoute.origin;
+          autoDest = parsedRoute.destination;
+          autoAvoid = parsedRoute.avoidRoad;
         }
 
         const isFoodQ = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
@@ -570,7 +638,8 @@ class AIChat {
         }
 
         if (autoOrigin && autoDest && window.appState && window.appState.triggerChatRoute) {
-          window.appState.triggerChatRoute(autoOrigin, autoDest, 1, parsedRoute ? parsedRoute.timeOffsetHours : 0);
+          const avoidList = autoAvoid ? [autoAvoid] : (parsedRoute?.avoidRoad ? [parsedRoute.avoidRoad] : []);
+          window.appState.triggerChatRoute(autoOrigin, autoDest, 1, parsedRoute ? parsedRoute.timeOffsetHours : 0, avoidList);
         }
         return;
       } catch (geminiErr) {
@@ -578,7 +647,7 @@ class AIChat {
       }
     }
 
-    // 3. Fallback sang Bộ não AI cục bộ dựa trên dữ liệu trạm đo thực tế
+    // 3. Fallback sang Bộ não AI cục bộ dựa trên dữ liệu trạm đo thực tế & tri thức sự kiện đô thị
     this.messages.pop();
     const allFloods = (window.appState && typeof window.appState.getCurrentFloods === 'function')
       ? window.appState.getCurrentFloods()
@@ -588,32 +657,73 @@ class AIChat {
     const activeJams = traffics.filter(t => t.isJam === true);
     const lower = query.toLowerCase();
 
-    // 3a. Nếu hỏi lộ trình từ A đến B (ví dụ: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không")
+    // 3a. Nhận diện các câu hỏi về sự kiện, đông người, ùn tắc diện rộng (Event & Crowd Inquiry)
+    const isEventOrCrowdQuery = (
+      lower.includes('đông thế') || lower.includes('đông vậy') || lower.includes('sao đông') ||
+      lower.includes('tại sao đông') || lower.includes('đông đúc') || lower.includes('có sự kiện gì') ||
+      lower.includes('hôm qua') || lower.includes('tối qua') || lower.includes('concert') ||
+      lower.includes('nhạc hội') || lower.includes('đại nhạc hội') || (lower.includes('sân vận động') && (lower.includes('đông') || lower.includes('tắc')))
+    );
+
+    if (isEventOrCrowdQuery && (lower.includes('mỹ đình') || lower.includes('sân vận động') || lower.includes('svđ'))) {
+      const reply = `**Hiện tượng đông đúc & ùn tắc tại khu vực Sân vận động Quốc gia Mỹ Đình**:\n\n` +
+                    `• **Nguyên nhân chính**: Khu vực SVĐ Mỹ Đình thường xuyên tổ chức các sự kiện văn hóa, đại nhạc hội âm nhạc quy mô lớn (như Concert Anh Trai Say Hi, Anh Trai Vượt Ngàn Chông Gai, các tour diễn âm nhạc trong nước & quốc tế) hoặc các trận thi đấu bóng đá của Đội tuyển Quốc gia Việt Nam với quy mô 30.000 - 40.000 khán giả.\n` +
+                    `• **Khung giờ cao điểm**: Khoảng 18h00 - 22h30 là thời điểm lượng khán giả và xe cộ dồn về cùng lúc, làm quá tải nghiêm trọng các trục tiếp cận: **Lê Đức Thọ, Lê Quang Đạo, Châu Văn Liêm, Nguyễn Hoàng, Mễ Trì và Hồ Tùng Mậu**.\n` +
+                    `• **Khuyến nghị di chuyển thông minh**: Nếu có lịch trình qua khu vực này trong các ngày diễn ra sự kiện, bạn nên đi sớm trước 2 tiếng, ưu tiên sử dụng tuyến **Đường sắt đô thị Metro Tuyến 3 (Ga Lê Đức Thọ / Ga Cầu Giấy)** hoặc gửi xe tại các bãi ngoài bán kính 1km (Khu liên hợp, Cung Điền kinh, The Garden) rồi đi bộ vào sân.`;
+      this.addBotMessage(reply);
+      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
+      return;
+    }
+
+    if (isEventOrCrowdQuery && (lower.includes('phố đi bộ') || lower.includes('hồ gươm') || lower.includes('hoàn kiếm'))) {
+      const reply = `**Tình hình sự kiện & lưu thông tại Không gian Phố đi bộ Hồ Gươm**:\n\n` +
+                    `• **Quy chế hoạt động**: Tuyến phố đi bộ Hồ Gươm và phụ cận cấm toàn bộ phương tiện cơ giới lưu thông từ tối thứ Sáu đến hết Chủ nhật hàng tuần.\n` +
+                    `• **Điểm ùn ứ thường gặp**: Các điểm gửi xe và nút giao tiếp cận (Hàng Bài, Hai Bà Trưng, Tràng Tiền, Đinh Tiên Hoàng) thường có mật độ người và xe rất đông vào khung giờ 19h00 - 23h00.\n` +
+                    `• **Gợi ý gửi xe**: Gửi xe máy/ô tô tại các điểm quy hoạch trên phố Lý Thái Tổ, Trần Nguyên Hãn, Hai Bà Trưng trước khi đi bộ vào khu vực trung tâm.`;
+      this.addBotMessage(reply);
+      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
+      return;
+    }
+
+    if (isEventOrCrowdQuery && (lower.includes('hội nghị quốc gia') || lower.includes('ncc'))) {
+      const reply = `**Tình hình giao thông tại Trung tâm Hội nghị Quốc gia (NCC)**:\n\n` +
+                    `Khu vực cổng đường Phạm Hùng và Đại lộ Thăng Long thường đón các đoàn xe ngoại giao, triển lãm quốc tế hoặc sự kiện hội nghị quy mô lớn. Vào giờ tan tầm hoặc trước giờ khai mạc sự kiện, luồng phương tiện chuyển làn rẽ vào trung tâm thường gây xung đột dòng xe nhẹ tại nút giao Phạm Hùng - Trần Duy Hưng.`;
+      this.addBotMessage(reply);
+      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
+      return;
+    }
+
+    // 3b. Nếu hỏi lộ trình từ A đến B (xử lý chính xác cả lộ trình xuôi, ngược và tình huống giả định cấm đường)
     if (parsedRoute) {
-      const { origin, destination, timeOffsetHours } = parsedRoute;
+      const { origin, destination, timeOffsetHours, avoidRoad } = parsedRoute;
       const timeNote = timeOffsetHours > 0
-        ? `\n**Dự báo trong +${timeOffsetHours} giờ tới**: Hệ thống đã kích hoạt mô hình dự báo giao thông +${timeOffsetHours}h. Lưu lượng trên các trục chính hướng về **${destination}** được phân tích trực tiếp trên thanh trạng thái lộ trình.`
+        ? `\n• **Dự báo trong +${timeOffsetHours} giờ tới**: Hệ thống đã kích hoạt mô hình dự báo giao thông +${timeOffsetHours}h. Lưu lượng trên các trục chính hướng về **${destination}** được phân tích trực tiếp trên thanh trạng thái lộ trình.`
         : '';
 
       const trafficNote = activeJams.length > 0
         ? `Hiện ghi nhận **${activeJams.length} điểm ùn ứ** trong khu vực, hệ thống đã tự động ưu tiên đường vòng thông thoáng.`
         : `Hiện tại các trục đường chính tương đối thông thoáng, không ghi nhận điểm ùn tắc nghiêm trọng.`;
 
+      const avoidHypothesisNote = avoidRoad
+        ? `\n• **Tình huống giả định**: Tuyến đường **${avoidRoad}** giả định bị cấm lưu thông. MoveSafe đã kích hoạt thuật toán tìm đường vòng, loại bỏ hoàn toàn các cung đường qua **${avoidRoad}** và chọn hành lang thay thế an toàn.`
+        : '';
+
       const reply = `**Đã tự động phân tích và vẽ lộ trình trên bản đồ**\n\n` +
                     `• **Điểm xuất phát**: ${origin}\n` +
                     `• **Điểm đến**: ${destination}\n` +
-                    `• **Tình trạng giao thông**: ${trafficNote}${timeNote}\n` +
-                    `• **Chế độ điều phối**: Ưu tiên lộ trình an toàn, né hoàn toàn các điểm ngập úng và nút giao ùn tắc.\n\n` +
+                    `• **Tình trạng giao thông**: ${trafficNote}${timeNote}${avoidHypothesisNote}\n` +
+                    `• **Chế độ điều phối**: Ưu tiên lộ trình an toàn, né hoàn toàn các điểm ngập úng, nút giao ùn tắc và tuyến đường cấm giả định.\n\n` +
                     `*Bảng chi tiết lộ trình và bản đồ dẫn đường đã được mở ở phía bên trái màn hình.*`;
 
       this.addBotMessage(reply);
       if (window.appState && window.appState.triggerChatRoute) {
-        window.appState.triggerChatRoute(origin, destination, 1, timeOffsetHours);
+        const avoidList = avoidRoad ? [avoidRoad] : [];
+        window.appState.triggerChatRoute(origin, destination, 1, timeOffsetHours, avoidList);
       }
       return;
     }
 
-    // 3a1. Đề xuất địa điểm ăn uống, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
+    // 3c. Đề xuất địa điểm ăn uống, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
     if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
       const rec = typeof window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
         ? await window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, currentCity, chatContext)
@@ -625,8 +735,8 @@ class AIChat {
       return;
     }
 
-    // 3b. Kiểm tra nếu hỏi về phường hoặc trục đường cụ thể tại Hà Nội
-    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
+    // 3d. Kiểm tra nếu hỏi về thông tin hành chính phường hoặc đặc thù thoát nước tại Hà Nội (chỉ kích hoạt khi không phải câu hỏi sự kiện)
+    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA && !isEventOrCrowdQuery && (lower.includes('phường') || lower.includes('quận') || lower.includes('thoát nước') || lower.startsWith('thông tin') || lower.startsWith('thời tiết'))) {
       let matchedWard = window.HANOI_WARDS_DATA.find(w => {
         const wLower = w.name.toLowerCase();
         const rawWName = wLower.replace(/^phường\s+|^xã\s+/i, '').trim();
@@ -673,7 +783,7 @@ class AIChat {
       }
     }
 
-    // 3c. Hỏi về trạm sạc xe điện (VinFast, Open Charge Map, EVOne, Porsche, Selex, ...)
+    // 3e. Hỏi về trạm sạc xe điện (VinFast, Open Charge Map, EVOne, Porsche, Selex, ...)
     if (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('sạc điện') || lower.includes('đổi pin') || lower.includes('open charge')) {
       const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
       const fastList = stations.filter(s => s.isFastCharge || (s.maxPowerKw && s.maxPowerKw >= 50));
@@ -756,7 +866,7 @@ class AIChat {
     const alerts = liveData.weatherAlerts || [];
 
     const lower = query.toLowerCase();
-    const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe')) && !lower.includes('ngập') && !lower.includes('mưa');
+    const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe') || lower.includes('đông thế') || lower.includes('đông')) && !lower.includes('ngập') && !lower.includes('mưa');
     const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
     const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc điện') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
     const isAskingFoodOrEntertainment = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
@@ -775,6 +885,13 @@ class AIChat {
 - Đặc điểm ngập úng mùa mưa: ${matched.floodVulnerability}\n\n`;
       }
     }
+
+    // Bổ sung tri thức sự kiện văn hóa, thể thao, tụ điểm đông người tại Hà Nội & đô thị lớn
+    dynamicContext += `Tri thức bối cảnh sự kiện đô thị ${cityName}:
+- Sân vận động Quốc gia Mỹ Đình: Thường tổ chức đại nhạc hội/concert âm nhạc quy mô 30.000 - 40.000 khán giả (như Concert Anh Trai Say Hi, Anh Trai Vượt Ngàn Chông Gai, đêm nhạc ca sĩ) hoặc trận bóng đá ĐTQG Việt Nam. Khung giờ 18h - 23h lưu lượng phương tiện đổ dồn về các tuyến Lê Đức Thọ, Lê Quang Đạo, Châu Văn Liêm, Mễ Trì, Hồ Tùng Mậu gây ùn tắc giao thông cục bộ.
+- Trung tâm Hội nghị Quốc gia NCC: Các hội nghị, triển lãm quốc tế, đại nhạc hội lớn tại đại lộ Thăng Long & Phạm Hùng.
+- Phố đi bộ Hồ Gươm: Cấm phương tiện vào tối thứ 6, thứ 7, chủ nhật.\n\n`;
+
     let instructions = '';
 
     if (isAskingTrafficOnly) {
@@ -782,9 +899,13 @@ class AIChat {
 - Sự cố / tình hình ùn tắc: ${JSON.stringify(traffics.slice(0, 6).map(t => ({ description: t.description, delay_min: Math.round((t.delaySeconds || 60) / 60) })))}`;
 
       instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng hỏi về TẮC ĐƯỜNG / KẸT XE.
-2. Nếu người dùng hỏi lộ trình từ A đến B kèm câu hỏi tắc đường, hãy nhận định tình hình lưu thông trên trục đó và ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] (chỉ ghi tên địa điểm A và B ngắn gọn, không kèm cụm từ 'trong 2h tới' hay 'có bị tắc đường không').
-3. Trả lời lịch sự, rõ ràng, ngắn gọn (2-3 đoạn ngắn), KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+1. Người dùng hỏi về TẮC ĐƯỜNG / KẸT XE / ĐÔNG NGƯỜI / SỰ KIỆN GIAO THÔNG.
+2. Nếu hỏi về lý do tại sao đông người / kẹt xe (ví dụ ở SVĐ Mỹ Đình hôm qua lúc 8h tối): Hãy giải thích rõ bản chất sự kiện (đại nhạc hội / concert / bóng đá), khung giờ khán giả đổ về và các tuyến đường bị ảnh hưởng, kèm lời khuyên di chuyển thông minh. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.
+3. Nếu người dùng hỏi lộ trình hoặc có tình huống giả định cấm đường / né đường (ví dụ: 'giả sử đường Trịnh Văn Bô cấm đường...', 'cuối tuần đi từ An Trai đến Cafe Cộng đối diện SVĐ Mỹ Đình'):
+   - Nhận định tình huống giả định nếu có và đề xuất phương án đi vòng thay thế.
+   - Suy luận chính xác Điểm xuất phát (Origin) và Điểm đến (Destination) cụ thể. Điểm đến không bao giờ là từ chung chung như 'đường' hay 'đường nào'.
+   - Ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm Xuất Phát -> Điểm Đến | AVOID: Tên đường cần tránh nếu có].
+4. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
     } else if (isAskingFloodOnly) {
       const floodsForPrompt = activeFloods.length > 0 ? activeFloods : allFloods.slice(0, 5);
       dynamicContext += `Dữ liệu đo đạc ngập úng từ trạm HSDC/UDi Maps tại ${cityName} (Số điểm ngập >0cm hiện tại: ${activeFloods.length}):
@@ -825,8 +946,11 @@ ${rec.text}`;
 - Cảnh báo thời tiết: ${JSON.stringify(alerts.slice(0, 2))}`;
 
       instructions = `YÊU CẦU TRẢ LỜI:
-1. Trả lời đúng trọng tâm câu hỏi của người dùng, trình bày lịch sự, dễ đọc, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).
-2. Nếu hỏi đường đi / lộ trình từ [Điểm A] đến [Điểm B], ở dòng cuối cùng của câu trả lời hãy ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B] (chỉ trích xuất tên địa danh Điểm A và Điểm B chuẩn xác).`;
+1. Trả lời đúng trọng tâm câu hỏi của người dùng, suy luận ngữ cảnh thời gian và sự kiện, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).
+2. Nếu người dùng hỏi đường đi / lộ trình (hoặc có tình huống giả định cấm đường / né đường):
+   - Nhận diện tình huống giả định (nếu có) và hướng dẫn đường vòng thay thế.
+   - Trích xuất chính xác Điểm A và Điểm B (không bao giờ trích xuất điểm đến là từ 'đường' hay câu hỏi).
+   - Ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B | AVOID: Tên đường cần tránh nếu có].`;
     }
 
     const prompt = `Bạn là Trợ lý AI Giao Thông MoveSafe VN thông minh.
@@ -837,15 +961,18 @@ Câu hỏi của người tham gia giao thông: "${query}"
 
 ${instructions}`;
 
+    // Danh sách model Google Gemini khả dụng mới nhất (không dùng các model 1.5/2.0 đã ngưng hoạt động)
     const candidateModels = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash'
+      'gemini-flash-lite-latest',
+      'gemini-flash-latest',
+      'gemini-3.5-flash',
+      'gemini-3.8-flash'
     ];
     for (const model of candidateModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const timeoutId = setTimeout(() => controller.abort(), 4500);
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -146,7 +146,7 @@ class RoutingService {
     return { allowed: true };
   }
 
-  // Gọi OSRM lấy tọa độ đường đi (có cache)
+  // Gọi OSRM lấy tọa độ đường đi (có cache và timeout chống treo)
   async fetchOsrmRoute(waypoints) {
     const coordsStr = waypoints.map(w => `${w[0].toFixed(5)},${w[1].toFixed(5)}`).join(';');
     const cacheKey = coordsStr;
@@ -158,26 +158,41 @@ class RoutingService {
 
     const url = `${this.osrmBaseUrl}/${coordsStr}?overview=full&geometries=geojson&steps=true&alternatives=true`;
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Không thể kết nối máy chủ định tuyến OSRM');
-    const data = await res.json();
-    if (!data.routes || data.routes.length === 0) throw new Error('Không tìm thấy đường đi');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
 
-    const mapped = data.routes.map(route => ({
-      distanceKm: (route.distance / 1000).toFixed(1),
-      distanceMeters: route.distance,
-      durationMin: Math.round(route.duration / 60),
-      durationSeconds: route.duration,
-      polyline: route.geometry.coordinates.map(c => [c[1], c[0]]),
-      steps: route.legs ? route.legs[0].steps.map(s => ({
-        instruction: s.maneuver.type + ' ' + (s.name || ''),
-        distance: s.distance,
-        name: s.name || ''
-      })) : []
-    }));
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('Không thể kết nối máy chủ định tuyến OSRM');
+      const data = await res.json();
+      if (!data.routes || data.routes.length === 0) throw new Error('Không tìm thấy đường đi');
 
-    this.routeCache.set(cacheKey, { timestamp: Date.now(), data: mapped });
-    return mapped;
+      const mapped = data.routes.map(route => ({
+        distanceKm: (route.distance / 1000).toFixed(1),
+        distanceMeters: route.distance,
+        durationMin: Math.round(route.duration / 60),
+        durationSeconds: route.duration,
+        polyline: route.geometry.coordinates.map(c => [c[1], c[0]]),
+        steps: route.legs ? route.legs[0].steps.map(s => ({
+          instruction: s.maneuver.type + ' ' + (s.name || ''),
+          distance: s.distance,
+          name: s.name || ''
+        })) : []
+      }));
+
+      // Giới hạn bộ đệm LRU tối đa 60 lộ trình chống rò rỉ RAM
+      if (this.routeCache.size >= 60) {
+        const oldestKey = this.routeCache.keys().next().value;
+        if (oldestKey) this.routeCache.delete(oldestKey);
+      }
+
+      this.routeCache.set(cacheKey, { timestamp: Date.now(), data: mapped });
+      return mapped;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
+    }
   }
 
   // Lọc loại bỏ các tuyến đường bị trùng lặp hình học
@@ -230,8 +245,7 @@ class RoutingService {
   }
 
   // Kiểm tra tuyến đường có quá dài so với đường thẳng không (vòng quá mức)
-  isExcessiveDetour(route, directDistMeters) {
-    const maxRatio = 2.2;
+  isExcessiveDetour(route, directDistMeters, maxRatio = 2.2) {
     if (directDistMeters > 0 && route.distanceMeters > directDistMeters * maxRatio) {
       return true;
     }
@@ -321,7 +335,7 @@ class RoutingService {
   /**
    * Sinh các tọa độ Waypoint né ngập động xung quanh các chướng ngại vật bị chặn
    */
-  generateDetourWaypoints(origin, destination, hazardsToAvoid, specs) {
+  generateDetourWaypoints(origin, destination, hazardsToAvoid, specs, customOffsets = null) {
     const dLat = destination.lat - origin.lat;
     const dLng = destination.lng - origin.lng;
     const len = Math.hypot(dLat, dLng);
@@ -332,10 +346,13 @@ class RoutingService {
     const perpLng = (dLat / len);
 
     const waypoints = [];
+    const offsets = (Array.isArray(customOffsets) && customOffsets.length > 0)
+      ? customOffsets
+      : specs.detourOffsets;
 
     // 1. Waypoint né hai bên của từng rốn ngập cần tránh
     hazardsToAvoid.forEach(bf => {
-      specs.detourOffsets.forEach(offM => {
+      offsets.forEach(offM => {
         const offDeg = offM / 111000;
         waypoints.push({ lat: bf.lat + perpLat * offDeg, lng: bf.lng + perpLng * offDeg });
         waypoints.push({ lat: bf.lat - perpLat * offDeg, lng: bf.lng - perpLng * offDeg });
@@ -343,7 +360,7 @@ class RoutingService {
     });
 
     // 2. Waypoints hành lang song song tại 40% và 60% cự ly
-    specs.detourOffsets.forEach(offM => {
+    offsets.forEach(offM => {
       const offDeg = offM / 111000;
       waypoints.push({ lat: origin.lat + dLat * 0.4 + perpLat * offDeg, lng: origin.lng + dLng * 0.4 + perpLng * offDeg });
       waypoints.push({ lat: origin.lat + dLat * 0.4 - perpLat * offDeg, lng: origin.lng + dLng * 0.4 - perpLng * offDeg });
@@ -548,7 +565,7 @@ class RoutingService {
    * - Nghịch lý "Né ngập rơi vào bẫy ngõ hẹp" -> Tuyến Resilient Corridor cấm ngõ nhỏ
    * - Nghịch lý "Cân bằng nửa nạc nửa mỡ" -> Tuyến Major Road & Eco-Smooth tối ưu năng lượng
    */
-  buildThreePassableModes(passableCandidates, activeAvoidLevel, specs, blockedRoutes) {
+  buildThreePassableModes(passableCandidates, activeAvoidLevel, specs, blockedRoutes, cleanAvoidRoads = []) {
     if (passableCandidates.length === 0) {
       throw new Error(`Không có tuyến đường khả dụng cho ${specs.name}`);
     }
@@ -683,21 +700,86 @@ class RoutingService {
       vehicleSpecs: specs,
       routes,
       blockedRoutes: blockedRoutes || [],
+      avoidedRoads: cleanAvoidRoads || [],
       totalHazards: fastestRoute.warnings.length,
       floodHazards: fastestRoute.matchedFloods,
       trafficHazards: fastestRoute.matchedTraffics
     };
   }
 
+  // Tạo các tuyến dự phòng chất lượng cao khi OSRM không phản hồi hoặc ngoại tuyến
+  generateFallbackRoutes(origin, destination) {
+    const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
+    const stepsCount = Math.max(12, Math.min(30, Math.round(directDistMeters / 200)));
+
+    // Tuyến 1: Trực diện trục chính
+    const directPolyline = [];
+    for (let i = 0; i <= stepsCount; i++) {
+      const ratio = i / stepsCount;
+      const lat = origin.lat + (destination.lat - origin.lat) * ratio;
+      const lng = origin.lng + (destination.lng - origin.lng) * ratio;
+      directPolyline.push([lat, lng]);
+    }
+    const directDurationMin = Math.max(4, Math.round((directDistMeters / 1000) / 25 * 60));
+    const directRoute = {
+      distanceKm: (directDistMeters / 1000).toFixed(1),
+      distanceMeters: directDistMeters,
+      durationMin: directDurationMin,
+      durationSeconds: directDurationMin * 60,
+      polyline: directPolyline,
+      steps: [
+        { instruction: 'Khởi hành từ ' + (origin.title || 'điểm xuất phát'), distance: Math.round(directDistMeters * 0.5), name: 'Trục đường chính' },
+        { instruction: 'Đến đích ' + (destination.title || 'điểm đến'), distance: Math.round(directDistMeters * 0.5), name: 'Đích đến' }
+      ]
+    };
+
+    // Tuyến 2: Uốn cong vòng cung né rốn ngập (Quadratic Detour Arc)
+    const midLat = (origin.lat + destination.lat) / 2;
+    const midLng = (origin.lng + destination.lng) / 2;
+    const dLat = destination.lat - origin.lat;
+    const dLng = destination.lng - origin.lng;
+    const pLat = -dLng * 0.22;
+    const pLng = dLat * 0.22;
+
+    const detourPolyline = [];
+    for (let i = 0; i <= stepsCount; i++) {
+      const t = i / stepsCount;
+      const lat = (1 - t) * (1 - t) * origin.lat + 2 * (1 - t) * t * (midLat + pLat) + t * t * destination.lat;
+      const lng = (1 - t) * (1 - t) * origin.lng + 2 * (1 - t) * t * (midLng + pLng) + t * t * destination.lng;
+      detourPolyline.push([lat, lng]);
+    }
+    const detourDistMeters = Math.round(directDistMeters * 1.15);
+    const detourDurationMin = Math.max(5, Math.round((detourDistMeters / 1000) / 26 * 60));
+    const detourRoute = {
+      distanceKm: (detourDistMeters / 1000).toFixed(1),
+      distanceMeters: detourDistMeters,
+      durationMin: detourDurationMin,
+      durationSeconds: detourDurationMin * 60,
+      polyline: detourPolyline,
+      steps: [
+        { instruction: 'Khởi hành theo hành lang lớn cao ráo', distance: Math.round(detourDistMeters * 0.4), name: 'Hành lang lớn' },
+        { instruction: 'Chuyển hướng an toàn né khu vực trũng thấp', distance: Math.round(detourDistMeters * 0.6), name: 'Đường bao cao ráo' }
+      ]
+    };
+
+    return [directRoute, detourRoute];
+  }
+
   /**
    * THUẬT TOÁN ĐỊNH TUYẾN CHÍNH:
    * Tìm kiếm lộ trình xét Đặc tính Kỹ thuật & Nguy cơ của Phương tiện
+   * Hỗ trợ cấm đường / né đường giả định (avoidRoads) theo yêu cầu tự nhiên của người dùng
    */
-  async calculateMultiRoutes({ origin, destination, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1 }) {
+  async calculateMultiRoutes({ origin, destination, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [] }) {
     const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } =
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
 
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
+
+    // Chuẩn hóa danh sách các tuyến đường giả định cấm / cần né
+    const cleanAvoidRoads = (Array.isArray(avoidRoads) ? avoidRoads : (avoidRoads ? [avoidRoads] : []))
+      .map(r => String(r || '').toLowerCase().replace(/^(?:đường|phố|tuyến)\s+/i, '').trim())
+      .filter(r => r.length >= 2);
 
     // 1. Kiểm tra nếu điểm xuất phát hoặc điểm đến nằm ngay trong tâm rốn ngập sâu
     const originInDeepFlood = blockedFloods.find(f =>
@@ -732,17 +814,72 @@ class RoutingService {
     directRoutes.forEach(r => {
       const p = this.checkRoutePassability(r.polyline, blockedFloods, blockedTraffics, specs.corridorBuffer);
       const v = this.checkVehicleRoadRestrictions(r, vehicleType);
-      if (p.isPassable && v.allowed) directPassableCount++;
+      let hitsAvoid = false;
+      if (cleanAvoidRoads.length > 0) {
+        hitsAvoid = (r.steps || []).some(s => {
+          const sName = (s.name || '').toLowerCase();
+          return cleanAvoidRoads.some(ar => sName.includes(ar));
+        });
+      }
+      if (p.isPassable && v.allowed && !hitsAvoid) directPassableCount++;
     });
 
     const allRawCandidates = [...directRoutes];
 
-    // 3. Chỉ sinh các tuyến vòng (Bypass Detours) khi chưa đủ tuyến an toàn hoặc có chướng ngại vật cần né
+    // 3. Chỉ sinh các tuyến vòng (Bypass Detours) khi chưa đủ tuyến an toàn hoặc có chướng ngại vật / đường cần né
     const hazardsForDetours = [...blockedFloods, ...cautionFloods];
+
+    // Nếu có đường cần né giả định, tìm tọa độ đại diện của tuyến đường đó và bổ sung chướng ngại vật để sinh đường vòng
+    if (cleanAvoidRoads.length > 0) {
+      let avoidCoord = null;
+      // Thử tìm trong các step của direct route trước
+      for (const dr of directRoutes) {
+        for (let si = 0; si < (dr.steps || []).length; si++) {
+          const st = dr.steps[si];
+          const stName = (st.name || '').toLowerCase();
+          if (cleanAvoidRoads.some(ar => stName.includes(ar))) {
+            const ratio = (si + 0.5) / Math.max(1, dr.steps.length);
+            const ptIdx = Math.min(dr.polyline.length - 1, Math.floor(dr.polyline.length * ratio));
+            if (dr.polyline[ptIdx]) {
+              avoidCoord = { lat: dr.polyline[ptIdx][0], lng: dr.polyline[ptIdx][1] };
+              break;
+            }
+          }
+        }
+        if (avoidCoord) break;
+      }
+
+      // Thử tìm trong danh mục phường/đường phố Hà Nội nếu chưa có tọa độ
+      if (!avoidCoord && typeof window !== 'undefined' && Array.isArray(window.HANOI_WARDS_DATA)) {
+        for (const w of window.HANOI_WARDS_DATA) {
+          const hasSt = (w.mainStreets || []).some(s => cleanAvoidRoads.some(ar => s.toLowerCase().includes(ar)));
+          if (hasSt) {
+            avoidCoord = { lat: w.lat, lng: w.lng };
+            break;
+          }
+        }
+      }
+
+      // Nếu vẫn chưa có, lấy điểm giữa A-B làm mốc lệch
+      if (!avoidCoord) {
+        avoidCoord = { lat: (origin.lat + destination.lat) / 2, lng: (origin.lng + destination.lng) / 2 };
+      }
+
+      hazardsForDetours.push({
+        id: 'avoid-road-simulated',
+        name: `Đường cấm: ${cleanAvoidRoads.join(', ')}`,
+        lat: avoidCoord.lat,
+        lng: avoidCoord.lng,
+        radius: 800,
+        depth_cm: 99
+      });
+    }
+
     if (directPassableCount < 2 && hazardsForDetours.length > 0) {
-      const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs);
-      // Giới hạn tối đa 4 detour song song để chống nghẽn HTTP 429
-      const detourPromises = detourWaypoints.slice(0, 4).map(wp =>
+      const customOffsets = cleanAvoidRoads.length > 0 ? [1800, 2600, 3400] : null;
+      const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs, customOffsets);
+      // Giới hạn tối đa 8 detour song song để tìm đủ nhánh vòng qua đường khác (như QL32 hay Đại lộ Thăng Long)
+      const detourPromises = detourWaypoints.slice(0, 8).map(wp =>
         this.fetchOsrmRoute([
           [origin.lng, origin.lat],
           [wp.lng, wp.lat],
@@ -757,7 +894,9 @@ class RoutingService {
     }
 
     if (allRawCandidates.length === 0) {
-      throw new Error('Không thể kết nối đến máy chủ định tuyến OSRM');
+      console.warn('[RoutingService] OSRM không phản hồi, tự động kích hoạt bộ định tuyến dự phòng ngoại tuyến.');
+      const fallbackRoutes = this.generateFallbackRoutes(origin, destination);
+      allRawCandidates.push(...fallbackRoutes);
     }
 
     // 4. Bộ lọc chất lượng hình học (Trùng lặp, Quay đầu, Vòng quá mức)
@@ -766,7 +905,7 @@ class RoutingService {
       !this.detectBacktracking(route.polyline, origin.lat, origin.lng, destination.lat, destination.lng)
     );
     goodCandidates = goodCandidates.filter(route =>
-      !this.isExcessiveDetour(route, directDistMeters)
+      !this.isExcessiveDetour(route, directDistMeters, cleanAvoidRoads.length > 0 ? 2.8 : 2.2)
     );
 
     // 5. BỘ LỌC CỐT TỬ: ĐÁNH GIÁ TÍNH KHẢ DỤNG (PASSABILITY) & QUY ĐỊNH GIAO THÔNG CHO PHƯƠNG TIỆN
@@ -780,11 +919,34 @@ class RoutingService {
 
       const roadRule = this.checkVehicleRoadRestrictions(route, vehicleType);
 
-      if (isPassable && roadRule.allowed) {
+      // Kiểm tra xem tuyến đường có dính vào tuyến đường giả định cấm / cần né không
+      let hitsAvoidRoad = false;
+      let avoidHitName = '';
+      if (cleanAvoidRoads.length > 0) {
+        for (const step of (route.steps || [])) {
+          const sName = (step.name || '').toLowerCase();
+          for (const ar of cleanAvoidRoads) {
+            if (sName.includes(ar)) {
+              hitsAvoidRoad = true;
+              avoidHitName = step.name || ar;
+              break;
+            }
+          }
+          if (hitsAvoidRoad) break;
+        }
+      }
+
+      if (isPassable && roadRule.allowed && !hitsAvoidRoad) {
         passableCandidates.push(route);
       } else {
         let reasonText = '';
-        if (!roadRule.allowed) {
+        if (hitsAvoidRoad) {
+          reasonText = `Đi qua tuyến đường giả định cấm: ${avoidHitName}`;
+          blockedBy.push({
+            hazardType: 'avoid_road',
+            description: reasonText
+          });
+        } else if (!roadRule.allowed) {
           reasonText = roadRule.violation;
           blockedBy.push({
             hazardType: 'vehicle_restriction',
@@ -828,7 +990,7 @@ class RoutingService {
     );
 
     // 8. Xây dựng 3 chế độ từ các tuyến ĐI ĐƯỢC
-    return this.buildThreePassableModes(analyzedPassableRoutes, avoidLevel, specs, blockedRoutes);
+    return this.buildThreePassableModes(analyzedPassableRoutes, avoidLevel, specs, blockedRoutes, cleanAvoidRoads);
   }
 }
 

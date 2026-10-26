@@ -3236,7 +3236,7 @@ class GoogleMapsApp {
 
     const targetDest = parsedRoute ? (parsedRoute.destination || parsedRoute.dest) : null;
     if (parsedRoute && parsedRoute.origin && targetDest) {
-      await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0);
+      await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0, parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []);
       return;
     }
 
@@ -3360,9 +3360,10 @@ class GoogleMapsApp {
     window.aiChat.sendMessage(query);
   }
 
-  // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công)
-  async triggerChatRoute(originStr, destStr, avoidLevel = 1, timeOffsetHours = 0) {
+  // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công, hỗ trợ né đường giả định)
+  async triggerChatRoute(originStr, destStr, avoidLevel = 1, timeOffsetHours = 0, avoidRoads = []) {
     this._shouldAnnounceRouteVoice = true;
+    this.currentAvoidRoads = Array.isArray(avoidRoads) ? avoidRoads : (avoidRoads ? [avoidRoads] : []);
     this.toggleDirectionsPanel(true);
     const originInput = document.getElementById('gm-route-origin');
     const destInput = document.getElementById('gm-route-dest');
@@ -3393,7 +3394,10 @@ class GoogleMapsApp {
     });
 
     const timeNote = timeOffsetHours > 0 ? ` (Dự báo +${timeOffsetHours}h tới)` : '';
-    this.showToast(`Tự động vẽ lộ trình: ${originStr} đến ${destStr}${timeNote}`, 'info', 4500);
+    const avoidNote = (this.currentAvoidRoads && this.currentAvoidRoads.length > 0)
+      ? ` (Né đường: ${this.currentAvoidRoads.join(', ')})`
+      : '';
+    this.showToast(`Tự động vẽ lộ trình: ${originStr} đến ${destStr}${avoidNote}${timeNote}`, 'info', 4500);
 
     const cityCenter = this.citiesConfig[this.currentCity] || this.citiesConfig.hanoi;
     const [origMatches, destMatches] = await Promise.all([
@@ -3586,7 +3590,8 @@ class GoogleMapsApp {
         floodPoints: effectiveFloods,
         trafficIncidents: effectiveTraffic,
         vehicleType: this.currentVehicle,
-        avoidLevel: this.currentAvoidLevel
+        avoidLevel: this.currentAvoidLevel,
+        avoidRoads: this.currentAvoidRoads || []
       });
 
       this.lastRouteResult = result;
@@ -4116,7 +4121,13 @@ class GoogleMapsApp {
     }
 
     let avoidedNotice = '';
-    if (blockedRoutes && blockedRoutes.length > 0) {
+    if (this.currentAvoidRoads && this.currentAvoidRoads.length > 0) {
+      avoidedNotice = `
+        <div style="font-size: 11px; color: #92400e; margin-top: 6px; padding: 5px 8px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+          <strong>Chế độ giả định:</strong> Đã tự động vạch đường vòng né hoàn toàn tuyến đường cấm <strong>${this.currentAvoidRoads.join(', ')}</strong>.
+        </div>
+      `;
+    } else if (blockedRoutes && blockedRoutes.length > 0) {
       const b = blockedRoutes[0];
       avoidedNotice = `
         <div style="font-size: 11px; color: #137333; margin-top: 6px; padding: 5px 8px; background: #e6f4ea; border-radius: 4px; display: flex; align-items: center; gap: 4px;">

@@ -87,6 +87,12 @@ class GeocodingService {
       { title: 'Hồ Ngọc Khánh', subtitle: 'Phố Phạm Huy Thông, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0270, lng: 105.8155, city: 'hanoi', category: 'Công viên / Hồ cảnh quan', type: 'park', radiusM: 180, aliases: ['ho ngoc khanh', 'pham huy thong'] },
       { title: 'Hồ Giảng Võ', subtitle: 'Phố Trần Huy Liệu, Giảng Võ, Ba Đình, Hà Nội', lat: 21.0280, lng: 105.8200, city: 'hanoi', category: 'Công viên / Hồ cảnh quan', type: 'park', radiusM: 180, aliases: ['ho giang vo', 'tran huy lieu'] },
 
+      // Hà Nội - Thể thao & Văn hóa lớn
+      { title: 'Sân Vận Động Quốc Gia Mỹ Đình', subtitle: 'Đường Lê Đức Thọ, Mỹ Đình 1, Nam Từ Liêm, Hà Nội', lat: 21.0205, lng: 105.7638, city: 'hanoi', category: 'Sân vận động / Thể thao văn hóa', type: 'landmark', radiusM: 350, aliases: ['san van dong my dinh', 'svd my dinh', 'san my dinh', 'my dinh stadium', 'svd quoc gia my dinh'] },
+      { title: 'Cộng Cà Phê (Đối diện SVĐ Mỹ Đình)', subtitle: 'Khu liên hợp thể thao quốc gia / Lê Đức Thọ, Nam Từ Liêm, Hà Nội', lat: 21.0212, lng: 105.7655, city: 'hanoi', category: 'Quán cà phê / Âm nhạc', type: 'food', radiusM: 100, aliases: ['cong ca phe my dinh', 'cafe cong my dinh', 'cafe cong doi dien san van dong my dinh', 'cong ca phe doi dien svd my dinh', 'cafe cong le duc tho'] },
+      { title: 'Thôn An Trai (Xã Vân Canh)', subtitle: 'Thôn An Trai, Xã Vân Canh, Huyện Hoài Đức, Hà Nội', lat: 21.0312, lng: 105.7332, city: 'hanoi', category: 'Khu dân cư / Làng cổ', type: 'landmark', radiusM: 300, aliases: ['an trai', 'thon an trai', 'lang an trai'] },
+      { title: 'Khu Đô Thị Vân Canh', subtitle: 'Khu đô thị mới Vân Canh, Hoài Đức, Hà Nội', lat: 21.0295, lng: 105.7285, city: 'hanoi', category: 'Khu đô thị', type: 'landmark', radiusM: 400, aliases: ['kdt van canh', 'khu do thi van canh', 'kdt moi van canh'] },
+
       // Hà Nội - Giao thông & Nhà ga
       { title: 'Nhà Ga Cầu Giấy (Tuyến Metro Nhổn - Ga Hà Nội)', subtitle: 'Cầu Giấy / Kim Mã, Ngọc Khánh, Ba Đình, Hà Nội', lat: 21.0298, lng: 105.8038, city: 'hanoi', category: 'Nhà ga / Tuyến Metro', type: 'transit', radiusM: 150, aliases: ['ga cau giay', 'nha ga cau giay', 'metro cau giay'] },
       { title: 'Bến Xe Mỹ Đình', subtitle: '20 Phạm Hùng, Mỹ Đình 2, Nam Từ Liêm, Hà Nội', lat: 21.0286, lng: 105.7783, city: 'hanoi', category: 'Bến xe khách liên tỉnh', type: 'transit', radiusM: 200, aliases: ['bx my dinh', 'ben xe my dinh'] },
