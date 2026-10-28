@@ -170,7 +170,7 @@ class SupabaseService {
 
     // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
     try {
-      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
+      const res = await fetch((typeof window !== "undefined" && typeof window.getApiUrl === "function") ? window.getApiUrl(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`) : `/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
         const preds = json.trafficPredictions || json.traffic;
@@ -229,7 +229,7 @@ class SupabaseService {
 
     // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
     try {
-      const res = await fetch(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
+      const res = await fetch((typeof window !== "undefined" && typeof window.getApiUrl === "function") ? window.getApiUrl(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`) : `/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
         const preds = json.floodPredictions || json.floods;

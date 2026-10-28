@@ -919,7 +919,8 @@ class AIChat {
 
     // 3. Gọi Backend API Server (/api/ai/chat)
     try {
-      const res = await fetch('/api/ai/chat', {
+      const chatUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function') ? window.getApiUrl('/api/ai/chat') : '/api/ai/chat';
+      const res = await fetch(chatUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

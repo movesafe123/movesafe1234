@@ -42,6 +42,59 @@ class GeocodingService {
     // Kho địa danh trọng điểm 3 miền (Trường ĐH, Bệnh viện, Bến xe, Cầu, Hồ, Địa danh hay gõ tắt)
     // Kho địa danh trọng điểm 3 miền (Đại sứ quán, Bệnh viện, Trường ĐH, Bến xe, Ga tàu, Công viên, Khách sạn lớn)
     this.builtinLandmarks = [
+      {
+        title: 'Quán Xôi Xéo Oanh Oanh',
+        subtitle: 'Số 559 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
+        lat: 21.023647,
+        lng: 105.817328,
+        city: 'hanoi',
+        category: 'Quán ăn / Ăn sáng',
+        type: 'restaurant',
+        radiusM: 20,
+        rating: 4.6,
+        reviewsCount: 1420,
+        price: '25.000 - 55.000 đ',
+        aliases: ['xoi xeo oanh oanh', 'quan xoi xeo oanh oanh', 'xoi oanh oanh', '559 la thanh']
+      },
+      {
+        title: 'Kệ Kính Cao Cấp Đài Loan',
+        subtitle: 'Số 559 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
+        lat: 21.023647,
+        lng: 105.817328,
+        city: 'hanoi',
+        category: 'Cửa hàng / Nội thất kính',
+        type: 'shop',
+        radiusM: 20,
+        rating: 4.4,
+        reviewsCount: 38,
+        aliases: ['ke kinh dai loan', 'ke kinh cao cap dai loan', '559 la thanh']
+      },
+      {
+        title: 'Nội thất Đông Á',
+        subtitle: 'Số 561 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
+        lat: 21.023690,
+        lng: 105.817150,
+        city: 'hanoi',
+        category: 'Cửa hàng / Nội thất',
+        type: 'shop',
+        radiusM: 20,
+        rating: 4.5,
+        reviewsCount: 65,
+        aliases: ['noi that dong a', '561 la thanh']
+      },
+      {
+        title: 'Kafe Muối TL & AE',
+        subtitle: 'Số 555 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
+        lat: 21.023620,
+        lng: 105.817450,
+        city: 'hanoi',
+        category: 'Quán cà phê / Đồ uống',
+        type: 'cafe',
+        radiusM: 20,
+        rating: 4.5,
+        reviewsCount: 42,
+        aliases: ['kafe muoi tl ae', 'cafe muoi la thanh', '555 la thanh']
+      },
       // Ẩm thực & Địa điểm Đang Thịnh Hành (Trending POIs - Chuẩn Tọa Độ Google Maps)
       {
         title: 'Cơm Tấm Sà Bì Chưởng (Nguyễn Văn Tuyết)',
@@ -685,7 +738,10 @@ class GeocodingService {
 
     // 0. TẦNG 0: Thử Google Maps Stream Search nếu backend Node.js đang chạy (Tốc độ cao ~300ms, dữ liệu chính xác 100%)
     try {
-      const gRes = await fetch(`/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`, { signal: AbortSignal.timeout(2200) });
+      const searchApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl(`/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`)
+        : `/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`;
+      const gRes = await fetch(searchApiUrl, { signal: AbortSignal.timeout(2400) });
       if (gRes.ok) {
         const gj = await gRes.json();
         if (gj.status === 'success' && Array.isArray(gj.results) && gj.results.length > 0) {
@@ -1056,7 +1112,10 @@ class GeocodingService {
   async reverseGeocodeSmart(lat, lng) {
     // 0a. Thử Google Maps Stream Reverse nếu backend Node.js đang chạy
     try {
-      const gRes = await fetch(`/api/geocode/google-reverse?lat=${lat}&lng=${lng}`, { signal: AbortSignal.timeout(1800) });
+      const revApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl(`/api/geocode/google-reverse?lat=${lat}&lng=${lng}`)
+        : `/api/geocode/google-reverse?lat=${lat}&lng=${lng}`;
+      const gRes = await fetch(revApiUrl, { signal: AbortSignal.timeout(2400) });
       if (gRes.ok) {
         const gj = await gRes.json();
         if (gj.status === 'success' && gj.exactMatch) {
@@ -1085,18 +1144,18 @@ class GeocodingService {
     } catch {}
 
     // 0b. Quét kiểm tra Địa danh / Cơ quan / Trường học / Bệnh viện / Đại sứ quán trọng điểm trong CSDL (tìm điểm gần nhất trong bán kính)
-    let closestLm = null;
-    let minLmDist = Infinity;
+    const nearbyLms = [];
     for (const lm of this.builtinLandmarks) {
       if (lm.lat && lm.lng) {
         const dM = this._calcDistanceM(lat, lng, lm.lat, lm.lng);
         const maxRadius = lm.radiusM || 150;
-        if (dM <= maxRadius && dM < minLmDist) {
-          minLmDist = dM;
-          closestLm = lm;
+        if (dM <= maxRadius) {
+          nearbyLms.push({ ...lm, distM: Math.round(dM) });
         }
       }
     }
+    nearbyLms.sort((a, b) => a.distM - b.distM);
+    const closestLm = nearbyLms[0] || null;
 
     if (closestLm) {
       const plusCode = this.getPlusCode(lat, lng, closestLm.subtitle);
@@ -1117,7 +1176,19 @@ class GeocodingService {
         plusCode,
         rating: closestLm.rating || 4.6,
         reviewsCount: closestLm.reviewsCount || 128,
-        price: null
+        price: closestLm.price || null,
+        nearbyCandidates: (nearbyLms || []).slice(1, 5).map(l => ({
+          title: l.title,
+          subtitle: l.subtitle,
+          category: l.category,
+          type: l.type,
+          lat: l.lat,
+          lng: l.lng,
+          rating: l.rating,
+          reviewsCount: l.reviewsCount,
+          price: l.price,
+          distM: l.distM
+        }))
       };
     }
 

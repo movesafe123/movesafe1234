@@ -1130,12 +1130,24 @@
 
     // 6. Khu vực Ba Đình
     badinh: {
-      aliases: ['ba đình', 'ba dinh', 'đội cấn', 'doi can', 'liễu giai', 'lieu giai', 'kim mã', 'kim ma', 'giảng võ', 'giang vo', 'hồ giảng võ', 'lăng bác', 'lang bac', 'phan đình phùng', 'lotte liễu giai'],
+      aliases: ['ba đình', 'ba dinh', 'đội cấn', 'doi can', 'liễu giai', 'lieu giai', 'kim mã', 'kim ma', 'giảng võ', 'giang vo', 'hồ giảng võ', 'lăng bác', 'lang bac', 'phan đình phùng', 'lotte liễu giai', 'xôi xéo oanh oanh', 'xoi xeo oanh oanh', 'la thành', 'la thanh', '559 la thành', '559 la thanh'],
       title: 'Khu vực Quận Ba Đình (Hà Nội)',
       lat: 21.0335,
       lng: 105.8235,
       highlight: 'Khu trung tâm hành chính lịch thiệp, đài quan sát Landmark Lotte Center, rạp chiếu phim sang trọng và món ngon Đội Cấn.',
       spots: [
+        {
+          name: 'Quán Xôi Xéo Oanh Oanh (La Thành)',
+          address: '559 La Thành, P. Thành Công, Q. Ba Đình, Hà Nội',
+          lat: 21.023647,
+          lng: 105.817328,
+          feature: 'Xôi xéo hạt mẩy dẻo thơm nước mỡ hành phi giòn rụm, đỗ xanh béo bùi xắt mỏng, kèm chả mỡ, thịt kho tàu mềm rục.',
+          vibe: 'Quán xôi sáng và tối nức tiếng phố La Thành, khách mua tấp nập mang về.',
+          price: '25.000đ - 55.000đ/hộp',
+          rating: 4.6,
+          reviewsCount: 1420,
+          category: 'food'
+        },
         {
           name: 'Bánh Xèo & Nem Lụi Đội Cấn',
           address: '166B Đội Cấn, P. Đội Cấn, Q. Ba Đình',

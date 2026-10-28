@@ -1,3 +1,16 @@
+// Smart API Resolver: Định tuyến thông minh sang Backend Cloud Render khi chạy trên GitHub Pages
+if (typeof window !== 'undefined' && typeof window.getApiUrl !== 'function') {
+  window.MOVESAFE_API_URL = localStorage.getItem('movesafe_api_url') || 'https://movesafe1234.onrender.com';
+  window.getApiUrl = function(endpoint) {
+    if (!endpoint) return '';
+    var cleanPath = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname.includes('github.io');
+    if (isLocal) return cleanPath;
+    var base = (window.MOVESAFE_API_URL || 'https://movesafe1234.onrender.com').replace(/\/+$/, '');
+    return base + cleanPath;
+  };
+}
+
 /**
  * App.js - Bộ điều khiển trung tâm trải nghiệm người dùng chuẩn Google Maps
  * MoveSafe VN: Bản đồ toàn màn hình, thanh tìm kiếm nổi, điều hướng né ngập & Vòng lặp cập nhật 24/24 trên Cloud

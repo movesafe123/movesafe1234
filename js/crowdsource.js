@@ -94,7 +94,8 @@ class CrowdsourceService {
   // Xác thực cộng đồng (Vote Up: Vẫn ngập/tắc; Vote Down: Đã thông thoáng)
   async voteReport(reportId, voteType) {
     try {
-      const res = await fetch('/api/crowdsource/vote', {
+      const voteUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function') ? window.getApiUrl('/api/crowdsource/vote') : '/api/crowdsource/vote';
+      const res = await fetch(voteUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: reportId, voteType: voteType === 'up' ? 'confirm' : 'clear' })
@@ -135,7 +136,8 @@ class CrowdsourceService {
     let reportData = null;
 
     try {
-      const res = await fetch('/api/crowdsource/report', {
+      const repUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function') ? window.getApiUrl('/api/crowdsource/report') : '/api/crowdsource/report';
+      const res = await fetch(repUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
