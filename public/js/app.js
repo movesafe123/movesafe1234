@@ -1517,7 +1517,7 @@ class GoogleMapsApp {
         // 1. Quét đối chiếu nhanh với CSDL nội bộ: Ẩm thực, Trú mưa, Trạm sạc EV
         const allSpots = this.getAllFoodSpots();
         let matchedSpot = null;
-        let minD = 0.035; // 35 mét
+        let minD = 0.018; // 18 mét (thu hẹp bán kính để không nuốt nhầm quán lân cận)
         for (const sp of allSpots) {
           if (sp.lat && sp.lng) {
             const d = this._calcDistanceKm(lat, lng, sp.lat, sp.lng);
@@ -1584,8 +1584,8 @@ class GoogleMapsApp {
         }
 
         if (matchedSpot) {
-          const pinLat = matchedSpot.lat;
-          const pinLng = matchedSpot.lng;
+          const pinLat = lat; // Đóng băng ghim đỏ chuẩn xác 100% tại điểm click chuột
+          const pinLng = lng;
           const icon = L.divIcon({
             className: 'gm-marker-container',
             html: `<div class="gm-route-pin pin-dest" style="cursor: pointer; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);">•</div>`,
@@ -1616,7 +1616,7 @@ class GoogleMapsApp {
             iconSize: [30, 30],
             iconAnchor: [15, 15]
           });
-          this._tempClickMarker = L.marker([smartPlace.lat || lat, smartPlace.lng || lng], { icon }).addTo(window.mapEngine.map);
+          this._tempClickMarker = L.marker([lat, lng], { icon }).addTo(window.mapEngine.map);
           this._tempClickMarker.on('click', () => this.openPlaceDetailsCard(smartPlace));
 
           this.openPlaceDetailsCard(smartPlace);
@@ -3024,14 +3024,20 @@ class GoogleMapsApp {
       });
     }
 
-    // 2. Gợi ý các quán ăn / điểm vui chơi khớp tên trực tiếp từ toàn bộ CSDL
+    // 2. Gợi ý các quán ăn / điểm vui chơi khớp tên trực tiếp từ toàn bộ CSDL (hỗ trợ sửa lỗi chính tả & không dấu)
     const allFoodSpots = this.getAllFoodSpots();
+    const cleanNorm = (window.geocodingService ? window.geocodingService.normalizeVietnameseQuery(clean) : clean).toLowerCase();
+    const cleanNoAccent = window.geocodingService ? window.geocodingService.removeAccents(cleanNorm) : cleanNorm;
     for (const spot of allFoodSpots) {
       if (spot.city && spot.city !== this.currentCity) continue;
+      const spNameNorm = (spot.name || '').toLowerCase();
+      const spNameNoAccent = window.geocodingService ? window.geocodingService.removeAccents(spNameNorm) : spNameNorm;
+      const spAddrNoAccent = window.geocodingService ? window.geocodingService.removeAccents((spot.address || '').toLowerCase()) : (spot.address || '').toLowerCase();
       if (
-        spot.name.toLowerCase().includes(lower) ||
-        (spot.specialty && spot.specialty.toLowerCase().includes(lower)) ||
-        (spot.address && spot.address.toLowerCase().includes(lower))
+        spNameNoAccent.includes(cleanNoAccent) ||
+        cleanNoAccent.includes(spNameNoAccent) ||
+        spAddrNoAccent.includes(cleanNoAccent) ||
+        (spot.specialty && window.geocodingService && window.geocodingService.removeAccents(spot.specialty.toLowerCase()).includes(cleanNoAccent))
       ) {
         suggestions.push({
           type: 'spot',
@@ -3255,12 +3261,14 @@ class GoogleMapsApp {
       return;
     }
 
-    // 0a. Nếu người dùng tìm kiếm trực tiếp một địa điểm ẩm thực / POI cụ thể trong CSDL (ví dụ: Bunenu Minh Khai, Phở Thìn, CGV...)
+    // 0a. Nếu người dùng tìm kiếm trực tiếp một địa điểm ẩm thực / POI cụ thể trong CSDL (ví dụ: Bunenu Minh Khai, Phở Thìn, CGV, Sà Bì Chưởng...)
     const allSpots = this.getAllFoodSpots();
-    const queryNorm = window.geocodingService ? window.geocodingService.removeAccents(lower) : lower;
+    const queryClean = window.geocodingService ? window.geocodingService.normalizeVietnameseQuery(lower) : lower;
+    const queryNorm = window.geocodingService ? window.geocodingService.removeAccents(queryClean) : queryClean;
     const directSpot = allSpots.find(sp => {
-      const spNameNorm = window.geocodingService ? window.geocodingService.removeAccents((sp.name || '').toLowerCase()) : (sp.name || '').toLowerCase();
-      return queryNorm.includes(spNameNorm) || (queryNorm.length >= 6 && spNameNorm.includes(queryNorm));
+      const spNameClean = (sp.name || '').toLowerCase();
+      const spNameNorm = window.geocodingService ? window.geocodingService.removeAccents(spNameClean) : spNameClean;
+      return queryNorm.includes(spNameNorm) || spNameNorm.includes(queryNorm) || (queryNorm.length >= 6 && spNameNorm.includes(queryNorm));
     });
     if (directSpot) {
       if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
@@ -3271,10 +3279,10 @@ class GoogleMapsApp {
       return;
     }
 
-    // 0b. Nếu là câu hỏi ẩm thực, vui chơi hoặc câu hỏi tự nhiên (có ... không, quán nào, ăn gì...) -> mở AI Chat & ghim bản đồ
-    const isFoodQuery = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
+    // 0b. Nếu là câu hỏi ẩm thực / vui chơi dạng khám phá tự nhiên (quán nào ngon, ăn gì, chơi gì, ở đâu, tắc không...) -> mở AI Chat & ghim bản đồ
+    const isExploratoryFood = /(quán\s+nào|ăn\s+gì|chơi\s+gì|uống\s+gì|ở\s+đâu\s+ngon|gợi\s+ý|quanh\s+đây|gần\s+đây|tìm\s+quán)/i.test(lower);
     const isNaturalQuestion = /(có\s+.*(không|ko|k\b|chưa)|quán\s+nào|ăn\s+gì|chơi\s+gì|ở\s+đâu\s+ngon|đi\s+đường\s+nào|tắc\s+không|ngập\s+không|\?)/i.test(lower);
-    if (isFoodQuery || isNaturalQuestion) {
+    if (isExploratoryFood || isNaturalQuestion) {
       window.aiChat.open();
       window.aiChat.sendMessage(query);
       return;
@@ -5397,6 +5405,40 @@ class GoogleMapsApp {
 
     if (titleEl) titleEl.textContent = name;
     if (subtitleEl) subtitleEl.textContent = data.subtitle || data.vibe || (isAddressOrStreet ? 'Vị trí địa chỉ đô thị' : 'Khu vực hoạt động & dịch vụ');
+
+    // Hiển thị các cơ sở / quán xá lân cận khác (Nearby Candidate Chips) nếu có
+    const candRow = document.getElementById('gm-place-candidates-row');
+    if (candRow) {
+      if (Array.isArray(data.nearbyCandidates) && data.nearbyCandidates.length > 0) {
+        candRow.style.display = 'flex';
+        candRow.innerHTML = `<div class="gm-nearby-candidates-label">Địa điểm lân cận:</div>` +
+          data.nearbyCandidates.map(c => `
+            <button type="button" class="gm-cand-chip" data-title="${c.title}" data-lat="${c.lat}" data-lng="${c.lng}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>${c.title}</span>
+            </button>
+          `).join('');
+        candRow.querySelectorAll('.gm-cand-chip').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const cTitle = btn.getAttribute('data-title');
+            const cLat = parseFloat(btn.getAttribute('data-lat'));
+            const cLng = parseFloat(btn.getAttribute('data-lng'));
+            const candObj = data.nearbyCandidates.find(c => c.title === cTitle) || { title: cTitle, lat: cLat, lng: cLng };
+            this.openPlaceDetailsCard({
+              ...candObj,
+              name: candObj.title,
+              isPoi: true,
+              type: 'restaurant',
+              category: candObj.category || 'Quán ăn / Nhà hàng'
+            });
+          });
+        });
+      } else {
+        candRow.style.display = 'none';
+        candRow.innerHTML = '';
+      }
+    }
 
     // Huy hiệu danh mục (Badge Category) linh hoạt theo từng loại
     let catLabel = data.category || data.typeName;

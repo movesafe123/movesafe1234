@@ -6453,3 +6453,64 @@ body.dark-mode .gm-chat-bubble.proactive-alert,
   background: #2b1d1d;
   border-left-color: #ef4444;
 }
+
+/* Hàng chip các địa điểm lân cận trong Place Card */
+.gm-place-candidates-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 0 4px;
+  border-top: 1px dashed #e2e8f0;
+}
+.gm-nearby-candidates-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  width: 100%;
+  margin-bottom: 2px;
+}
+.gm-cand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.gm-cand-chip:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+.gm-cand-chip svg {
+  color: #ea580c;
+  flex-shrink: 0;
+}
+body.dark-mode .gm-place-candidates-row,
+[data-theme="dark"] .gm-place-candidates-row {
+  border-top-color: #334155;
+}
+body.dark-mode .gm-nearby-candidates-label,
+[data-theme="dark"] .gm-nearby-candidates-label {
+  color: #94a3b8;
+}
+body.dark-mode .gm-cand-chip,
+[data-theme="dark"] .gm-cand-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+body.dark-mode .gm-cand-chip:hover,
+[data-theme="dark"] .gm-cand-chip:hover {
+  background: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}

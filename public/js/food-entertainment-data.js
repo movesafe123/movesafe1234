@@ -27,6 +27,7 @@
     if (!str) return '';
     let s = String(str).toLowerCase().trim();
     // Khử ký tự lặp từ 3 lần trở lên bất kỳ (ví dụ: "ngonnn" -> "ngon")
+    s = s.replace(/sài\s+bì\s+chưởng/gi, "sà bì chưởng").replace(/sai\s+bi\s+chuong/gi, "sà bì chưởng").replace(/xà\s+bì\s+chưởng/gi, "sà bì chưởng");
     s = s.replace(/(.)\1{2,}/g, '$1');
     // Khử ký tự lặp đôi ở cuối từ tiếng Việt (trừ các từ tiếng Anh phổ biến như coffee, free, tree, bee, mall, Grill, Bell)
     s = s.replace(/([a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])\1(?=$|\s|[,.?!])/gi, function(match, ch) {
@@ -943,12 +944,24 @@
 
     // 4. Khu vực Đống Đa (Xã Đàn - Phạm Ngọc Thạch - Chùa Bộc - Tây Sơn)
     dongda: {
-      aliases: ['đống đa', 'dong da', 'xã đàn', 'xa dan', 'láng hạ', 'lang ha', 'đặng văn ngữ', 'hồ đắc di', 'nam đồng', 'khâm thiên'],
+      aliases: ['đống đa', 'dong da', 'xã đàn', 'xa dan', 'láng hạ', 'lang ha', 'đặng văn ngữ', 'hồ đắc di', 'nam đồng', 'khâm thiên', 'nguyễn văn tuyết', 'nguyen van tuyet', 'sà bì chưởng', 'sa bi chuong', 'sài bì chưởng', 'sai bi chuong', 'độ mixi'],
       title: 'Khu vực Quận Đống Đa (Hà Nội)',
       lat: 21.0145,
       lng: 105.8285,
       highlight: 'Tổ hợp mua sắm, thời trang sinh viên Chùa Bộc - Phạm Ngọc Thạch, rạp phim hiện đại và các tuyến phố ẩm thực sầm uất.',
       spots: [
+        {
+          name: 'Cơm Tấm Sà Bì Chưởng (Đống Đa)',
+          address: '86 Nguyễn Văn Tuyết, P. Trung Liệt, Q. Đống Đa, Hà Nội',
+          lat: 21.009288,
+          lng: 105.820635,
+          feature: 'Cơm tấm sườn bì chưởng đặc biệt, sườn nướng mật ong mềm thơm, chả trứng béo bùi, tóp mỡ da heo chiên giòn, nước mắm kẹo đậm đà.',
+          vibe: 'Quán ăn thương hiệu nổi tiếng của bộ ba Độ Mixi - PewPew - Xemesis, không gian hiện đại, máy lạnh mát mẻ.',
+          price: '45.000đ - 110.000đ/suất',
+          rating: 4.7,
+          reviewsCount: 8264,
+          category: 'food'
+        },
         {
           name: 'Lẩu Ếch Măng Cay & Lẩu Riêu Cua Xã Đàn',
           address: 'Đường Xã Đàn & Đê La Thành, Q. Đống Đa',
@@ -1241,12 +1254,24 @@
 
     // 7. TP. Hồ Chí Minh
     hcm: {
-      aliases: ['hcm', 'sài gòn', 'sai gon', 'quận 1', 'quan 1', 'quận 3', 'quan 3', 'bến thành', 'ben thanh', 'bùi viện', 'bui vien', 'nguyễn huệ', 'nguyen hue'],
+      aliases: ['hcm', 'sài gòn', 'sai gon', 'quận 1', 'quan 1', 'quận 3', 'quan 3', 'bến thành', 'ben thanh', 'bùi viện', 'bui vien', 'nguyễn huệ', 'nguyen hue', 'sà bì chưởng', 'sa bi chuong', 'sài bì chưởng', 'sai bi chuong'],
       title: 'Trung tâm Quận 1 & TP. Hồ Chí Minh',
       lat: 10.7769,
       lng: 106.7009,
       highlight: 'Thiên đường ẩm thực phương Nam không ngủ, cà phê bệt Nhà thờ Đức Bà, cụm rạp phim Vincom và phố đi bộ Nguyễn Huệ sôi động.',
       spots: [
+        {
+          name: 'Cơm Tấm Sà Bì Chưởng (Quận 5)',
+          address: '179 Trần Bình Trọng, Phường 3, Quận 5, TP.HCM',
+          lat: 10.7578,
+          lng: 106.6806,
+          feature: 'Cơm tấm sườn cốt lết tảng dày nướng than thơm lừng, bì sợi dai giòn, chả trứng vàng ươm, canh rong biển.',
+          vibe: 'Cơ sở Sài Gòn đầu tiên của bộ ba Độ Mixi, PewPew, Xemesis, tấp nập khách.',
+          price: '45.000đ - 110.000đ/suất',
+          rating: 4.6,
+          reviewsCount: 6500,
+          category: 'food'
+        },
         {
           name: 'Cơm Tấm Ba Ghiền & Cơm Tấm Phúc Lộc Thọ',
           address: '84 Đặng Văn Ngữ, Q. Phú Nhuận / Chuỗi Q.1, TP.HCM',
@@ -1303,12 +1328,24 @@
 
     // 8. Đà Nẵng
     danang: {
-      aliases: ['đà nẵng', 'da nang', 'hải châu', 'hai chau', 'sơn trà', 'son tra', 'cầu rồng', 'cau rong', 'mỹ khê', 'my khe'],
+      aliases: ['đà nẵng', 'da nang', 'hải châu', 'hai chau', 'sơn trà', 'son tra', 'cầu rồng', 'cau rong', 'mỹ khê', 'my khe', 'sà bì chưởng', 'sa bi chuong', 'sài bì chưởng', 'sai bi chuong'],
       title: 'Trung tâm Quận Hải Châu & Bãi Biển Mỹ Khê (Đà Nẵng)',
       lat: 16.0678,
       lng: 108.2208,
       highlight: 'Thiên đường ẩm thực miền Trung đậm đà, rạp chiếu phim hiện đại, show cầu Rồng phun lửa và bãi biển quyến rũ nhất hành tinh.',
       spots: [
+        {
+          name: 'Cơm Tấm Sà Bì Chưởng (Đà Nẵng)',
+          address: '68 Bình Minh 5, P. Bình Thuận, Q. Hải Châu, Đà Nẵng',
+          lat: 16.0526,
+          lng: 108.2238,
+          feature: 'Cơm tấm sườn nướng thảo mộc mềm ngọt, chả trứng đúc hấp dẫn, đồ chua giòn thanh.',
+          vibe: 'Không gian rộng rãi 2 tầng, điều hòa mát lạnh, nhân viên phục vụ chu đáo.',
+          price: '45.000đ - 110.000đ/suất',
+          rating: 4.7,
+          reviewsCount: 3200,
+          category: 'food'
+        },
         {
           name: 'Bánh Tráng Cuốn Thịt Heo Đại Lộc',
           address: '97 Trưng Nữ Vương, Q. Hải Châu, TP. Đà Nẵng',

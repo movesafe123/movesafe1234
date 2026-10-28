@@ -240,6 +240,137 @@ app.post('/api/crowdsource/vote', reportLimiter, (req, res) => {
 });
 
 // 5. API Trợ lý AI Thông Minh
+
+// 5.1 API Tra cứu Địa điểm Google Maps Công Khai (Zero API Key - Tốc độ cao ~300ms)
+function parseGoogleTbmMapPayload(txt, refLat = null, refLng = null) {
+  if (!txt || typeof txt !== 'string') return [];
+  const results = [];
+  const seen = new Set();
+  const re = /\[null,null,(-?\d+\.\d+),(-?\d+\.\d+)\],\s*"(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)",\s*"((?:[^"\\]|\\.)+)"/g;
+  let m;
+  while ((m = re.exec(txt)) !== null) {
+    const lat = parseFloat(m[1]);
+    const lng = parseFloat(m[2]);
+    const cid = m[3];
+    let rawTitle = '';
+    try { rawTitle = JSON.parse(`"${m[4]}"`); } catch { rawTitle = m[4]; }
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !rawTitle) continue;
+    if (seen.has(cid)) continue;
+    seen.add(cid);
+
+    const beforeSlice = txt.slice(Math.max(0, m.index - 180), m.index);
+    const afterSlice = txt.slice(m.index + m[0].length, m.index + m[0].length + 650);
+
+    let rating = null;
+    let reviewsCount = null;
+    const rateMatch = beforeSlice.match(/,(\d\.\d),(\d+)\],null,null,null,null,$/);
+    if (rateMatch) {
+      rating = parseFloat(rateMatch[1]);
+      reviewsCount = parseInt(rateMatch[2], 10);
+    }
+
+    let category = 'Địa điểm';
+    const catMatch = afterSlice.match(/^,\s*null,\s*\["((?:[^"\\]|\\.)+)"/);
+    if (catMatch) {
+      try { category = JSON.parse(`"${catMatch[1]}"`); } catch {}
+    }
+
+    let address = '';
+    const strMatches = [...afterSlice.matchAll(/"((?:[^"\\]|\\.)+)"/g)].map(x => {
+      try { return JSON.parse(`"${x[1]}"`); } catch { return x[1]; }
+    });
+    for (const s of strMatches) {
+      if (s.length > rawTitle.length + 5 && (s.includes(',') || s.includes('Hà Nội') || s.includes('Hồ Chí Minh') || s.includes('Đà Nẵng') || s.includes('Việt Nam'))) {
+        address = s.replace(/^.*?\b(?=\d+\s+|\bNgõ\b|\bPhố\b|\bĐường\b)/, '');
+        if (!address || address.length < 6) address = s;
+        break;
+      }
+    }
+    if (address.startsWith(rawTitle + ', ')) {
+      address = address.slice(rawTitle.length + 2).trim();
+    }
+
+    const distM = (Number.isFinite(refLat) && Number.isFinite(refLng))
+      ? Math.round(Math.hypot((lat - refLat) * 111320, (lng - refLng) * 104000))
+      : null;
+
+    results.push({
+      title: rawTitle,
+      subtitle: address || category,
+      fullAddress: address ? `${rawTitle}, ${address}` : rawTitle,
+      category,
+      lat,
+      lng,
+      rating,
+      reviewsCount,
+      distM,
+      source: 'google-map-stream'
+    });
+  }
+  return results;
+}
+
+app.get('/api/geocode/google-search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q || q.length < 2) return res.json({ status: 'success', results: [] });
+
+  const refLat = req.query.lat ? parseFloat(req.query.lat) : null;
+  const refLng = req.query.lng ? parseFloat(req.query.lng) : null;
+  const cityName = req.query.city === 'hcm' ? 'Hồ Chí Minh' : (req.query.city === 'danang' ? 'Đà Nẵng' : 'Hà Nội');
+  const fullQ = q.includes(cityName) ? q : `${q} ${cityName}`;
+
+  try {
+    const url = 'https://www.google.com/search?tbm=map&authuser=0&hl=vi&gl=vn&q=' + encodeURIComponent(fullQ);
+    const gRes = await axios.get(url, {
+      timeout: 3800,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+    });
+    const parsed = parseGoogleTbmMapPayload(gRes.data, refLat, refLng);
+    res.json({ status: 'success', results: parsed });
+  } catch (err) {
+    res.json({ status: 'fallback', results: [], message: err.message });
+  }
+});
+
+app.get('/api/geocode/google-reverse', async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return res.status(400).json({ status: 'error', message: 'Tọa độ không hợp lệ' });
+  }
+
+  try {
+    const pb = `!4m12!1m3!1d55!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i600!2i600!4f13.1!7i15!10b1`;
+    const searchTasks = ['quán ăn', 'cửa hàng', 'công ty'].map(term =>
+      axios.get(`https://www.google.com/search?tbm=map&authuser=0&hl=vi&gl=vn&pb=${pb}&q=${encodeURIComponent(term)}`, {
+        timeout: 3500,
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      }).then(r => parseGoogleTbmMapPayload(r.data, lat, lng)).catch(() => [])
+    );
+
+    const batches = await Promise.all(searchTasks);
+    const all = batches.flat();
+    const seen = new Set();
+    const unique = [];
+    for (const item of all) {
+      if (!seen.has(item.title)) {
+        seen.add(item.title);
+        unique.push(item);
+      }
+    }
+    unique.sort((a, b) => (a.distM || 999) - (b.distM || 999));
+
+    const exactMatch = unique.find(p => (p.distM || 999) <= 22) || null;
+    res.json({
+      status: 'success',
+      exactMatch,
+      nearbyCandidates: unique.slice(0, 5)
+    });
+  } catch (err) {
+    res.json({ status: 'fallback', exactMatch: null, nearbyCandidates: [], message: err.message });
+  }
+});
+
 app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
   try {
     const { query, city, apiKey, context } = req.body;
