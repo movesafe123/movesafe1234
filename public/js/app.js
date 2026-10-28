@@ -596,6 +596,11 @@ class GoogleMapsApp {
     this.renderAllData();
     if (this.isDirectionsOpen) {
       this.calculateSmartRoute();
+      if (this.isSimulationMode && this.lastRouteResult) {
+        setTimeout(() => {
+          window.aiChat?.triggerProactiveHazardAlert?.(this.lastRouteResult, this.getCurrentFloods());
+        }, 800);
+      }
     }
     const depths = newFloods.map(f => f.depth_cm);
     const minD = Math.min(...depths);
@@ -1464,11 +1469,21 @@ class GoogleMapsApp {
 
     // Click lên bản đồ sẽ tự động đóng AI chat, menu lớp hoặc chọn điểm đi/đến (hoặc hiện POI)
     window.mapEngine.map?.on('click', async (e) => {
-      window.aiChat.close();
       document.getElementById('gm-layer-menu')?.classList.remove('open');
 
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
+
+      // 1-Click Spatial Radar Lens: Chấm Bản Đồ Hỏi AI Ngay (Đột phá 6.5)
+      if (window.aiChat && window.aiChat.isPickingSpatialPoint) {
+        window.aiChat.analyzePickedMapPoint(lat, lng);
+        return;
+      }
+
+      // Chỉ đóng AI chat trên màn hình điện thoại/tablet nhỏ khi click bản đồ
+      if (window.innerWidth < 1100 && window.aiChat && window.aiChat.isOpen) {
+        window.aiChat.close();
+      }
 
       if (this.pickingLocationType) {
         const type = this.pickingLocationType;
@@ -5403,6 +5418,20 @@ class GoogleMapsApp {
     }
     if (badgeCategory) badgeCategory.textContent = catLabel;
 
+    // Đồng bộ địa điểm vừa xem vào trí nhớ không gian của AI (Spatial Entity Graph)
+    if (window.aiChat && window.aiChat.sessionMemory) {
+      window.aiChat.sessionMemory.lastInspectedPlace = {
+        name,
+        lat,
+        lng,
+        address: data.address || data.fullAddress || '',
+        category: catLabel
+      };
+      if (typeof window.aiChat.updateMemoryBarUI === 'function') {
+        window.aiChat.updateMemoryBarUI();
+      }
+    }
+
     // Banner ảnh thực tế theo thể loại
     if (imgEl) {
       if (data.image) {
@@ -5538,6 +5567,16 @@ class GoogleMapsApp {
     }
 
     // Gán sự kiện nút tròn hành động
+    const askAiBtn = document.getElementById('btn-place-ask-ai');
+    if (askAiBtn) {
+      askAiBtn.onclick = () => {
+        if (window.aiChat) {
+          window.aiChat.open();
+          window.aiChat.analyzeSpecificPlace(lat, lng, name, data.address || '');
+        }
+      };
+    }
+
     const routeBtn = document.getElementById('btn-place-route');
     if (routeBtn) {
       routeBtn.onclick = () => {
@@ -5815,6 +5854,25 @@ class GoogleMapsApp {
         Bán kính 1.5km có sẵn <strong>${evNearCount} trạm sạc EV</strong> và <strong>${foodNearCount} điểm dịch vụ ẩm thực/tiện ích</strong> — Rất an tâm để an cư lâu dài hoặc kinh doanh mặt bằng.
       `;
     }
+
+    this._lastPropertyEvaluation = {
+      targetName,
+      targetLat,
+      targetLng,
+      totalScore,
+      grade,
+      verdict,
+      elevationM,
+      minDistM,
+      nearestFloodName: nearestFlood ? nearestFlood.name : 'Không có',
+      floodScore,
+      mobilityScore,
+      infraScore,
+      lifestyleScore,
+      evNearCount,
+      sheltersNearCount: sheltersNear.length,
+      foodNearCount
+    };
 
     this._lastPropertyReportText = `[PHIẾU KHẢO SÁT AN CƯ & MẶT BẰNG - MOVESAFE VN]\n- Địa điểm: ${targetName} (${targetLat.toFixed(5)}, ${targetLng.toFixed(5)})\n- Tổng điểm: ${totalScore}/100 (Hạng ${grade} - ${verdict})\n- Cốt nền vệ tinh: +${elevationM}m so với mực nước biển\n- Khoảng cách tới rốn ngập lịch sử gần nhất: ${minDistM}m (${nearestFlood?.name || 'Không có'})\n- Bán kính 1.5km: ${evNearCount} Trạm sạc EV, ${sheltersNear.length} Điểm gửi xe cao ráo, ${foodNearCount} Tiện ích ẩm thực/TTTM.`;
 

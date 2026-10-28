@@ -481,6 +481,13 @@
           <span>Chống ngập</span>
         </button>
 
+        <button type="button" class="gm-place-circle-action ai-ask" id="btn-place-ask-ai" title="Hỏi Trợ lý AI phân tích toàn diện điểm này">
+          <div class="gm-place-circle-icon" style="background:#eff6ff;color:#1a73e8;border-color:#bfdbfe;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M8 10h.01"></path><path d="M12 10h.01"></path><path d="M16 10h.01"></path></svg>
+          </div>
+          <span>Hỏi AI</span>
+        </button>
+
         <button type="button" class="gm-place-circle-action" id="btn-place-share" title="Chia sẻ tọa độ">
           <div class="gm-place-circle-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -769,7 +776,18 @@
       <!-- Chat bubbles render tại đây -->
     </div>
 
+    <!-- Thanh trạng thái ngữ cảnh đang nhớ -->
+    <div class="gm-ai-memory-bar" id="ai-memory-bar" style="display: none;">
+      <div class="gm-ai-memory-content" id="ai-memory-text"></div>
+      <button type="button" class="gm-ai-memory-clear" onclick="window.aiChat && window.aiChat.resetSessionMemory()" title="Xóa ngữ cảnh đang nhớ">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
     <div class="gm-ai-footer">
+      <button type="button" class="gm-btn-text-sm" id="btn-chat-map-pick" onclick="window.aiChat && window.aiChat.toggleSpatialLensPick()" title="Chấm 1 điểm bất kỳ trên bản đồ để AI phân tích thực địa 360°">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+      </button>
       <input 
         type="text" 
         class="gm-ai-input" 

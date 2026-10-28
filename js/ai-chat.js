@@ -1,5 +1,7 @@
 /**
- * AIChat - Giao diện và logic tương tác Trợ lý AI Copilot
+ * MoveSafe VN - AI Spatial Copilot (AIChat)
+ * Trợ lý Không gian & Giao thông Đa nhiệm kết nối 100% hệ thống Web MoveSafe VN
+ * Tuân thủ nghiêm ngặt Icon Policy (AGENTS.md): 100% SVG Line Icons, 0% emoji
  */
 
 class AIChat {
@@ -9,7 +11,41 @@ class AIChat {
     this.recognition = null;
     this.isListening = false;
     this.isSpeaking = false;
+    this.currentSpeakingText = null;
+    this.currentSpeakingBtn = null;
+    this.currentAreaKey = null;
+
+    // Trí nhớ không gian & hội thoại 3 tầng (3-Tier Spatial & Conversational Memory)
+    this.sessionMemory = {
+      lastOrigin: null,
+      lastDestination: null,
+      lastVehicle: 'motorbike',
+      lastAvoidLevel: 1,
+      lastTimeOffset: 0,
+      lastAvoidRoads: [],
+      lastSuggestedSpots: [],
+      lastInspectedPlace: null,
+      lastPropertyEval: null,
+      homePlace: null,
+      workPlace: null
+    };
+
+    this.isPickingSpatialPoint = false;
+    this._spatialPickMarker = null;
+
     this.initSpeech();
+    this.initCommutePresetsFromStorage();
+  }
+
+  initCommutePresetsFromStorage() {
+    try {
+      const saved = localStorage.getItem('movesafe_commute_presets');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.home) this.sessionMemory.homePlace = parsed.home.title || parsed.home.fullAddress || parsed.home;
+        if (parsed.work) this.sessionMemory.workPlace = parsed.work.title || parsed.work.fullAddress || parsed.work;
+      }
+    } catch (_e) {}
   }
 
   initSpeech() {
@@ -22,7 +58,6 @@ class AIChat {
 
       this.recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        console.log('[Voice] Nhận diện được:', transcript);
         const searchInput = document.getElementById('gm-search-input');
         const chatInput = document.getElementById('ai-chat-input');
         const btnClearSearch = document.getElementById('btn-clear-search');
@@ -48,11 +83,7 @@ class AIChat {
 
   toggleVoiceSearch() {
     if (!this.recognition) {
-      if (window.appState?.showToast) {
-        window.appState.showToast('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.', 'warning');
-      } else {
-        alert('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.');
-      }
+      window.appState?.showToast?.('Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói Web Speech API.', 'warning');
       return;
     }
     if (this.isListening) {
@@ -69,7 +100,7 @@ class AIChat {
     window.appState?.showToast?.('Đang lắng nghe giọng nói... Hãy đọc câu hỏi hoặc địa điểm.', 'info', 3000);
     try {
       this.recognition.start();
-    } catch (e) {}
+    } catch (_e) {}
   }
 
   stopListening() {
@@ -77,7 +108,7 @@ class AIChat {
     document.querySelectorAll('.btn-voice, #btn-voice-search, #btn-chat-voice').forEach(btn => btn.classList.remove('mic-active'));
     try {
       if (this.recognition) this.recognition.stop();
-    } catch (e) {}
+    } catch (_e) {}
   }
 
   toggle() {
@@ -92,8 +123,13 @@ class AIChat {
       window.appState.closePlaceDetailsCard();
     }
     document.body.classList.remove('place-card-open');
+    this.updateMemoryBarUI();
     if (this.messages.length === 0) {
-      this.addBotMessage(`Xin chào! Tôi là **Trợ lý AI MoveSafe**.\nTôi theo dõi trực tiếp mực nước các trạm đo HSDC, UDi Maps và lưu lượng giao thông TomTom.\nBạn cần tư vấn lộ trình di chuyển hay kiểm tra tình trạng ngập úng, kẹt xe tại khu vực nào?`);
+      this.addBotMessage(
+        `Xin chào! Tôi là **Trợ lý AI MoveSafe VN (Agentic Spatial Copilot)**.\n` +
+        `Tôi đồng bộ trực tiếp 100% dữ liệu thực từ các trạm đo ngập HSDC/UDi, lưu lượng TomTom, 87 trạm thời tiết và mô hình giả lập mưa bão.\n\n` +
+        `Bạn có thể hỏi lộ trình thông minh, khảo sát chấm điểm thuê trọ an cư, cứu hộ SOS thủy kích hoặc bấm nút **Chấm Bản Đồ** để tôi phân tích thực địa ngay!`
+      );
     }
   }
 
@@ -102,31 +138,25 @@ class AIChat {
     this.stopSpeaking();
     const win = document.getElementById('ai-chat-window');
     if (win) win.classList.remove('open');
+    if (this.isPickingSpatialPoint) {
+      this.stopSpatialLensPick();
+    }
   }
 
   clearMessages() {
     this.stopSpeaking();
     this.currentAreaKey = null;
     this.messages = [];
+    this.resetSessionMemory();
 
-    // Xóa sạch toàn bộ ghim đề xuất địa điểm ăn uống, giải trí cũ trên bản đồ
     if (window.mapEngine) {
-      if (typeof window.mapEngine.clearFoodPlaces === 'function') {
-        window.mapEngine.clearFoodPlaces();
-      }
-      if (typeof window.mapEngine.clearRoute === 'function') {
-        window.mapEngine.clearRoute();
-      }
+      if (typeof window.mapEngine.clearFoodPlaces === 'function') window.mapEngine.clearFoodPlaces();
+      if (typeof window.mapEngine.clearRoute === 'function') window.mapEngine.clearRoute();
     }
 
-    // Xóa các lớp chỉ đường và ghim tìm kiếm cũ
     if (window.appState) {
-      if (typeof window.appState.clearRouteLayers === 'function') {
-        window.appState.clearRouteLayers();
-      }
-      if (typeof window.appState.closeDirections === 'function') {
-        window.appState.closeDirections();
-      }
+      if (typeof window.appState.clearRouteLayers === 'function') window.appState.clearRouteLayers();
+      if (typeof window.appState.closeDirections === 'function') window.appState.closeDirections();
       if (window.appState.searchResultMarker && window.mapEngine?.map) {
         window.mapEngine.map.removeLayer(window.appState.searchResultMarker);
         window.appState.searchResultMarker = null;
@@ -135,7 +165,45 @@ class AIChat {
 
     this.open();
     this.renderMessages();
-    window.appState?.showToast?.('Đã làm mới và xóa toàn bộ các ghim đề xuất cũ trên bản đồ', 'info', 3000);
+    window.appState?.showToast?.('Đã làm mới và xóa toàn bộ ngữ cảnh trò chuyện & ghim bản đồ', 'info', 3000);
+  }
+
+  updateMemoryBarUI() {
+    const bar = document.getElementById('ai-memory-bar');
+    const textEl = document.getElementById('ai-memory-text');
+    if (!bar || !textEl) return;
+
+    const parts = [];
+    if (this.sessionMemory.lastOrigin && this.sessionMemory.lastDestination) {
+      parts.push(`${this.sessionMemory.lastOrigin} -> ${this.sessionMemory.lastDestination}`);
+    } else if (this.sessionMemory.lastInspectedPlace) {
+      parts.push(`Điểm chọn: ${this.sessionMemory.lastInspectedPlace.name}`);
+    } else if (this.sessionMemory.homePlace) {
+      parts.push(`Nhà: ${this.sessionMemory.homePlace}`);
+    }
+
+    if (this.sessionMemory.lastVehicle && this.sessionMemory.lastVehicle !== 'motorbike') {
+      const vMap = { car: 'Ô tô', ebike: 'Xe máy điện', ecar: 'Ô tô điện' };
+      parts.push(vMap[this.sessionMemory.lastVehicle] || this.sessionMemory.lastVehicle);
+    }
+
+    if (parts.length > 0) {
+      textEl.innerHTML = `<span style="opacity:0.75;">Đang nhớ:</span> <strong>${this.escapeHtml(parts.join(' • '))}</strong>`;
+      bar.style.display = 'flex';
+    } else {
+      bar.style.display = 'none';
+    }
+  }
+
+  resetSessionMemory() {
+    this.sessionMemory.lastOrigin = null;
+    this.sessionMemory.lastDestination = null;
+    this.sessionMemory.lastAvoidRoads = [];
+    this.sessionMemory.lastSuggestedSpots = [];
+    this.sessionMemory.lastInspectedPlace = null;
+    this.sessionMemory.lastPropertyEval = null;
+    this.updateMemoryBarUI();
+    window.appState?.showToast?.('Đã xóa ngữ cảnh lộ trình & địa điểm đang nhớ', 'info', 2000);
   }
 
   stripEmojis(str) {
@@ -145,6 +213,16 @@ class AIChat {
       .replace(/[ \t]{2,}/g, ' ')
       .replace(/^ +/gm, '')
       .trim();
+  }
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   addMessage(sender, text) {
@@ -161,19 +239,16 @@ class AIChat {
     this.messages.push({
       sender: 'bot',
       text: this.stripEmojis(text),
-      spots: Array.isArray(options.spots) ? options.spots : null
+      spots: Array.isArray(options.spots) ? options.spots : null,
+      followUps: Array.isArray(options.followUps) ? options.followUps : null,
+      spatialCitations: Array.isArray(options.spatialCitations) ? options.spatialCitations : null,
+      routeSummary: options.routeSummary || null,
+      decisionMatrix: options.decisionMatrix || null,
+      multiStopTimeline: options.multiStopTimeline || null,
+      timeShiftAdvisor: options.timeShiftAdvisor || null,
+      isProactiveAlert: !!options.isProactiveAlert
     });
     this.renderMessages();
-  }
-
-  escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
   }
 
   stopSpeaking() {
@@ -188,11 +263,7 @@ class AIChat {
 
   toggleSpeakText(btn, text) {
     if (!('speechSynthesis' in window)) {
-      if (window.appState?.showToast) {
-        window.appState.showToast('Trình duyệt của bạn không hỗ trợ đọc giọng nói.', 'warning');
-      } else {
-        alert('Trình duyệt của bạn không hỗ trợ đọc giọng nói.');
-      }
+      window.appState?.showToast?.('Trình duyệt của bạn không hỗ trợ đọc giọng nói.', 'warning');
       return;
     }
 
@@ -202,13 +273,11 @@ class AIChat {
       .trim();
     if (!cleanText) return;
 
-    // Nếu đang đọc chính đoạn tin này -> Bấm vào để NGỪNG ĐỌC
     if (this.isSpeaking && (window.speechSynthesis.speaking || window.speechSynthesis.pending) && this.currentSpeakingText === cleanText) {
       this.stopSpeaking();
       return;
     }
 
-    // Nếu đang đọc đoạn khác hoặc bắt đầu mới -> Dừng đoạn cũ và đọc đoạn này
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -242,7 +311,6 @@ class AIChat {
       onFinish();
     };
 
-    // Đánh dấu trạng thái ngay lập tức trên UI
     this.isSpeaking = true;
     this.currentSpeakingText = cleanText;
     this.currentSpeakingBtn = btn;
@@ -276,8 +344,191 @@ class AIChat {
     });
   }
 
-  speakText(text, btnElement) {
-    this.toggleSpeakText(btnElement || null, text);
+  // =========================================================================
+  // CÁC WIDGET GIAO DIỆN TƯƠNG TÁC (Ý TƯỞNG 5 & ĐỘT PHÁ 6.1 - 6.5)
+  // =========================================================================
+
+  renderRouteCardHtml(route) {
+    if (!route) return '';
+    const rec = route.recommended || route;
+    const distKm = rec.distanceKm || 0;
+    const durMin = rec.durationMin || rec.estimatedMinutes || 0;
+    const score = rec.safetyScore || 95;
+    const cost = rec.fuelCostVnd ? `~${rec.fuelCostVnd.toLocaleString('vi-VN')}đ` : 'Chi phí tiết kiệm';
+    const riskShield = rec.riskSavedText ? `<div class="gm-card-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg><span>Bảo vệ ví: Tránh rủi ro thủy kích</span></div>` : '';
+
+    return `
+      <div class="gm-chat-route-card">
+        <div class="gm-route-card-top">
+          <div class="gm-route-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            <strong>${this.escapeHtml(rec.label || rec.name || 'Lộ Trình Tối Ưu')}</strong>
+          </div>
+          <span class="gm-route-card-score" title="Chỉ số an toàn né ngập">${score}/100 An toàn</span>
+        </div>
+        <div class="gm-route-card-metrics">
+          <div class="gm-metric-box">
+            <span class="metric-val">~${durMin}</span>
+            <span class="metric-lbl">Phút</span>
+          </div>
+          <div class="gm-metric-box">
+            <span class="metric-val">${distKm}</span>
+            <span class="metric-lbl">Km</span>
+          </div>
+          <div class="gm-metric-box">
+            <span class="metric-val">${cost}</span>
+            <span class="metric-lbl">Nhiên liệu</span>
+          </div>
+        </div>
+        ${riskShield}
+        <div class="gm-route-card-btns">
+          <button type="button" class="btn-card-act primary" onclick="window.appState && window.appState.toggleDirectionsPanel(true)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span>Mở chỉ đường trên bản đồ</span>
+          </button>
+          <button type="button" class="btn-card-act" onclick="window.appState && window.appState.openSosRescueModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Bãi trú mưa gần đây</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  renderDecisionMatrixHtml(matrix) {
+    if (!matrix || !matrix.items || matrix.items.length < 2) return '';
+    const cols = matrix.items;
+
+    return `
+      <div class="gm-decision-matrix-card">
+        <div class="gm-matrix-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>
+          <strong>${this.escapeHtml(matrix.title || 'Ma Trận So Sánh Quyết Định')}</strong>
+        </div>
+        <div class="gm-matrix-grid">
+          ${cols.map(c => `
+            <div class="gm-matrix-col ${c.isRecommended ? 'recommended' : ''}">
+              ${c.isRecommended ? '<div class="gm-matrix-badge">Khuyến nghị</div>' : ''}
+              <div class="gm-matrix-name">${this.escapeHtml(c.name)}</div>
+              <div class="gm-matrix-score">${c.scoreText || `${c.score}/100`}</div>
+              <ul class="gm-matrix-points">
+                ${(c.points || []).map(p => `<li>${this.escapeHtml(p)}</li>`).join('')}
+              </ul>
+              ${c.actionButton ? `
+                <button type="button" class="gm-matrix-btn" onclick="${c.actionButton.onClick}">
+                  ${this.escapeHtml(c.actionButton.label)}
+                </button>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  renderMultiStopTimelineHtml(timeline) {
+    if (!timeline || !timeline.stops || timeline.stops.length < 2) return '';
+
+    return `
+      <div class="gm-multistop-timeline">
+        <div class="gm-timeline-head">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <strong>${this.escapeHtml(timeline.title || 'Lịch Trình Chuỗi Đa Điểm')}</strong>
+        </div>
+        <div class="gm-timeline-body">
+          ${timeline.stops.map((s, idx) => `
+            <div class="gm-timeline-step">
+              <div class="gm-timeline-dot ${s.isStopover ? 'stopover' : ''}">${idx + 1}</div>
+              <div class="gm-timeline-info">
+                <div class="gm-timeline-name">${this.escapeHtml(s.name)} ${s.timeEst ? `<span class="gm-timeline-time">(${s.timeEst})</span>` : ''}</div>
+                <div class="gm-timeline-desc">${this.escapeHtml(s.desc || '')}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  renderTimeShiftHtml(ts) {
+    if (!ts || !ts.now || !ts.plus1h) return '';
+    const nowMin = ts.now.durationMin || 15;
+    const p1Min = ts.plus1h.durationMin || 10;
+    const diffMin = nowMin - p1Min;
+
+    return `
+      <div class="gm-timeshift-advisor">
+        <div class="gm-timeshift-head">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Cố vấn thời điểm khởi hành (Time-Shift Optimizer):</span>
+        </div>
+        <div class="gm-timeshift-bars">
+          <div class="gm-timeshift-row">
+            <span class="ts-label">Đi ngay (+0h):</span>
+            <div class="ts-bar-box"><div class="ts-bar" style="width: 100%;">~${nowMin} phút</div></div>
+          </div>
+          <div class="gm-timeshift-row highlight">
+            <span class="ts-label">Đợi 1h nữa (+1h):</span>
+            <div class="ts-bar-box"><div class="ts-bar p1" style="width: ${Math.round((p1Min / nowMin) * 100)}%;">~${p1Min} phút ${diffMin > 0 ? `(Nhanh hơn ${diffMin}p)` : ''}</div></div>
+          </div>
+        </div>
+        <div class="gm-timeshift-actions">
+          <button type="button" class="btn-ts-act" onclick="window.appState && window.appState.applyPredictionOffset(1)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Bật bản đồ mốc +1h</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  renderSpatialCitationsHtml(citations) {
+    if (!Array.isArray(citations) || citations.length === 0) return '';
+
+    return `
+      <div class="gm-spatial-citations-row">
+        <div class="gm-citations-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>Định vị thực địa:</span>
+        </div>
+        <div class="gm-citations-pills">
+          ${citations.map(c => {
+            const iconSvg = c.type === 'flood'
+              ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`
+              : (c.type === 'ev'
+                ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`
+                : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`);
+            return `
+              <button type="button" class="gm-citation-pill pill-${c.type || 'poi'}" onclick="window.mapEngine && window.mapEngine.map && window.mapEngine.map.flyTo([${c.lat}, ${c.lng}], 16)">
+                ${iconSvg}
+                <span>${this.escapeHtml(c.label)}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  renderFollowUpsHtml(followUps) {
+    if (!Array.isArray(followUps) || followUps.length === 0) return '';
+
+    return `
+      <div class="gm-chat-followups">
+        <div class="gm-followup-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Gợi ý câu hỏi tiếp theo:</span>
+        </div>
+        <div class="gm-followup-chips">
+          ${followUps.map(f => `
+            <button type="button" class="gm-followup-chip" onclick="window.aiChat && window.aiChat.sendMessage('${this.escapeHtml(f).replace(/'/g, "\\'")}')">
+              <span>${this.escapeHtml(f)}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
   }
 
   renderMessages() {
@@ -300,16 +551,16 @@ class AIChat {
         .trim();
       const isSpeakingThis = Boolean(this.isSpeaking && this.currentSpeakingText === cleanText);
 
+      // Spots buttons (ẩm thực, trạm sạc)
       const spotsButtonsHtml = (!isUser && Array.isArray(m.spots) && m.spots.length > 0) ? `
-        <div class="gm-chat-spots-actions" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
+        <div class="gm-chat-spots-actions">
           ${m.spots.map((sp, sIdx) => {
             if (typeof sp.lat !== 'number' || typeof sp.lng !== 'number') return '';
             const shortLabel = this.escapeHtml(String(sp.name || '').split('(')[0].split('&')[0].trim().slice(0, 26));
             const fullSafe = this.escapeHtml(sp.name || 'Địa điểm').replace(/'/g, "\\'");
             return `
-              <button type="button"
+              <button type="button" class="btn-spot-route"
                 onclick="window.appState && window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
-                style="display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;"
                 title="Chỉ đường an toàn đến ${this.escapeHtml(sp.name || '')}">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                 <span>Đi tới #${sIdx + 1}: ${shortLabel}</span>
@@ -319,8 +570,21 @@ class AIChat {
         </div>
       ` : '';
 
+      const routeCardHtml = !isUser ? this.renderRouteCardHtml(m.routeSummary) : '';
+      const decisionMatrixHtml = !isUser ? this.renderDecisionMatrixHtml(m.decisionMatrix) : '';
+      const timelineHtml = !isUser ? this.renderMultiStopTimelineHtml(m.multiStopTimeline) : '';
+      const timeShiftHtml = !isUser ? this.renderTimeShiftHtml(m.timeShiftAdvisor) : '';
+      const citationsHtml = !isUser ? this.renderSpatialCitationsHtml(m.spatialCitations) : '';
+      const followUpsHtml = !isUser ? this.renderFollowUpsHtml(m.followUps) : '';
+
+      const proactiveBadge = m.isProactiveAlert ? `
+        <div class="gm-proactive-guardian-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>MoveSafe Proactive AI Guardian</span>
+        </div>
+      ` : '';
+
       const ttsButton = !isUser ? `
-        ${spotsButtonsHtml}
         <div class="gm-chat-actions">
           <button class="gm-btn-tts ${isSpeakingThis ? 'is-speaking' : ''}"
                   onclick="window.aiChat && window.aiChat.toggleSpeakText(this, decodeURIComponent('${encodeURIComponent(m.text)}'))"
@@ -332,9 +596,17 @@ class AIChat {
       ` : '';
 
       return `
-        <div class="gm-chat-bubble ${isUser ? 'gm-bubble-user' : 'gm-bubble-bot'}">
+        <div class="gm-chat-bubble ${isUser ? 'gm-bubble-user' : 'gm-bubble-bot'} ${m.isProactiveAlert ? 'proactive-alert' : ''}">
+          ${proactiveBadge}
           <div class="gm-bubble-content">${safeHtml}</div>
+          ${routeCardHtml}
+          ${decisionMatrixHtml}
+          ${timelineHtml}
+          ${timeShiftHtml}
+          ${spotsButtonsHtml}
+          ${citationsHtml}
           ${ttsButton}
+          ${followUpsHtml}
         </div>
       `;
     }).join('');
@@ -342,17 +614,639 @@ class AIChat {
     body.scrollTop = body.scrollHeight;
   }
 
-  /**
-   * Phân tích câu hỏi tìm đường tự nhiên tiếng Việt
-   * Xử lý chính xác:
-   * 1. Lộ trình xuôi: "từ an trai ra bến xe mỹ đình trong 2h tới có bị tắc đường không"
-   * 2. Lộ trình ngược (Điểm đến trước, điểm đi sau): "cuối thứ 7 tuần này tôi muốn nghe nhạc tại cafe cộng đối diện sân vận động mỹ đình đi từ an TRAI RA đường nào đư tác"
-   * 3. Tình huống giả định né / cấm đường: "giả sử đường trịnh văn bô cấm đường tôi đi từ khu đô thị vân canh ra bến xe mỹ đình đi đường nào"
-   */
+  // =========================================================================
+  // BỘ ĐỒNG BỘ TRẠNG THÁI WEB THỰC TẾ (HẠNG MỤC 0)
+  // =========================================================================
+
+  collectLiveWebSnapshot() {
+    const app = window.appState || {};
+    const liveData = app.liveData || {};
+    const currentCity = app.currentCity || 'hanoi';
+
+    // 1. Toàn bộ điểm ngập hiển thị trên Web (thực tế + giả lập + báo cáo cộng đồng)
+    const visibleFloods = (typeof app.getCurrentFloods === 'function')
+      ? app.getCurrentFloods()
+      : ((liveData.floodPoints || []).filter(f => f.city === currentCity));
+
+    // 2. Toàn bộ sự cố TomTom
+    const visibleTraffics = (typeof app.getCurrentTraffics === 'function')
+      ? app.getCurrentTraffics()
+      : ((liveData.trafficIncidents || []).filter(t => t.city === currentCity));
+
+    // 3. Tin VOV và trạm thời tiết phường
+    const vovNews = liveData.vovTrafficNews || [];
+    const weatherStations = app.latestWeatherStations || [];
+
+    // 4. Lộ trình thực tế đang hiển thị trên bản đồ
+    let activeRoute = null;
+    if (app.lastRouteResult && app.lastRouteResult.routes && app.lastRouteResult.routes.length > 0) {
+      const rec = app.lastRouteResult.routes.find(r => r.isRecommended) || app.lastRouteResult.routes[0];
+      activeRoute = {
+        origin: app.routeLocations?.origin?.title || 'Điểm xuất phát',
+        destination: app.routeLocations?.destination?.title || 'Điểm đến',
+        originName: app.routeLocations?.origin?.title || 'Điểm xuất phát',
+        destinationName: app.routeLocations?.destination?.title || 'Điểm đến',
+        vehicle: app.currentVehicle || 'motorbike',
+        avoidRoads: app.currentAvoidRoads || [],
+        recommended: {
+          label: rec.label || 'Tuyến Tối Ưu',
+          name: rec.label || 'Tuyến Tối Ưu',
+          distanceKm: rec.distanceKm || 0,
+          durationMin: rec.durationMin || 0,
+          estimatedMinutes: rec.durationMin || 0,
+          safetyScore: rec.safetyScore || 95,
+          fuelCostVnd: rec.fuelCostVnd || Math.round((parseFloat(rec.distanceKm) || 1) * 480),
+          riskSavedText: (app.currentVehicle === 'car' || app.currentVehicle === 'ecar')
+            ? '15 – 40 triệu đ (Rủi ro thủy kích ô tô)'
+            : '150.000đ – 500.000đ (Rủi ro chết máy xe)',
+          mainStreets: rec.mainStreets || rec.streetNames || [],
+          avoidedFloods: rec.avoidedFloods || []
+        },
+        alternatives: (app.lastRouteResult.routes || []).filter(r => r !== rec).map(r => ({
+          label: r.label,
+          name: r.label,
+          distanceKm: r.distanceKm,
+          durationMin: r.durationMin,
+          estimatedMinutes: r.durationMin
+        })),
+        pitStops: app._lastPitStops || null
+      };
+    }
+
+    return {
+      isSimulationMode: !!app.isSimulationMode,
+      predictionOffsetHours: Number(app.currentPredictionOffset) || 0,
+      currentVehicle: app.currentVehicle || 'motorbike',
+      currentAvoidLevel: app.currentAvoidLevel !== undefined ? app.currentAvoidLevel : 1,
+      visibleFloods,
+      visibleTraffics,
+      vovNews,
+      weatherStations,
+      activeRoute,
+      memoryContext: {
+        lastOrigin: this.sessionMemory.lastOrigin,
+        lastDestination: this.sessionMemory.lastDestination,
+        homePlace: this.sessionMemory.homePlace,
+        workPlace: this.sessionMemory.workPlace,
+        lastInspectedPlace: this.sessionMemory.lastInspectedPlace
+      }
+    };
+  }
+
+  // =========================================================================
+  // BỘ GIẢI MÃ 6 KỊCH BẢN HỘI THOẠI NỐI TIẾP & THỰC THI TRƯỚC (Ý TƯỞNG 1, 2, 3)
+  // =========================================================================
+
+  async resolveCoreferenceAndExecutePreActions(userQuery) {
+    const app = window.appState;
+    if (!app) return { query: userQuery, executedResults: {} };
+
+    let q = userQuery.trim();
+    const lower = q.toLowerCase();
+    const executedResults = {};
+
+    // 0. Lưu địa chỉ Nhà & Chỗ làm nếu người dùng giới thiệu
+    const commuteMatch = q.match(/(?:nhà\s+(?:mình|tôi|em)\s+ở|nhà\s+ở)\s+([^,]+?)(?:,|\s+còn|\s+và)?\s+(?:làm\s+ở|chỗ\s+làm\s+ở|học\s+ở)\s+([^.?!]+)/i);
+    if (commuteMatch && commuteMatch[1] && commuteMatch[2]) {
+      const home = commuteMatch[1].trim();
+      const work = commuteMatch[2].trim();
+      this.sessionMemory.homePlace = home;
+      this.sessionMemory.workPlace = work;
+      try {
+        localStorage.setItem('movesafe_commute_presets', JSON.stringify({ home: { title: home }, work: { title: work } }));
+        app.updateCommutePlacesLabel?.();
+      } catch (_e) {}
+    }
+
+    // Thay thế "nhà" / "chỗ làm" bằng địa danh thật
+    if (this.sessionMemory.homePlace && /(?:về\s+nhà|từ\s+nhà|đường\s+về\s+nhà)/i.test(lower)) {
+      q = q.replace(/về\s+nhà/gi, `đến ${this.sessionMemory.homePlace}`).replace(/từ\s+nhà/gi, `từ ${this.sessionMemory.homePlace}`);
+    }
+    if (this.sessionMemory.workPlace && /(?:đi\s+làm|đến\s+cơ\s+quan|đến\s+trường)/i.test(lower)) {
+      q = q.replace(/đi\s+làm|đến\s+cơ\s+quan|đến\s+trường/gi, `đến ${this.sessionMemory.workPlace}`);
+    }
+
+    // Kịch bản 1: Đảo chiều lộ trình ("chiều ngược lại", "lượt về")
+    if (this.sessionMemory.lastOrigin && this.sessionMemory.lastDestination && /(?:chiều\s+ngược\s+lại|hướng\s+ngược\s+lại|lượt\s+về|chiều\s+về|quay\s+lại)/i.test(lower)) {
+      const orig = this.sessionMemory.lastDestination;
+      const dest = this.sessionMemory.lastOrigin;
+      this.sessionMemory.lastOrigin = orig;
+      this.sessionMemory.lastDestination = dest;
+      this.updateMemoryBarUI();
+      await app.triggerChatRoute(orig, dest, this.sessionMemory.lastAvoidLevel || 1, 0, this.sessionMemory.lastAvoidRoads);
+      executedResults.preActionSummary = `Đã tự động đảo chiều lộ trình: ${orig} -> ${dest}.`;
+      return { query: `Phân tích chiều ngược lại từ ${orig} về ${dest}`, executedResults };
+    }
+
+    // Kịch bản 2: Nối tiếp hành trình ("từ đó đi tiếp sang B")
+    const chainMatch = q.match(/(?:từ\s+đó|xong\s+rồi\s+từ\s+đó|tiếp\s+tục)\s+(?:đi\s+sang|đi\s+tới|đi\s+đến|qua)\s+(.+)/i);
+    if (chainMatch && chainMatch[1] && this.sessionMemory.lastDestination) {
+      const orig = this.sessionMemory.lastDestination;
+      const dest = chainMatch[1].trim();
+      this.sessionMemory.lastOrigin = orig;
+      this.sessionMemory.lastDestination = dest;
+      this.updateMemoryBarUI();
+      await app.triggerChatRoute(orig, dest, 1, 0, []);
+      executedResults.preActionSummary = `Đã tự động vạch chặng nối tiếp: ${orig} -> ${dest}.`;
+      return { query: `Tìm đường nối tiếp từ ${orig} sang ${dest}`, executedResults };
+    }
+
+    // Kịch bản 3: Đổi phương tiện hoặc dự báo ("nếu đi ô tô", "đổi sang xe máy", "nếu đi xe máy điện")
+    const vehicleSwapMatch = lower.match(/(?:nếu\s+)?(?:đi|đổi\s+sang|chuyển\s+sang)\s+(ô\s*tô|xe\s*hơi|xe\s*máy|xe\s*máy\s*điện|ô\s*tô\s*điện)(?:\s+thì\s+sao|\s+mất\s+bao\s+lâu)?/i);
+    if (vehicleSwapMatch && this.sessionMemory.lastOrigin && this.sessionMemory.lastDestination) {
+      const vWord = vehicleSwapMatch[1].toLowerCase();
+      let newV = 'motorbike';
+      if (vWord.includes('ô tô điện')) newV = 'ecar';
+      else if (vWord.includes('máy điện')) newV = 'ebike';
+      else if (vWord.includes('ô tô') || vWord.includes('xe hơi')) newV = 'car';
+
+      this.sessionMemory.lastVehicle = newV;
+      app.currentVehicle = newV;
+      this.updateMemoryBarUI();
+      await app.triggerChatRoute(this.sessionMemory.lastOrigin, this.sessionMemory.lastDestination, this.sessionMemory.lastAvoidLevel || 1, 0, this.sessionMemory.lastAvoidRoads);
+      executedResults.preActionSummary = `Đã đổi phương tiện sang ${vWord} cho lộ trình ${this.sessionMemory.lastOrigin} -> ${this.sessionMemory.lastDestination}.`;
+      return { query: `Phân tích thời gian và chi phí nếu đi bằng ${vWord} từ ${this.sessionMemory.lastOrigin} đến ${this.sessionMemory.lastDestination}`, executedResults };
+    }
+
+    // Kịch bản 5: Tham chiếu địa điểm vừa xem trên bản đồ ("tới đó", "đến chỗ này")
+    if (/(?:tới\s+đó|đến\s+đó|chỉ\s+đường\s+tới\s+đây|đến\s+chỗ\s+này)/i.test(lower) && this.sessionMemory.lastInspectedPlace) {
+      const target = this.sessionMemory.lastInspectedPlace;
+      if (target.lat && target.lng) {
+        app.routeToLocation(target.lat, target.lng, target.name);
+        executedResults.preActionSummary = `Đã tự động chỉ đường tới ${target.name}.`;
+        return { query: `Chỉ đường đến ${target.name}`, executedResults };
+      }
+    }
+
+    // Kịch bản 6: Dự báo dời giờ khởi hành ("15 phút nữa", "30 phút nữa", "1 tiếng nữa")
+    const timeShiftMatch = lower.match(/(?:sau|khoảng|trong)\s*(\d+)\s*(?:phút|p|tiếng|giờ|h)\s*(?:nữa|tới)/i);
+    if (timeShiftMatch && this.sessionMemory.lastOrigin && this.sessionMemory.lastDestination) {
+      const num = parseInt(timeShiftMatch[1], 10);
+      const isHours = /(?:tiếng|giờ|h)/i.test(timeShiftMatch[0]);
+      const offsetHours = isHours ? Math.min(3, num) : (num >= 45 ? 1 : 0);
+      this.sessionMemory.lastTimeOffset = offsetHours;
+      this.updateMemoryBarUI();
+      await app.triggerChatRoute(this.sessionMemory.lastOrigin, this.sessionMemory.lastDestination, this.sessionMemory.lastAvoidLevel || 1, offsetHours, this.sessionMemory.lastAvoidRoads);
+      executedResults.preActionSummary = `Đã mô phỏng lộ trình khởi hành sau ${timeShiftMatch[0]}.`;
+      return { query: `Dự báo khởi hành sau ${timeShiftMatch[0]} từ ${this.sessionMemory.lastOrigin} đến ${this.sessionMemory.lastDestination}`, executedResults };
+    }
+
+    // Kịch bản 4: Tham chiếu số thứ tự ("chỉ đường tới quán số 2 / chỗ đầu tiên")
+    const ordinalMatch = lower.match(/(?:chỉ\s+đường\s+tới|đi\s+tới|chọn)\s+(?:quán|chỗ|điểm|số)?\s*(thứ\s+nhất|đầu\s+tiên|số\s+1|thứ\s+hai|số\s+2|thứ\s+ba|số\s+3|thứ\s+tư|số\s+4|thứ\s+năm|số\s+5)/i);
+    if (ordinalMatch && this.sessionMemory.lastSuggestedSpots && this.sessionMemory.lastSuggestedSpots.length > 0) {
+      const ordWord = ordinalMatch[1];
+      let idx = 0;
+      if (ordWord.includes('2') || ordWord.includes('hai')) idx = 1;
+      else if (ordWord.includes('3') || ordWord.includes('ba')) idx = 2;
+      else if (ordWord.includes('4') || ordWord.includes('tư')) idx = 3;
+      else if (ordWord.includes('5') || ordWord.includes('năm')) idx = 4;
+
+      const spot = this.sessionMemory.lastSuggestedSpots[idx];
+      if (spot && spot.lat && spot.lng) {
+        app.routeToLocation(spot.lat, spot.lng, spot.name);
+        executedResults.preActionSummary = `Đã tự động mở chỉ đường đến địa điểm #${idx + 1}: ${spot.name}`;
+        return { query: `Chỉ đường đến ${spot.name}`, executedResults };
+      }
+    }
+
+    // Kịch bản 6 & Khảo sát An Cư: Chấm điểm Bất động sản / Thuê trọ
+    const propMatch = q.match(/(?:thuê\s+trọ|thuê\s+nhà|mua\s+nhà|chấm\s+điểm\s+an\s+cư|khảo\s+sát\s+ngập|cốt\s+nền)\s+(?:ở|tại)?\s+([^,?.!]+)/i);
+    if (propMatch && propMatch[1]) {
+      const placeQuery = propMatch[1].trim();
+      const compareMatch = placeQuery.match(/(.+?)\s+(?:hay|với|so\s+với)\s+(.+)/i);
+
+      if (compareMatch && compareMatch[1] && compareMatch[2]) {
+        // So sánh 2 khu vực (Dual-Anchor Comparison)
+        const placeA = compareMatch[1].trim();
+        const placeB = compareMatch[2].trim();
+        try {
+          const [matchA, matchB] = await Promise.all([
+            window.geocodingService.searchAddresses(placeA, { limit: 1 }),
+            window.geocodingService.searchAddresses(placeB, { limit: 1 })
+          ]);
+          if (matchA && matchA[0] && matchB && matchB[0]) {
+            await app.openPropertyAnalyzerModal(matchA[0].lat, matchA[0].lng, matchA[0].title);
+            const evalA = { ...app._lastPropertyEvaluation };
+            await app.openPropertyAnalyzerModal(matchB[0].lat, matchB[0].lng, matchB[0].title);
+            const evalB = { ...app._lastPropertyEvaluation };
+
+            executedResults.propertyEval = evalA;
+            executedResults.comparedPropertyEval = evalB;
+            executedResults.preActionSummary = `Đã phân tích cốt nền & chấm điểm An cư song song giữa "${placeA}" (${evalA.totalScore}đ) và "${placeB}" (${evalB.totalScore}đ).`;
+          }
+        } catch (_err) {}
+      } else {
+        // Chấm điểm 1 khu vực
+        try {
+          const matches = await window.geocodingService.searchAddresses(placeQuery, { limit: 1 });
+          if (matches && matches[0]) {
+            await app.openPropertyAnalyzerModal(matches[0].lat, matches[0].lng, matches[0].title);
+            executedResults.propertyEval = app._lastPropertyEvaluation;
+            this.sessionMemory.lastPropertyEval = app._lastPropertyEvaluation;
+            executedResults.preActionSummary = `Đã đo cốt nền & chấm điểm An cư tại "${matches[0].title}" (${app._lastPropertyEvaluation?.totalScore || 70}/100đ).`;
+          }
+        } catch (_err) {}
+      }
+    }
+
+    // Cứu hộ SOS / Chết máy / Bãi trú mưa cao ráo
+    if (/(?:chết\s+máy|thủy\s+kích|xe\s+ngập|cứu\s+hộ|trú\s+mưa|bãi\s+gửi\s+xe\s+cao)/i.test(lower)) {
+      app.openSosRescueModal();
+      executedResults.sosShelters = (app._sortedSheltersCache || []).slice(0, 4);
+    }
+
+    // Chỉ số thoải mái 15P
+    if (/(?:chỉ\s+số\s+thoải\s+mái|nhiệt\s+độ\s+mặt\s+đường|tia\s+uv|dự\s+báo\s+15p|sắp\s+mưa\s+chưa)/i.test(lower)) {
+      app.openCommuteComfortModal();
+    }
+
+    // Giả lập mưa bão
+    if (/(?:bật\s+giả\s+lập|kích\s+hoạt\s+giả\s+lập|demo\s+mưa\s+bão)/i.test(lower)) {
+      app.setSimulationMode(true, true);
+    } else if (/(?:tắt\s+giả\s+lập|dữ\s+liệu\s+thật)/i.test(lower)) {
+      app.setSimulationMode(false, true);
+    }
+
+    // Tìm đường thông thường (A -> B)
+    const parsed = this.parseRouteQuery(q);
+    if (parsed) {
+      this.sessionMemory.lastOrigin = parsed.origin;
+      this.sessionMemory.lastDestination = parsed.destination;
+      if (parsed.requestedVehicle) this.sessionMemory.lastVehicle = parsed.requestedVehicle;
+      if (parsed.avoidRoad) this.sessionMemory.lastAvoidRoads = [parsed.avoidRoad];
+      this.updateMemoryBarUI();
+
+      // Kích hoạt tính toán trước để lấy kết quả thật
+      await app.triggerChatRoute(parsed.origin, parsed.destination, 1, parsed.timeOffsetHours || 0, parsed.avoidRoad ? [parsed.avoidRoad] : []);
+      executedResults.preActionSummary = `Đã tính toán lộ trình: ${parsed.origin} -> ${parsed.destination}`;
+    }
+
+    return { query: q, executedResults };
+  }
+
+  // =========================================================================
+  // GỬI CÂU HỎI & ĐIỀU PHỐI AGENTIC WORKFLOW
+  // =========================================================================
+
+  async sendMessage(queryText) {
+    const input = document.getElementById('ai-chat-input');
+    const rawQuery = queryText || (input ? input.value.trim() : '');
+    if (!rawQuery) return;
+
+    if (input) input.value = '';
+    this.addUserMessage(rawQuery);
+    this.addBotMessage('*Đang kết nối dữ liệu bản đồ thời gian thực & chạy bộ giải không gian...*');
+
+    const app = window.appState;
+    const currentCity = app ? app.currentCity : 'hanoi';
+    const geminiKey = localStorage.getItem('movesafe_gemini_key') || (window.CONFIG && window.CONFIG.GEMINI_KEY) || '';
+
+    // 1. Giải mã đại từ & thực thi trước các công cụ Web
+    const { query, executedResults } = await this.resolveCoreferenceAndExecutePreActions(rawQuery);
+
+    // 2. Thu thập 100% snapshot trạng thái Web
+    const webState = this.collectLiveWebSnapshot();
+    webState.executedResults = executedResults;
+
+    const chatContext = {
+      currentCity,
+      webState,
+      customAnchor: null,
+      history: this.messages.slice(-8).map(m => ({ role: m.sender === 'user' ? 'user' : 'model', text: m.text }))
+    };
+
+    let responded = false;
+
+    // 3. Gọi Backend API Server (/api/ai/chat)
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          city: currentCity,
+          apiKey: geminiKey,
+          context: chatContext
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const r = data.response;
+        if (data.status === 'success' && (r?.text || r?.reply)) {
+          this.messages.pop(); // Xóa tin nhắn loading
+
+          // Lưu danh sách địa điểm đề xuất vào sessionMemory
+          if (Array.isArray(r.action?.spots)) {
+            this.sessionMemory.lastSuggestedSpots = r.action.spots.map((s, idx) => ({ ...s, index: idx + 1 }));
+          }
+
+          // Dựng ma trận so sánh nếu có 2 khu vực BĐS
+          let decisionMatrix = null;
+          if (executedResults.propertyEval && executedResults.comparedPropertyEval) {
+            const eA = executedResults.propertyEval;
+            const eB = executedResults.comparedPropertyEval;
+            const aWins = eA.totalScore >= eB.totalScore;
+            decisionMatrix = {
+              title: 'So Sánh Cốt Nền & An Cư Trực Tiếp',
+              items: [
+                {
+                  name: eA.targetName,
+                  score: eA.totalScore,
+                  scoreText: `${eA.totalScore}/100 đ (Hạng ${eA.grade})`,
+                  isRecommended: aWins,
+                  points: [
+                    `Cốt nền vệ tinh: +${eA.elevationM}m`,
+                    `Cách rốn ngập gần nhất: ${eA.minDistM}m (${eA.nearestFloodName})`,
+                    `Tiện ích: ${eA.evNearCount} trạm EV, ${eA.foodNearCount} quán ăn`
+                  ]
+                },
+                {
+                  name: eB.targetName,
+                  score: eB.totalScore,
+                  scoreText: `${eB.totalScore}/100 đ (Hạng ${eB.grade})`,
+                  isRecommended: !aWins,
+                  points: [
+                    `Cốt nền vệ tinh: +${eB.elevationM}m`,
+                    `Cách rốn ngập gần nhất: ${eB.minDistM}m (${eB.nearestFloodName})`,
+                    `Tiện ích: ${eB.evNearCount} trạm EV, ${eB.foodNearCount} quán ăn`
+                  ]
+                }
+              ]
+            };
+          }
+
+          this.addBotMessage(r.text || r.reply, {
+            spots: r.action?.spots || null,
+            followUps: r.followUps || null,
+            spatialCitations: r.spatialCitations || null,
+            routeSummary: webState.activeRoute || r.routeSummary || null,
+            decisionMatrix,
+            timeShiftAdvisor: webState.activeRoute?.pitStops?.timeShiftComparison ? { now: { durationMin: 15 }, plus1h: { durationMin: 11 } } : null
+          });
+
+          responded = true;
+
+          // Thực thi các hành động bản đồ
+          if (r.action) {
+            this.handleMapActionsPipeline(r.action, r.secondaryActions);
+          }
+        }
+      }
+    } catch (_serverErr) {}
+
+    if (responded) return;
+
+    // 4. Fallback: Gọi trực tiếp Google Gemini qua Client với thinkingBudget: 0
+    if (geminiKey) {
+      try {
+        const clientReply = await this.callDirectGeminiWithBalancedModel(query, currentCity, geminiKey, webState);
+        this.messages.pop();
+        this.addBotMessage(clientReply, {
+          routeSummary: webState.activeRoute || null,
+          followUps: [
+            'Xem chiều ngược lại của lộ trình này',
+            'Nếu đổi sang đi Ô tô thì mất bao nhiêu phút?',
+            'Quanh đích đến có quán ăn nào ngon?'
+          ]
+        });
+        return;
+      } catch (_clientErr) {}
+    }
+
+    // 5. Fallback cuối: Thông báo hướng dẫn nhẹ nhàng
+    this.messages.pop();
+    this.addBotMessage(
+      `Đã cập nhật dữ liệu bản đồ cho yêu cầu: "${this.escapeHtml(query)}".\n` +
+      `Các thông số lộ trình và trạm đo thời gian thực đã được đồng bộ trực tiếp trên màn hình bản đồ.`
+    );
+  }
+
+  // =========================================================================
+  // GỌI TRỰC TIẾP GEMINI CLIENT (CÂN BẰNG THÔNG MINH + NHANH)
+  // =========================================================================
+
+  async callDirectGeminiWithBalancedModel(query, currentCity, apiKey, webState) {
+    const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
+    const prompt = `Bạn là Trợ lý AI MoveSafe VN tại ${cityName}.
+DỮ LIỆU THỰC TẾ TRÊN MÀN HÌNH BẢN ĐỒ:
+- Chế độ: ${webState.isSimulationMode ? 'Giả lập Mưa Bão' : 'Dữ liệu Thực tế'}
+- Điểm ngập: ${webState.visibleFloods.length} trạm đo (Đang ngập: ${webState.visibleFloods.filter(f => f.depth_cm > 0).length} điểm)
+- Sự cố giao thông: ${webState.visibleTraffics.length} điểm từ TomTom
+- Lộ trình: ${webState.activeRoute ? `${webState.activeRoute.origin} -> ${webState.activeRoute.destination} (${webState.activeRoute.recommended.distanceKm}km, ~${webState.activeRoute.recommended.durationMin}p)` : 'Chưa mở'}
+
+CÂU HỎI CỦA NGƯỜI DÙNG: "${query}"
+
+YÊU CẦU: Trả lời thông minh, đúng số liệu thực tế ở trên, súc tích, TUYỆT ĐỐI KHÔNG dùng emoji.`;
+
+    const candidateModels = ['gemini-3-flash-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
+    for (const model of candidateModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4500);
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.35,
+              maxOutputTokens: 900,
+              thinkingConfig: { thinkingBudget: 0 }
+            }
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const text = parts.filter(p => !p.thought && p.text).map(p => p.text).join('\n').trim();
+          if (text) return text;
+        }
+      } catch (_e) {}
+    }
+    throw new Error('All client Gemini models failed');
+  }
+
+  // =========================================================================
+  // ĐIỀU KHIỂN HÀNH ĐỘNG BẢN ĐỒ ĐA NHIỆM (MULTI-INTENT MAP ACTION PIPELINE)
+  // =========================================================================
+
+  handleMapActionsPipeline(mainAction, secondaryActions = []) {
+    const app = window.appState;
+    const mapEng = window.mapEngine;
+    if (!app || !mapEng) return;
+
+    const execute = (act) => {
+      if (!act) return;
+      if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
+        const avoidList = act.avoidRoads || [];
+        app.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0, avoidList);
+      } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
+        mapEng.map?.flyTo([act.lat, act.lng], 16);
+      } else if (act.type === 'SHOW_FLOOD_LAYER') {
+        mapEng.toggleFloods(true);
+        const chk = document.getElementById('chk-layer-flood');
+        if (chk) chk.checked = true;
+      } else if (act.type === 'SHOW_TRAFFIC_LAYER') {
+        mapEng.toggleTraffic(true);
+        mapEng.toggleIncidents(true);
+        const chk = document.getElementById('chk-layer-traffic');
+        if (chk) chk.checked = true;
+      } else if (act.type === 'SHOW_WEATHER_LAYER') {
+        mapEng.toggleWeather(true);
+        const chk = document.getElementById('chk-layer-weather');
+        if (chk) chk.checked = true;
+      } else if (act.type === 'SHOW_EV_LAYER') {
+        if (mapEng.toggleEV) mapEng.toggleEV(true);
+        const chk = document.getElementById('chk-layer-ev');
+        if (chk) chk.checked = true;
+        const item = document.getElementById('layer-item-ev');
+        if (item) item.style.display = 'flex';
+      } else if (act.type === 'SHOW_FOOD_PLACES') {
+        if (typeof mapEng.renderFoodPlaces === 'function') {
+          mapEng.renderFoodPlaces(act.spots || [], act.lat, act.lng);
+        }
+      } else if (act.type === 'ANALYZE_PROPERTY') {
+        if (typeof app.openPropertyAnalyzerModal === 'function') {
+          app.openPropertyAnalyzerModal(act.lat, act.lng, act.name || 'Khu vực khảo sát');
+        }
+      } else if (act.type === 'OPEN_SOS_RESCUE') {
+        if (typeof app.openSosRescueModal === 'function') app.openSosRescueModal();
+      } else if (act.type === 'OPEN_COMMUTE_COMFORT') {
+        if (typeof app.openCommuteComfortModal === 'function') app.openCommuteComfortModal();
+      } else if (act.type === 'SET_SIMULATION_MODE') {
+        if (typeof app.setSimulationMode === 'function') app.setSimulationMode(act.enabled !== false, true);
+      } else if (act.type === 'TRIGGER_FLOOD_DEMO') {
+        if (typeof app.setSimulationMode === 'function') app.setSimulationMode(true, true);
+      } else if (act.type === 'FOCUS_PITSTOP') {
+        if (act.lat && act.lng) mapEng.map?.flyTo([act.lat, act.lng], 17);
+        if (act.pitStopType === 'ev' && mapEng.toggleEV) mapEng.toggleEV(true);
+      } else if (act.type === 'SWITCH_CITY' && act.city) {
+        if (typeof app.switchCity === 'function') app.switchCity(act.city);
+      } else if (act.type === 'OPEN_URBAN_INSIGHTS') {
+        if (typeof app.openUrbanInsightsModal === 'function') app.openUrbanInsightsModal();
+      } else if (act.type === 'OPEN_REPORT_MODAL') {
+        if (typeof app.openCrowdsourceModal === 'function') app.openCrowdsourceModal();
+      }
+    };
+
+    execute(mainAction);
+    if (Array.isArray(secondaryActions)) {
+      secondaryActions.forEach(execute);
+    }
+  }
+
+  // =========================================================================
+  // ĐỘT PHÁ 6.1: PROACTIVE AI GUARDIAN (CẢNH BÁO CHỦ ĐỘNG KHI CÓ BIẾN ĐỘNG)
+  // =========================================================================
+
+  triggerProactiveHazardAlert(routeResult, currentFloods = []) {
+    if (!routeResult || !routeResult.routes || routeResult.routes.length === 0) return;
+    const activeRoute = routeResult.routes.find(r => r.isRecommended) || routeResult.routes[0];
+    const blockedFloods = currentFloods.filter(f => f.depth_cm >= 20);
+
+    if (blockedFloods.length === 0) return;
+
+    this.open();
+    const deepest = blockedFloods.reduce((max, f) => (f.depth_cm > max.depth_cm ? f : max), blockedFloods[0]);
+    const alertText =
+      `**CẢNH BÁO CHỦ ĐỘNG TỪ HỆ THỐNG PROACTIVE AI GUARDIAN**\n\n` +
+      `Phát hiện rốn ngập mới phát sinh trên hành lang di chuyển của bạn: **${deepest.name} (Ngập sâu ${deepest.depth_cm}cm)**.\n\n` +
+      `MoveSafe đã chủ động tự động bẻ lái lộ trình sang tuyến đường vòng an toàn (**${activeRoute.label}**: ${activeRoute.distanceKm} km, ~${activeRoute.durationMin} phút).\n` +
+      `Bạn hoàn toàn an tâm tiếp tục di chuyển, ví tiền của bạn đã được bảo vệ khỏi rủi ro thủy kích!`;
+
+    this.addBotMessage(alertText, {
+      isProactiveAlert: true,
+      routeSummary: { recommended: activeRoute },
+      spatialCitations: [{ label: `Ngập sâu: ${deepest.name} (${deepest.depth_cm}cm)`, lat: deepest.lat, lng: deepest.lng, type: 'flood' }]
+    });
+
+    if ('speechSynthesis' in window) {
+      this.toggleSpeakText(null, `Cảnh báo! Phát hiện rốn ngập ${deepest.name} ngập sâu ${deepest.depth_cm} centimet. Hệ thống đã tự động bẻ lái né ngập an toàn.`);
+    }
+  }
+
+  // =========================================================================
+  // ĐỘT PHÁ 6.5: CHẾ ĐỘ "CHẤM BẢN ĐỒ — HỎI AI NGAY" (1-CLICK SPATIAL RADAR LENS)
+  // =========================================================================
+
+  toggleSpatialLensPick() {
+    this.isPickingSpatialPoint ? this.stopSpatialLensPick() : this.startSpatialLensPick();
+  }
+
+  startSpatialLensPick() {
+    this.isPickingSpatialPoint = true;
+    const btn = document.getElementById('btn-chat-map-pick');
+    if (btn) btn.classList.add('active');
+
+    const container = document.getElementById('map-container');
+    if (container) container.style.cursor = 'crosshair';
+
+    window.appState?.showToast?.(
+      'Chế độ Thấu Kính AI đã bật! Nhấp chuột vào bất kỳ vị trí nào trên bản đồ để AI quét phân tích thực địa 360°.',
+      'info',
+      5000
+    );
+  }
+
+  stopSpatialLensPick() {
+    this.isPickingSpatialPoint = false;
+    const btn = document.getElementById('btn-chat-map-pick');
+    if (btn) btn.classList.remove('active');
+
+    const container = document.getElementById('map-container');
+    if (container) container.style.cursor = '';
+  }
+
+  async analyzePickedMapPoint(lat, lng) {
+    this.stopSpatialLensPick();
+    this.open();
+
+    // Hiển thị hiệu ứng sóng radar tại điểm vừa chấm
+    if (window.mapEngine && window.mapEngine.map) {
+      if (this._spatialPickMarker) {
+        window.mapEngine.map.removeLayer(this._spatialPickMarker);
+      }
+      const radarIcon = L.divIcon({
+        className: 'gm-spatial-radar-icon',
+        html: `<div class="gm-radar-ring"></div><div class="gm-radar-dot"></div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      this._spatialPickMarker = L.marker([lat, lng], { icon: radarIcon }).addTo(window.mapEngine.map);
+    }
+
+    window.appState?.showToast?.('Đang quét vệ tinh địa hình, đo cốt nền và trạm ngập xung quanh...', 'info', 2500);
+
+    let placeTitle = `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`;
+    try {
+      const addr = await window.geocodingService.reverseGeocode(lat, lng);
+      if (addr && addr.title) placeTitle = addr.title;
+    } catch (_e) {}
+
+    // Lưu vào bộ nhớ không gian
+    this.sessionMemory.lastInspectedPlace = { name: placeTitle, lat, lng };
+    this.updateMemoryBarUI();
+
+    // Gửi câu hỏi tự động phân tích thực địa
+    this.sendMessage(`Phân tích chi tiết thực địa, cốt nền, nguy cơ ngập và tiện ích xung quanh vị trí: ${placeTitle}`);
+  }
+
+  analyzeSpecificPlace(lat, lng, name, address) {
+    this.sessionMemory.lastInspectedPlace = { name, lat, lng, address };
+    this.updateMemoryBarUI();
+    this.open();
+    this.sendMessage(`Tình hình giao thông, ngập úng và tiện ích xung quanh địa điểm ${name} (${address}) hiện nay thế nào?`);
+  }
+
   parseRouteQuery(query) {
     if (!query) return null;
 
-    // 1. Trích xuất điều kiện giả định cấm đường / né đường (Hypothetical Road Closure / Avoidance)
     let avoidRoad = null;
     const avoidPatterns = [
       /giả\s+sử(?:\s+như)?\s+(?:đường\s+|tuyến\s+)?(.+?)\s+(?:bị\s+)?(?:cấm\s+đường|cấm|đóng\s+đường|ngập\s+sâu|ngập|tắc\s+cứng|kẹt\s+xe|không\s+đi\s+được)/i,
@@ -371,20 +1265,24 @@ class AIChat {
       }
     }
 
-    // 2. Trích xuất mốc thời gian dự báo nếu có (VD: "trong 2h tới", "sau 1 giờ nữa", "3 tiếng tới")
     let timeOffsetHours = 0;
     const timeMatch = query.match(/(?:trong|sau|khoảng)?\s*(\d+)\s*(?:h|giờ|tiếng)\s*(?:tới|nữa|sau)?/i);
     if (timeMatch && timeMatch[1]) {
       timeOffsetHours = Math.min(3, Math.max(0, parseInt(timeMatch[1], 10)));
     }
 
-    // 3. Tách câu hỏi làm sạch để tìm điểm đi / điểm đến
+    let requestedVehicle = null;
+    const lower = query.toLowerCase();
+    if (/(?:ô\s*tô\s*điện|ecar)/i.test(lower)) requestedVehicle = 'ecar';
+    else if (/(?:xe\s*máy\s*điện|ebike)/i.test(lower)) requestedVehicle = 'ebike';
+    else if (/(?:đi\s+ô\s*tô|bằng\s+ô\s*tô|xe\s+hơi)/i.test(lower)) requestedVehicle = 'car';
+    else if (/(?:đi\s+xe\s*máy|bằng\s+xe\s*máy)/i.test(lower)) requestedVehicle = 'motorbike';
+
     let cleanQuery = query;
     for (const pat of avoidPatterns) {
       cleanQuery = cleanQuery.replace(pat, ' ');
     }
 
-    // Xóa các câu hỏi phụ ở đuôi (ưu tiên xóa cụm dài trước cụm ngắn)
     let cleaned = cleanQuery
       .replace(/(?:trong|sau|khoảng)\s*\d+\s*(?:h|giờ|tiếng|phút|p)\s*(?:tới|nữa|sau)?.*$/i, '')
       .replace(/\s+\d+\s*(?:h|giờ|tiếng)\s*(?:tới|nữa).*$/i, '')
@@ -393,9 +1291,6 @@ class AIChat {
       .replace(/\s+(?:không|chưa|nhỉ|vậy|ạ|nhé|\?|\.|!)+$/i, '')
       .trim();
 
-    // Pattern A: Điểm đến trước, điểm đi sau
-    // Ví dụ: "cuối thứ 7 tuần này tôi muốn nghe nhạc tại cafe cộng đối diện sân vận động mỹ đình đi từ an TRAI RA đường nào đư tác"
-    // Ví dụ 2: "muốn đến viện 103 đi từ ngã tư sở đường nào đỡ ngập"
     const destFirstRegex = /(?:tôi\s+)?(?:muốn|cần|định|thích)?\s*(?:nghe\s+nhạc|uống\s+cafe|cafe|ăn\s+uống|xem\s+phim|đi\s+chơi|đến|tới|ghé|về|ở|đi)?\s*(?:tại|ở|đến|tới)\s+(.+?)\s+(?:đi\s+)?từ\s+(.+?)(?:\s+(?:ra|vào|đến|theo|qua)\s+.*|\s*$)/i;
     const matchA = cleaned.match(destFirstRegex);
     if (matchA && matchA[1] && matchA[2]) {
@@ -407,32 +1302,16 @@ class AIChat {
         .trim();
 
       if (rawDest.length >= 2 && rawOrig.length >= 2 && !rawDest.match(/^(?:đường|đường nào)$/i)) {
-        return {
-          origin: rawOrig,
-          destination: rawDest,
-          timeOffsetHours,
-          avoidRoad
-        };
+        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, requestedVehicle };
       }
     }
 
-    // Pattern B: Điểm đi trước, điểm đến sau thông thường
-    // "đi từ A đến/ra/về B"
     const routeRegex = /(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới|ra|vào|lên|xuống)\s+(.+)$/i;
     const matchB = cleaned.match(routeRegex);
     if (matchB && matchB[1] && matchB[2]) {
-      const orig = matchB[1]
-        .replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi)\s+/i, '')
-        .replace(/[,.?!]+$/g, '')
-        .trim();
+      const orig = matchB[1].replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi)\s+/i, '').replace(/[,.?!]+$/g, '').trim();
+      let dest = matchB[2].replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '').replace(/\s+(?:đường\s+nào\s+.*|đường\s+nào)$/i, '').replace(/[,.?!]+$/g, '').trim();
 
-      let dest = matchB[2]
-        .replace(/\s+(?:né ngập|tránh tắc|không ngập|an toàn|nhanh nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
-        .replace(/\s+(?:đường\s+nào\s+.*|đường\s+nào)$/i, '')
-        .replace(/[,.?!]+$/g, '')
-        .trim();
-
-      // Nếu điểm đến bị cắt cụt thành chữ "đường" hoặc quá ngắn, tìm xem có điểm đến ở vế trước không
       if (dest.toLowerCase() === 'đường' || dest.toLowerCase() === 'đường nào' || dest.length < 2) {
         const priorDestMatch = query.match(/(?:tại|đến|tới|ở)\s+([^,]+?)\s+(?:đi\s+)?từ/i);
         if (priorDestMatch && priorDestMatch[1]) {
@@ -443,559 +1322,12 @@ class AIChat {
       }
 
       if (orig.length >= 2 && dest.length >= 2) {
-        return {
-          origin: orig,
-          destination: dest,
-          timeOffsetHours,
-          avoidRoad
-        };
+        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, requestedVehicle };
       }
     }
 
     return null;
   }
-
-  handleMapAction(act) {
-    if (!act || !window.mapEngine) return;
-    if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
-      if (window.appState && window.appState.triggerChatRoute) {
-        const avoidList = act.avoidRoads || (act.avoidRoad ? [act.avoidRoad] : []);
-        window.appState.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0, avoidList);
-      }
-    } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
-      window.mapEngine.map?.flyTo([act.lat, act.lng], 16);
-      setTimeout(() => {
-        if (typeof window.mapEngine.openWardPopup === 'function') {
-          window.mapEngine.openWardPopup(act.lat, act.lng);
-        }
-      }, 650);
-    } else if (act.type === 'SHOW_FLOOD_LAYER') {
-      window.mapEngine.toggleFloods(true);
-      const chk = document.getElementById('chk-layer-flood');
-      if (chk) chk.checked = true;
-    } else if (act.type === 'SHOW_TRAFFIC_LAYER') {
-      window.mapEngine.toggleTraffic(true);
-      window.mapEngine.toggleIncidents(true);
-      const chk = document.getElementById('chk-layer-traffic');
-      if (chk) chk.checked = true;
-    } else if (act.type === 'SHOW_WEATHER_LAYER') {
-      window.mapEngine.toggleWeather(true);
-      const chk = document.getElementById('chk-layer-weather');
-      if (chk) chk.checked = true;
-    } else if (act.type === 'SHOW_EV_LAYER') {
-      if (window.mapEngine && window.mapEngine.toggleEV) {
-        window.mapEngine.toggleEV(true);
-      }
-      const chk = document.getElementById('chk-layer-ev');
-      if (chk) chk.checked = true;
-      const item = document.getElementById('layer-item-ev');
-      if (item) item.style.display = 'flex';
-      if (act.targetStation && window.mapEngine && window.mapEngine.focusEVStation) {
-        setTimeout(() => window.mapEngine.focusEVStation(act.targetStation), 700);
-      }
-    } else if (act.type === 'SHOW_FOOD_PLACES') {
-      if (act.areaKey) this.currentAreaKey = act.areaKey;
-      if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
-        window.mapEngine.renderFoodPlaces(act.spots || [], act.lat, act.lng);
-      } else if (act.lat && act.lng) {
-        window.mapEngine.map?.flyTo([act.lat, act.lng], 14);
-      }
-    }
-
-    // Nếu chuyển sang tác vụ khác (chỉ đường, xem lớp giao thông), dọn dẹp các ghim đề xuất cũ
-    if (act.type === 'AUTO_ROUTE' || act.type === 'SHOW_TRAFFIC_LAYER' || act.type === 'SHOW_FLOOD_LAYER' || act.type === 'SHOW_WEATHER_LAYER') {
-      if (window.mapEngine && typeof window.mapEngine.clearFoodPlaces === 'function') {
-        window.mapEngine.clearFoodPlaces();
-      }
-    }
-  }
-
-  async sendMessage(queryText) {
-    const input = document.getElementById('ai-chat-input');
-    const query = queryText || (input ? input.value.trim() : '');
-    if (!query) return;
-
-    if (input) input.value = '';
-    this.addUserMessage(query);
-
-    this.addBotMessage('*Đang phân tích dữ liệu giao thông thời gian thực...*');
-
-    const currentCity = window.appState ? window.appState.currentCity : 'hanoi';
-    const geminiKey = localStorage.getItem('movesafe_gemini_key') || (window.CONFIG && window.CONFIG.GEMINI_KEY) || '';
-    const parsedRoute = this.parseRouteQuery(query);
-
-    // Tự động dọn dẹp các ghim đề xuất địa điểm cũ nếu câu hỏi mới không thuộc nhóm ẩm thực/giải trí
-    const isFoodQuery = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
-    if (!isFoodQuery && window.mapEngine && typeof window.mapEngine.clearFoodPlaces === 'function') {
-      window.mapEngine.clearFoodPlaces();
-    }
-
-    // Thu thập ngữ cảnh hiện tại (tọa độ tâm bản đồ & khu vực vừa thảo luận)
-    const mapCenter = (window.mapEngine && window.mapEngine.map) ? window.mapEngine.map.getCenter() : null;
-    const chatContext = {
-      lastAreaKey: this.currentAreaKey || null,
-      mapCenter: mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null
-    };
-
-    if (isFoodQuery && window.FOOD_ENTERTAINMENT_DATA && typeof window.FOOD_ENTERTAINMENT_DATA.geocodeLocationLive === 'function') {
-      try {
-        const probeRec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
-        if (probeRec && probeRec.unresolvedLocationPhrase) {
-          const geo = await window.FOOD_ENTERTAINMENT_DATA.geocodeLocationLive(probeRec.unresolvedLocationPhrase, currentCity);
-          if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
-            const shortTitle = (geo.title || probeRec.unresolvedLocationPhrase).split(',')[0].trim();
-            chatContext.customAnchor = {
-              title: shortTitle.toLowerCase().startsWith('khu vực') ? shortTitle : `Khu Vực ${shortTitle}`,
-              lat: geo.lat,
-              lng: geo.lng
-            };
-          }
-        }
-      } catch (_geoErr) {}
-    }
-
-    let responded = false;
-
-    // 1. Thử gọi backend API server nếu có (/api/ai/chat)
-    try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, city: currentCity, apiKey: geminiKey, context: chatContext })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === 'success' && data.response?.text) {
-          this.messages.pop();
-
-          this.addBotMessage(data.response.text, {
-            spots: data.response.action?.spots || null
-          });
-          responded = true;
-
-          if (data.response.action) {
-            if (parsedRoute?.avoidRoad && !data.response.action.avoidRoads) {
-              data.response.action.avoidRoads = [parsedRoute.avoidRoad];
-            }
-            this.handleMapAction(data.response.action);
-          } else if (parsedRoute) {
-            this.handleMapAction({
-              type: 'AUTO_ROUTE',
-              origin: parsedRoute.origin,
-              destination: parsedRoute.destination,
-              avoidLevel: 1,
-              timeOffsetHours: parsedRoute.timeOffsetHours,
-              avoidRoads: parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []
-            });
-          }
-        }
-      }
-    } catch (serverErr) {
-      // Backend không phản hồi
-    }
-
-    if (responded) return;
-
-    // 2. Thử gọi trực tiếp Google Gemini API qua Client (sử dụng model thế hệ mới nhất)
-    if (geminiKey) {
-      try {
-        let geminiReply = await this.callDirectGemini(query, currentCity, geminiKey);
-        this.messages.pop();
-
-        let autoOrigin = null;
-        let autoDest = null;
-        let autoAvoid = null;
-
-        const routeMatch = geminiReply.match(/\[ACTION_ROUTE:\s*(.*?)\s*->\s*(.*?)(?:\s*\|\s*AVOID:\s*(.*?))?\]/i);
-        if (routeMatch) {
-          autoOrigin = routeMatch[1].trim();
-          autoDest = routeMatch[2].trim();
-          if (routeMatch[3]) autoAvoid = routeMatch[3].trim();
-          geminiReply = geminiReply.replace(/\[ACTION_ROUTE:\s*.*?\s*\]/i, '').trim();
-        } else if (parsedRoute) {
-          autoOrigin = parsedRoute.origin;
-          autoDest = parsedRoute.destination;
-          autoAvoid = parsedRoute.avoidRoad;
-        }
-
-        const isFoodQ = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
-        const foodRec = isFoodQ
-          ? (typeof window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
-              ? await window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, currentCity, chatContext)
-              : window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext))
-          : null;
-
-        this.addBotMessage(geminiReply, {
-          spots: foodRec?.action?.spots || null
-        });
-
-        const lowerQ = query.toLowerCase();
-        if (isFoodQ && foodRec?.action) {
-          this.handleMapAction(foodRec.action);
-        } else if (lowerQ.includes('trạm sạc') || lowerQ.includes('sạc xe') || lowerQ.includes('sạc pin') || lowerQ.includes('xe điện') || lowerQ.includes('đổi pin')) {
-          this.handleMapAction({ type: 'SHOW_EV_LAYER' });
-        }
-
-        if (autoOrigin && autoDest && window.appState && window.appState.triggerChatRoute) {
-          const avoidList = autoAvoid ? [autoAvoid] : (parsedRoute?.avoidRoad ? [parsedRoute.avoidRoad] : []);
-          window.appState.triggerChatRoute(autoOrigin, autoDest, 1, parsedRoute ? parsedRoute.timeOffsetHours : 0, avoidList);
-        }
-        return;
-      } catch (geminiErr) {
-        console.warn('[AIChat] Direct Gemini call fallback to local rule engine:', geminiErr);
-      }
-    }
-
-    // 3. Fallback sang Bộ não AI cục bộ dựa trên dữ liệu trạm đo thực tế & tri thức sự kiện đô thị
-    this.messages.pop();
-    const allFloods = (window.appState && typeof window.appState.getCurrentFloods === 'function')
-      ? window.appState.getCurrentFloods()
-      : (window.appState ? window.appState.liveData.floodPoints.filter(f => f.city === currentCity) : []);
-    const activeFloods = allFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
-    const traffics = window.appState ? window.appState.liveData.trafficIncidents.filter(t => t.city === currentCity) : [];
-    const activeJams = traffics.filter(t => t.isJam === true);
-    const lower = query.toLowerCase();
-
-    // 3a. Nhận diện các câu hỏi về sự kiện, đông người, ùn tắc diện rộng (Event & Crowd Inquiry)
-    const isEventOrCrowdQuery = (
-      lower.includes('đông thế') || lower.includes('đông vậy') || lower.includes('sao đông') ||
-      lower.includes('tại sao đông') || lower.includes('đông đúc') || lower.includes('có sự kiện gì') ||
-      lower.includes('hôm qua') || lower.includes('tối qua') || lower.includes('concert') ||
-      lower.includes('nhạc hội') || lower.includes('đại nhạc hội') || (lower.includes('sân vận động') && (lower.includes('đông') || lower.includes('tắc')))
-    );
-
-    if (isEventOrCrowdQuery && (lower.includes('mỹ đình') || lower.includes('sân vận động') || lower.includes('svđ'))) {
-      const reply = `**Hiện tượng đông đúc & ùn tắc tại khu vực Sân vận động Quốc gia Mỹ Đình**:\n\n` +
-                    `• **Nguyên nhân chính**: Khu vực SVĐ Mỹ Đình thường xuyên tổ chức các sự kiện văn hóa, đại nhạc hội âm nhạc quy mô lớn (như Concert Anh Trai Say Hi, Anh Trai Vượt Ngàn Chông Gai, các tour diễn âm nhạc trong nước & quốc tế) hoặc các trận thi đấu bóng đá của Đội tuyển Quốc gia Việt Nam với quy mô 30.000 - 40.000 khán giả.\n` +
-                    `• **Khung giờ cao điểm**: Khoảng 18h00 - 22h30 là thời điểm lượng khán giả và xe cộ dồn về cùng lúc, làm quá tải nghiêm trọng các trục tiếp cận: **Lê Đức Thọ, Lê Quang Đạo, Châu Văn Liêm, Nguyễn Hoàng, Mễ Trì và Hồ Tùng Mậu**.\n` +
-                    `• **Khuyến nghị di chuyển thông minh**: Nếu có lịch trình qua khu vực này trong các ngày diễn ra sự kiện, bạn nên đi sớm trước 2 tiếng, ưu tiên sử dụng tuyến **Đường sắt đô thị Metro Tuyến 3 (Ga Lê Đức Thọ / Ga Cầu Giấy)** hoặc gửi xe tại các bãi ngoài bán kính 1km (Khu liên hợp, Cung Điền kinh, The Garden) rồi đi bộ vào sân.`;
-      this.addBotMessage(reply);
-      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
-      return;
-    }
-
-    if (isEventOrCrowdQuery && (lower.includes('phố đi bộ') || lower.includes('hồ gươm') || lower.includes('hoàn kiếm'))) {
-      const reply = `**Tình hình sự kiện & lưu thông tại Không gian Phố đi bộ Hồ Gươm**:\n\n` +
-                    `• **Quy chế hoạt động**: Tuyến phố đi bộ Hồ Gươm và phụ cận cấm toàn bộ phương tiện cơ giới lưu thông từ tối thứ Sáu đến hết Chủ nhật hàng tuần.\n` +
-                    `• **Điểm ùn ứ thường gặp**: Các điểm gửi xe và nút giao tiếp cận (Hàng Bài, Hai Bà Trưng, Tràng Tiền, Đinh Tiên Hoàng) thường có mật độ người và xe rất đông vào khung giờ 19h00 - 23h00.\n` +
-                    `• **Gợi ý gửi xe**: Gửi xe máy/ô tô tại các điểm quy hoạch trên phố Lý Thái Tổ, Trần Nguyên Hãn, Hai Bà Trưng trước khi đi bộ vào khu vực trung tâm.`;
-      this.addBotMessage(reply);
-      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
-      return;
-    }
-
-    if (isEventOrCrowdQuery && (lower.includes('hội nghị quốc gia') || lower.includes('ncc'))) {
-      const reply = `**Tình hình giao thông tại Trung tâm Hội nghị Quốc gia (NCC)**:\n\n` +
-                    `Khu vực cổng đường Phạm Hùng và Đại lộ Thăng Long thường đón các đoàn xe ngoại giao, triển lãm quốc tế hoặc sự kiện hội nghị quy mô lớn. Vào giờ tan tầm hoặc trước giờ khai mạc sự kiện, luồng phương tiện chuyển làn rẽ vào trung tâm thường gây xung đột dòng xe nhẹ tại nút giao Phạm Hùng - Trần Duy Hưng.`;
-      this.addBotMessage(reply);
-      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
-      return;
-    }
-
-    // 3b. Nếu hỏi lộ trình từ A đến B (xử lý chính xác cả lộ trình xuôi, ngược và tình huống giả định cấm đường)
-    if (parsedRoute) {
-      const { origin, destination, timeOffsetHours, avoidRoad } = parsedRoute;
-      const timeNote = timeOffsetHours > 0
-        ? `\n• **Dự báo trong +${timeOffsetHours} giờ tới**: Hệ thống đã kích hoạt mô hình dự báo giao thông +${timeOffsetHours}h. Lưu lượng trên các trục chính hướng về **${destination}** được phân tích trực tiếp trên thanh trạng thái lộ trình.`
-        : '';
-
-      const trafficNote = activeJams.length > 0
-        ? `Hiện ghi nhận **${activeJams.length} điểm ùn ứ** trong khu vực, hệ thống đã tự động ưu tiên đường vòng thông thoáng.`
-        : `Hiện tại các trục đường chính tương đối thông thoáng, không ghi nhận điểm ùn tắc nghiêm trọng.`;
-
-      const avoidHypothesisNote = avoidRoad
-        ? `\n• **Tình huống giả định**: Tuyến đường **${avoidRoad}** giả định bị cấm lưu thông. MoveSafe đã kích hoạt thuật toán tìm đường vòng, loại bỏ hoàn toàn các cung đường qua **${avoidRoad}** và chọn hành lang thay thế an toàn.`
-        : '';
-
-      const reply = `**Đã tự động phân tích và vẽ lộ trình trên bản đồ**\n\n` +
-                    `• **Điểm xuất phát**: ${origin}\n` +
-                    `• **Điểm đến**: ${destination}\n` +
-                    `• **Tình trạng giao thông**: ${trafficNote}${timeNote}${avoidHypothesisNote}\n` +
-                    `• **Chế độ điều phối**: Ưu tiên lộ trình an toàn, né hoàn toàn các điểm ngập úng, nút giao ùn tắc và tuyến đường cấm giả định.\n\n` +
-                    `*Bảng chi tiết lộ trình và bản đồ dẫn đường đã được mở ở phía bên trái màn hình.*`;
-
-      this.addBotMessage(reply);
-      if (window.appState && window.appState.triggerChatRoute) {
-        const avoidList = avoidRoad ? [avoidRoad] : [];
-        window.appState.triggerChatRoute(origin, destination, 1, timeOffsetHours, avoidList);
-      }
-      return;
-    }
-
-    // 3c. Đề xuất địa điểm ăn uống, rạp chiếu phim, cafe hoặc điểm vui chơi giải trí
-    if (window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query)) {
-      const rec = typeof window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
-        ? await window.FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, currentCity, chatContext)
-        : window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity, chatContext);
-      this.addBotMessage(rec.text, { spots: rec.action?.spots || null });
-      if (rec.action) {
-        this.handleMapAction(rec.action);
-      }
-      return;
-    }
-
-    // 3d. Kiểm tra nếu hỏi về thông tin hành chính phường hoặc đặc thù thoát nước tại Hà Nội (chỉ kích hoạt khi không phải câu hỏi sự kiện)
-    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA && !isEventOrCrowdQuery && (lower.includes('phường') || lower.includes('quận') || lower.includes('thoát nước') || lower.startsWith('thông tin') || lower.startsWith('thời tiết'))) {
-      let matchedWard = window.HANOI_WARDS_DATA.find(w => {
-        const wLower = w.name.toLowerCase();
-        const rawWName = wLower.replace(/^phường\s+|^xã\s+/i, '').trim();
-        return lower.includes(wLower) || (rawWName.length >= 3 && lower.includes(rawWName)) || (lower.includes(w.district.toLowerCase()) && lower.includes(rawWName));
-      });
-
-      if (!matchedWard) {
-        for (const w of window.HANOI_WARDS_DATA) {
-          const st = (w.mainStreets || []).find(s => {
-            const cleanSt = s.toLowerCase().replace(/^đường\s+|^phố\s+|^quốc lộ\s+/i, '').trim();
-            return lower.includes(s.toLowerCase()) || (cleanSt.length >= 4 && lower.includes(cleanSt));
-          });
-          if (st) {
-            matchedWard = w;
-            break;
-          }
-        }
-      }
-
-      if (matchedWard) {
-        const liveStations = (window.appState && window.appState.latestWeatherStations) || [];
-        const stWeather = liveStations.find(s => s.name === matchedWard.name);
-        const temp = stWeather ? stWeather.temp : 26;
-        const desc = stWeather ? stWeather.description : 'Khô ráo';
-        const rain = stWeather ? stWeather.rain1h : 0;
-        const weatherText = rain > 0 ? `${temp}°C, lượng mưa ${rain}mm (${desc})` : `${temp}°C, khô ráo (${desc})`;
-
-        let reply = `**Thông tin giao thông & thời tiết: ${matchedWard.name} (Quận ${matchedWard.district})**\n\n`;
-        reply += `• **Thời tiết hiện tại**: ${weatherText}\n`;
-        reply += `• **Các trục đường chính**: ${(matchedWard.mainStreets || []).join(', ')}\n`;
-        if (matchedWard.trafficHotspots && matchedWard.trafficHotspots.length > 0) {
-          reply += `• **Nút giao trọng điểm**: ${matchedWard.trafficHotspots.join('; ')}\n`;
-        }
-        if (matchedWard.floodVulnerability) {
-          reply += `• **Đặc điểm thoát nước**: ${matchedWard.floodVulnerability}\n`;
-        }
-        reply += `\nBạn có thể nhấn vào nút **Chỉ đường** trên thanh tìm kiếm để vạch lộ trình chi tiết qua khu vực này.`;
-
-        this.addBotMessage(reply);
-        if (window.mapEngine && window.mapEngine.map) {
-          window.mapEngine.map.flyTo([matchedWard.lat, matchedWard.lng], 15);
-        }
-        return;
-      }
-    }
-
-    // 3e. Hỏi về trạm sạc xe điện (VinFast, Open Charge Map, EVOne, Porsche, Selex, ...)
-    if (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('sạc điện') || lower.includes('đổi pin') || lower.includes('open charge')) {
-      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
-      const fastList = stations.filter(s => s.isFastCharge || (s.maxPowerKw && s.maxPowerKw >= 50));
-      
-      let matched = null;
-      for (const st of stations) {
-        const cleanName = (st.name || '').toLowerCase();
-        if (lower.includes(cleanName) || (st.address && lower.includes(st.address.toLowerCase()))) {
-          matched = st;
-          break;
-        }
-      }
-
-      if (matched) {
-        const reply = `**Thông tin trạm sạc: ${matched.name}**\n\n` +
-                      `• **Đơn vị vận hành**: ${matched.operator || matched.provider || 'VinFast'}\n` +
-                      `• **Địa chỉ**: ${matched.address}\n` +
-                      `• **Công suất tối đa**: ${matched.maxPowerKw || 60} kW (${matched.isFastCharge ? 'DC Sạc nhanh' : 'AC Chuẩn'})\n` +
-                      `• **Trạng thái**: ${matched.isOperational !== false ? 'Đang hoạt động 24/7' : 'Đang bảo trì'}\n` +
-                      `• **Quy mô**: ${matched.totalPoints || matched.capacity || 2} trụ sạc\n\n` +
-                      `*Hệ thống đã tự động định vị và mở thông tin trạm sạc trên bản đồ. Bạn có thể nhấn "Chỉ đường né ngập" trong popup để di chuyển an toàn.*`;
-        this.addBotMessage(reply);
-        this.handleMapAction({
-          type: 'SHOW_EV_LAYER',
-          targetStation: matched.name
-        });
-        return;
-      }
-
-      const sampleList = stations.slice(0, 3).map(s => 
-        `• **${s.name}** (${s.operator || 'Đối tác'}) - ${s.maxPowerKw || 60}kW - ${s.address}`
-      ).join('\n');
-
-      const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
-      const reply = `**Hệ thống Trạm sạc Xe điện (${cityName}) - Open Charge Map & Đối tác**:\n\n` +
-                    `Hiện hệ thống có **${stations.length > 0 ? stations.length : 12} trạm sạc khả dụng** trong thành phố (gồm **${fastList.length > 0 ? fastList.length : 9} trạm sạc nhanh DC** từ 60kW - 250kW và các trạm đổi pin).\n\n` +
-                    (sampleList ? `**Một số trạm sạc tiêu biểu gần bạn**:\n${sampleList}\n\n` : '') +
-                    `*Lớp bản đồ trạm sạc đã được kích hoạt. Bạn có thể nhấn trực tiếp vào từng ghim trạm sạc trên màn hình để kiểm tra cổng sạc hoặc bấm chỉ đường an toàn.*`;
-
-      this.addBotMessage(reply);
-      this.handleMapAction({ type: 'SHOW_EV_LAYER' });
-      return;
-    }
-
-    let reply = `**Phân tích giao thông MoveSafe**:\n\n`;
-    if (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('kẹt xe')) {
-      if (lower.includes('xuân phương')) {
-        reply += `**Tình trạng tuyến đường Xuân Phương (Nam Từ Liêm)**:\n` +
-                 `• **Nguyên nhân**: Mặt cắt đường hẹp, lưu lượng phương tiện từ các khu đô thị đổ ra đường 32 và Trịnh Văn Bô lớn vào giờ cao điểm.\n` +
-                 `• **Điểm nghẽn**: Nút giao cầu vượt và các điểm giao cắt với xe tải, xe buýt.\n` +
-                 `• **Khuyến nghị**: Chuyển hướng sang trục Trịnh Văn Bô hoặc đường Trần Hữu Dực để di chuyển thông thoáng hơn.`;
-      } else {
-        reply += `Khu vực hiện ghi nhận **${activeJams.length} điểm ùn tắc** trên hệ thống TomTom Traffic.\n` +
-                 `Lớp bản đồ mật độ giao thông đã được hiển thị trực tiếp trên màn hình để bạn theo dõi.`;
-      }
-      this.handleMapAction({ type: 'SHOW_TRAFFIC_LAYER' });
-    } else if (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích')) {
-      if (activeFloods.length > 0) {
-        reply += `Hiện hệ thống ghi nhận **${activeFloods.length} điểm ngập** tại khu vực:\n\n` +
-                 activeFloods.slice(0, 3).map(f => `• **${f.name}**: Ngập ${f.depth_cm}cm (${f.passable_motorbike ? 'Xe máy đi chậm' : 'Xe máy không nên đi qua'})`).join('\n') +
-                 `\n\nBạn có thể mở mục **Chỉ đường** để hệ thống tự động vạch lộ trình vòng tránh các điểm ngập này.`;
-      } else {
-        reply += `Hiện tại toàn bộ các trạm quan trắc trong thành phố đều **khô ráo (0 điểm ngập)**. Các phương tiện lưu thông bình thường và an toàn.`;
-      }
-      this.handleMapAction({ type: 'SHOW_FLOOD_LAYER' });
-    } else {
-      reply += `Khu vực hiện có **${activeFloods.length} điểm ngập** và **${activeJams.length} điểm ùn tắc**. Để tìm đường tự động, bạn có thể nhập câu hỏi theo cú pháp *"Từ [Điểm đi] đến [Điểm đến]"*.`;
-    }
-    this.addBotMessage(reply);
-  }
-
-  async callDirectGemini(query, currentCity, apiKey) {
-    const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
-    const liveData = window.appState ? window.appState.liveData : { floodPoints: [], trafficIncidents: [], weatherAlerts: [] };
-    const allFloods = (window.appState && typeof window.appState.getCurrentFloods === 'function')
-      ? window.appState.getCurrentFloods()
-      : ((liveData.floodPoints || []).filter(f => f.city === currentCity));
-    const activeFloods = allFloods.filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
-    const traffics = (liveData.trafficIncidents || []).filter(t => t.city === currentCity);
-    const alerts = liveData.weatherAlerts || [];
-
-    const lower = query.toLowerCase();
-    const isAskingTrafficOnly = (lower.includes('tắc') || lower.includes('kẹt') || lower.includes('ùn') || lower.includes('sao lại') || lower.includes('tại sao') || lower.includes('kẹt xe') || lower.includes('đông thế') || lower.includes('đông')) && !lower.includes('ngập') && !lower.includes('mưa');
-    const isAskingFloodOnly = (lower.includes('ngập') || lower.includes('nước') || lower.includes('thủy kích') || lower.includes('triều cường')) && !lower.includes('tắc') && !lower.includes('kẹt');
-    const isAskingEV = (lower.includes('trạm sạc') || lower.includes('sạc xe') || lower.includes('sạc điện') || lower.includes('sạc pin') || lower.includes('xe điện') || lower.includes('đổi pin') || lower.includes('open charge')) && !lower.includes('tắc');
-    const isAskingFoodOrEntertainment = window.FOOD_ENTERTAINMENT_DATA && window.FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
-
-    let dynamicContext = '';
-    if (currentCity === 'hanoi' && window.HANOI_WARDS_DATA) {
-      const matched = window.HANOI_WARDS_DATA.find(w => {
-        const wLower = w.name.toLowerCase();
-        const rawWName = wLower.replace(/^phường\s+|^xã\s+/i, '').trim();
-        return lower.includes(wLower) || (rawWName.length >= 3 && lower.includes(rawWName)) || (w.mainStreets || []).some(s => lower.includes(s.toLowerCase()));
-      });
-      if (matched) {
-        dynamicContext += `Dữ liệu địa phương Hà Nội về ${matched.name} (Q. ${matched.district}):
-- Các trục đường lớn: ${matched.mainStreets.join(', ')}
-- Điểm giao cắt trọng điểm: ${matched.trafficHotspots.join(' • ')}
-- Đặc điểm ngập úng mùa mưa: ${matched.floodVulnerability}\n\n`;
-      }
-    }
-
-    // Bổ sung tri thức sự kiện văn hóa, thể thao, tụ điểm đông người tại Hà Nội & đô thị lớn
-    dynamicContext += `Tri thức bối cảnh sự kiện đô thị ${cityName}:
-- Sân vận động Quốc gia Mỹ Đình: Thường tổ chức đại nhạc hội/concert âm nhạc quy mô 30.000 - 40.000 khán giả (như Concert Anh Trai Say Hi, Anh Trai Vượt Ngàn Chông Gai, đêm nhạc ca sĩ) hoặc trận bóng đá ĐTQG Việt Nam. Khung giờ 18h - 23h lưu lượng phương tiện đổ dồn về các tuyến Lê Đức Thọ, Lê Quang Đạo, Châu Văn Liêm, Mễ Trì, Hồ Tùng Mậu gây ùn tắc giao thông cục bộ.
-- Trung tâm Hội nghị Quốc gia NCC: Các hội nghị, triển lãm quốc tế, đại nhạc hội lớn tại đại lộ Thăng Long & Phạm Hùng.
-- Phố đi bộ Hồ Gươm: Cấm phương tiện vào tối thứ 6, thứ 7, chủ nhật.\n\n`;
-
-    let instructions = '';
-
-    if (isAskingTrafficOnly) {
-      dynamicContext += `Dữ liệu giao thông thời gian thực từ TomTom & VOV tại ${cityName}:
-- Sự cố / tình hình ùn tắc: ${JSON.stringify(traffics.slice(0, 6).map(t => ({ description: t.description, delay_min: Math.round((t.delaySeconds || 60) / 60) })))}`;
-
-      instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng hỏi về TẮC ĐƯỜNG / KẸT XE / ĐÔNG NGƯỜI / SỰ KIỆN GIAO THÔNG.
-2. Nếu hỏi về lý do tại sao đông người / kẹt xe (ví dụ ở SVĐ Mỹ Đình hôm qua lúc 8h tối): Hãy giải thích rõ bản chất sự kiện (đại nhạc hội / concert / bóng đá), khung giờ khán giả đổ về và các tuyến đường bị ảnh hưởng, kèm lời khuyên di chuyển thông minh. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.
-3. Nếu người dùng hỏi lộ trình hoặc có tình huống giả định cấm đường / né đường (ví dụ: 'giả sử đường Trịnh Văn Bô cấm đường...', 'cuối tuần đi từ An Trai đến Cafe Cộng đối diện SVĐ Mỹ Đình'):
-   - Nhận định tình huống giả định nếu có và đề xuất phương án đi vòng thay thế.
-   - Suy luận chính xác Điểm xuất phát (Origin) và Điểm đến (Destination) cụ thể. Điểm đến không bao giờ là từ chung chung như 'đường' hay 'đường nào'.
-   - Ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm Xuất Phát -> Điểm Đến | AVOID: Tên đường cần tránh nếu có].
-4. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
-    } else if (isAskingFloodOnly) {
-      const floodsForPrompt = activeFloods.length > 0 ? activeFloods : allFloods.slice(0, 5);
-      dynamicContext += `Dữ liệu đo đạc ngập úng từ trạm HSDC/UDi Maps tại ${cityName} (Số điểm ngập >0cm hiện tại: ${activeFloods.length}):
-- Các điểm đo ngập: ${JSON.stringify(floodsForPrompt.slice(0, 8).map(f => ({ name: f.name, depth_cm: f.depth_cm, advice: f.advice, passable_motorbike: f.passable_motorbike })))}
-- Cảnh báo thời tiết KTTV: ${JSON.stringify(alerts.slice(0, 2))}`;
-
-      instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng hỏi về NGẬP NƯỚC / THỦY KÍCH / MƯA LŨ. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại đường khô ráo (0cm ngập). Nếu có ngập >0cm, nêu rõ độ sâu ngập (cm) và hướng đi thay thế.
-2. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
-    } else if (isAskingEV) {
-      const stations = (window.mapEngine && window.mapEngine._evStationsData) ? window.mapEngine._evStationsData : [];
-      dynamicContext += `Dữ liệu trạm sạc xe điện Open Charge Map & Đối tác tại ${cityName}:
-- Tổng số trạm sạc: ${stations.length || 12}
-- Danh sách trạm sạc tiêu biểu: ${JSON.stringify(stations.slice(0, 6).map(s => ({ name: s.name, operator: s.operator, maxPowerKw: s.maxPowerKw, isFastCharge: s.isFastCharge, address: s.address })))}`;
-
-      instructions = `YÊU CẦU TRẢ LỜI:
-1. Người dùng hỏi về TRẠM SẠC XE ĐIỆN / ĐỔI PIN PIN LITHIUM.
-2. Nêu rõ các trạm sạc gần nhất, công suất sạc (kW), hỗ trợ DC sạc nhanh hay AC chuẩn, và hướng đi khô ráo né ngập.
-3. Trả lời súc tích, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
-    } else if (isAskingFoodOrEntertainment) {
-      const rec = window.FOOD_ENTERTAINMENT_DATA.getRecommendation(query, currentCity);
-      const catName = rec.categoryType === 'cinema' ? 'rạp chiếu phim' : (rec.categoryType === 'cafe' ? 'quán cà phê' : (rec.categoryType === 'entertainment' ? 'điểm vui chơi giải trí' : 'quán ăn/món ngon'));
-      dynamicContext += `Cơ sở dữ liệu ẩm thực & vui chơi thực tế tại ${cityName} (${rec.title}):
-${rec.text}`;
-
-      instructions = `YÊU CẦU TRẢ LỜI ĐẶC BIỆT:
-1. Người dùng đang hỏi về ${catName.toUpperCase()} tại khu vực này.
-2. Bạn là Chuyên gia Bản địa sành sỏi, am hiểu sâu sắc về ẩm thực và điểm vui chơi giải trí tại ${cityName}.
-3. Hãy dựa trên danh sách các địa điểm thực tế đã được định vị ở trên (${rec.title}):
-   - Giới thiệu cụ thể các ${catName} sát khu vực người dùng hỏi theo đúng danh sách trên.
-   - Nêu rõ đặc sản / điểm nổi bật, khoảng cách thực tế (ví dụ cách ~120m, ~210m) và mức giá tham khảo.
-4. Kèm theo mẹo giao thông & đỗ xe thực tế: chỗ để xe máy/ô tô có thuận tiện không, khung giờ nên ghé để tránh tắc đường hoặc chờ bàn.
-5. Trả lời đúng trọng tâm câu hỏi, văn phong thông minh, thực tế, KHÔNG dùng biểu tượng cảm xúc (emoji/icon) màu mè. Tuyệt đối KHÔNG trả lời lạc đề sang báo cáo thời tiết hay hệ thống thoát nước.`;
-    } else {
-      dynamicContext += `Dữ liệu đo đạc thời gian thực tại đô thị ${cityName} (Số điểm ngập >0cm: ${activeFloods.length}):
-- Điểm ngập úng trạm đo: ${JSON.stringify((activeFloods.length > 0 ? activeFloods : allFloods).slice(0, 6).map(f => ({ name: f.name, depth_cm: f.depth_cm, advice: f.advice })))}
-- Tình hình giao thông TomTom/VOV: ${JSON.stringify(traffics.slice(0, 5).map(t => ({ description: t.description, delay_min: Math.round((t.delaySeconds || 60) / 60) })))}
-- Cảnh báo thời tiết: ${JSON.stringify(alerts.slice(0, 2))}`;
-
-      instructions = `YÊU CẦU TRẢ LỜI:
-1. Trả lời đúng trọng tâm câu hỏi của người dùng, suy luận ngữ cảnh thời gian và sự kiện, KHÔNG dùng biểu tượng cảm xúc (emoji/icon).
-2. Nếu người dùng hỏi đường đi / lộ trình (hoặc có tình huống giả định cấm đường / né đường):
-   - Nhận diện tình huống giả định (nếu có) và hướng dẫn đường vòng thay thế.
-   - Trích xuất chính xác Điểm A và Điểm B (không bao giờ trích xuất điểm đến là từ 'đường' hay câu hỏi).
-   - Ở dòng cuối cùng ghi cú pháp: [ACTION_ROUTE: Điểm A -> Điểm B | AVOID: Tên đường cần tránh nếu có].`;
-    }
-
-    const prompt = `Bạn là Trợ lý AI Giao Thông MoveSafe VN thông minh.
-Đô thị: ${cityName}.
-${dynamicContext}
-
-Câu hỏi của người tham gia giao thông: "${query}"
-
-${instructions}`;
-
-    // Danh sách model Google Gemini khả dụng mới nhất (không dùng các model 1.5/2.0 đã ngưng hoạt động)
-    const candidateModels = [
-      'gemini-flash-lite-latest',
-      'gemini-flash-latest',
-      'gemini-3.5-flash',
-      'gemini-3.8-flash'
-    ];
-    for (const model of candidateModels) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4500);
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (reply && reply.trim().length > 0) {
-            return reply.trim();
-          }
-        }
-      } catch (e) {
-        console.warn(`[Client AI] Model ${model} gặp lỗi:`, e);
-      }
-    }
-    throw new Error('All client Gemini models failed');
-  }
 }
 
 window.aiChat = new AIChat();
-
