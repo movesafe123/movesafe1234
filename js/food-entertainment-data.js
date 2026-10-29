@@ -16,7 +16,7 @@
     root.FOOD_ENTERTAINMENT_DATA = factory();
   }
 })(typeof self !== 'undefined' ? self : this, function () {
-  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|ăn đêm|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
+  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|ăn đêm|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|cửa hàng đồ trung|đồ trung|đồ ăn trung|quán đồ trung|món trung|trung hoa|món hoa|dimsum|sủi cảo|mì vằn thắn|mì kéo|vịt quay bắc kinh|đồ hàn|món hàn|đồ nhật|món nhật|đồ thái|món thái|đồ âu|món âu|quán nào ngon|có gì ngon|món gì ngon|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
 
   /**
    * Bộ lọc sửa lỗi gõ dính phím tiếng Việt Telex thông minh
@@ -1339,6 +1339,94 @@
     },
 
     // 8. Đà Nẵng
+    // 9. Khu vực An Trai - Vân Canh - Xuân Phương (Tây Hà Nội)
+    an_trai_van_canh: {
+      aliases: [
+        'an trai', 'thôn an trai', 'vân canh', 'van canh',
+        'xuân phương', 'xuan phuong', 'phương canh', 'phuong canh',
+        'hoài đức', 'hoai duc', 'cầu ngà', 'cau nga', 'ngã tư canh', 'nga tu canh',
+        'trịnh văn bô', 'trinh van bo', 'fpt polytechnic', 'đh đông á', 'đông á'
+      ],
+      title: 'Khu Vực An Trai - Vân Canh - Xuân Phương (Tây Hà Nội)',
+      lat: 21.0315,
+      lng: 105.7380,
+      highlight: 'Khu vực giáp ranh Nam Từ Liêm & Hoài Đức, tập trung nhiều trường cao đẳng/đại học và các quán đồ ăn Trung Hoa, lẩu nướng, dimsum, trà sữa sinh viên giá mềm.',
+      trafficTip: 'Trục đường Trịnh Văn Bô và Tỉnh lộ 70 qua cầu Ngà đường rộng rãi, vỉa hè thoáng, các quán đều có chỗ để xe máy thoải mái.',
+      spots: [
+        {
+          name: 'Tiệm Mì Kéo & Sủi Cảo Trung Hoa An Trai',
+          address: 'Đường Tỉnh Lộ 70, Thôn An Trai, Xã Vân Canh, H. Hoài Đức (Gần Ngã Tư Canh)',
+          lat: 21.0312,
+          lng: 105.7385,
+          feature: 'Mì kéo tươi sợi dai mềm chuẩn vị Trung Hoa, sủi cảo hấp/chiên nhân thịt bắp tôm tươi ngọt nước, nước dùng xương hầm đậm đà.',
+          vibe: 'Không gian bình dân, sạch sẽ, phục vụ tận tình, chuẩn vị món Trung.',
+          price: '35.000đ - 65.000đ/bát',
+          rating: 4.8,
+          reviewsCount: 380,
+          category: 'food'
+        },
+        {
+          name: 'Lẩu Nướng & Đồ Ăn Vặt Trung Quốc Trịnh Văn Bô',
+          address: 'Số 48 Trịnh Văn Bô, P. Phương Canh, Q. Nam Từ Liêm (Giáp An Trai)',
+          lat: 21.0348,
+          lng: 105.7420,
+          feature: 'Thịt xiên nướng rắc bột ớt tê cay Tứ Xuyên, đậu phụ thối chiên giòn, lẩu cay tê Tứ Xuyên và bánh bao chiên chấm sữa.',
+          vibe: 'Quán trẻ trung phong cách đường phố Trung Hoa, view thoáng mát.',
+          price: '50.000đ - 120.000đ/người',
+          rating: 4.7,
+          reviewsCount: 520,
+          category: 'food'
+        },
+        {
+          name: 'Dimsum & Vịt Quay Bắc Kinh Vân Canh',
+          address: 'Khu Đô Thị Vân Canh HUD, Xã Vân Canh, H. Hoài Đức',
+          lat: 21.0280,
+          lng: 105.7340,
+          feature: 'Vịt quay da giòn bóng bẩy chấm sốt tương ngọt, há cảo tôm sò điệp, bánh bao kim sa trứng muối tan chảy.',
+          vibe: 'Phù hợp ăn gia đình, bạn bè tụ tập cuối tuần, có điều hòa mát.',
+          price: '60.000đ - 150.000đ',
+          rating: 4.6,
+          reviewsCount: 290,
+          category: 'food'
+        },
+        {
+          name: 'Cà Phê Sân Vườn An Trai Garden',
+          address: 'Đường ven hồ An Trai, Xã Vân Canh, H. Hoài Đức',
+          lat: 21.0305,
+          lng: 105.7375,
+          feature: 'Cà phê muối béo ngậy, trà đào cam sả thanh mát trong không gian sân vườn cây xanh yên bình.',
+          vibe: 'Thoáng đãng, trong lành, thích hợp ngồi học bài hoặc trò chuyện thư giãn.',
+          price: '25.000đ - 45.000đ',
+          rating: 4.7,
+          reviewsCount: 210,
+          category: 'cafe'
+        },
+        {
+          name: 'Beta Cinemas Mỹ Đình (Cách An Trai ~5 phút)',
+          address: 'Tòa nhà Golden Palace, Đường Mễ Trì, P. Mễ Trì, Q. Nam Từ Liêm',
+          lat: 21.0145,
+          lng: 105.7765,
+          feature: 'Cụm rạp chiếu phim giá vé sinh viên hợp lý, âm thanh Dolby 7.1, màn chiếu sắc nét và nhiều phim bom tấn mới nhất.',
+          vibe: 'Năng động, dịch vụ nhanh chóng, bắp nước ngon giòn.',
+          price: '50.000đ - 90.000đ/vé',
+          rating: 4.6,
+          reviewsCount: 1650,
+          category: 'cinema'
+        },
+        {
+          name: 'CGV Vincom Mega Mall Smart City (Cách An Trai ~6 phút)',
+          address: 'TTTM Vincom Mega Mall Smart City, Tây Mỗ, Nam Từ Liêm',
+          lat: 20.9985,
+          lng: 105.7485,
+          feature: 'Cụm rạp chiếu phim chuẩn quốc tế đẳng cấp hàng đầu, phòng chiếu Gold Class sang trọng bậc nhất khu Tây Hà Nội.',
+          vibe: 'Đẳng cấp, sang xịn, tổ hợp trung tâm thương mại lớn.',
+          price: '85.000đ - 160.000đ/vé',
+          rating: 4.8,
+          reviewsCount: 2800,
+          category: 'cinema'
+        }
+      ]
+    },
     danang: {
       aliases: ['đà nẵng', 'da nang', 'hải châu', 'hai chau', 'sơn trà', 'son tra', 'cầu rồng', 'cau rong', 'mỹ khê', 'my khe', 'sà bì chưởng', 'sa bi chuong', 'sài bì chưởng', 'sai bi chuong'],
       title: 'Trung tâm Quận Hải Châu & Bãi Biển Mỹ Khê (Đà Nẵng)',
@@ -1426,7 +1514,7 @@
 
     // 1. Nếu câu hỏi bắt đầu hoặc nhấn mạnh vào mục đích ăn uống/cafe dù đứng cạnh tên công viên/rạp phim
     // Ví dụ: "quán ăn gần công viên thống nhất" -> phải là 'food', KHÔNG PHẢI 'entertainment'
-    const asksFoodExplicit = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|ăn sáng|ăn trưa|ăn tối|ăn đêm|ăn vặt)/i.test(q);
+    const asksFoodExplicit = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|ăn sáng|ăn trưa|ăn tối|ăn đêm|ăn vặt|cửa hàng đồ trung|đồ trung|đồ ăn trung|quán đồ trung|món trung|trung hoa|món hoa|dimsum|sủi cảo|mì vằn thắn|mì kéo|vịt quay|đồ hàn|đồ nhật|đồ thái|quán nào ngon|có gì ngon|món gì ngon)/i.test(q);
     const asksCafeExplicit = /(?:quán cafe|quán cà phê|cafe|cà phê|coffee|trà sữa|trà chanh|đồ uống|uống gì)/i.test(q);
     const asksCinemaExplicit = /(?:rạp phim|rạp chiếu phim|chiếu phim|xem phim|cinema|cgv|beta|lotte cinema|bhd|galaxy)/i.test(q);
     const asksFunExplicit = /(?:vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát)/i.test(q);
@@ -1457,7 +1545,7 @@
     const prepMatch = q.match(/(?:ở|tại|gần|quanh|xung quanh|khu vực|khu|bên|mạn|đoạn|dọc|cạnh|sát|đối diện|trên đường|trên phố|phố|đường|ngõ)\s+(.+)$/i);
     if (prepMatch && prepMatch[1]) {
       return prepMatch[1]
-        .replace(/\s+(?:có\s+quán|có\s+nhà\s+hàng|có\s+chỗ|có\s+nơi|có\s+rạp|có\s+điểm|có\s+gì|ăn\s+gì|uống\s+gì|chơi\s+gì|nào\s+ngon|nào\s+đẹp|nào\s+nổi\s+tiếng|nào|không|ko|k\b|chưa|nhỉ|vậy|ạ|nhé).*$/i, '')
+        .replace(/\s+(?:có\s+(?:cửa\s+hàng|quán|nhà\s+hàng|tiệm|chỗ|nơi|rạp|điểm|đồ|món|gì)|ăn\s+gì|uống\s+gì|chơi\s+gì|nào\s+ngon|nào\s+đẹp|nào\s+nổi\s+tiếng|nào|không|ko|k\b|chưa|nhỉ|vậy|ạ|nhé).*$/i, '')
         .replace(/[,.?!]+$/g, '')
         .trim();
     }
@@ -1485,7 +1573,7 @@
     const q = cleanVietnameseTypo(query).toLowerCase();
     const specificKeywords = [
       'bún chả', 'bún đậu', 'bún bò', 'bún riêu', 'bún cá', 'bún ngan', 'bún ốc', 'bánh đa',
-      'phở bò', 'phở gà', 'phở cuốn', 'phở', 'miến lươn', 'miến ngan', 'mì cay', 'mì vằn thắn', 'ramen', 'sushi', 'dimsum',
+      'phở bò', 'phở gà', 'phở cuốn', 'phở', 'miến lươn', 'miến ngan', 'mì cay', 'mì vằn thắn', 'ramen', 'sushi', 'dimsum', 'đồ trung', 'món trung', 'đồ ăn trung', 'quán đồ trung', 'trung hoa', 'sủi cảo', 'mì kéo', 'vịt quay bắc kinh', 'đồ hàn', 'món hàn', 'đồ nhật', 'món nhật', 'đồ thái', 'món thái',
       'cháo sườn', 'cháo', 'xôi', 'bánh mì', 'bánh cuốn', 'bánh xèo', 'nem nướng', 'nem lụi',
       'cơm tấm', 'cơm niêu', 'cơm thố', 'cơm rang', 'cơm gà', 'cơm chay', 'đồ chay', 'quán chay', 'chay',
       'chả cá', 'lẩu nấm', 'lẩu thái', 'lẩu bò', 'lẩu gà', 'lẩu ếch', 'lẩu nướng', 'lẩu', 'nướng', 'bbq', 'buffet',

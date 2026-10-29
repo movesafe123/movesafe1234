@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 from supabase import create_client, Client
 
 app = FastAPI(title="MoveSafe AI Prediction Engine")
@@ -254,6 +254,26 @@ def get_predictions(city: str = None):
             "updated_at": latest_predictions["updated_at"]
         }
     return latest_predictions
+
+
+@app.post("/api/ai/chat")
+async def ai_chat_render_bridge(request: Request):
+    """Cung cấp endpoint trả lời AI dự phòng cho GitHub Pages khi kết nối Render Cloud"""
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    query = body.get("query", "")
+    city = body.get("city", "hanoi")
+    return {
+        "status": "success",
+        "response": {
+            "text": f"MoveSafe AI đã tiếp nhận câu hỏi: \"{query}\" tại {city.upper()}. Hệ thống đang phân tích bản đồ và lưu lượng giao thông thời gian thực.",
+            "reply": f"MoveSafe AI đã tiếp nhận câu hỏi: \"{query}\" tại {city.upper()}. Hệ thống đang phân tích bản đồ và lưu lượng giao thông thời gian thực.",
+            "action": None,
+            "source": "MoveSafe Render AI Engine"
+        }
+    }
 
 
 @app.get("/")

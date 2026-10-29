@@ -50,38 +50,13 @@ class GeocodingService {
         city: 'hanoi',
         category: 'Quán ăn / Ăn sáng',
         type: 'restaurant',
-        radiusM: 20,
+        radiusM: 30,
         rating: 4.6,
         reviewsCount: 1420,
         price: '25.000 - 55.000 đ',
         aliases: ['xoi xeo oanh oanh', 'quan xoi xeo oanh oanh', 'xoi oanh oanh', '559 la thanh']
       },
-      {
-        title: 'Kệ Kính Cao Cấp Đài Loan',
-        subtitle: 'Số 559 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
-        lat: 21.023647,
-        lng: 105.817328,
-        city: 'hanoi',
-        category: 'Cửa hàng / Nội thất kính',
-        type: 'shop',
-        radiusM: 20,
-        rating: 4.4,
-        reviewsCount: 38,
-        aliases: ['ke kinh dai loan', 'ke kinh cao cap dai loan', '559 la thanh']
-      },
-      {
-        title: 'Nội thất Đông Á',
-        subtitle: 'Số 561 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
-        lat: 21.023690,
-        lng: 105.817150,
-        city: 'hanoi',
-        category: 'Cửa hàng / Nội thất',
-        type: 'shop',
-        radiusM: 20,
-        rating: 4.5,
-        reviewsCount: 65,
-        aliases: ['noi that dong a', '561 la thanh']
-      },
+
       {
         title: 'Kafe Muối TL & AE',
         subtitle: 'Số 555 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
@@ -194,7 +169,7 @@ class GeocodingService {
       { title: 'Trường Đại Học Ngoại Thương (FTU)', subtitle: '91 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0225, lng: 105.8055, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 160, aliases: ['ftu', 'dh ngoai thuong', 'dai hoc ngoai thuong', 'ngoai thuong'] },
       { title: 'Trường Đại Học Luật Hà Nội (HLU)', subtitle: '87 Nguyễn Chí Thanh, Láng Hạ, Đống Đa, Hà Nội', lat: 21.0185, lng: 105.8095, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 150, aliases: ['hlu', 'dh luat', 'dai hoc luat ha noi', 'dh luat ha noi'] },
       { title: 'Học Viện Ngoại Giao (DAV)', subtitle: '69 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', lat: 21.0210, lng: 105.8060, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 140, aliases: ['dav', 'hoc vien ngoai giao'] },
-      { title: 'Học Viện Báo Chí & Tuyên Truyền (AJC)', subtitle: '36 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0360, lng: 105.7885, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 150, aliases: ['ajc', 'hoc vien bao chi', 'dh bao chi'] },
+      { title: 'Học Viện Báo Chí & Tuyên Truyền (AJC)', subtitle: '36 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0371, lng: 105.7876, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 35, aliases: ['ajc', 'hoc vien bao chi', 'dh bao chi'] },
       { title: 'Trường Đại Học Sư Phạm Hà Nội (HNUE)', subtitle: '136 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0370, lng: 105.7820, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 160, aliases: ['hnue', 'dh su pham ha noi', 'su pham'] },
       { title: 'Đại Học Quốc Gia Hà Nội (Cầu Giấy)', subtitle: '144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', lat: 21.0376, lng: 105.7816, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 180, aliases: ['dh quoc gia', 'vnu', 'dh cong nghe'] },
       { title: 'Đại Học Bách Khoa Hà Nội (HUST)', subtitle: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', lat: 21.0051, lng: 105.8433, city: 'hanoi', category: 'Trường đại học / Học viện', type: 'university', radiusM: 250, aliases: ['dh bach khoa', 'bach khoa ha noi', 'hust', 'dai hoc bach khoa'] },
@@ -1157,7 +1132,9 @@ class GeocodingService {
     nearbyLms.sort((a, b) => a.distM - b.distM);
     const closestLm = nearbyLms[0] || null;
 
-    if (closestLm) {
+    // CHỈ gán làm tiêu đề chính nếu click chuột rơi vào bán kính lõi (<= 35m).
+    // Nếu từ 36m - 150m, ưu tiên định danh đường / ngã tư và đưa địa danh vào nearbyCandidates.
+    if (closestLm && closestLm.distM <= 35) {
       const plusCode = this.getPlusCode(lat, lng, closestLm.subtitle);
       return {
         isPoi: true,

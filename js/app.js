@@ -1530,7 +1530,7 @@ class GoogleMapsApp {
         // 1. Quét đối chiếu nhanh với CSDL nội bộ: Ẩm thực, Trú mưa, Trạm sạc EV
         const allSpots = this.getAllFoodSpots();
         let matchedSpot = null;
-        let minD = 0.018; // 18 mét (thu hẹp bán kính để không nuốt nhầm quán lân cận)
+        let minD = 0.035; // 35 mét (đảm bảo bắt trúng khi click vào nhãn POI/quán ăn trên bản đồ) (thu hẹp bán kính để không nuốt nhầm quán lân cận)
         for (const sp of allSpots) {
           if (sp.lat && sp.lng) {
             const d = this._calcDistanceKm(lat, lng, sp.lat, sp.lng);
@@ -5384,7 +5384,7 @@ class GoogleMapsApp {
     // Thêm class lên body và ẩn thanh chips để chống đè giao diện trên Desktop
     document.body.classList.add('place-card-open');
     const chipsEl = document.getElementById('gm-chips-scroll');
-    if (chipsEl && window.innerWidth > 768) chipsEl.style.display = 'none';
+    if (chipsEl) chipsEl.style.display = 'flex';
 
     const titleEl = document.getElementById('gm-place-title');
     const subtitleEl = document.getElementById('gm-place-subtitle');
@@ -5408,9 +5408,15 @@ class GoogleMapsApp {
     const name = data.name || data.title || 'Địa điểm đã chọn';
 
     // Xác định phân loại địa điểm để hiển thị giao diện linh hoạt
-    const isFood = (data.category && /(nhà hàng|quán|ăn|uống|buffet|cafe|cà phê|tiệm|phở|bún|bánh mì|ẩm thực|lẩu|nướng|cơm|kem|cháo)/i.test(data.category))
-      || (data.feature && /(ăn|uống|món|nem|thịt|nướng|lẩu|cafe|ẩm thực)/i.test(data.feature))
-      || (data.name && /(bunenu|quán|nhà hàng|buffet|cà phê|cafe|phở|bún|ẩm thực|lẩu|nướng|cơm|kem|cháo)/i.test(data.name));
+    const isCompanyOrOffice = (data.category && /(văn phòng|công ty|tòa nhà|tập đoàn|doanh nghiệp|chi nhánh|store|cửa hàng)/i.test(data.category))
+      || (data.type === 'company' || data.type === 'office' || data.type === 'shop');
+
+    const isFood = !isCompanyOrOffice && (
+      (data.category && /(nhà hàng|quán ăn|quán cà phê|quán nước|ẩm thực|buffet|cafe|cà phê|tiệm bánh|tiệm trà|phở|bún|bánh mì|lẩu|nướng|cơm|kem|cháo|món việt|món hàn|món nhật|món trung)/i.test(data.category))
+      || (data.type === 'restaurant' || data.type === 'cafe')
+      || (data.feature && /(ăn uống|món ăn|nem|thịt|nướng|lẩu|cafe|ẩm thực|nước dùng)/i.test(data.feature))
+      || (data.name && /(quán|nhà hàng|buffet|cà phê|cafe|phở|bún|ẩm thực|lẩu|nướng|cơm|kem|cháo|bánh mì)/i.test(data.name))
+    );
 
     const isPoi = !!data.isPoi || isFood || !!data.rating || !!data.openingHours || (data.type && data.type !== 'address' && data.type !== 'street' && data.type !== 'alley');
     const isStreet = data.type === 'street' || (data.category && /(phố|đường|quốc lộ|đại lộ|cầu|nút giao)/i.test(data.category));
@@ -5455,6 +5461,9 @@ class GoogleMapsApp {
 
     // Huy hiệu danh mục (Badge Category) linh hoạt theo từng loại
     let catLabel = data.category || data.typeName;
+    if (/(viettel|fpt|vinaphone|mobifone|thế giới di động|điện thoại|viễn thông)/i.test(name)) {
+      catLabel = 'Cửa hàng / Dịch vụ viễn thông';
+    }
     if (!catLabel || catLabel === 'Địa điểm công cộng') {
       if (data.type === 'embassy' || data.type === 'government') catLabel = 'Đại sứ quán / Ngoại giao';
       else if (data.type === 'hospital' || data.type === 'health') catLabel = 'Bệnh viện / Cơ sở y tế';
@@ -5505,8 +5514,16 @@ class GoogleMapsApp {
         imgEl.src = 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=720&auto=format&fit=crop&q=80';
       } else if (data.type === 'hotel') {
         imgEl.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=720&auto=format&fit=crop&q=80';
+      } else if (isCompanyOrOffice || data.type === 'company') {
+        imgEl.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=720&auto=format&fit=crop&q=80';
       } else if (data.type === 'shop' || data.type === 'mall') {
-        imgEl.src = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=720&auto=format&fit=crop&q=80';
+        if (/(công nghệ|điện thoại|viettel|fpt|laptop|điện tử)/i.test(name + ' ' + (data.category || ''))) {
+          imgEl.src = 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=720&auto=format&fit=crop&q=80';
+        } else if (/(nội thất|kính|gỗ|xây dựng)/i.test(name + ' ' + (data.category || ''))) {
+          imgEl.src = 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=720&auto=format&fit=crop&q=80';
+        } else {
+          imgEl.src = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=720&auto=format&fit=crop&q=80';
+        }
       } else if (data.type === 'shelter' || data.type === 'ev') {
         imgEl.src = 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=720&auto=format&fit=crop&q=80';
       } else if (isStreet) {
@@ -5681,6 +5698,15 @@ class GoogleMapsApp {
     if (window.mapEngine?.map) {
       window.mapEngine.map.flyTo([lat, lng], 16, { duration: 0.8 });
     }
+  }
+
+  closeDirections() {
+    this.toggleDirectionsPanel(false);
+    this.clearRouteLayers();
+    const chipsEl = document.getElementById('gm-chips-scroll');
+    if (chipsEl) chipsEl.style.display = 'flex';
+    const searchBox = document.getElementById('gm-search-box');
+    if (searchBox) searchBox.style.display = 'flex';
   }
 
   closePlaceDetailsCard() {

@@ -5440,7 +5440,14 @@ body {
 
 @media (min-width: 769px) {
   body.place-card-open .gm-chips-scroll {
-    display: none !important;
+    margin-left: 428px;
+    display: flex !important;
+    transition: margin-left 0.25s cubic-bezier(0, 0, 0.2, 1);
+  }
+  body.directions-open .gm-chips-scroll {
+    margin-left: 448px;
+    display: flex !important;
+    transition: margin-left 0.25s cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
