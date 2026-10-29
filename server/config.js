@@ -25,6 +25,8 @@ module.exports = {
     OPENWEATHER: process.env.OPENWEATHER_KEY || '1e050d36d170249efaf439dcdb324228',
     TOMTOM: process.env.TOMTOM_KEY || 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF',
     GEMINI: process.env.GEMINI_KEY || '',
+    GEMINI_BACKUP: process.env.GEMINI_KEY_BACKUP || '',
+    GOOGLE_MAPS: process.env.GOOGLE_MAPS_KEY || '',
     SUPABASE_URL: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://cuvleafsohxtchhgbdbk.supabase.co',
     SUPABASE_KEY: process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_IL2L6IKBOYusIzdEGkK6PQ_QTD5OE4e',
     OPEN_CHARGE_MAP: process.env.OPEN_CHARGE_MAP_KEY || 'ef996480-7ae1-4c38-adef-acfd69ace0d6'

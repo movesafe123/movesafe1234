@@ -923,7 +923,7 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
       result = await new Promise((resolve, reject) => {
         let settled = false;
         let errors = 0;
-        const primaryPair = ['gemini-3-flash-preview', 'gemini-3.6-flash'];
+        const primaryPair = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
 
         const handleSuccess = (res) => {
           if (!settled) {
@@ -955,7 +955,7 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
       });
     } catch (_primaryErr) {
       // Dự phòng sang tầng 2 nếu cả 2 model chính đều bận
-      const backupModels = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview'];
+      const backupModels = ['gemini-2.5-flash-lite', 'gemini-flash-latest'];
       for (const bModel of backupModels) {
         try {
           result = await this._invokeSingleGeminiModel(bModel, apiKey, contents, false, 6000);
