@@ -16,7 +16,7 @@
     root.FOOD_ENTERTAINMENT_DATA = factory();
   }
 })(typeof self !== 'undefined' ? self : this, function () {
-  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta|lotte cinema|bhd|galaxy|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|ăn đêm|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|cửa hàng đồ trung|đồ trung|đồ ăn trung|quán đồ trung|món trung|trung hoa|món hoa|dimsum|sủi cảo|mì vằn thắn|mì kéo|vịt quay bắc kinh|đồ hàn|món hàn|đồ nhật|món nhật|đồ thái|món thái|đồ âu|món âu|quán nào ngon|có gì ngon|món gì ngon|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
+  const FOOD_KEYWORDS_REGEX = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|cafe|cà phê|trà sữa|trà chanh|vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát|rạp phim|rạp chiếu phim|chiếu phim|xem phim|phim|cinema|cgv|beta cinemas|beta rạp|lotte cinema|bhd|galaxy cinema|trung tâm thương mại|tttm|mua sắm|công viên|quán nào|nơi nào|chỗ nào|uống gì|ăn sáng|ăn trưa|ăn tối|ăn đêm|đồ uống|chỗ tụ tập|ăn vặt|karaoke|bida|billiards|bowling|bar|pub|cửa hàng đồ trung|đồ trung|đồ ăn trung|quán đồ trung|món trung|trung hoa|món hoa|dimsum|sủi cảo|mì vằn thắn|mì kéo|vịt quay bắc kinh|đồ hàn|món hàn|đồ nhật|món nhật|đồ thái|món thái|đồ âu|món âu|quán nào ngon|có gì ngon|món gì ngon|quanh đây|gần đây|ở đây|gần đó|gần tôi|xung quanh|khu này)/i;
 
   /**
    * Bộ lọc sửa lỗi gõ dính phím tiếng Việt Telex thông minh
@@ -1516,7 +1516,7 @@
     // Ví dụ: "quán ăn gần công viên thống nhất" -> phải là 'food', KHÔNG PHẢI 'entertainment'
     const asksFoodExplicit = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|đặc sản|nhà hàng|buffet|lẩu|nướng|quán nhậu|phở|bún|cơm|bánh mì|ăn sáng|ăn trưa|ăn tối|ăn đêm|ăn vặt|cửa hàng đồ trung|đồ trung|đồ ăn trung|quán đồ trung|món trung|trung hoa|món hoa|dimsum|sủi cảo|mì vằn thắn|mì kéo|vịt quay|đồ hàn|đồ nhật|đồ thái|quán nào ngon|có gì ngon|món gì ngon)/i.test(q);
     const asksCafeExplicit = /(?:quán cafe|quán cà phê|cafe|cà phê|coffee|trà sữa|trà chanh|đồ uống|uống gì)/i.test(q);
-    const asksCinemaExplicit = /(?:rạp phim|rạp chiếu phim|chiếu phim|xem phim|cinema|cgv|beta|lotte cinema|bhd|galaxy)/i.test(q);
+    const asksCinemaExplicit = !/(?:samsung|điện\s*thoại|phone)/i.test(q) && /(?:rạp\s*(?:chiếu\s*)?phim|xem\s*phim|chiếu\s*phim|cinema|cgv|lotte\s*cinema|bhd|beta\s*(?:cinemas?|phim|rạp|mỹ\s*đình|thanh\s*xuân|đan\s*phượng|giải\s*phóng)|galaxy\s*(?:cinema|phim|rạp|mipec|long\s*biên|tràng\s*thi))/i.test(q);
     const asksFunExplicit = /(?:vui chơi|chỗ chơi|đi chơi|chơi đâu|chơi gì|nơi giải trí|điểm giải trí|khu giải trí|giải trí|check-in|checkin|dạo phố|dạo mát)/i.test(q);
 
     if (asksFoodExplicit && !asksCinemaExplicit) return 'food';

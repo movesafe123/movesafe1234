@@ -180,4 +180,71 @@ describe('Module TC-NAV: Routing Engine & Smart Flood Avoidance', () => {
     // Ô tô cần detour rộng hơn để tránh mắc kẹt ngõ cụt
     assert.deepStrictEqual(carOffsets, [650, 1000, 1400]);
   });
+  // TC-NAV-008: Quy tắc lọc trùng mới - Chênh lệch >= 100m luôn giữ làm 2 tuyến riêng
+  it('[TC-NAV-008] filterDistinctRoutes preserves routes differing by >= 100m', () => {
+    const mockRoutes = [
+      {
+        distanceMeters: 5000,
+        polyline: [[21.0, 105.8], [21.01, 105.81], [21.02, 105.82]]
+      },
+      {
+        distanceMeters: 5100, // Chênh đúng 100m -> Bắt buộc giữ lại làm tuyến riêng
+        polyline: [[21.0, 105.8], [21.0101, 105.8101], [21.02, 105.82]]
+      },
+      {
+        distanceMeters: 5050, // Chênh chỉ 50m so với tuyến 1 (< 100m) và cùng mid point -> Lọc bỏ
+        polyline: [[21.0, 105.8], [21.01005, 105.81005], [21.02, 105.82]]
+      }
+    ];
+
+    const filtered = router.filterDistinctRoutes(mockRoutes);
+    assert.strictEqual(filtered.length, 2, 'Should keep routes differing by >= 100m and filter < 100m');
+    assert.strictEqual(filtered[0].distanceMeters, 5000);
+    assert.strictEqual(filtered[1].distanceMeters, 5100);
+  });
+
+  // TC-NAV-009: buildThreePassableModes gộp trùng: 3 chế độ trùng -> 1 thẻ Nhanh nhất; 2 chế độ trùng -> ghép tên Nhanh -> An toàn -> Êm ái
+  it('[TC-NAV-009] buildThreePassableModes merges identical modes accurately', () => {
+    const specs = router.vehicleSpecs.motorbike;
+    const baseCandidate = {
+      distanceKm: '4.6',
+      distanceMeters: 4600,
+      durationMin: 6,
+      realAvgSpeedKmh: 46,
+      rpi: 95,
+      ecoScore: 90,
+      jamPercent: 0,
+      freeFlowPercent: 100,
+      moderatePercent: 0,
+      severePercent: 0,
+      matchedFloods: [],
+      matchedTraffics: [],
+      warnings: [],
+      bottleneckWarnings: [],
+      polyline: [[21.0, 105.7], [21.02, 105.75], [21.03, 105.78]]
+    };
+
+    // Khi chỉ có 1 tuyến khả dụng: Cả 3 chế độ trùng nhau
+    const resSingle = router.buildThreePassableModes([baseCandidate], 1, specs, []);
+    assert.strictEqual(resSingle.routes.length, 1, '3 chế độ trùng nhau chỉ được trả về đúng 1 thẻ');
+    assert.strictEqual(resSingle.routes[0].label, 'Nhanh nhất');
+    assert.strictEqual(resSingle.routes[0].isRecommended, true);
+
+    // Khi có 2 tuyến khác nhau: Tuyến 1 nhanh & an toàn, Tuyến 2 êm ái hơn
+    const cand1 = { ...baseCandidate, durationMin: 6, ecoScore: 80 };
+    const cand2 = {
+      ...baseCandidate,
+      distanceMeters: 5200,
+      durationMin: 9,
+      ecoScore: 98,
+      polyline: [[21.0, 105.7], [21.04, 105.75], [21.03, 105.78]]
+    };
+
+    const resTwo = router.buildThreePassableModes([cand1, cand2], 1, specs, []);
+    assert.strictEqual(resTwo.routes.length, 2, '2 tuyến khác nhau trả về 2 thẻ');
+    const mergedCard = resTwo.routes.find(r => r.label.includes('+'));
+    assert.ok(mergedCard, 'Phải có thẻ ghép tên 2 chế độ trùng nhau');
+    assert.strictEqual(mergedCard.label, 'Nhanh thực tế + An toàn hành lang lớn');
+    assert.strictEqual(mergedCard.shortLabel, 'Nhanh + An toàn');
+  });
 });

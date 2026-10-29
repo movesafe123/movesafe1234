@@ -839,6 +839,15 @@ class AIAssistantService {
     const parsedRoute = this.parseRouteQuery(query, sessionMemory);
     const lower = query.toLowerCase();
 
+    // Chốt chặn an toàn: Từ chối vi phạm luật giao thông
+    if (/(?:né\s*chốt|tránh\s*chốt|né\s*csgt|tránh\s*công\s*an|đi\s*ngược\s*chiều|vượt\s*đèn\s*đỏ|thổi\s*nồng\s*độ\s*cồn)/i.test(lower)) {
+      return {
+        text: 'MoveSafe VN là nền tảng giao thông an toàn và tuân thủ pháp luật. Tôi không cung cấp hướng dẫn né chốt kiểm tra hoặc vi phạm luật giao thông. Bạn hãy luôn chấp hành hiệu lệnh và đi đúng luật để bảo vệ an toàn cho bản thân và cộng đồng.',
+        action: null,
+        followUps: ['Xem bản đồ điểm ngập hiện tại', 'Chỉ đường an toàn hợp pháp', 'Dự báo thời tiết 15P']
+      };
+    }
+
     const isAskingEV = /(?:trạm sạc|sạc xe|sạc pin|sạc điện|xe điện|đổi pin|open charge|vinfast)/i.test(lower);
     const isAskingFoodOrEntertainment = FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
     const isAskingTrafficOnly = /(?:tắc|kẹt|ùn|đông thế|đông vậy|sao đông|tại sao đông)/i.test(lower) && !lower.includes('ngập');

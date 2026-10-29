@@ -201,7 +201,7 @@ class RoutingService {
     for (const r of routes) {
       const isDuplicate = distinct.some(d => {
         const distDiff = Math.abs(d.distanceMeters - r.distanceMeters);
-        if (distDiff < 120) {
+        if (distDiff < 100) {
           const mid1 = d.polyline[Math.floor(d.polyline.length / 2)];
           const mid2 = r.polyline[Math.floor(r.polyline.length / 2)];
           if (mid1 && mid2) {
@@ -570,7 +570,7 @@ class RoutingService {
       throw new Error(`Không có tuyến đường khả dụng cho ${specs.name}`);
     }
 
-    // 1. Tuyến 1: ⚡ Nhanh thực tế (Dynamic Flow)
+        // 1. Tuyến 1: ⚡ Nhanh thực tế (Dynamic Flow)
     // Sắp xếp theo realDurationMin (thời gian thực tế đã tính BPR delay và vận tốc dòng xe)
     const sortedByFastest = [...passableCandidates].sort((a, b) => {
       if (a.durationMin !== b.durationMin) return a.durationMin - b.durationMin;
@@ -578,6 +578,22 @@ class RoutingService {
       return a.distanceMeters - b.distanceMeters;
     });
     const fastestRoute = sortedByFastest[0];
+
+    const isSameRoute = (r1, r2) => {
+      if (!r1 || !r2) return false;
+      if (r1 === r2) return true;
+      if (r1.distanceMeters === r2.distanceMeters && Math.abs(r1.durationMin - r2.durationMin) <= 1) {
+        if (Array.isArray(r1.polyline) && Array.isArray(r2.polyline) && r1.polyline.length === r2.polyline.length) {
+          const midIdx = Math.floor(r1.polyline.length / 2);
+          const p1 = r1.polyline[midIdx];
+          const p2 = r2.polyline[midIdx];
+          if (p1 && p2 && Math.abs(p1[0] - p2[0]) < 0.0001 && Math.abs(p1[1] - p2[1]) < 0.0001) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
 
     // 2. Tuyến 2: 🛡️ An toàn hành lang lớn (Resilient Corridor)
     // Ưu tiên: 0 ngập, CẤM BẪY NGÕ HẸP, cốt nền cao, RPI cao nhất
@@ -599,7 +615,15 @@ class RoutingService {
 
       return a.durationMin - b.durationMin;
     });
-    const safeRoute = sortedBySafety[0];
+    // Nếu có ứng viên khác fastestRoute mà độ an toàn tương đương, ưu tiên chọn để tạo sự khác biệt thực tế
+    let safeRoute = sortedBySafety.find(r => !isSameRoute(r, fastestRoute) &&
+      (r.hasAlleyTrap === sortedBySafety[0].hasAlleyTrap) &&
+      (r.matchedFloods.length === sortedBySafety[0].matchedFloods.length) &&
+      (r.durationMin <= sortedBySafety[0].durationMin * 1.25)
+    );
+    if (!safeRoute) {
+      safeRoute = sortedBySafety[0];
+    }
 
     // 3. Tuyến 3: ⚖️ Trục chính êm ái (Major Road & Eco-Smooth)
     // Ưu tiên: Điểm êm ái EcoScore cao nhất, dòng xe đều đặn, ít khúc cua gấp, tiết kiệm nhiên liệu/pin
@@ -612,9 +636,9 @@ class RoutingService {
       const scoreB = b.durationMin * 1.8 + b.matchedFloods.length * 12 + b.congestionScore * 0.3;
       return scoreA - scoreB;
     });
-    let balancedRoute = sortedByBalanced.find(r => r !== fastestRoute && r !== safeRoute);
+    let balancedRoute = sortedByBalanced.find(r => !isSameRoute(r, fastestRoute) && !isSameRoute(r, safeRoute));
     if (!balancedRoute) {
-      balancedRoute = sortedByBalanced.find(r => r !== safeRoute) || sortedByBalanced[0];
+      balancedRoute = sortedByBalanced.find(r => !isSameRoute(r, safeRoute)) || sortedByBalanced[0];
     }
 
     const safeJam = safeRoute.jamPercent;
@@ -633,6 +657,7 @@ class RoutingService {
       ...safeRoute,
       routeType: 'safe_bypass',
       label: 'An toàn hành lang lớn',
+      shortLabel: 'An toàn',
       sublabel: `${safeFloodText} • Tránh bẫy ngõ hẹp • Tin cậy ${safeRoute.rpi}%`,
       tagText: `Tin cậy ${safeRoute.rpi}% • 0% Ngập lụt`,
       tagClass: 'gm-tag-safe',
@@ -645,13 +670,15 @@ class RoutingService {
       severePercent: 0,
       isRecommended: (activeAvoidLevel === 1),
       color: '#1e8e3e',
-      avoidLevel: 1
+      avoidLevel: 1,
+      mergedLevels: [1]
     };
 
     const routeBalanced = {
       ...balancedRoute,
       routeType: 'balanced',
       label: 'Trục chính êm ái (Eco-Smooth)',
+      shortLabel: 'Êm ái',
       sublabel: `Tốc độ đều ~${balancedRoute.realAvgSpeedKmh} km/h • Êm ái ${balancedRoute.ecoScore}/100`,
       tagText: `Êm ái ${balancedRoute.ecoScore}/100 • Tiết kiệm năng lượng`,
       tagClass: 'gm-tag-warning',
@@ -662,7 +689,8 @@ class RoutingService {
       severePercent: 0,
       isRecommended: (activeAvoidLevel === 2),
       color: '#f9ab00',
-      avoidLevel: 2
+      avoidLevel: 2,
+      mergedLevels: [2]
     };
 
     const delayText = fastestRoute.delayMin > 0 ? ` (+${fastestRoute.delayMin}p)` : '';
@@ -674,6 +702,7 @@ class RoutingService {
       ...fastestRoute,
       routeType: 'fastest',
       label: 'Nhanh thực tế (Dynamic Flow)',
+      shortLabel: 'Nhanh nhất',
       sublabel: `Tốc độ thực ~${fastestRoute.realAvgSpeedKmh} km/h • Trễ${delayText} • Tin cậy ${fastestRoute.rpi}%`,
       tagText: `Nhanh thực tế • ~${fastestRoute.realAvgSpeedKmh} km/h`,
       tagClass: 'gm-tag-fastest',
@@ -684,17 +713,91 @@ class RoutingService {
       severePercent: Math.round(fastJam * 0.4),
       isRecommended: (activeAvoidLevel === 3),
       color: '#1a73e8',
-      avoidLevel: 3
+      avoidLevel: 3,
+      mergedLevels: [3]
     };
 
-    let routes = [routeSafe, routeBalanced, routeFastest];
-    if (activeAvoidLevel === 2) {
-      routes = [routeBalanced, routeSafe, routeFastest];
-    } else if (activeAvoidLevel === 3) {
-      routes = [routeFastest, routeBalanced, routeSafe];
+    // Kiểm tra các chế độ có trùng cùng một tuyến hình học không
+    const sameSafeFast = isSameRoute(safeRoute, fastestRoute);
+    const sameBalancedFast = isSameRoute(balancedRoute, fastestRoute);
+    const sameSafeBalanced = isSameRoute(safeRoute, balancedRoute);
+
+    let routes = [];
+
+    // Trường hợp 1: Cả 3 chế độ trùng nhau -> Chỉ hiện đúng 1 chế độ đường đi nhanh nhất
+    if ((sameSafeFast && sameBalancedFast) || passableCandidates.length === 1) {
+      const singleFastest = {
+        ...routeFastest,
+        label: 'Nhanh nhất',
+        shortLabel: 'Nhanh nhất',
+        tagText: `Nhanh nhất • ~${fastestRoute.realAvgSpeedKmh} km/h`,
+        isRecommended: true,
+        avoidLevel: 3,
+        mergedLevels: [3, 1, 2]
+      };
+      routes = [singleFastest];
+    } else if (sameSafeFast) {
+      // Trường hợp 2a: Nhanh trùng An toàn (Thứ tự ưu tiên: Nhanh -> An toàn)
+      const mergedFastSafe = {
+        ...routeFastest,
+        label: 'Nhanh thực tế + An toàn hành lang lớn',
+        shortLabel: 'Nhanh + An toàn',
+        tagText: `Nhanh & An toàn • ~${fastestRoute.realAvgSpeedKmh} km/h`,
+        mergedLevels: [3, 1],
+        avoidLevel: (activeAvoidLevel === 1 || activeAvoidLevel === 3) ? activeAvoidLevel : 3,
+        isRecommended: (activeAvoidLevel === 1 || activeAvoidLevel === 3)
+      };
+      const cardBalanced = {
+        ...routeBalanced,
+        mergedLevels: [2],
+        isRecommended: (activeAvoidLevel === 2)
+      };
+      routes = (activeAvoidLevel === 2) ? [cardBalanced, mergedFastSafe] : [mergedFastSafe, cardBalanced];
+    } else if (sameBalancedFast) {
+      // Trường hợp 2b: Nhanh trùng Êm ái (Thứ tự ưu tiên: Nhanh -> Êm ái)
+      const mergedFastBalanced = {
+        ...routeFastest,
+        label: 'Nhanh thực tế + Trục chính êm ái',
+        shortLabel: 'Nhanh + Êm ái',
+        tagText: `Nhanh & Êm ái • ~${fastestRoute.realAvgSpeedKmh} km/h`,
+        mergedLevels: [3, 2],
+        avoidLevel: (activeAvoidLevel === 2 || activeAvoidLevel === 3) ? activeAvoidLevel : 3,
+        isRecommended: (activeAvoidLevel === 2 || activeAvoidLevel === 3)
+      };
+      const cardSafe = {
+        ...routeSafe,
+        mergedLevels: [1],
+        isRecommended: (activeAvoidLevel === 1)
+      };
+      routes = (activeAvoidLevel === 1) ? [cardSafe, mergedFastBalanced] : [mergedFastBalanced, cardSafe];
+    } else if (sameSafeBalanced) {
+      // Trường hợp 2c: An toàn trùng Êm ái (Thứ tự ưu tiên: An toàn -> Êm ái)
+      const mergedSafeBalanced = {
+        ...routeSafe,
+        label: 'An toàn hành lang lớn + Trục chính êm ái',
+        shortLabel: 'An toàn + Êm ái',
+        tagText: `An toàn & Êm ái • Tin cậy ${safeRoute.rpi}%`,
+        mergedLevels: [1, 2],
+        avoidLevel: (activeAvoidLevel === 1 || activeAvoidLevel === 2) ? activeAvoidLevel : 1,
+        isRecommended: (activeAvoidLevel === 1 || activeAvoidLevel === 2)
+      };
+      const cardFast = {
+        ...routeFastest,
+        mergedLevels: [3],
+        isRecommended: (activeAvoidLevel === 3)
+      };
+      routes = (activeAvoidLevel === 3) ? [cardFast, mergedSafeBalanced] : [mergedSafeBalanced, cardFast];
+    } else {
+      // Trường hợp 3: Cả 3 chế độ là 3 tuyến khác nhau
+      routes = [routeSafe, routeBalanced, routeFastest];
+      if (activeAvoidLevel === 2) {
+        routes = [routeBalanced, routeSafe, routeFastest];
+      } else if (activeAvoidLevel === 3) {
+        routes = [routeFastest, routeBalanced, routeSafe];
+      }
     }
 
-    return {
+return {
       noPassableRoute: false,
       avoidLevel: activeAvoidLevel,
       vehicleSpecs: specs,

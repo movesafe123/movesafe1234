@@ -4462,10 +4462,13 @@ class GoogleMapsApp {
     if (!selectedRoute) return;
 
     // Đồng bộ mức độ tránh né và radio button trong UI
-    this.currentAvoidLevel = selectedRoute.avoidLevel;
+    const targetAvoidLevel = (Array.isArray(selectedRoute.mergedLevels) && selectedRoute.mergedLevels.includes(this.currentAvoidLevel))
+      ? this.currentAvoidLevel
+      : selectedRoute.avoidLevel;
+    this.currentAvoidLevel = targetAvoidLevel;
     document.querySelectorAll('.gm-avoidance-option').forEach(o => {
       const lvl = parseInt(o.getAttribute('data-level'));
-      if (lvl === selectedRoute.avoidLevel) {
+      if (lvl === targetAvoidLevel) {
         o.classList.add('active');
         const r = o.querySelector('input[type="radio"]');
         if (r) r.checked = true;

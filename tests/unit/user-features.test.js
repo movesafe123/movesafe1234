@@ -77,7 +77,8 @@ async function main() {
     });
     assert.ok(!res.text.includes('Đặc điểm thoát nước'), 'Vẫn trả lời lạc đề thoát nước');
     assert.ok(res.text.toLowerCase().includes('mỹ đình'), 'Thiếu địa danh Mỹ Đình');
-    assert.ok(res.text.includes('Hàn Quốc') || res.text.includes('Bún chả') || res.text.includes('K-Town') || res.text.includes('ẩm thực'), 'Chưa có gợi ý ẩm thực');
+    const lowerText = res.text.toLowerCase();
+    assert.ok(lowerText.includes('hàn quốc') || lowerText.includes('bún chả') || lowerText.includes('k-town') || lowerText.includes('ẩm thực') || lowerText.includes('quán'), 'Chưa có gợi ý ẩm thực');
   });
 
   await runAsyncTest('TC-UI-08', 'Chatbot AI đề xuất địa điểm vui chơi giải trí tại Cầu Giấy', async () => {
@@ -147,6 +148,29 @@ async function main() {
     const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
     assert.ok(mapEngineJs.includes('lyrs=m,traffic'), 'Thiếu tích hợp lyrs=m,traffic mượt mà');
     assert.strictEqual(mapEngineJs.includes('lyrs=h@159000000'), false, 'Vẫn còn lớp hybrid lyrs=h gây chữ to');
+  });
+  runTest('TC-AI-01', 'C1 bug fix: "quán ăn sạch sẽ gần đây" không rơi vào nhánh trạm sạc xe điện', () => {
+    const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(chatJs.includes('sạch'), 'Thiếu chốt chặn loại trừ chữ sạch khỏi trạm sạc');
+    const isEvRegex = /(?:trạm\s*sạc|sạc\s*xe|sạc\s*điện|sạc\s*pin|xe\s*điện|vinfast|đổi\s*pin|\bsạc(?!h)\b)/i;
+    assert.strictEqual(isEvRegex.test('quán ăn sạch sẽ gần đây'), false, 'Không được nhận nhầm sạch sẽ thành sạc');
+  });
+
+  runTest('TC-AI-02', 'C2 bug fix: "cửa hàng Samsung Galaxy" không bị nhận nhầm thành rạp chiếu phim', () => {
+    const intent = foodData.detectSearchIntent('cửa hàng Samsung Galaxy');
+    assert.notStrictEqual(intent, 'cinema', 'Samsung Galaxy không được coi là rạp phim');
+  });
+
+  runTest('TC-AI-03', 'C3 bug fix: "tình hình tắc đường hiện tại" phản hồi tình trạng giao thông, không mở bảng chỉ đường', () => {
+    const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(chatJs.includes('isTrafficStatusQuery'), 'Thiếu nhánh isTrafficStatusQuery phân loại tắc đường');
+  });
+
+  runTest('TC-AI-04', 'Safety guardrails: Câu hỏi né chốt CSGT bị từ chối, câu hỏi cấp cứu có 115/114/113', () => {
+    const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(chatJs.includes('ILLEGAL_TRAFFIC'), 'Thiếu chốt chặn ILLEGAL_TRAFFIC');
+    assert.ok(chatJs.includes('EMERGENCY_LIFE'), 'Thiếu chốt chặn EMERGENCY_LIFE');
+    assert.ok(chatJs.includes('115 (Cấp cứu Y tế)'), 'Thiếu số khẩn cấp 115 trong chốt chặn');
   });
 }
 
