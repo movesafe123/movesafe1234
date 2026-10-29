@@ -880,8 +880,10 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
 2. Nếu người dùng hỏi lộ trình từ A đến B (hoặc đảo chiều lộ trình):
    - Ở dòng cuối cùng của câu trả lời, ghi đúng cú pháp lệnh điều khiển bản đồ:
      [ACTION_ROUTE: Điểm Xuất Phát -> Điểm Đến | AVOID: Tên đường cần tránh nếu có]
+   - CHÚ Ý: Nếu người dùng KHÔNG hỏi tìm đường/lộ trình từ A đến B (ví dụ: chỉ hỏi tìm quán ăn, cafe, rạp phim, trạm sạc, xem thời tiết, kiểm tra điểm ngập), TUYỆT ĐỐI KHÔNG xuất cú pháp [ACTION_ROUTE:...].
 3. Nếu người dùng hỏi về ăn uống, cafe, rạp phim, vui chơi giải trí:
    - Tư vấn chi tiết các địa điểm theo đúng danh sách đã định vị ở trên (tên quán, địa chỉ, khoảng cách ~m, đặc sản, giá tham khảo và mẹo gửi xe/di chuyển).
+   - KHÔNG xuất [ACTION_ROUTE] vì hệ thống đã tự động ghim vị trí các quán lên bản đồ.
 4. Phong cách: Thông minh, súc tích, cấu trúc gạch đầu dòng rõ ràng, giàu thông tin thực địa. TUYỆT ĐỐI KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
 
     // Xây dựng mảng contents đa lượt (Multi-turn Conversation History)
@@ -1020,11 +1022,18 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
         requestedVehicle: parsedRoute?.requestedVehicle || null
       };
 
-      // Nếu câu hỏi kết hợp vừa tìm đường vừa hỏi quán ăn/trạm sạc (Multi-intent) -> Giữ cả 2 action!
+      // Nếu câu hỏi thuần tuý về ẩm thực/vui chơi/trạm sạc (không có parsedRoute A -> B)
+      // thì ưu tiên action chuyên biệt (SHOW_FOOD_PLACES, SHOW_EV_LAYER), routeAction chỉ là secondary.
       if (action && (action.type === 'SHOW_FOOD_PLACES' || action.type === 'SHOW_EV_LAYER')) {
-        secondaryActions.push(action);
+        if (parsedRoute) {
+          secondaryActions.push(action);
+          action = routeAction;
+        } else {
+          secondaryActions.push(routeAction);
+        }
+      } else {
+        action = routeAction;
       }
-      action = routeAction;
     }
 
     const followUpMatch = reply.match(/\[FOLLOW_UPS:\s*(.*?)\]/i);

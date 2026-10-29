@@ -33,7 +33,7 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://cuvleafsohxtchhgbdbk.supa
 SUPABASE_KEY = (
     os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
     or os.environ.get("SUPABASE_SERVICE_KEY")
-    or os.environ.get("SUPABASE_KEY", "")
+    or os.environ.get("SUPABASE_KEY", "sb_publishable_IL2L6IKBOYusIzdEGkK6PQ_QTD5OE4e")
 )
 
 supabase: Client = None
