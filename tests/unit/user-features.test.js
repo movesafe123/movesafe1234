@@ -172,6 +172,28 @@ async function main() {
     assert.ok(chatJs.includes('EMERGENCY_LIFE'), 'Thiếu chốt chặn EMERGENCY_LIFE');
     assert.ok(chatJs.includes('115 (Cấp cứu Y tế)'), 'Thiếu số khẩn cấp 115 trong chốt chặn');
   });
+
+  runTest('TC-AI-05', 'AI tìm được điểm nào sẽ kích hoạt renderFoodPlaces để ghim ngay lên bản đồ và lưu sessionMemory', () => {
+    const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(chatJs.includes('resolveSpotsToRender'), 'Thiếu hàm resolveSpotsToRender đồng bộ điểm AI');
+    assert.ok(chatJs.includes('mapEngine.renderFoodPlaces(spotsToRender)'), 'Thiếu gọi mapEngine.renderFoodPlaces khi có spotsToRender');
+    assert.ok(chatJs.includes('sessionMemory.lastSuggestedSpots = spotsToRender'), 'Thiếu cập nhật sessionMemory.lastSuggestedSpots');
+  });
+
+  runTest('TC-AI-06', 'renderFoodPlaces hỗ trợ đa danh mục (cinema/cafe/ev/shelter/food) với màu sắc & badge tương ứng và flyTo khi chỉ có 1 điểm', () => {
+    const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    assert.ok(mapEngineJs.includes('themeColor'), 'Thiếu themeColor động theo category');
+    assert.ok(mapEngineJs.includes('catLabel'), 'Thiếu catLabel động theo category');
+    assert.ok(mapEngineJs.includes('else if (validCoords.length === 1)'), 'Thiếu flyTo khi validCoords có 1 điểm');
+  });
+
+  runTest('TC-AI-07', 'Kích hoạt các tính năng chạy ngầm lên giao diện: buildDecisionMatrix, buildTimeShiftAdvisor, buildMultiStopTimeline, buildSpatialCitations', () => {
+    const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
+    assert.ok(chatJs.includes('buildDecisionMatrix('), 'Thiếu hàm buildDecisionMatrix');
+    assert.ok(chatJs.includes('buildTimeShiftAdvisor('), 'Thiếu hàm buildTimeShiftAdvisor');
+    assert.ok(chatJs.includes('buildMultiStopTimeline('), 'Thiếu hàm buildMultiStopTimeline');
+    assert.ok(chatJs.includes('buildSpatialCitations('), 'Thiếu hàm buildSpatialCitations');
+  });
 }
 
 main().catch(err => {

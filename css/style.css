@@ -2231,6 +2231,10 @@ body {
 /* ==========================================================================
    Google Maps Custom Markers
    ========================================================================== */
+.gm-food-pin-container { background: transparent !important; border: none !important; }
+.gm-food-pin { cursor: pointer; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease; }
+.gm-food-pin:hover { transform: translateY(-2px) scale(1.06); box-shadow: 0 6px 14px rgba(0,0,0,0.22) !important; }
+
 .gm-route-pin {
   display: flex;
   align-items: center;

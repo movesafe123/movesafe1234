@@ -1002,53 +1002,28 @@ class AIChat {
         if (data.status === 'success' && (r?.text || r?.reply)) {
           this.messages.pop(); // Xóa tin nhắn loading
 
-          // Lưu danh sách địa điểm đề xuất vào sessionMemory
-          if (Array.isArray(r.action?.spots)) {
-            this.sessionMemory.lastSuggestedSpots = r.action.spots.map((s, idx) => ({ ...s, index: idx + 1 }));
+          // Lưu danh sách địa điểm đề xuất vào sessionMemory & ghim bản đồ
+          const serverSpots = Array.isArray(r.action?.spots) ? r.action.spots : await this.resolveSpotsToRender(ragInfo, r.text || r.reply, query, executedResults);
+          if (serverSpots.length > 0) {
+            this.sessionMemory.lastSuggestedSpots = serverSpots.map((s, idx) => ({ ...s, index: idx + 1 }));
+            if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+              window.mapEngine.renderFoodPlaces(this.sessionMemory.lastSuggestedSpots);
+            }
           }
 
-          // Dựng ma trận so sánh nếu có 2 khu vực BĐS
-          let decisionMatrix = null;
-          if (executedResults.propertyEval && executedResults.comparedPropertyEval) {
-            const eA = executedResults.propertyEval;
-            const eB = executedResults.comparedPropertyEval;
-            const aWins = eA.totalScore >= eB.totalScore;
-            decisionMatrix = {
-              title: 'So Sánh Cốt Nền & An Cư Trực Tiếp',
-              items: [
-                {
-                  name: eA.targetName,
-                  score: eA.totalScore,
-                  scoreText: `${eA.totalScore}/100 đ (Hạng ${eA.grade})`,
-                  isRecommended: aWins,
-                  points: [
-                    `Cốt nền vệ tinh: +${eA.elevationM}m`,
-                    `Cách rốn ngập gần nhất: ${eA.minDistM}m (${eA.nearestFloodName})`,
-                    `Tiện ích: ${eA.evNearCount} trạm EV, ${eA.foodNearCount} quán ăn`
-                  ]
-                },
-                {
-                  name: eB.targetName,
-                  score: eB.totalScore,
-                  scoreText: `${eB.totalScore}/100 đ (Hạng ${eB.grade})`,
-                  isRecommended: !aWins,
-                  points: [
-                    `Cốt nền vệ tinh: +${eB.elevationM}m`,
-                    `Cách rốn ngập gần nhất: ${eB.minDistM}m (${eB.nearestFloodName})`,
-                    `Tiện ích: ${eB.evNearCount} trạm EV, ${eB.foodNearCount} quán ăn`
-                  ]
-                }
-              ]
-            };
-          }
+          const decisionMatrix = this.buildDecisionMatrix(executedResults);
+          const timeShiftAdvisor = this.buildTimeShiftAdvisor(webState, query);
+          const multiStopTimeline = this.buildMultiStopTimeline(webState, query);
+          const spatialCitations = r.spatialCitations || this.buildSpatialCitations(serverSpots, webState);
 
           this.addBotMessage(r.text || r.reply, {
-            spots: r.action?.spots || null,
+            spots: serverSpots.length > 0 ? serverSpots : null,
             followUps: r.followUps || null,
-            spatialCitations: r.spatialCitations || null,
+            spatialCitations,
             routeSummary: webState.activeRoute || r.routeSummary || null,
             decisionMatrix,
-            timeShiftAdvisor: webState.activeRoute?.pitStops?.timeShiftComparison ? { now: { durationMin: 15 }, plus1h: { durationMin: 11 } } : null
+            timeShiftAdvisor,
+            multiStopTimeline
           });
 
           responded = true;
@@ -1069,8 +1044,13 @@ class AIChat {
         const clientReply = await this.callDirectGeminiWithBalancedModel(query, currentCity, geminiKey, webState, ragInfo);
         this.messages.pop();
 
-        if (Array.isArray(ragInfo.verifiedSpots) && ragInfo.verifiedSpots.length > 0) {
-          this.sessionMemory.lastSuggestedSpots = ragInfo.verifiedSpots;
+        // Tự động tìm & ghim tất cả địa điểm đề xuất lên bản đồ
+        const spotsToRender = await this.resolveSpotsToRender(ragInfo, clientReply, query, executedResults);
+        if (spotsToRender.length > 0) {
+          this.sessionMemory.lastSuggestedSpots = spotsToRender;
+          if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+            window.mapEngine.renderFoodPlaces(spotsToRender);
+          }
         }
 
         const isFoodOrFunQuery = /(?:quán|ăn|uống|cafe|cà phê|rạp|phim|cinema|sạc|trạm)/i.test(query);
@@ -1086,10 +1066,19 @@ class AIChat {
               'Quanh đích đến có quán ăn nào ngon?'
             ];
 
+        const decisionMatrix = this.buildDecisionMatrix(executedResults);
+        const timeShiftAdvisor = this.buildTimeShiftAdvisor(webState, query);
+        const multiStopTimeline = this.buildMultiStopTimeline(webState, query);
+        const spatialCitations = this.buildSpatialCitations(spotsToRender, webState);
+
         this.addBotMessage(clientReply, {
-          spots: (ragInfo.verifiedSpots && ragInfo.verifiedSpots.length > 0) ? ragInfo.verifiedSpots : null,
+          spots: spotsToRender.length > 0 ? spotsToRender : null,
           routeSummary: webState.activeRoute || null,
-          followUps: dynamicFollowUps
+          followUps: dynamicFollowUps,
+          decisionMatrix,
+          timeShiftAdvisor,
+          multiStopTimeline,
+          spatialCitations
         });
         return;
       } catch (_clientErr) {}
@@ -1098,10 +1087,30 @@ class AIChat {
     // 5. Fallback thông minh: Tự động kích hoạt Client-Side Smart Spatial AI Engine
     this.messages.pop();
     const smartReply = this.generateClientSmartLocalResponse(query, currentCity, webState);
+    const localSpots = (Array.isArray(smartReply.spots) && smartReply.spots.length > 0)
+      ? smartReply.spots
+      : await this.resolveSpotsToRender(ragInfo, smartReply.text, query, executedResults);
+
+    if (localSpots.length > 0) {
+      this.sessionMemory.lastSuggestedSpots = localSpots.map((s, idx) => ({ ...s, index: idx + 1 }));
+      if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+        window.mapEngine.renderFoodPlaces(this.sessionMemory.lastSuggestedSpots);
+      }
+    }
+
+    const decisionMatrix = this.buildDecisionMatrix(executedResults);
+    const timeShiftAdvisor = this.buildTimeShiftAdvisor(webState, query);
+    const multiStopTimeline = this.buildMultiStopTimeline(webState, query);
+    const spatialCitations = this.buildSpatialCitations(localSpots, webState);
+
     this.addBotMessage(smartReply.text, {
-      spots: smartReply.spots || null,
+      spots: localSpots.length > 0 ? localSpots : null,
       followUps: smartReply.followUps || null,
-      routeSummary: webState.activeRoute || null
+      routeSummary: webState.activeRoute || null,
+      decisionMatrix,
+      timeShiftAdvisor,
+      multiStopTimeline,
+      spatialCitations
     });
 
     if (smartReply.action) {

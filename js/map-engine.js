@@ -1094,6 +1094,39 @@ class MapEngine {
       if (typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return;
       validCoords.push([spot.lat, spot.lng]);
 
+      const cat = spot.category || 'food';
+      let themeColor = '#ea580c';
+      let themeBg = '#fff7ed';
+      let themeBorder = '#fed7aa';
+      let themeText = '#7c2d12';
+      let catLabel = 'Đề xuất Ẩm thực';
+
+      if (cat === 'cinema' || /(?:cgv|beta|lotte|cinema|rạp)/i.test(spot.name)) {
+        themeColor = '#7c3aed';
+        themeBg = '#f5f3ff';
+        themeBorder = '#ddd6fe';
+        themeText = '#5b21b6';
+        catLabel = 'Đề xuất Rạp phim';
+      } else if (cat === 'cafe' || /(?:cafe|cà phê|coffee|trà)/i.test(spot.name)) {
+        themeColor = '#d97706';
+        themeBg = '#fffbeb';
+        themeBorder = '#fde68a';
+        themeText = '#92400e';
+        catLabel = 'Đề xuất Cafe & Trà';
+      } else if (cat === 'ev' || /(?:trạm\s*sạc|vinfast|sạc)/i.test(spot.name)) {
+        themeColor = '#059669';
+        themeBg = '#ecfdf5';
+        themeBorder = '#a7f3d0';
+        themeText = '#065f46';
+        catLabel = 'Trạm Sạc EV';
+      } else if (cat === 'shelter' || /(?:trú\s*mưa|bãi\s*gửi\s*xe|cứu\s*hộ)/i.test(spot.name)) {
+        themeColor = '#2563eb';
+        themeBg = '#eff6ff';
+        themeBorder = '#bfdbfe';
+        themeText = '#1e40af';
+        catLabel = 'Điểm Trú Mưa Cao Ráo';
+      }
+
       const shortName = String(spot.name || '').split('(')[0].split('&')[0].trim().slice(0, 22);
       const safeName = this.escapeHtml(spot.name || 'Địa điểm');
       const safeAddr = this.escapeHtml(spot.address || '');
@@ -1101,8 +1134,8 @@ class MapEngine {
       const safePrice = this.escapeHtml(spot.price || '');
 
       const iconHtml = `
-        <div class="gm-food-pin" style="display: inline-flex; align-items: center; gap: 5px; background: #ffffff; color: #1e293b; border: 2px solid #ea580c; border-radius: 99px; padding: 3px 9px 3px 5px; box-shadow: 0 3px 10px rgba(234,88,12,0.28); font-family: var(--font-family); font-size: 11.5px; font-weight: 700; white-space: nowrap;">
-          <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 10.5px; font-weight: 700;">${idx + 1}</span>
+        <div class="gm-food-pin" style="display: inline-flex; align-items: center; gap: 5px; background: #ffffff; color: #1e293b; border: 2px solid ${themeColor}; border-radius: 99px; padding: 3px 9px 3px 5px; box-shadow: 0 3px 10px rgba(0,0,0,0.18); font-family: var(--font-family); font-size: 11.5px; font-weight: 700; white-space: nowrap;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: ${themeColor}; color: #fff; font-size: 10.5px; font-weight: 700;">${idx + 1}</span>
           <span>${this.escapeHtml(shortName)}</span>
         </div>
       `;
@@ -1117,8 +1150,8 @@ class MapEngine {
       const marker = L.marker([spot.lat, spot.lng], { icon, zIndexOffset: 800 });
       const popupHtml = `
         <div style="font-family: var(--font-family); min-width: 250px; max-width: 300px; line-height: 1.4;">
-          <div style="font-size: 10.5px; font-weight: 700; color: #ea580c; text-transform: uppercase; margin-bottom: 4px;">
-            Đề xuất Ẩm thực & Vui chơi #${idx + 1}
+          <div style="font-size: 10.5px; font-weight: 700; color: ${themeColor}; text-transform: uppercase; margin-bottom: 4px;">
+            ${catLabel} #${idx + 1}
           </div>
           <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">
             ${safeName}
@@ -1126,7 +1159,7 @@ class MapEngine {
           <div style="font-size: 11.5px; color: #475569; margin-bottom: 6px;">
             <strong>Địa chỉ:</strong> ${safeAddr}
           </div>
-          <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; color: #7c2d12; margin-bottom: 6px;">
+          <div style="background: ${themeBg}; border: 1px solid ${themeBorder}; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; color: ${themeText}; margin-bottom: 6px;">
             ${safeFeature}
           </div>
           <div style="font-size: 11.5px; color: #15803d; font-weight: 600; margin-bottom: 8px;">
@@ -1162,6 +1195,8 @@ class MapEngine {
     if (validCoords.length > 1) {
       const bounds = L.latLngBounds(validCoords);
       this.map.flyToBounds(bounds, { padding: [70, 70], maxZoom: 15, duration: 0.9 });
+    } else if (validCoords.length === 1) {
+      this.map.flyTo(validCoords[0], 15, { duration: 0.9 });
     } else if (centerLat && centerLng) {
       this.map.flyTo([centerLat, centerLng], 14, { duration: 0.9 });
     }
