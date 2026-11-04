@@ -1,5 +1,5 @@
 {
-  "suiteRunAt": "2026-11-04T14:42:31.547Z",
+  "suiteRunAt": "2026-11-04T14:44:58.957Z",
   "environment": {
     "nodeVersion": "v24.15.0",
     "platform": "win32",
@@ -12,61 +12,61 @@
       "category": "Unit: Thuật toán Dẫn đường Né ngập",
       "prefix": "TC-NAV",
       "exitCode": 0,
-      "durationMs": 194,
+      "durationMs": 181,
       "tests": [
         {
           "id": "TC-NAV-001",
           "title": "Haversine formula calculates real-world distance accurately",
           "status": "PASSED",
-          "durationMs": 1.6591
+          "durationMs": 1.6489
         },
         {
           "id": "TC-NAV-002",
           "title": "Vehicle specifications must enforce strict safety thresholds",
           "status": "PASSED",
-          "durationMs": 0.1894
+          "durationMs": 0.1825
         },
         {
           "id": "TC-NAV-003",
           "title": "Road restrictions forbid 2-wheelers on expressways",
           "status": "PASSED",
-          "durationMs": 0.3169
+          "durationMs": 0.2931
         },
         {
           "id": "TC-NAV-004",
           "title": "Filter removes geometrically duplicate routes",
           "status": "PASSED",
-          "durationMs": 0.2819
+          "durationMs": 0.5453
         },
         {
           "id": "TC-NAV-005",
           "title": "Detects unnatural detour backtracking",
           "status": "PASSED",
-          "durationMs": 0.3984
+          "durationMs": 0.6458
         },
         {
           "id": "TC-NAV-006",
           "title": "Classifies active flood zones based on vehicle threshold",
           "status": "PASSED",
-          "durationMs": 0.2027
+          "durationMs": 0.2141
         },
         {
           "id": "TC-NAV-007",
           "title": "Detour offsets scale with vehicle mobility footprint",
           "status": "PASSED",
-          "durationMs": 0.8651
+          "durationMs": 0.7898
         },
         {
           "id": "TC-NAV-008",
           "title": "filterDistinctRoutes preserves routes differing by >= 100m",
           "status": "PASSED",
-          "durationMs": 0.1768
+          "durationMs": 0.1685
         },
         {
           "id": "TC-NAV-009",
           "title": "buildThreePassableModes merges identical modes accurately",
           "status": "PASSED",
-          "durationMs": 0.8386
+          "durationMs": 0.8013
         }
       ]
     },
@@ -75,43 +75,43 @@
       "category": "Unit: Dữ liệu Khí tượng & Cảnh báo",
       "prefix": "TC-WTH",
       "exitCode": 0,
-      "durationMs": 1608,
+      "durationMs": 1517,
       "tests": [
         {
           "id": "TC-WTH-001",
           "title": "WMO weather codes are parsed into accurate Vietnamese text",
           "status": "PASSED",
-          "durationMs": 0.8111
+          "durationMs": 0.7594
         },
         {
           "id": "TC-WTH-002",
           "title": "Prevents daylight sun rendering during night hours",
           "status": "PASSED",
-          "durationMs": 0.2662
+          "durationMs": 0.3865
         },
         {
           "id": "TC-WTH-003",
           "title": "Flood risk calculation aligns with urban drainage capacity",
           "status": "PASSED",
-          "durationMs": 0.2237
+          "durationMs": 0.2254
         },
         {
           "id": "TC-WTH-004",
           "title": "Presets contain rich station coordinates for Hanoi, HCM and Danang",
           "status": "PASSED",
-          "durationMs": 0.1817
+          "durationMs": 0.181
         },
         {
           "id": "TC-WTH-005",
           "title": "getCommuteComfortData provides Road RealFeel, CCI score, and 15P timeline",
           "status": "PASSED",
-          "durationMs": 1417.3108
+          "durationMs": 1337.8146
         },
         {
           "id": "TC-WTH-006",
           "title": "index.html contains Commute Comfort modal and required interactive elements",
           "status": "PASSED",
-          "durationMs": 1.7236
+          "durationMs": 1.6888
         }
       ]
     },
@@ -120,163 +120,163 @@
       "category": "Unit: Giao diện & Đề xuất Ẩm thực AI",
       "prefix": "TC-UI",
       "exitCode": 0,
-      "durationMs": 13565,
+      "durationMs": 6954,
       "tests": [
         {
           "id": "TC-UI-01",
           "title": "Thanh tìm kiếm nền trắng, đã bỏ logo và có placeholder \"Nhập địa chỉ...\"",
           "status": "PASSED",
-          "durationMs": 0.9823
+          "durationMs": 0.8963
         },
         {
           "id": "TC-UI-02",
           "title": "Thanh công cụ có nút mic (hình mic) và nút tìm kiếm cạnh ô nhập",
           "status": "PASSED",
-          "durationMs": 0.1498
+          "durationMs": 0.1192
         },
         {
           "id": "TC-UI-03",
           "title": "Từ khóa \"Trạm Sạc\" chuẩn 2 từ, không hiển thị số lượng trạm sạc",
           "status": "PASSED",
-          "durationMs": 0.1531
+          "durationMs": 0.1461
         },
         {
           "id": "TC-UI-04",
           "title": "Directions Panel cố định tiêu đề phương tiện và tạo thanh trượt cho dữ liệu bên dưới",
           "status": "PASSED",
-          "durationMs": 0.1049
+          "durationMs": 0.2215
         },
         {
           "id": "TC-UI-05",
           "title": "Thẻ lộ trình không bị đè chữ, huy hiệu Đang chọn và Tin cậy xếp linh hoạt",
           "status": "PASSED",
-          "durationMs": 1.7677
+          "durationMs": 1.7744
         },
         {
           "id": "TC-UI-06",
           "title": "Phân loại câu hỏi ẩm thực, ăn uống và vui chơi giải trí chính xác 100%",
           "status": "PASSED",
-          "durationMs": 0.9461
+          "durationMs": 0.8229
         },
         {
           "id": "TC-UI-07",
           "title": "Chatbot AI đề xuất thực tế quán ăn nổi tiếng khu vực Mỹ Đình",
           "status": "PASSED",
-          "durationMs": 4135.483
+          "durationMs": 2646.1047
         },
         {
           "id": "TC-UI-08",
           "title": "Chatbot AI đề xuất địa điểm vui chơi giải trí tại Cầu Giấy",
           "status": "PASSED",
-          "durationMs": 2700.9971
+          "durationMs": 1647.472
         },
         {
           "id": "TC-UI-09",
           "title": "Hệ thống dẫn đường tự động từ A đến B vẫn hoạt động chuẩn xác",
           "status": "PASSED",
-          "durationMs": 2330.5041
+          "durationMs": 909.3908
         },
         {
           "id": "TC-UI-10",
           "title": "Chatbot AI trả kèm action SHOW_FOOD_PLACES với toạ độ ghim bản đồ và danh sách quán",
           "status": "PASSED",
-          "durationMs": 3519.2045
+          "durationMs": 910.6067
         },
         {
           "id": "TC-UI-11",
           "title": "Ô tìm kiếm chính có Autocomplete Dropdown, MapEngine có clearRoute và renderFoodPlaces",
           "status": "PASSED",
-          "durationMs": 3.2564
+          "durationMs": 3.8662
         },
         {
           "id": "TC-UI-12",
           "title": "Mục Thời tiết phường đồng bộ chuẩn màu và kiểu dáng với các chip khác, không bị mờ lạc loài",
           "status": "PASSED",
-          "durationMs": 2.4362
+          "durationMs": 1.6399
         },
         {
           "id": "TC-UI-13",
           "title": "Trợ lý AI trả lời đúng rạp chiếu phim tại khu vực hiện tại khi hỏi \"CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY\"",
           "status": "PASSED",
-          "durationMs": 1.9121
+          "durationMs": 1.5815
         },
         {
           "id": "TC-UI-14",
           "title": "Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort Modal) và cơ chế dọn sạch ghim lộ trình",
           "status": "PASSED",
-          "durationMs": 3.5729
+          "durationMs": 2.5553
         },
         {
           "id": "TC-UI-15",
           "title": "Nút bấm Dự báo thời tiết 15P nổi bật và tối ưu lớp nền bản đồ không bị đè chữ to",
           "status": "PASSED",
-          "durationMs": 0.9106
+          "durationMs": 2.5351
         },
         {
           "id": "TC-AI-01",
           "title": "C1 bug fix: \"quán ăn sạch sẽ gần đây\" không rơi vào nhánh trạm sạc xe điện",
           "status": "PASSED",
-          "durationMs": 1.4744
+          "durationMs": 1.494
         },
         {
           "id": "TC-AI-02",
           "title": "C2 bug fix: \"cửa hàng Samsung Galaxy\" không bị nhận nhầm thành rạp chiếu phim",
           "status": "PASSED",
-          "durationMs": 0.4836
+          "durationMs": 0.2846
         },
         {
           "id": "TC-AI-03",
           "title": "C3 bug fix: \"tình hình tắc đường hiện tại\" phản hồi tình trạng giao thông, không mở bảng chỉ đường",
           "status": "PASSED",
-          "durationMs": 1.8888
+          "durationMs": 1.1282
         },
         {
           "id": "TC-AI-04",
           "title": "Safety guardrails: Câu hỏi né chốt CSGT bị từ chối, câu hỏi cấp cứu có 115/114/113",
           "status": "PASSED",
-          "durationMs": 1.0715
+          "durationMs": 0.9862
         },
         {
           "id": "TC-AI-05",
           "title": "AI tìm được điểm nào sẽ kích hoạt renderFoodPlaces để ghim ngay lên bản đồ và lưu sessionMemory",
           "status": "PASSED",
-          "durationMs": 0.9297
+          "durationMs": 0.9186
         },
         {
           "id": "TC-AI-06",
           "title": "renderFoodPlaces hỗ trợ đa danh mục (cinema/cafe/ev/shelter/food) với màu sắc & badge tương ứng và flyTo khi chỉ có 1 điểm",
           "status": "PASSED",
-          "durationMs": 0.8571
+          "durationMs": 0.7927
         },
         {
           "id": "TC-AI-08",
           "title": "NLU đa ý định: Tự động dịch từ viết tắt đô thị (bk -> Đại học Bách Khoa, cg -> Cầu Giấy) và trích xuất đồng thời route + cafe/food trong 1 câu hỏi",
           "status": "PASSED",
-          "durationMs": 2.8539
+          "durationMs": 0.5265
         },
         {
           "id": "TC-AI-09",
           "title": "Hồ sơ vật lý phương tiện & tính toán đánh đổi định lượng: So sánh mực nước với gầm xe và tính toán rủi ro tài chính",
           "status": "PASSED",
-          "durationMs": 1.8131
+          "durationMs": 0.2737
         },
         {
           "id": "TC-AI-10",
           "title": "Trụ cột 5 - Tự kiểm chứng cảm biến thực địa & khử mâu thuẫn ngập úng với verifyAndEnrichAiResponse",
           "status": "PASSED",
-          "durationMs": 4.8456
+          "durationMs": 5.1987
         },
         {
           "id": "TC-AI-11",
           "title": "Giao diện trực quan hoá độ thông minh AI: live thinking steps, spatial scan header, vehicle physics meter và verification badge",
           "status": "PASSED",
-          "durationMs": 2.7093
+          "durationMs": 2.5351
         },
         {
           "id": "TC-AI-07",
           "title": "Kích hoạt các tính năng chạy ngầm lên giao diện: buildDecisionMatrix, buildTimeShiftAdvisor, buildMultiStopTimeline, buildSpatialCitations",
           "status": "PASSED",
-          "durationMs": 1.259
+          "durationMs": 1.827
         }
       ]
     },
@@ -285,31 +285,31 @@
       "category": "Unit: Tra cứu Sự kiện Web & Tin tức Báo chí",
       "prefix": "TC-EVT",
       "exitCode": 0,
-      "durationMs": 5072,
+      "durationMs": 3664,
       "tests": [
         {
           "id": "TC-EVT-001",
           "title": "Venue and temporal event intent are extracted accurately",
           "status": "PASSED",
-          "durationMs": 0.5774
+          "durationMs": 0.8342
         },
         {
           "id": "TC-EVT-002",
           "title": "4-tier quality assurance filters out unverified sources and stale news",
           "status": "PASSED",
-          "durationMs": 0.398
+          "durationMs": 0.9382
         },
         {
           "id": "TC-EVT-003",
           "title": "Live web event search returns verified news articles with high speed",
           "status": "PASSED",
-          "durationMs": 706.787
+          "durationMs": 672.6199
         },
         {
           "id": "TC-EVT-004",
           "title": "AI Assistant incorporates live news articles into responses with citations",
           "status": "PASSED",
-          "durationMs": 3573.5728
+          "durationMs": 1851.9005
         }
       ]
     },
@@ -318,67 +318,67 @@
       "category": "Integration: Backend REST API & Bảo mật",
       "prefix": "TC-API",
       "exitCode": 0,
-      "durationMs": 3480,
+      "durationMs": 3400,
       "tests": [
         {
           "id": "TC-API-001",
           "title": "GET /api/config returns public configuration without exposing private secrets",
           "status": "PASSED",
-          "durationMs": 19.4673
+          "durationMs": 18.9077
         },
         {
           "id": "TC-API-002",
           "title": "GET /api/live-data provides multi-source urban flood and traffic data",
           "status": "PASSED",
-          "durationMs": 6.9737
+          "durationMs": 19.5026
         },
         {
           "id": "TC-API-003",
           "title": "GET /api/history returns 7-day rolling time-series records",
           "status": "PASSED",
-          "durationMs": 7.7348
+          "durationMs": 6.17
         },
         {
           "id": "TC-API-004",
           "title": "GET /api/predictions delivers AI forecast with target hours",
           "status": "PASSED",
-          "durationMs": 13.3375
+          "durationMs": 8.8226
         },
         {
           "id": "TC-API-005",
           "title": "GET /api/ev-stations returns EV charging stations with fast charger filter",
           "status": "PASSED",
-          "durationMs": 7.4495
+          "durationMs": 4.3845
         },
         {
           "id": "TC-API-006",
           "title": "POST /api/crowdsource/report accepts and stores valid user reports",
           "status": "PASSED",
-          "durationMs": 38.1216
+          "durationMs": 32.6118
         },
         {
           "id": "TC-API-007",
           "title": "POST /api/crowdsource/report rejects invalid/missing coordinates with HTTP 400",
           "status": "PASSED",
-          "durationMs": 5.2043
+          "durationMs": 4.2934
         },
         {
           "id": "TC-API-008",
           "title": "POST /api/crowdsource/vote validates vote types and IDs",
           "status": "PASSED",
-          "durationMs": 3.9013
+          "durationMs": 3.1029
         },
         {
           "id": "TC-API-009",
           "title": "Security Whitelist denies access to dotfiles like .env and .git",
           "status": "PASSED",
-          "durationMs": 3.6224
+          "durationMs": 2.392
         },
         {
           "id": "TC-API-010",
           "title": "GET / and /manifest.json serve application shell and PWA manifest",
           "status": "PASSED",
-          "durationMs": 10.1293
+          "durationMs": 8.504
         }
       ]
     },
@@ -387,43 +387,43 @@
       "category": "E2E: Trải nghiệm Người dùng & Giao diện Bản đồ",
       "prefix": "TC-E2E",
       "exitCode": 0,
-      "durationMs": 4544,
+      "durationMs": 4423,
       "tests": [
         {
           "id": "TC-MAP-001",
           "title": "Leaflet Map engine initializes with interactive controls",
           "status": "PASSED",
-          "durationMs": 3.2626
+          "durationMs": 4.2276
         },
         {
           "id": "TC-MAP-002",
           "title": "Satellite and standard map layer switching works seamlessly",
           "status": "PASSED",
-          "durationMs": 1.4548
+          "durationMs": 1.7765
         },
         {
           "id": "TC-NAV-008",
           "title": "Directions workflow calculates smart routes and renders route info",
           "status": "PASSED",
-          "durationMs": 1.6976
+          "durationMs": 2.1593
         },
         {
           "id": "TC-PRD-001",
           "title": "AI Prediction time-slider updates state and recalculates future risk",
           "status": "PASSED",
-          "durationMs": 7.4976
+          "durationMs": 7.699
         },
         {
           "id": "TC-CRW-001",
           "title": "Crowdsource reporting modal opens with complete incident fields",
           "status": "PASSED",
-          "durationMs": 2.9476
+          "durationMs": 4.3387
         },
         {
           "id": "TC-AIC-001",
           "title": "AI Copilot drawer interface toggles and provides contextual chat",
           "status": "PASSED",
-          "durationMs": 7.4943
+          "durationMs": 7.7767
         }
       ]
     }
@@ -434,6 +434,6 @@
     "passed": 61,
     "failed": 0,
     "passRate": "100.0%",
-    "totalDurationMs": 28463
+    "totalDurationMs": 20139
   }
 }
