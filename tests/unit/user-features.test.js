@@ -1,76 +1,59 @@
+/**
+ * ============================================================================
+ * MOVESAFE VN - AUTOMATED TEST SUITE: UNIT TESTING
+ * Module: User Features & Intelligent AI Traffic Co-Pilot
+ * Reference Prefix: TC-UI & TC-AI
+ * ============================================================================
+ */
+
+const { describe, it } = require('node:test');
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const aiService = require('../../server/ai-service');
 const foodData = require('../../js/food-entertainment-data');
 
-function runTest(tcId, name, fn) {
-  const t0 = Date.now();
-  try {
-    fn();
-    const duration = Date.now() - t0;
-    console.log(`✔ [${tcId}] ${name} (${duration}ms)`);
-  } catch (err) {
-    const duration = Date.now() - t0;
-    console.error(`✖ [${tcId}] ${name} (${duration}ms) - ${err.message}`);
-    process.exitCode = 1;
-  }
-}
-
-async function runAsyncTest(tcId, name, fn) {
-  const t0 = Date.now();
-  try {
-    await fn();
-    const duration = Date.now() - t0;
-    console.log(`✔ [${tcId}] ${name} (${duration}ms)`);
-  } catch (err) {
-    const duration = Date.now() - t0;
-    console.error(`✖ [${tcId}] ${name} (${duration}ms) - ${err.message}`);
-    process.exitCode = 1;
-  }
-}
-
-async function main() {
+describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
   const htmlPath = path.join(__dirname, '../../index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
   const cssPath = path.join(__dirname, '../../css/style.css');
   const css = fs.readFileSync(cssPath, 'utf8');
 
-  runTest('TC-UI-01', 'Thanh tìm kiếm nền trắng, đã bỏ logo và có placeholder "Nhập địa chỉ..."', () => {
+  it('[TC-UI-01] Thanh tìm kiếm nền trắng, đã bỏ logo và có placeholder "Nhập địa chỉ..."', () => {
     assert.strictEqual(html.includes('class="gm-brand-badge"'), false, 'Vẫn còn gm-brand-badge');
     assert.ok(html.includes('placeholder="Nhập địa chỉ..."'), 'Thiếu placeholder Nhập địa chỉ...');
     assert.ok(css.includes('.gm-search-box'), 'Thiếu class .gm-search-box');
   });
 
-  runTest('TC-UI-02', 'Thanh công cụ có nút mic (hình mic) và nút tìm kiếm cạnh ô nhập', () => {
+  it('[TC-UI-02] Thanh công cụ có nút mic (hình mic) và nút tìm kiếm cạnh ô nhập', () => {
     assert.ok(html.includes('id="btn-voice-search"'), 'Thiếu id btn-voice-search');
     assert.ok(html.includes('id="btn-search-trigger"'), 'Thiếu id btn-search-trigger');
   });
 
-  runTest('TC-UI-03', 'Từ khóa "Trạm Sạc" chuẩn 2 từ, không hiển thị số lượng trạm sạc', () => {
+  it('[TC-UI-03] Từ khóa "Trạm Sạc" chuẩn 2 từ, không hiển thị số lượng trạm sạc', () => {
     assert.ok(html.includes('<span class="chip-text">Trạm Sạc</span>'), 'Chưa chuẩn nhãn Trạm Sạc');
     assert.strictEqual(html.includes('id="badge-ev-count"'), false, 'Vẫn còn badge hiển thị số lượng');
   });
 
-  runTest('TC-UI-04', 'Directions Panel cố định tiêu đề phương tiện và tạo thanh trượt cho dữ liệu bên dưới', () => {
+  it('[TC-UI-04] Directions Panel cố định tiêu đề phương tiện và tạo thanh trượt cho dữ liệu bên dưới', () => {
     assert.ok(html.includes('id="gm-directions-header"'), 'Thiếu id gm-directions-header');
     assert.ok(html.includes('id="gm-directions-body"'), 'Thiếu id gm-directions-body');
     assert.ok(css.includes('.gm-directions-body'), 'Thiếu CSS .gm-directions-body');
   });
 
-  runTest('TC-UI-05', 'Thẻ lộ trình không bị đè chữ, huy hiệu Đang chọn và Tin cậy xếp linh hoạt', () => {
+  it('[TC-UI-05] Thẻ lộ trình không bị đè chữ, huy hiệu Đang chọn và Tin cậy xếp linh hoạt', () => {
     assert.ok(css.includes('.gm-badge-selected') || css.includes('.gm-recommended-badge'), 'Thiếu class badge');
     const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
     assert.ok(appJs.includes('gm-route-header-badges'), 'Thiếu gm-route-header-badges chống đè chữ');
   });
 
-  runTest('TC-UI-06', 'Phân loại câu hỏi ẩm thực, ăn uống và vui chơi giải trí chính xác 100%', () => {
+  it('[TC-UI-06] Phân loại câu hỏi ẩm thực, ăn uống và vui chơi giải trí chính xác 100%', () => {
     assert.ok(foodData.isFoodOrFun('quanh mỹ đình có quán ăn nào nổi tiếng k'));
     assert.ok(foodData.isFoodOrFun('khu vực cầu giấy có chỗ nào vui chơi checkin'));
     assert.ok(foodData.isFoodOrFun('gợi ý quán cafe view đẹp hồ tây'));
   });
 
-  await runAsyncTest('TC-UI-07', 'Chatbot AI đề xuất thực tế quán ăn nổi tiếng khu vực Mỹ Đình', async () => {
+  it('[TC-UI-07] Chatbot AI đề xuất thực tế quán ăn nổi tiếng khu vực Mỹ Đình', async () => {
     const res = await aiService.processQuery({
       query: 'quanh mỹ đình có quán ăn nào nổi tiếng k',
       city: 'hanoi'
@@ -81,7 +64,7 @@ async function main() {
     assert.ok(lowerText.includes('hàn quốc') || lowerText.includes('bún chả') || lowerText.includes('k-town') || lowerText.includes('ẩm thực') || lowerText.includes('quán'), 'Chưa có gợi ý ẩm thực');
   });
 
-  await runAsyncTest('TC-UI-08', 'Chatbot AI đề xuất địa điểm vui chơi giải trí tại Cầu Giấy', async () => {
+  it('[TC-UI-08] Chatbot AI đề xuất địa điểm vui chơi giải trí tại Cầu Giấy', async () => {
     const res = await aiService.processQuery({
       query: 'cầu giấy có chỗ nào vui chơi không',
       city: 'hanoi'
@@ -90,7 +73,7 @@ async function main() {
     assert.ok(res.text.includes('Công Viên') || res.text.includes('Tô Hiệu') || res.text.includes('vui chơi') || res.text.includes('ẩm thực'));
   });
 
-  await runAsyncTest('TC-UI-09', 'Hệ thống dẫn đường tự động từ A đến B vẫn hoạt động chuẩn xác', async () => {
+  it('[TC-UI-09] Hệ thống dẫn đường tự động từ A đến B vẫn hoạt động chuẩn xác', async () => {
     const res = await aiService.processQuery({
       query: 'Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?',
       city: 'hanoi'
@@ -98,7 +81,7 @@ async function main() {
     assert.ok(res.action && res.action.type === 'AUTO_ROUTE');
   });
 
-  await runAsyncTest('TC-UI-10', 'Chatbot AI trả kèm action SHOW_FOOD_PLACES với toạ độ ghim bản đồ và danh sách quán', async () => {
+  it('[TC-UI-10] Chatbot AI trả kèm action SHOW_FOOD_PLACES với toạ độ ghim bản đồ và danh sách quán', async () => {
     const res = await aiService.processQuery({
       query: 'quanh đống đa chùa láng có quán ăn nào ngon',
       city: 'hanoi'
@@ -108,7 +91,7 @@ async function main() {
     assert.ok(typeof res.action.spots[0].lat === 'number' && typeof res.action.spots[0].lng === 'number', 'Thiếu lat/lng trên spot');
   });
 
-  runTest('TC-UI-11', 'Ô tìm kiếm chính có Autocomplete Dropdown, MapEngine có clearRoute và renderFoodPlaces', () => {
+  it('[TC-UI-11] Ô tìm kiếm chính có Autocomplete Dropdown, MapEngine có clearRoute và renderFoodPlaces', () => {
     assert.ok(html.includes('id="dropdown-main-search"'), 'Thiếu dropdown-main-search trong index.html');
     const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
     assert.ok(mapEngineJs.includes('renderFoodPlaces('), 'Thiếu hàm renderFoodPlaces trong map-engine.js');
@@ -117,7 +100,7 @@ async function main() {
     assert.ok(appJs.includes('renderMainSearchSuggestions('), 'Thiếu hàm renderMainSearchSuggestions trong app.js');
   });
 
-  runTest('TC-UI-12', 'Mục Thời tiết phường đồng bộ chuẩn màu và kiểu dáng với các chip khác, không bị mờ lạc loài', () => {
+  it('[TC-UI-12] Mục Thời tiết phường đồng bộ chuẩn màu và kiểu dáng với các chip khác, không bị mờ lạc loài', () => {
     assert.strictEqual(html.includes('id="chip-weather-toggle" class="gm-chip gm-chip-inactive"'), false, 'Vẫn còn gm-chip-inactive trong index.html');
     assert.ok(html.includes('id="chip-weather-toggle"'), 'Thiếu id chip-weather-toggle');
     const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
@@ -126,14 +109,14 @@ async function main() {
     assert.ok(aiChatJs.includes('window.mapEngine.clearFoodPlaces()'), 'Nút làm mới chưa dọn dẹp food markers trên bản đồ');
   });
 
-  await runAsyncTest('TC-UI-13', 'Trợ lý AI trả lời đúng rạp chiếu phim tại khu vực hiện tại khi hỏi "CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY"', async () => {
+  it('[TC-UI-13] Trợ lý AI trả lời đúng rạp chiếu phim tại khu vực hiện tại khi hỏi "CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY"', async () => {
     assert.ok(foodData.isFoodOrFun('CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY'), 'isFoodOrFun không nhận diện rạp chiếu phim');
     const rec = foodData.getRecommendation('CÓ RẠP CHIẾU PHIM NÀO QUANH ĐÂY', 'hanoi', { lastAreaKey: 'mydinh' });
     assert.ok(rec.text.includes('Rạp Chiếu Phim') || rec.text.includes('CGV') || rec.text.includes('Beta') || rec.text.includes('Lotte'), 'Chưa trả về rạp chiếu phim');
     assert.ok(Array.isArray(rec.action.spots) && rec.action.spots.some(s => s.name.includes('Rạp') || s.name.includes('Cinema') || s.name.includes('CGV')), 'Spots thiếu rạp phim');
   });
 
-  runTest('TC-UI-14', 'Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort Modal) và cơ chế dọn sạch ghim lộ trình', () => {
+  it('[TC-UI-14] Chỉ số Thoải Mái Khi Đi Đường (Commute Comfort Modal) và cơ chế dọn sạch ghim lộ trình', () => {
     const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
     assert.ok(appJs.includes('openCommuteComfortModal('), 'Thiếu openCommuteComfortModal trong app.js');
     assert.ok(appJs.includes('this.routeMarkers.origin'), 'clearRouteLayers thiếu xóa routeMarkers.origin');
@@ -142,62 +125,127 @@ async function main() {
     assert.ok(aiChatJs.includes('window.appState.closeDirections()'), 'clearMessages chưa gọi closeDirections()');
   });
 
-  runTest('TC-UI-15', 'Nút bấm Dự báo thời tiết 15P nổi bật và tối ưu lớp nền bản đồ không bị đè chữ to', () => {
+  it('[TC-UI-15] Nút bấm Dự báo thời tiết 15P nổi bật và tối ưu lớp nền bản đồ không bị đè chữ to', () => {
     assert.ok(html.includes('id="chip-commute-comfort"'), 'Thiếu nút chip-commute-comfort trên thanh Category Chips');
     assert.ok(html.includes('class="weather-pill-cta"'), 'Thiếu badge CTA Dự báo 15P trên gm-weather-pill');
     const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
     assert.ok(mapEngineJs.includes('lyrs=m,traffic'), 'Thiếu tích hợp lyrs=m,traffic mượt mà');
     assert.strictEqual(mapEngineJs.includes('lyrs=h@159000000'), false, 'Vẫn còn lớp hybrid lyrs=h gây chữ to');
   });
-  runTest('TC-AI-01', 'C1 bug fix: "quán ăn sạch sẽ gần đây" không rơi vào nhánh trạm sạc xe điện', () => {
+
+  it('[TC-AI-01] C1 bug fix: "quán ăn sạch sẽ gần đây" không rơi vào nhánh trạm sạc xe điện', () => {
     const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(chatJs.includes('sạch'), 'Thiếu chốt chặn loại trừ chữ sạch khỏi trạm sạc');
     const isEvRegex = /(?:trạm\s*sạc|sạc\s*xe|sạc\s*điện|sạc\s*pin|xe\s*điện|vinfast|đổi\s*pin|\bsạc(?!h)\b)/i;
     assert.strictEqual(isEvRegex.test('quán ăn sạch sẽ gần đây'), false, 'Không được nhận nhầm sạch sẽ thành sạc');
   });
 
-  runTest('TC-AI-02', 'C2 bug fix: "cửa hàng Samsung Galaxy" không bị nhận nhầm thành rạp chiếu phim', () => {
+  it('[TC-AI-02] C2 bug fix: "cửa hàng Samsung Galaxy" không bị nhận nhầm thành rạp chiếu phim', () => {
     const intent = foodData.detectSearchIntent('cửa hàng Samsung Galaxy');
     assert.notStrictEqual(intent, 'cinema', 'Samsung Galaxy không được coi là rạp phim');
   });
 
-  runTest('TC-AI-03', 'C3 bug fix: "tình hình tắc đường hiện tại" phản hồi tình trạng giao thông, không mở bảng chỉ đường', () => {
+  it('[TC-AI-03] C3 bug fix: "tình hình tắc đường hiện tại" phản hồi tình trạng giao thông, không mở bảng chỉ đường', () => {
     const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(chatJs.includes('isTrafficStatusQuery'), 'Thiếu nhánh isTrafficStatusQuery phân loại tắc đường');
   });
 
-  runTest('TC-AI-04', 'Safety guardrails: Câu hỏi né chốt CSGT bị từ chối, câu hỏi cấp cứu có 115/114/113', () => {
+  it('[TC-AI-04] Safety guardrails: Câu hỏi né chốt CSGT bị từ chối, câu hỏi cấp cứu có 115/114/113', () => {
     const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(chatJs.includes('ILLEGAL_TRAFFIC'), 'Thiếu chốt chặn ILLEGAL_TRAFFIC');
     assert.ok(chatJs.includes('EMERGENCY_LIFE'), 'Thiếu chốt chặn EMERGENCY_LIFE');
     assert.ok(chatJs.includes('115 (Cấp cứu Y tế)'), 'Thiếu số khẩn cấp 115 trong chốt chặn');
   });
 
-  runTest('TC-AI-05', 'AI tìm được điểm nào sẽ kích hoạt renderFoodPlaces để ghim ngay lên bản đồ và lưu sessionMemory', () => {
+  it('[TC-AI-05] AI tìm được điểm nào sẽ kích hoạt renderFoodPlaces để ghim ngay lên bản đồ và lưu sessionMemory', () => {
     const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(chatJs.includes('resolveSpotsToRender'), 'Thiếu hàm resolveSpotsToRender đồng bộ điểm AI');
     assert.ok(chatJs.includes('mapEngine.renderFoodPlaces(spotsToRender)'), 'Thiếu gọi mapEngine.renderFoodPlaces khi có spotsToRender');
     assert.ok(chatJs.includes('sessionMemory.lastSuggestedSpots = spotsToRender'), 'Thiếu cập nhật sessionMemory.lastSuggestedSpots');
   });
 
-  runTest('TC-AI-06', 'renderFoodPlaces hỗ trợ đa danh mục (cinema/cafe/ev/shelter/food) với màu sắc & badge tương ứng và flyTo khi chỉ có 1 điểm', () => {
+  it('[TC-AI-06] renderFoodPlaces hỗ trợ đa danh mục (cinema/cafe/ev/shelter/food) với màu sắc & badge tương ứng và flyTo khi chỉ có 1 điểm', () => {
     const mapEngineJs = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
     assert.ok(mapEngineJs.includes('themeColor'), 'Thiếu themeColor động theo category');
     assert.ok(mapEngineJs.includes('catLabel'), 'Thiếu catLabel động theo category');
     assert.ok(mapEngineJs.includes('else if (validCoords.length === 1)'), 'Thiếu flyTo khi validCoords có 1 điểm');
   });
 
-  runTest('TC-AI-07', 'Kích hoạt các tính năng chạy ngầm lên giao diện: buildDecisionMatrix, buildTimeShiftAdvisor, buildMultiStopTimeline, buildSpatialCitations', () => {
+  it('[TC-AI-08] NLU đa ý định: Tự động dịch từ viết tắt đô thị (bk -> Đại học Bách Khoa, cg -> Cầu Giấy) và trích xuất đồng thời route + cafe/food trong 1 câu hỏi', () => {
+    const multi = aiService.analyzeMultiIntentProfile('Hôm nay trời mưa đi xe tay ga từ bk về cg có sợ chết máy không hay nên ngồi cafe đợi?');
+    assert.ok(multi.routeIntent, 'Không nhận diện được lộ trình từ câu hỏi ghép');
+    assert.ok(multi.routeIntent.origin.toLowerCase().includes('bách khoa'), 'Chưa dịch được bk thành Bách Khoa');
+    assert.ok(multi.routeIntent.destination.toLowerCase().includes('cầu giấy'), 'Chưa dịch được cg thành Cầu Giấy');
+    assert.strictEqual(multi.poiCategory, 'cafe', 'Chưa bắt được ý định cafe');
+    assert.strictEqual(multi.dilemmaType, 'go_now_or_wait', 'Chưa bắt được thế phân vân go_now_or_wait');
+    assert.strictEqual(multi.vehicleSubType, 'scooter', 'Chưa phân loại được xe tay ga');
+  });
+
+  it('[TC-AI-09] Hồ sơ vật lý phương tiện & tính toán đánh đổi định lượng: So sánh mực nước với gầm xe và tính toán rủi ro tài chính', () => {
+    const mockMerged = {
+      allFloods: [{ name: 'Võ Chí Công', depth_cm: 25 }],
+      activeFloods: [{ name: 'Võ Chí Công', depth_cm: 25 }],
+      allTraffics: [],
+      currentVehicle: 'motorbike'
+    };
+    const brief = aiService.buildDeterministicDecisionBrief('Đi xe tay ga qua Võ Chí Công', 'hanoi', mockMerged);
+    assert.strictEqual(brief.vehicleDisplayName, 'Xe tay ga');
+    assert.strictEqual(brief.maxFloodCm, 25);
+    assert.strictEqual(brief.isCritical, true, '25cm phải vượt ngưỡng nguy hiểm của xe tay ga (18cm)');
+    assert.ok(brief.recommendedVerdict.includes('CẢNH BÁO NGUY CƠ') || brief.recommendedVerdict.includes('chết máy'), 'Thiếu cảnh báo chết máy');
+    assert.ok(Array.isArray(brief.tradeoffOptions) && brief.tradeoffOptions.length === 3, 'Thiếu 3 phương án đánh đổi');
+  });
+
+  it('[TC-AI-10] Trụ cột 5 - Tự kiểm chứng cảm biến thực địa & khử mâu thuẫn ngập úng với verifyAndEnrichAiResponse', () => {
+    const AIChatClass = require('../../js/ai-chat');
+    const chatInstance = new AIChatClass();
+    const mockWebState = {
+      visibleFloods: [{ name: 'Nguyễn Trãi', depth_cm: 25 }]
+    };
+    const verified = chatInstance.verifyAndEnrichAiResponse('Tuyến đường hoàn toàn khô ráo 100% không ngập.', mockWebState);
+    assert.ok(verified.text.includes('Đính chính cảm biến MoveSafe'), 'Chưa tự đính chính mâu thuẫn ngập');
+    assert.strictEqual(verified.verification.type, 'warning');
+    assert.ok(verified.verification.badgeText.includes('Nguyễn Trãi'));
+  });
+
+  it('[TC-AI-11] Giao diện trực quan hoá độ thông minh AI: live thinking steps, spatial scan header, vehicle physics meter và verification badge', () => {
+    const AIChatClass = require('../../js/ai-chat');
+    const chatInstance = new AIChatClass();
+    
+    // Test spatial scan header
+    const scanHtml = chatInstance.renderSpatialScanHeaderHtml({ title: 'Đã quét hành lang 2.5km', stats: '15 trạm ngập' });
+    assert.ok(scanHtml.includes('gm-spatial-scan-header'), 'Thiếu class gm-spatial-scan-header');
+    assert.ok(scanHtml.includes('15 trạm ngập'), 'Thiếu nội dung thống kê quét');
+
+    // Test vehicle physics meter
+    const physicsHtml = chatInstance.renderVehiclePhysicsMeterHtml({
+      vehicleDisplayName: 'Xe tay ga',
+      safeLimit: 15,
+      maxPassable: 18,
+      maxFloodCm: 22,
+      isSafe: false,
+      isCritical: true,
+      spec: { intakePart: 'Ống xả và lọc gió', damageRisk: 'Chết máy', riskCostRangeVnd: '500k-2tr' }
+    });
+    assert.ok(physicsHtml.includes('gm-vehicle-physics-meter'), 'Thiếu class gm-vehicle-physics-meter');
+    assert.ok(physicsHtml.includes('VƯỢT NGƯỠNG AN TOÀN'), 'Thiếu trạng thái vượt ngưỡng');
+
+    // Test verification badge
+    const badgeHtml = chatInstance.renderVerificationBadgeHtml({ badgeText: 'Đã kiểm chứng cảm biến 100%', type: 'success' });
+    assert.ok(badgeHtml.includes('gm-verification-badge success'), 'Thiếu class gm-verification-badge success');
+
+    // Test CSS styles exist
+    const currentCss = fs.readFileSync(path.join(__dirname, '../../css/style.css'), 'utf8');
+    assert.ok(currentCss.includes('.gm-spatial-scan-header'), 'Thiếu CSS .gm-spatial-scan-header');
+    assert.ok(currentCss.includes('.gm-vehicle-physics-meter'), 'Thiếu CSS .gm-vehicle-physics-meter');
+    assert.ok(currentCss.includes('.gm-verification-badge'), 'Thiếu CSS .gm-verification-badge');
+  });
+
+  it('[TC-AI-07] Kích hoạt các tính năng chạy ngầm lên giao diện: buildDecisionMatrix, buildTimeShiftAdvisor, buildMultiStopTimeline, buildSpatialCitations', () => {
     const chatJs = fs.readFileSync(path.join(__dirname, '../../js/ai-chat.js'), 'utf8');
     assert.ok(chatJs.includes('buildDecisionMatrix('), 'Thiếu hàm buildDecisionMatrix');
     assert.ok(chatJs.includes('buildTimeShiftAdvisor('), 'Thiếu hàm buildTimeShiftAdvisor');
     assert.ok(chatJs.includes('buildMultiStopTimeline('), 'Thiếu hàm buildMultiStopTimeline');
     assert.ok(chatJs.includes('buildSpatialCitations('), 'Thiếu hàm buildSpatialCitations');
   });
-}
-
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
 });
-

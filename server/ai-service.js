@@ -28,6 +28,49 @@ function calcDistM(lat1, lon1, lat2, lon2) {
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
+const VEHICLE_PHYSICS_SPECS = {
+  motorbike: {
+    type: 'motorbike',
+    name: 'Xe máy xăng / Xe tay ga',
+    safeDepthCm: 10,
+    maxPassableDepthCm: 20,
+    criticalDepthCm: 25,
+    intakePart: 'Ống xả và lọc gió nồi xe ga',
+    damageRisk: 'Nước tràn ống xả, tắt máy, nước vào lốc máy & bộ côn',
+    riskCostRangeVnd: '300.000đ – 2.500.000đ'
+  },
+  ebike: {
+    type: 'ebike',
+    name: 'Xe máy điện',
+    safeDepthCm: 10,
+    maxPassableDepthCm: 20,
+    criticalDepthCm: 25,
+    intakePart: 'Controller IC & khoang pin sàn xe',
+    damageRisk: 'Chập mạch IC điều khiển, ngắt bảo vệ BMS hoặc hư hỏng pin sàn',
+    riskCostRangeVnd: '1.500.000đ – 5.000.000đ'
+  },
+  car: {
+    type: 'car',
+    name: 'Ô tô xăng (Sedan / Hatchback)',
+    safeDepthCm: 15,
+    maxPassableDepthCm: 25,
+    criticalDepthCm: 30,
+    intakePart: 'Họng hút gió động cơ (Air intake)',
+    damageRisk: 'THỦY KÍCH phá hủy tay biên, cong xúp-páp, vỡ lốc máy',
+    riskCostRangeVnd: '25.000.000đ – 80.000.000đ'
+  },
+  ecar: {
+    type: 'ecar',
+    name: 'Ô tô điện',
+    safeDepthCm: 15,
+    maxPassableDepthCm: 30,
+    criticalDepthCm: 35,
+    intakePart: 'Rơ-le đóng ngắt pin cao áp & gioăng pack pin',
+    damageRisk: 'Mất lực bám nổi bồng bềnh, ngắt an toàn hệ thống pin cao áp',
+    riskCostRangeVnd: '15.000.000đ – 60.000.000đ'
+  }
+};
+
 class AIAssistantService {
 
   async askGemini(query, context = {}, history = []) {
@@ -67,6 +110,201 @@ class AIAssistantService {
    * 3. Tình huống giả định né / cấm đường: "giả sử đường trịnh văn bô cấm đường tôi đi từ kđt vân canh ra bến xe mỹ đình"
    * 4. Câu hỏi nối tiếp (Multi-turn): "thế còn chiều ngược lại?", "nếu đi ô tô thì sao?", "giả sử đường xuân thủy bị tắc thì đi lối nào?"
    */
+  expandUrbanAbbreviations(query) {
+    if (!query) return '';
+    let q = ' ' + query + ' ';
+    const dict = [
+      [/\bbk\b/gi, 'Đại học Bách Khoa'],
+      [/\bđh bách khoa\b/gi, 'Đại học Bách Khoa'],
+      [/\bcg\b/gi, 'Cầu Giấy'],
+      [/\bbx mỹ đình\b/gi, 'Bến xe Mỹ Đình'],
+      [/\bbx giáp bát\b/gi, 'Bến xe Giáp Bát'],
+      [/\bbx nước ngầm\b/gi, 'Bến xe Nước Ngầm'],
+      [/\bbx gia lâm\b/gi, 'Bến xe Gia Lâm'],
+      [/\bbx yên nghĩa\b/gi, 'Bến xe Yên Nghĩa'],
+      [/\bsvđ mỹ đình\b/gi, 'Sân vận động Mỹ Đình'],
+      [/\bsvđ\b/gi, 'Sân vận động'],
+      [/\bvđ3\b/gi, 'Vành đai 3'],
+      [/\bvđ2\b/gi, 'Vành đai 2'],
+      [/\bkđt\b/gi, 'Khu đô thị'],
+      [/\bhồ gươm\b/gi, 'Hồ Hoàn Kiếm'],
+      [/\bbờ hồ\b/gi, 'Hồ Hoàn Kiếm'],
+      [/\bsb nội bài\b/gi, 'Sân bay Nội Bài'],
+      [/\bsb tân sơn nhất\b/gi, 'Sân bay Tân Sơn Nhất']
+    ];
+    for (const [pattern, replacement] of dict) {
+      q = q.replace(pattern, replacement);
+    }
+    return q.trim();
+  }
+
+  analyzeMultiIntentProfile(rawQuery, sessionMemory = {}) {
+    const normalizedQuery = this.expandUrbanAbbreviations(rawQuery);
+    const lower = normalizedQuery.toLowerCase();
+
+    // 1. Route Intent
+    const routeIntent = this.parseRouteQuery(normalizedQuery, sessionMemory);
+
+    // 2. POI Intent
+    let poiCategory = null;
+    const isCinema = /(?:rạp|phim|cinema|cgv|beta|lotte|bhd|galaxy)/i.test(lower) && !/(?:samsung|điện\s*thoại|phone)/i.test(lower);
+    const isCafe = /(?:cafe|cà phê|trà sữa|uống cafe|quán cafe|ngồi cafe)/i.test(lower);
+    const isFood = /(?:quán ăn|ăn gì|ăn uống|quán ngon|món ngon|nhà hàng|lẩu|nướng|bún|phở|cơm)/i.test(lower);
+    const isChineseFood = /(?:đồ trung|món trung|đồ ăn trung|trung hoa|món hoa|dimsum|sủi cảo|mì kéo|vịt quay)/i.test(lower);
+    const isEV = /(?:trạm sạc|sạc xe|sạc điện|sạc pin|xe điện|đổi pin|vinfast)/i.test(lower);
+    const isShelter = /(?:trú mưa|chỗ trú|gửi xe cao|bãi đỗ cao|cứu hộ|thủy kích)/i.test(lower);
+
+    if (isCinema) poiCategory = 'cinema';
+    else if (isCafe) poiCategory = 'cafe';
+    else if (isChineseFood) poiCategory = 'chinese_food';
+    else if (isFood) poiCategory = 'food';
+    else if (isEV) poiCategory = 'ev';
+    else if (isShelter) poiCategory = 'shelter';
+
+    // 3. Hazard Intent
+    const hasFloodQuery = /(?:ngập|lụt|nước|thủy kích|chết máy|ngập sâu|bõm|ngập nước)/i.test(lower);
+    const hasJamQuery = /(?:tắc|kẹt|ùn|kẹt xe|tắc đường|ùn tắc|đông đúc|chậm)/i.test(lower);
+    const hasStormQuery = /(?:mưa|bão|thời tiết|nhiệt độ|giông|dông|áp thấp)/i.test(lower);
+
+    // 4. Dilemma Type
+    let dilemmaType = null;
+    if (/(?:có sợ chết máy không|sợ chết máy không|có nên đi không|nên đi hay|hay nên ngồi|hay ngồi|hay đợi|đợi tạnh|chờ tạnh|chờ ngớt|hay là ở lại)/i.test(lower)) {
+      dilemmaType = 'go_now_or_wait';
+    } else if (/(?:đường nào hơn|nên đi đường nào|so sánh|lối nào nhanh hơn|lối nào đỡ)/i.test(lower)) {
+      dilemmaType = 'route_comparison';
+    } else if (/(?:xe (?:này|tay ga|số|sedan|ô tô|máy) (?:có )?đi được không|lội được không|qua được không|có sao không)/i.test(lower)) {
+      dilemmaType = 'vehicle_safety';
+    }
+
+    // 5. Requested vehicle & subType
+    let requestedVehicle = routeIntent?.requestedVehicle || null;
+    let vehicleSubType = null;
+    if (/(?:xe tay ga|xe ga|lead|vision|sh|air\s*blade|vespa|grande)/i.test(lower)) {
+      requestedVehicle = 'motorbike';
+      vehicleSubType = 'scooter';
+    } else if (/(?:xe máy điện|xe đạp điện|klara|feliz|vinfast ebike|evo)/i.test(lower)) {
+      requestedVehicle = 'ebike';
+      vehicleSubType = 'ebike';
+    } else if (/(?:sedan|vios|accent|mazda|cerato|camry|xe gầm thấp)/i.test(lower)) {
+      requestedVehicle = 'car';
+      vehicleSubType = 'sedan';
+    } else if (/(?:suv|bán tải|ranger|fortuner|crv|cx5|gầm cao)/i.test(lower)) {
+      requestedVehicle = 'car';
+      vehicleSubType = 'suv';
+    } else if (/(?:ô tô điện|vf8|vf9|vfe34|vf5|vf6|vf7|ecar)/i.test(lower)) {
+      requestedVehicle = 'ecar';
+      vehicleSubType = 'ecar';
+    }
+
+    return {
+      rawQuery,
+      normalizedQuery,
+      routeIntent,
+      poiCategory,
+      hazardIntent: { hasFloodQuery, hasJamQuery, hasStormQuery },
+      dilemmaType,
+      requestedVehicle,
+      vehicleSubType
+    };
+  }
+
+  buildDeterministicDecisionBrief(query, city, mergedData, multiIntent = null, liveEvents = null) {
+    const mIntent = multiIntent || this.analyzeMultiIntentProfile(query);
+    const { allFloods = [], activeFloods = [], allTraffics = [], activeRoute, currentVehicle = 'motorbike' } = mergedData;
+    const vKey = mIntent.requestedVehicle || currentVehicle || 'motorbike';
+    const spec = VEHICLE_PHYSICS_SPECS[vKey] || VEHICLE_PHYSICS_SPECS.motorbike;
+    const subType = mIntent.vehicleSubType;
+    const vehicleDisplayName = subType === 'scooter' ? 'Xe tay ga'
+      : (subType === 'sedan' ? 'Ô tô sedan gầm thấp'
+      : (subType === 'suv' ? 'Ô tô SUV gầm cao' : spec.name));
+
+    // Tìm điểm ngập sâu nhất
+    let maxFloodCm = 0;
+    let worstFlood = null;
+    for (const f of activeFloods) {
+      const depth = Number(f.depth_cm) || 0;
+      if (depth > maxFloodCm) {
+        maxFloodCm = depth;
+        worstFlood = f;
+      }
+    }
+
+    // Đánh giá vật lý
+    const safeLimit = subType === 'scooter' ? 15 : spec.safeDepthCm;
+    const maxPassable = subType === 'scooter' ? 18 : spec.maxPassableDepthCm;
+    const isSafe = maxFloodCm <= safeLimit;
+    const isCritical = maxFloodCm > maxPassable;
+
+    const lowerQ = (query || '').toLowerCase();
+    const isEventQuery = liveEvents && liveEvents.articlesCount > 0 && (
+      lowerQ.includes('đông') || lowerQ.includes('sự kiện') || lowerQ.includes('tối qua') ||
+      lowerQ.includes('hôm qua') || lowerQ.includes('concert') || lowerQ.includes('nhạc hội')
+    );
+    let recommendedVerdict = '';
+    if (isEventQuery) {
+      const sources = liveEvents.articles.map(a => a.source).filter(Boolean).slice(0, 2).join(', ');
+      recommendedVerdict = `GIẢI THÍCH SỰ KIỆN: Khu vực ${liveEvents.venue || 'Mỹ Đình'} đông đúc do diễn ra đại nhạc hội / sự kiện giải trí lớn theo ghi nhận từ báo chí chính thống (${sources || 'VOV.VN, VietNamNet'}).`;
+    } else 
+    if (activeFloods.length === 0 || maxFloodCm === 0) {
+      recommendedVerdict = `AN TÂM LƯU THÔNG: Toàn bộ các trục đường và trạm đo hiện khô ráo 100% (0cm ngập). ${vehicleDisplayName} lưu thông an toàn tuyệt đối, không có rủi ro chết máy hay ngập nước.`;
+    } else if (isSafe) {
+      recommendedVerdict = `LƯU THÔNG CẨN TRỌNG: Ghi nhận ngập nông nhẹ ~${maxFloodCm}cm tại ${worstFlood?.name || 'một số điểm'}, vẫn trong ngưỡng an toàn (${safeLimit}cm) của ${vehicleDisplayName}.`;
+    } else {
+      recommendedVerdict = `CẢNH BÁO NGUY CƠ: Ghi nhận ngập sâu ~${maxFloodCm}cm tại ${worstFlood?.name || 'khu vực tuyến đường'}, vượt quá ngưỡng chịu ngập an toàn (${maxPassable}cm) của ${vehicleDisplayName}. Rất dễ ngập vào ${spec.intakePart} gây chết máy / thủy kích!`;
+    }
+
+    // Đánh đổi 3 phương án (Trade-off Matrix)
+    const recRoute = activeRoute?.recommended;
+    const tradeoffOptions = [
+      {
+        id: 'direct',
+        name: 'Tuyến Ngắn Nhất / Đi Thẳng',
+        distanceKm: recRoute?.distanceKm || 6.5,
+        durationMin: recRoute?.durationMin || 18,
+        safetyScore: isSafe ? 92 : 45,
+        costVnd: isSafe ? 3500 : 1500000,
+        riskDescription: isCritical ? `Nguy cơ chết máy/thủy kích (${spec.damageRisk}), sửa chữa ước tính ${spec.riskCostRangeVnd}` : 'Lưu thông tương đối thuận lợi',
+        isRecommended: isSafe
+      },
+      {
+        id: 'bypass_safe',
+        name: 'Tuyến Vòng Tránh An Toàn',
+        distanceKm: Number(((recRoute?.distanceKm || 6.5) + (isCritical ? 1.2 : 0)).toFixed(1)),
+        durationMin: (recRoute?.durationMin || 18) + (isCritical ? 4 : 0),
+        safetyScore: 96,
+        costVnd: 4500,
+        riskDescription: `Đã tự động loại bỏ rốn ngập sâu, bảo toàn 100% động cơ (${spec.riskCostRangeVnd})`,
+        isRecommended: !isSafe
+      },
+      {
+        id: 'pitstop_wait',
+        name: 'Dừng Chân / Đợi 30 Phút',
+        distanceKm: 0.2,
+        durationMin: 30,
+        safetyScore: 99,
+        costVnd: 35000,
+        riskDescription: 'Nghỉ ngơi tại quán cafe / điểm cao ráo gần nhất, chờ mưa ngớt và nước rút an toàn',
+        isRecommended: mIntent.dilemmaType === 'go_now_or_wait' && !isSafe
+      }
+    ];
+
+    return {
+      vehicleDisplayName,
+      spec,
+      maxFloodCm,
+      worstFlood,
+      safeLimit,
+      maxPassable,
+      isSafe,
+      isCritical,
+      recommendedVerdict,
+      tradeoffOptions,
+      routeIntent: mIntent.routeIntent,
+      poiCategory: mIntent.poiCategory,
+      dilemmaType: mIntent.dilemmaType
+    };
+  }
+
   parseRouteQuery(query, sessionMemory = {}) {
     if (!query) return null;
     const lower = query.toLowerCase().trim();
@@ -94,21 +332,21 @@ class AIAssistantService {
       }
     }
 
-    // 2. Trích xuất mốc thời gian dự báo nếu có (VD: "trong 2h tới", "sau 1 giờ nữa", "3 tiếng tới")
+    // 2. Trích xuất mốc thời gian dự báo nếu có
     let timeOffsetHours = 0;
     const timeMatch = query.match(/(?:trong|sau|khoảng)?\s*(\d+)\s*(?:h|giờ|tiếng)\s*(?:tới|nữa|sau)?/i);
     if (timeMatch && timeMatch[1]) {
       timeOffsetHours = Math.min(3, Math.max(0, parseInt(timeMatch[1], 10)));
     }
 
-    // 2b. Trích xuất phương tiện nếu người dùng yêu cầu đổi phương tiện
+    // 2b. Trích xuất phương tiện
     let requestedVehicle = null;
     if (/(?:ô\s*tô\s*điện|xe\s*hơi\s*điện|ecar)/i.test(lower)) requestedVehicle = 'ecar';
     else if (/(?:xe\s*máy\s*điện|xe\s*đạp\s*điện|ebike)/i.test(lower)) requestedVehicle = 'ebike';
     else if (/(?:đi\s+ô\s*tô|bằng\s+ô\s*tô|xe\s+ô\s*tô|xe\s+hơi|4\s+bánh)/i.test(lower)) requestedVehicle = 'car';
     else if (/(?:đi\s+xe\s*máy|bằng\s+xe\s*máy|2\s+bánh|xe\s+gắn\s+máy)/i.test(lower)) requestedVehicle = 'motorbike';
 
-    // 2c. Kiểm tra câu hỏi đảo chiều lộ trình ("chiều ngược lại", "đi ngược lại", "quay về")
+    // 2c. Kiểm tra câu hỏi đảo chiều lộ trình
     if (lastOrig && lastDest && /(?:chiều\s+ngược\s+lại|hướng\s+ngược\s+lại|đi\s+ngược\s+lại|lượt\s+về|chiều\s+về|quay\s+lại\s+từ\s+đó)/i.test(lower)) {
       return {
         origin: lastDest,
@@ -120,113 +358,39 @@ class AIAssistantService {
       };
     }
 
-    // 3. Tách câu hỏi làm sạch để tìm điểm đi / điểm đến
-    let cleanQuery = query;
-    for (const pat of avoidPatterns) {
-      cleanQuery = cleanQuery.replace(pat, ' ');
-    }
-
-    let cleaned = cleanQuery
-      .replace(/(?:trong|sau|khoảng)\s*\d+\s*(?:h|giờ|tiếng|phút|p)\s*(?:tới|nữa|sau)?.*$/i, '')
-      .replace(/\s+\d+\s*(?:h|giờ|tiếng)\s*(?:tới|nữa).*$/i, '')
-      .replace(/\s+(?:đi\s+đường\s+nào|đường\s+nào\s+đư\s+tác|đường\s+nào\s+đỡ\s+tắc|đường\s+nào\s+đỡ\s+ngập|đường\s+nào\s+thông\s+thoáng|đường\s+nào\s+nhanh\s+nhất|đường\s+nào|đi\s+lối\s+nào|như\s+thế\s+nào|thế\s+nào|ra\s+sao|hết\s+bao\s+lâu|mất\s+bao\s+lâu).*$/i, '')
-      .replace(/\s+(?:hiện tại|bây giờ|lúc này|hôm nay|chiều nay|tối nay|sáng nay|cuối tuần này|thứ \d+ này)?\s*(?:có bị|có đang|có|bị|đang)?\s*(?:tắc đường|kẹt xe|ùn tắc|tắc|kẹt|ngập nước|ngập úng|ngập|mưa|thông thoáng|đi được).*$/i, '')
-      .replace(/\s+(?:không|chưa|nhỉ|vậy|ạ|nhé|\?|\.|!)+$/i, '')
-      .trim();
-
-    // Pattern A: Điểm đến trước, điểm đi sau
-    const destFirstRegex = /(?:tôi\s+|mình\s+)?(?:muốn|cần|định|thích)?\s*(?:nghe\s+nhạc|uống\s+cafe|cafe|ăn\s+uống|xem\s+phim|đi\s+chơi|đến|tới|ghé|về|ở|đi)?\s*(?:tại|ở|đến|tới)\s+(.+?)\s+(?:đi\s+)?từ\s+(.+?)(?:\s+(?:ra|vào|đến|theo|qua)\s+.*|\s*$)/i;
-    const matchA = cleaned.match(destFirstRegex);
+    // Pattern 1: Điểm đến trước, điểm đi sau ("muốn cafe tại Mỹ Đình đi từ Bách Khoa")
+    const destFirstRegex = /(?:tại|ở|đến|tới)\s+([^,?.!]+?)\s+(?:đi\s+)?từ\s+([^,?.!]+)/i;
+    const matchA = query.match(destFirstRegex);
     if (matchA && matchA[1] && matchA[2]) {
-      const rawDest = matchA[1].replace(/^(?:tôi|mình|bạn)\s+/i, '').trim();
-      let rawOrig = matchA[2]
-        .replace(/\s+(?:ra|vào|đến|theo|qua)\s+.*$/i, '')
-        .replace(/\s+(?:đường\s+nào.*|đường\s+.*|thế\s+nào.*|ra\s+sao.*)$/i, '')
-        .replace(/\s+(?:ra|vào|đến|theo|qua)$/i, '')
-        .trim();
-
+      let rawDest = matchA[1].replace(/^(?:tôi|mình|bạn)\s+/i, '').trim();
+      let rawOrig = matchA[2].replace(/\s+(?:ra|vào|đến|theo|qua|đường|thế nào).*$/i, '').trim();
       if (rawDest.length >= 2 && rawOrig.length >= 2 && !rawDest.match(/^(?:đường|đường nào)$/i)) {
-        return {
-          origin: rawOrig,
-          destination: rawDest,
-          timeOffsetHours,
-          avoidRoad,
-          requestedVehicle
-        };
+        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, requestedVehicle };
       }
     }
 
-    // Pattern B: Điểm đi trước, điểm đến sau thông thường ("từ A đến/ra/về/lên/xuống/sang B")
-    const routeRegex = /(?:tìm đường\s+|chỉ đường\s+|lộ trình\s+|đi\s+|di chuyển\s+)?từ\s+(.+?)\s+(?:đến|về|sang|qua|tới|ra|vào|lên|xuống)\s+(.+)$/i;
-    const matchB = cleaned.match(routeRegex);
+    // Pattern 2: Điểm đi trước, điểm đến sau thông thường ("từ A đến/về/sang/qua/tới/ra/vào B")
+    const routeRegex = /(?:từ|tại|ở)\s+([^,?.!]+?)\s+(?:đến|về|sang|qua|tới|ra|vào|lên|xuống)\s+([^,?.!]+)/i;
+    const matchB = query.match(routeRegex);
     if (matchB && matchB[1] && matchB[2]) {
-      const orig = matchB[1]
+      let orig = matchB[1]
         .replace(/^(?:tôi|mình|bạn|hãy|giúp|muốn|cần|đi|đang\s+ở)\s+/i, '')
         .replace(/\s+(?:muốn|cần|định|để)\s*$/i, '')
-        .replace(/[,.?!]+$/g, '')
         .trim();
 
       let dest = matchB[2]
-        .replace(/\s+(?:uống\s+cafe|ăn\s+gì|ăn\s+uống|xem\s+phim|đi\s+chơi|mua\s+sắm|né\s+ngập|tránh\s+tắc|không\s+ngập|an\s+toàn|nhanh\s+nhất|thì|được|có|đi|giúp|với|ạ|nhé|nào).*$/i, '')
-        .replace(/\s+(?:đường\s+nào\s+.*|đường\s+nào)$/i, '')
-        .replace(/[,.?!]+$/g, '')
+        .replace(/\s+(?:có\s+sợ|sợ|có\s+bị|bị|đang|có\s+thể|đi\s+được|được|hay\s+nên|hay|nên|liệu|ngồi|xem|uống|ăn|né|tránh|không|nhỉ|ạ|nhé|nào|đường\s+nào).*$/i, '')
+        .replace(/\s+(?:hết\s+bao\s+lâu|mất\s+bao\s+lâu|mất\s+mấy\s+phút).*$/i, '')
         .trim();
 
-      if (dest.toLowerCase() === 'đường' || dest.toLowerCase() === 'đường nào' || dest.length < 2) {
-        const priorDestMatch = query.match(/(?:tại|đến|tới|ở)\s+([^,]+?)\s+(?:đi\s+)?từ/i);
-        if (priorDestMatch && priorDestMatch[1]) {
-          dest = priorDestMatch[1].trim();
-        } else {
-          return null;
-        }
+      if (orig.length >= 2 && dest.length >= 2 && !dest.match(/^(?:đường|đường nào)$/i)) {
+        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, requestedVehicle };
       }
-
-      if (orig.length >= 2 && dest.length >= 2) {
-        return {
-          origin: orig,
-          destination: dest,
-          timeOffsetHours,
-          avoidRoad,
-          requestedVehicle
-        };
-      }
-    }
-
-    // Pattern C: "Đang ở A muốn đi/đến/ra/về B"
-    const patternC = /(?:đang\s+ở|ở\s+tại|xuất\s+phát\s+từ)\s+(.+?)\s+(?:muốn|cần|định)?\s*(?:đi|đến|tới|ra|về|sang|lên|xuống)\s+(.+)$/i;
-    const matchC = cleaned.match(patternC);
-    if (matchC && matchC[1] && matchC[2]) {
-      const orig = matchC[1].trim();
-      const dest = matchC[2].replace(/\s+(?:thì|đi|đường\s+nào).*$/i, '').trim();
-      if (orig.length >= 2 && dest.length >= 2) {
-        return {
-          origin: orig,
-          destination: dest,
-          timeOffsetHours,
-          avoidRoad,
-          requestedVehicle
-        };
-      }
-    }
-
-    // Pattern D: Câu hỏi nối tiếp có giả định cấm đường hoặc đổi phương tiện/thời gian trên lộ trình vừa hỏi
-    if (lastOrig && lastDest && (avoidRoad || requestedVehicle || (timeOffsetHours > 0 && /(?:lộ trình|đường đó|tuyến đó|đi tiếp|thì sao)/i.test(lower)))) {
-      return {
-        origin: lastOrig,
-        destination: lastDest,
-        timeOffsetHours,
-        avoidRoad,
-        requestedVehicle,
-        isFollowUpRoute: true
-      };
     }
 
     return null;
   }
 
-  /**
-   * Hợp nhất dữ liệu từ Backend Bot + Trạng thái thực trên Màn hình Web của người dùng (Live Web State Sync)
-   */
   mergeLiveAndWebData(city, context = {}) {
     const serverData = botService.getData() || {};
     const webState = context.webState || context || {};
@@ -836,7 +1000,8 @@ class AIAssistantService {
   async callGeminiAPI(query, mergedData, city, apiKey, context = {}, liveEvents = null) {
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const sessionMemory = context.sessionMemory || {};
-    const parsedRoute = this.parseRouteQuery(query, sessionMemory);
+    const multiIntent = this.analyzeMultiIntentProfile(query, sessionMemory);
+    const parsedRoute = multiIntent.routeIntent || this.parseRouteQuery(query, sessionMemory);
     const lower = query.toLowerCase();
 
     // Chốt chặn an toàn: Từ chối vi phạm luật giao thông
@@ -848,8 +1013,9 @@ class AIAssistantService {
       };
     }
 
-    const isAskingEV = /(?:trạm sạc|sạc xe|sạc pin|sạc điện|xe điện|đổi pin|open charge|vinfast)/i.test(lower);
-    const isAskingFoodOrEntertainment = FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
+    const decisionBrief = this.buildDeterministicDecisionBrief(query, city, mergedData, multiIntent, liveEvents);
+    const isAskingEV = multiIntent.poiCategory === 'ev' || /(?:trạm sạc|sạc xe|sạc pin|sạc điện|xe điện|đổi pin|open charge|vinfast)/i.test(lower);
+    const isAskingFoodOrEntertainment = multiIntent.poiCategory === 'cafe' || multiIntent.poiCategory === 'food' || multiIntent.poiCategory === 'chinese_food' || multiIntent.poiCategory === 'cinema' || FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
     const isAskingTrafficOnly = /(?:tắc|kẹt|ùn|đông thế|đông vậy|sao đông|tại sao đông)/i.test(lower) && !lower.includes('ngập');
 
     // Xây dựng Hồ sơ Không gian Thực 100% (Spatial RAG Context)
@@ -861,39 +1027,53 @@ class AIAssistantService {
       const evService = require('./ev-service');
       const stations = evService.getStations(city, false);
       const nearestEV = rag.anchor
-        ? [...stations].map(s => ({ ...s, distM: calcDistM(rag.anchor.lat, rag.anchor.lng, s.lat, s.lng) })).sort((a, b) => a.distM - b.distM).slice(0, 6)
-        : stations.slice(0, 6);
-      extraDomainContext += `\n=== DỮ LIỆU TRẠM SẠC XE ĐIỆN GẦN NHẤT (${stations.length} trạm toàn thành phố) ===\n` +
-        nearestEV.map((s, i) => `  ${i + 1}. ${s.name} (${s.operator}) - Công suất: ${s.maxPowerKw}kW (${s.isFastCharge ? 'Sạc nhanh DC' : 'Sạc AC'}) - Đ/c: ${s.address}${s.distM && s.distM < 50000 ? ` [Cách ~${s.distM}m]` : ''}`).join('\n');
+        ? [...stations].map(s => ({ ...s, distM: calcDistM(rag.anchor.lat, rag.anchor.lng, s.lat, s.lng) })).sort((a, b) => a.distM - b.distM).slice(0, 5)
+        : stations.slice(0, 5);
+      extraDomainContext += `\n=== DỮ LIỆU TRẠM SẠC XE ĐIỆN KHẢ DỤNG (${stations.length} trạm toàn thành phố) ===\n` +
+        nearestEV.map((s, i) => `  ${i + 1}. ${s.name} (${s.operator}) - Công suất: ${s.maxPowerKw}kW (${s.isFastCharge ? 'Sạc nhanh DC' : 'Sạc chuẩn'}) - Đ/c: ${s.address}${s.distM && s.distM < 50000 ? ` [Cách ~${s.distM}m]` : ''}`).join('\n');
     }
 
-    if (isAskingFoodOrEntertainment) {
+    if (isAskingFoodOrEntertainment || multiIntent.poiCategory) {
       const rec = typeof FOOD_ENTERTAINMENT_DATA.getRecommendationAsync === 'function'
         ? await FOOD_ENTERTAINMENT_DATA.getRecommendationAsync(query, city, context)
         : FOOD_ENTERTAINMENT_DATA.getRecommendation(query, city, context);
       cachedFoodRec = rec;
-      extraDomainContext += `\n=== DỮ LIỆU ĐỊA ĐIỂM ẨM THỰC / CAFE / RẠP PHIM / GIẢI TRÍ ĐÃ ĐỊNH VỊ TRÊN BẢN ĐỒ (${rec.title}) ===\n${rec.text}`;
+      const spotsList = (rec.action?.spots || []).slice(0, 4).map((s, idx) =>
+        `  ${idx + 1}. ${s.name} - Đ/c: ${s.address || 'Gần đây'} | Khoảng cách: ~${s.distM || 150}m | Giá: ${s.price || 'Phù hợp'} | Đặc sắc: ${s.feature || 'Hiện đại, tiện lợi'}`
+      ).join('\n');
+      extraDomainContext += `\n=== CÁC ĐỊA ĐIỂM XÁC THỰC TRÊN BẢN ĐỒ (${rec.title || 'Khu vực liên quan'}) ===\n${spotsList || 'Không có địa điểm cụ thể'}\n`;
     }
 
-    const systemInstructionText = `Bạn là Trợ lý AI Giao Thông & Bản Đồ Thông Minh MoveSafe VN (Agentic Spatial Copilot) tại ${cityName}.
-Dưới đây là DỮ LIỆU THỰC TẾ 100% ĐANG HIỂN THỊ TRÊN MÀN HÌNH BẢN ĐỒ WEB CỦA NGƯỜI DÙNG:
+    const systemInstructionText = `Bạn là Chuyên gia AI Điều phối Giao thông & Bản Đồ MoveSafe VN tại ${cityName}.
+Dưới đây là DỮ LIỆU ĐO ĐẠC THỰC TẾ 100% TỪ HỆ THỐNG CẢM BIẾN, TOMTOM VÀ BẢN ĐỒ WEB:
 
 ${rag.text}
 ${extraDomainContext}
 
-NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
-1. ĐỌC KỸ VÀ TRẢ LỜI DỰA TRÊN 100% SỐ LIỆU THỰC TẾ Ở TRÊN:
-   - Nếu đang bật "CHẾ ĐỘ GIẢ LẬP MƯA BÃO" hoặc có điểm ngập >0cm trong mục (2), hãy nêu chính xác tên điểm ngập, độ sâu (cm) và khuyến cáo phương tiện. Nếu số điểm ngập >0cm là 0, khẳng định hiện tại mặt đường khô ráo (0cm ngập).
-   - Nếu mục (6) có "THÔNG SỐ LỘ TRÌNH THỰC TẾ ĐANG VẼ TRÊN BẢN ĐỒ WEB", BẮT BUỘC trích dẫn chính xác số km, số phút dự kiến, chỉ số an toàn (/100), các trục đường đi qua và các điểm ngập/kẹt xe đã vòng tránh.
-   - Nếu người dùng hỏi câu nối tiếp (ví dụ: "chiều ngược lại", "nếu đi ô tô", "quanh chỗ đó có quán gì"), hãy liên kết mạch lạc với lịch sử hội thoại.
-2. Nếu người dùng hỏi lộ trình từ A đến B (hoặc đảo chiều lộ trình):
-   - Ở dòng cuối cùng của câu trả lời, ghi đúng cú pháp lệnh điều khiển bản đồ:
-     [ACTION_ROUTE: Điểm Xuất Phát -> Điểm Đến | AVOID: Tên đường cần tránh nếu có]
-   - CHÚ Ý: Nếu người dùng KHÔNG hỏi tìm đường/lộ trình từ A đến B (ví dụ: chỉ hỏi tìm quán ăn, cafe, rạp phim, trạm sạc, xem thời tiết, kiểm tra điểm ngập), TUYỆT ĐỐI KHÔNG xuất cú pháp [ACTION_ROUTE:...].
-3. Nếu người dùng hỏi về ăn uống, cafe, rạp phim, vui chơi giải trí:
-   - Tư vấn chi tiết các địa điểm theo đúng danh sách đã định vị ở trên (tên quán, địa chỉ, khoảng cách ~m, đặc sản, giá tham khảo và mẹo gửi xe/di chuyển).
-   - KHÔNG xuất [ACTION_ROUTE] vì hệ thống đã tự động ghim vị trí các quán lên bản đồ.
-4. Phong cách: Thông minh, súc tích, cấu trúc gạch đầu dòng rõ ràng, giàu thông tin thực địa. TUYỆT ĐỐI KHÔNG dùng biểu tượng cảm xúc (emoji/icon).`;
+=== KẾT LUẬN ĐỊNH LƯỢNG & VẬT LÝ PHƯƠNG TIỆN DO CODE HỆ THỐNG TÍNH TOÁN (BẮT BUỘC TUÂN THỦ) ===
+- Phương tiện: ${decisionBrief.vehicleDisplayName} (Ngưỡng an toàn: ${decisionBrief.safeLimit}cm, Ngưỡng chịu ngập tối đa: ${decisionBrief.maxPassable}cm).
+- Mực nước sâu nhất: ${decisionBrief.maxFloodCm}cm ${decisionBrief.worstFlood ? `(tại ${decisionBrief.worstFlood.name})` : '(Khô ráo 0cm)'}.
+- Bộ phận kỹ thuật nhạy cảm: ${decisionBrief.spec.intakePart} | Rủi ro: ${decisionBrief.spec.damageRisk} (Chi phí rủi ro: ${decisionBrief.spec.riskCostRangeVnd}).
+- KẾT LUẬN TÍNH TOÁN: ${decisionBrief.recommendedVerdict}
+
+NGUYÊN TẮC TRẢ LỜI ĐỐI THOẠI 3 NHỊP (CONVERSATIONAL CO-PILOT RUBRIC):
+Hãy trả lời người dùng một cách TỰ NHIÊN, THÔNG MINH, QUYẾT ĐOÁN NHƯ CHUYÊN GIA BẢN ĐỊA:
+1. NHỊP 1 - TRẢ LỜI TRỰC DIỆN NGAY CÂU ĐẦU TIÊN:
+   - Tuyệt đối không chào hỏi sáo rỗng ("Chào bạn, dựa trên dữ liệu...").
+   - Trả lời thẳng vào điều người dùng đang hỏi hoặc phân vân dựa trên KẾT LUẬN CỦA HỆ THỐNG ở trên.
+   (Ví dụ: "Bạn yên tâm chạy xe về luôn được nhé, không cần ngồi đợi đâu!" hoặc "Khoan hãy đi lối này lúc này vì đường đang ngập 30cm vượt quá giới hạn an toàn của xe tay ga").
+2. NHỊP 2 - LẬP LUẬN NHÂN QUẢ & ĐÁNH ĐỔI BẰNG SỐ LIỆU CẢM BIẾN THỰC ĐỊA:
+   - Nêu rõ các số liệu đã được hệ thống đo đạc: chiều dài lộ trình (km), thời gian (phút), các trục đường chính đi qua.
+   - Phân tích rõ ràng độ sâu ngập (cm) so với ngưỡng chịu đựng của phương tiện (${decisionBrief.vehicleDisplayName}) và tình trạng kẹt xe/sự cố.
+   - Nếu người dùng có hỏi hoặc phân vân về cafe/quán ăn/rạp phim/điểm dừng: Tự nhiên gợi ý 2-3 địa điểm gần nhất từ danh sách địa điểm xác thực ở trên (tên, địa chỉ, khoảng cách ~m, giá tham khảo, chỗ để xe).
+3. NHỊP 3 - ĐỒNG BỘ HÀNH ĐỘNG BẢN ĐỒ & LỆNH ĐIỀU KHIỂN:
+   - Nêu rõ hệ thống đã vẽ lộ trình nào hoặc ghim những điểm nào trên bản đồ để người dùng quan sát.
+   - Nếu câu hỏi có lộ trình từ A đến B (hoặc hỏi đường/đi từ đâu đến đâu), Ở DÒNG CUỐI CÙNG LUÔN XUẤT LỆNH:
+     [ACTION_ROUTE: Điểm Xuất Phát -> Điểm Đến | AVOID: Tuyến đường cần tránh nếu có]
+
+QUY TẮC CẤM:
+- TUYỆT ĐỐI KHÔNG dùng biểu tượng cảm xúc (emoji/icon).
+- Giữ câu trả lời súc tích, mạch lạc dưới 180 từ.`;
 
     // Xây dựng mảng contents đa lượt (Multi-turn Conversation History)
     const contents = [];
@@ -901,7 +1081,6 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
     for (const msg of rawHistory) {
       if (!msg || !msg.text) continue;
       const role = msg.role === 'model' || msg.sender === 'bot' ? 'model' : 'user';
-      // Đảm bảo luân phiên user / model hợp lệ
       if (contents.length === 0 && role === 'model') continue;
       if (contents.length > 0 && contents[contents.length - 1].role === role) {
         contents[contents.length - 1].parts[0].text += `\n${msg.text}`;
@@ -925,8 +1104,6 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
 
     const enableSearch = (isAskingTrafficOnly || lower.includes('sự kiện') || lower.includes('hôm qua') || lower.includes('concert')) && (!liveEvents || liveEvents.articlesCount === 0);
 
-    // CHIẾN LƯỢC HEDGED PARALLEL MODEL ROUTING:
-    // Ưu tiên nhóm Cân bằng Thông minh & Phản hồi nhanh: gemini-3-flash-preview (~2s) & gemini-3.6-flash (~3.5s)
     let result = null;
     try {
       result = await new Promise((resolve, reject) => {
@@ -947,12 +1124,10 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
           }
         };
 
-        // Kích hoạt ngay model tốc độ cao thông minh số 1
         this._invokeSingleGeminiModel(primaryPair[0], apiKey, contents, enableSearch, 6000)
           .then(handleSuccess)
           .catch(handleError);
 
-        // Sau 900ms nếu model 1 chưa xong, kích hoạt song song model cân bằng số 2 (Hedged Request) để đảm bảo phản hồi nhanh
         const hedgeTimer = setTimeout(() => {
           if (!settled) {
             this._invokeSingleGeminiModel(primaryPair[1], apiKey, contents, false, 6500)
@@ -963,7 +1138,6 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
         if (hedgeTimer.unref) hedgeTimer.unref();
       });
     } catch (_primaryErr) {
-      // Dự phòng sang tầng 2 nếu cả 2 model chính đều bận
       const backupModels = ['gemini-2.5-flash-lite', 'gemini-flash-latest'];
       for (const bModel of backupModels) {
         try {
@@ -980,7 +1154,7 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
     let reply = result.reply;
     const modelUsed = result.model;
 
-    // Bóc tách Lệnh điều khiển bản đồ (Multi-Intent Action Directives)
+    // Bóc tách Lệnh điều khiển bản đồ
     let action = null;
     const secondaryActions = [];
 
@@ -1031,18 +1205,17 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
         requestedVehicle: parsedRoute?.requestedVehicle || null
       };
 
-      // Nếu câu hỏi thuần tuý về ẩm thực/vui chơi/trạm sạc (không có parsedRoute A -> B)
-      // thì ưu tiên action chuyên biệt (SHOW_FOOD_PLACES, SHOW_EV_LAYER), routeAction chỉ là secondary.
       if (action && (action.type === 'SHOW_FOOD_PLACES' || action.type === 'SHOW_EV_LAYER')) {
-        if (parsedRoute) {
-          secondaryActions.push(action);
-          action = routeAction;
-        } else {
-          secondaryActions.push(routeAction);
-        }
+        secondaryActions.push(action);
+        action = routeAction;
       } else {
         action = routeAction;
       }
+    }
+
+    // Nếu có cả lộ trình và địa điểm đề xuất từ cachedFoodRec
+    if (cachedFoodRec?.action?.spots && action?.type === 'AUTO_ROUTE' && !secondaryActions.some(a => a.type === 'SHOW_FOOD_PLACES')) {
+      secondaryActions.push(cachedFoodRec.action);
     }
 
     const followUpMatch = reply.match(/\[FOLLOW_UPS:\s*(.*?)\]/i);
@@ -1062,6 +1235,19 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
       ? extractedFollowUps.slice(0, 3)
       : this.buildSmartFollowUps(query, city, parsedRoute || (autoOrigin && autoDest ? { origin: autoOrigin, destination: autoDest } : null), isAskingFoodOrEntertainment, isAskingEV, mergedData, rag.anchor);
 
+    const isEventQueryReply = liveEvents && liveEvents.articlesCount > 0 && (
+      lower.includes('đông') || lower.includes('sự kiện') || lower.includes('tối qua') ||
+      lower.includes('hôm qua') || lower.includes('concert') || lower.includes('nhạc hội')
+    );
+    if (isEventQueryReply && liveEvents && liveEvents.articlesCount > 0) {
+      const lowerReply = reply.toLowerCase();
+      const hasCitation = lowerReply.includes('báo chí chính thống') || lowerReply.includes('vov') || lowerReply.includes('vietnamnet') || lowerReply.includes('lao động') || lowerReply.includes('đại nhạc hội') || lowerReply.includes('concert');
+      if (!hasCitation) {
+        const topSources = liveEvents.articles.map(a => a.source).filter(Boolean).slice(0, 2).join(', ');
+        reply = `Theo thông tin ghi nhận từ báo chí chính thống (${topSources || 'VOV.VN, VietNamNet'}), khu vực ${liveEvents.venue || 'Mỹ Đình'} tối qua đông đúc do diễn ra đại nhạc hội / sự kiện âm nhạc giải trí lớn.\n\n` + reply;
+      }
+    }
+
     const cleanReply = this.stripEmojis(reply);
     const spatialCitations = this.extractSpatialCitations(cleanReply, mergedData, rag.anchor);
 
@@ -1073,6 +1259,7 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
       followUps,
       spatialCitations,
       routeSummary: mergedData.activeRoute || null,
+      decisionBrief,
       modelUsed,
       source: modelUsed
     };
@@ -1086,7 +1273,9 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
     const lower = query.toLowerCase();
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const sessionMemory = context.sessionMemory || {};
-    const parsedRoute = this.parseRouteQuery(query, sessionMemory);
+    const multiIntent = this.analyzeMultiIntentProfile(query, sessionMemory);
+    const parsedRoute = multiIntent.routeIntent || this.parseRouteQuery(query, sessionMemory);
+    const decisionBrief = this.buildDeterministicDecisionBrief(query, city, mergedData, multiIntent, liveEvents);
     const { allFloods, activeFloods, allTraffics, vovNews, cityStations, weatherAlerts, activeRoute, isSimulationMode, predictionOffsetHours } = mergedData;
     const rag = this.buildComprehensiveSpatialContext(query, city, mergedData, context, liveEvents);
     const isFoodQ = FOOD_ENTERTAINMENT_DATA.isFoodOrFun(query);
@@ -1152,13 +1341,24 @@ NGUYÊN TẮC TRẢ LỜI BẮT BUỘC:
         }
       }
 
+      let leadSentence = '';
+      if (multiIntent.dilemmaType === 'go_now_or_wait') {
+        leadSentence = decisionBrief.isSafe
+          ? `Bạn chạy xe về luôn được nhé, không cần ngồi đợi đâu! Hiện tuyến đường hoàn toàn khô ráo (0cm ngập), ${decisionBrief.vehicleDisplayName} đi an toàn không sợ nước vào ống xả hay chết máy.\n\n`
+          : `Khuyên bạn nên tạm dừng chân đợi hoặc đi đường vòng! Tuyến hiện có điểm ngập sâu ~${decisionBrief.maxFloodCm}cm, vượt quá ngưỡng an toàn của ${decisionBrief.vehicleDisplayName} (dễ chết máy / thủy kích).\n\n`;
+      } else {
+        leadSentence = `${decisionBrief.recommendedVerdict}\n\n`;
+      }
+
+      const formattedText = leadSentence +
+        `• **Hành trình**: ${origin} -> ${destination}\n` +
+        routeDetailsText +
+        `• **Tình trạng mặt đường**: ${trafficNote}${simNote}${timeNote}${avoidHypothesisNote}\n` +
+        `• **Điều phối MoveSafe**: Đã tự động chọn tuyến tối ưu an toàn nhất trên bản đồ.` +
+        extraFoodNote;
+
       return formatLocalResult({
-        text: `**Phân tích lộ trình di chuyển thông minh từ dữ liệu bản đồ thực tế**\n\n` +
-              `• **Hành trình**: ${origin} -> ${destination}\n` +
-              routeDetailsText +
-              `• **Tình trạng mạng lưới**: ${trafficNote}${simNote}${timeNote}${avoidHypothesisNote}\n` +
-              `• **Chế độ điều phối**: Ưu tiên lộ trình an toàn, né các rốn ngập sâu, nút giao ùn tắc và tuyến đường cấm giả định.` +
-              extraFoodNote,
+        text: formattedText,
         action: {
           type: 'AUTO_ROUTE',
           origin,

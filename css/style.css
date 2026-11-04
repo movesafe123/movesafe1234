@@ -6525,3 +6525,226 @@ body.dark-mode .gm-cand-chip:hover,
   border-color: #475569;
   color: #ffffff;
 }
+
+/* =========================================================================
+   UX TRÍ TUỆ AI 2.0 (SPATIAL SCAN, VEHICLE PHYSICS & VERIFICATION BADGE)
+   ========================================================================= */
+
+.gm-spatial-scan-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.08), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(147, 197, 253, 0.6);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.gm-spatial-scan-header .scan-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  animation: gmScanPulse 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes gmScanPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.gm-spatial-scan-header .scan-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.gm-vehicle-physics-meter {
+  margin-top: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.gm-vehicle-physics-meter .meter-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gm-vehicle-physics-meter .meter-bar-container {
+  position: relative;
+  height: 14px;
+  background: #f1f5f9;
+  border-radius: 7px;
+  overflow: visible;
+  margin: 4px 0;
+}
+
+.gm-vehicle-physics-meter .meter-bar {
+  height: 100%;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 700;
+  transition: width 0.4s ease;
+}
+
+.gm-vehicle-physics-meter .meter-threshold {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: #0f172a;
+  border-radius: 1px;
+}
+
+.gm-vehicle-physics-meter .meter-threshold::after {
+  content: 'Ngưỡng';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.gm-vehicle-physics-meter .meter-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10.5px;
+  color: #475569;
+}
+
+.gm-vehicle-physics-meter .meter-cost {
+  font-size: 10px;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.gm-verification-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.gm-verification-badge.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.gm-verification-badge.warning {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+}
+
+.gm-verification-badge.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.gm-chat-bubble.thinking {
+  background: #f8fafc !important;
+  border: 1px dashed #94a3b8 !important;
+  color: #475569 !important;
+  font-style: italic;
+  animation: gmThinkingPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes gmThinkingPulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+body.dark-mode .gm-spatial-scan-header,
+[data-theme="dark"] .gm-spatial-scan-header {
+  background: rgba(30, 58, 138, 0.35);
+  border-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+body.dark-mode .gm-spatial-scan-header .scan-badge,
+[data-theme="dark"] .gm-spatial-scan-header .scan-badge {
+  background: #1e293b;
+  color: #60a5fa;
+}
+
+body.dark-mode .gm-vehicle-physics-meter,
+[data-theme="dark"] .gm-vehicle-physics-meter {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .gm-vehicle-physics-meter .meter-header,
+[data-theme="dark"] .gm-vehicle-physics-meter .meter-header {
+  color: #f1f5f9;
+}
+
+body.dark-mode .gm-vehicle-physics-meter .meter-bar-container,
+[data-theme="dark"] .gm-vehicle-physics-meter .meter-bar-container {
+  background: #334155;
+}
+
+body.dark-mode .gm-verification-badge.success,
+[data-theme="dark"] .gm-verification-badge.success {
+  background: rgba(6, 95, 70, 0.25);
+  border-color: #065f46;
+  color: #6ee7b7;
+}
+
+body.dark-mode .gm-verification-badge.warning,
+[data-theme="dark"] .gm-verification-badge.warning {
+  background: rgba(154, 52, 18, 0.25);
+  border-color: #9a3412;
+  color: #fdba74;
+}
+
+body.dark-mode .gm-verification-badge.info,
+[data-theme="dark"] .gm-verification-badge.info {
+  background: rgba(30, 64, 175, 0.25);
+  border-color: #1e40af;
+  color: #93c5fd;
+}
