@@ -135,8 +135,17 @@ class WeatherService {
     const stations = this.stationPresets[cityKey] || this.stationPresets.hanoi;
     if (!stations || stations.length === 0) return [];
 
+    // Ưu tiên 0: Kiểm tra bộ nhớ đệm stationCache nội bộ (< 5 phút) để không gọi lặp Open-Meteo khi bật/tắt lớp bản đồ
+    const localCached = this.stationCache[cityKey];
+    if (Array.isArray(localCached) && localCached.length >= stations.length) {
+      const cachedTime = localCached[0]?.updated_at ? new Date(localCached[0].updated_at).getTime() : 0;
+      if (cachedTime > 0 && (Date.now() - cachedTime) < 5 * 60 * 1000) {
+        return localCached;
+      }
+    }
+
     // Ưu tiên 1: Nếu liveData từ Server/SSE đã có sẵn dữ liệu trạm thời tiết mới (< 5 phút), dùng ngay để tiết kiệm băng thông
-    const serverStations = window.appState?.liveData?.weatherStations?.[cityKey];
+    const serverStations = (typeof window !== 'undefined') ? window.appState?.liveData?.weatherStations?.[cityKey] : null;
     if (Array.isArray(serverStations) && serverStations.length >= stations.length) {
       const sampleTime = serverStations[0]?.updated_at ? new Date(serverStations[0].updated_at).getTime() : 0;
       if (sampleTime > 0 && (Date.now() - sampleTime) < 5 * 60 * 1000) {

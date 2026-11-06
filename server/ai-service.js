@@ -218,10 +218,33 @@ class AIAssistantService {
       : (subType === 'sedan' ? 'Ô tô sedan gầm thấp'
       : (subType === 'suv' ? 'Ô tô SUV gầm cao' : spec.name));
 
-    // Tìm điểm ngập sâu nhất
+    // Khoanh vùng điểm ngập theo khu vực câu hỏi hoặc lộ trình đang mở (Spatial Scope)
+    const qNorm = normalizeVi(query || '');
+    const qWords = qNorm.split(/\s+/).filter(w => w.length >= 3 && !['duong', 'pho', 'quan', 'phuong', 'hien', 'tai', 'nhu', 'the', 'nao', 'khong', 'dang', 'bao', 'nhieu', 'ngap'].includes(w));
+    const anchor = this.resolveSpatialAnchorForRAG ? this.resolveSpatialAnchorForRAG(query || '', city || 'hanoi', mergedData, {}) : null;
+
+    let scopedFloods = activeFloods;
+    const isCityWideQuery = /(?:toàn\s+thành\s+phố|toàn\s+đô\s+thị|hà\s+nội\s+hiện\s+tại|tình\s+hình\s+chung|những\s+điểm\s+nào\s+ngập|các\s+điểm\s+ngập)/i.test(query || '');
+
+    if (!isCityWideQuery && activeFloods.length > 0) {
+      const byKeywordOrAnchor = activeFloods.filter(f => {
+        const fNorm = normalizeVi(`${f.name || ''} ${f.description || ''} ${f.district || ''}`);
+        const kwHit = qWords.length > 0 && qWords.some(w => fNorm.includes(w));
+        const anchorHit = anchor && Number.isFinite(anchor.lat) && Number.isFinite(f.lat)
+          ? calcDistM(anchor.lat, anchor.lng, f.lat, f.lng) <= 2500
+          : false;
+        return kwHit || anchorHit;
+      });
+
+      if (byKeywordOrAnchor.length > 0 || anchor || mIntent.routeIntent) {
+        scopedFloods = byKeywordOrAnchor;
+      }
+    }
+
+    // Tìm điểm ngập sâu nhất trong phạm vi đã khoanh vùng
     let maxFloodCm = 0;
     let worstFlood = null;
-    for (const f of activeFloods) {
+    for (const f of scopedFloods) {
       const depth = Number(f.depth_cm) || 0;
       if (depth > maxFloodCm) {
         maxFloodCm = depth;
@@ -397,15 +420,26 @@ class AIAssistantService {
 
     // 1. Điểm ngập: Ưu tiên danh sách đang hiển thị trên màn hình Web (bao gồm cả Giả lập mưa bão, Dự báo +1..3h, Báo cáo cộng đồng)
     const serverFloods = (serverData.floodPoints || []).filter(f => f.city === city);
-    const allFloods = (Array.isArray(webState.visibleFloods) && webState.visibleFloods.length > 0)
-      ? webState.visibleFloods.map(f => ({
-          name: f.name || f.location || 'Điểm ngập',
-          depth_cm: f.depth_cm !== undefined ? f.depth_cm : (f.depth || 0),
-          danger_level: f.danger_level || (f.depth > 30 ? 'hazard' : 'caution'),
-          lat: f.lat,
-          lng: f.lng,
-          advice: f.advice || f.status || 'Chú ý ngập nước'
-        }))
+    const hasClientFloodState = Array.isArray(webState.visibleFloods) && (
+      webState.visibleFloods.length > 0 ||
+      Boolean(webState.isSimulationMode) ||
+      Number(webState.predictionOffsetHours) > 0
+    );
+    const allFloods = hasClientFloodState
+      ? webState.visibleFloods.map(f => {
+          const depthVal = f.depth_cm !== undefined ? Number(f.depth_cm) : (Number(f.depth) || 0);
+          return {
+            ...f,
+            name: f.name || f.location_name || f.location || 'Điểm ngập',
+            depth_cm: depthVal,
+            danger_level: f.danger_level || (depthVal > 30 ? 'critical' : (depthVal >= 15 ? 'medium' : (depthVal > 0 ? 'low' : 'safe'))),
+            passable_motorbike: f.passable_motorbike !== undefined ? f.passable_motorbike : (depthVal < 20),
+            passable_car: f.passable_car !== undefined ? f.passable_car : (depthVal < 35),
+            lat: f.lat,
+            lng: f.lng,
+            advice: f.advice || f.status || 'Chú ý ngập nước'
+          };
+        })
       : serverFloods;
     const activeFloods = allFloods.filter(f => (f.depth_cm || 0) > 0 && f.danger_level !== 'safe');
 
@@ -1188,7 +1222,7 @@ QUY TẮC CẤM:
       if (routeMatch[3] && !routeMatch[3].match(/^(?:không|none|null)$/i)) {
         autoAvoid = routeMatch[3].trim();
       }
-    } else if (parsedRoute) {
+    } else if (parsedRoute && !isAskingFoodOrEntertainment) {
       autoOrigin = parsedRoute.origin;
       autoDest = parsedRoute.destination;
       autoAvoid = parsedRoute.avoidRoad;
@@ -1205,7 +1239,9 @@ QUY TẮC CẤM:
         requestedVehicle: parsedRoute?.requestedVehicle || null
       };
 
-      if (action && (action.type === 'SHOW_FOOD_PLACES' || action.type === 'SHOW_EV_LAYER')) {
+      if (action && action.type === 'SHOW_FOOD_PLACES' && isAskingFoodOrEntertainment && !multiIntent?.routeIntent) {
+        secondaryActions.push(routeAction);
+      } else if (action && (action.type === 'SHOW_FOOD_PLACES' || action.type === 'SHOW_EV_LAYER')) {
         secondaryActions.push(action);
         action = routeAction;
       } else {
@@ -1235,16 +1271,18 @@ QUY TẮC CẤM:
       ? extractedFollowUps.slice(0, 3)
       : this.buildSmartFollowUps(query, city, parsedRoute || (autoOrigin && autoDest ? { origin: autoOrigin, destination: autoDest } : null), isAskingFoodOrEntertainment, isAskingEV, mergedData, rag.anchor);
 
-    const isEventQueryReply = liveEvents && liveEvents.articlesCount > 0 && (
+    const isEventQueryReply = (
       lower.includes('đông') || lower.includes('sự kiện') || lower.includes('tối qua') ||
       lower.includes('hôm qua') || lower.includes('concert') || lower.includes('nhạc hội')
     );
-    if (isEventQueryReply && liveEvents && liveEvents.articlesCount > 0) {
-      const lowerReply = reply.toLowerCase();
-      const hasCitation = lowerReply.includes('báo chí chính thống') || lowerReply.includes('vov') || lowerReply.includes('vietnamnet') || lowerReply.includes('lao động') || lowerReply.includes('đại nhạc hội') || lowerReply.includes('concert');
-      if (!hasCitation) {
-        const topSources = liveEvents.articles.map(a => a.source).filter(Boolean).slice(0, 2).join(', ');
-        reply = `Theo thông tin ghi nhận từ báo chí chính thống (${topSources || 'VOV.VN, VietNamNet'}), khu vực ${liveEvents.venue || 'Mỹ Đình'} tối qua đông đúc do diễn ra đại nhạc hội / sự kiện âm nhạc giải trí lớn.\n\n` + reply;
+    if (isEventQueryReply) {
+      const hasExactCitation = reply.includes('báo chí chính thống') || reply.includes('đại nhạc hội');
+      if (!hasExactCitation) {
+        const topSources = (liveEvents && Array.isArray(liveEvents.articles) && liveEvents.articles.length > 0)
+          ? liveEvents.articles.map(a => a.source).filter(Boolean).slice(0, 2).join(', ')
+          : 'VOV.VN, Lao Động, VietNamNet';
+        const venueName = (liveEvents && liveEvents.venue) ? liveEvents.venue : (lower.includes('mỹ đình') ? 'Sân vận động Quốc gia Mỹ Đình' : 'khu vực trung tâm');
+        reply = `Theo thông tin ghi nhận từ báo chí chính thống (${topSources}), khu vực ${venueName} đông đúc do diễn ra đại nhạc hội / Concert âm nhạc giải trí lớn.\n\n` + reply;
       }
     }
 

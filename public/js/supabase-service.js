@@ -90,7 +90,10 @@ class SupabaseService {
 
     // 1. Thử gọi API backend Node.js (Open Charge Map Live Service)
     try {
-      const res = await fetch(`/api/ev-stations?city=${city}&fastOnly=${fastOnly}`);
+      const evUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl(`/api/ev-stations?city=${city}&fastOnly=${fastOnly}`)
+        : `/api/ev-stations?city=${city}&fastOnly=${fastOnly}`;
+      const res = await fetch(evUrl);
       if (res.ok) {
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
@@ -296,7 +299,10 @@ class SupabaseService {
   async getHistoricalTrends(city = 'hanoi', days = 7) {
     // 1. Thử gọi API backend Node.js
     try {
-      const res = await fetch(`/api/history?city=${city}&days=${days}`);
+      const histUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl(`/api/history?city=${city}&days=${days}`)
+        : `/api/history?city=${city}&days=${days}`;
+      const res = await fetch(histUrl);
       if (res.ok) {
         const json = await res.json();
         if (json.status === 'success') {

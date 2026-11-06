@@ -15,6 +15,7 @@ const testSuites = [
   { file: 'tests/unit/weather-parser.test.js', category: 'Unit: Dữ liệu Khí tượng & Cảnh báo', prefix: 'TC-WTH' },
   { file: 'tests/unit/user-features.test.js', category: 'Unit: Giao diện & Đề xuất Ẩm thực AI', prefix: 'TC-UI' },
   { file: 'tests/unit/web-event.test.js', category: 'Unit: Tra cứu Sự kiện Web & Tin tức Báo chí', prefix: 'TC-EVT' },
+  { file: 'tests/unit/optimization-18.test.js', category: 'Unit: 18 Hạng mục Tối ưu Toàn diện', prefix: 'OPT' },
   { file: 'tests/api/server-api.test.js', category: 'Integration: Backend REST API & Bảo mật', prefix: 'TC-API' },
   { file: 'tests/e2e/browser-e2e.test.js', category: 'E2E: Trải nghiệm Người dùng & Giao diện Bản đồ', prefix: 'TC-E2E' }
 ];
@@ -47,15 +48,15 @@ function parseTestOutput(stdout) {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    const passMatch = trimmed.match(/^✔\s+(\[TC-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
-    const failMatch = trimmed.match(/^✖\s+(\[TC-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
+    const passMatch = trimmed.match(/^✔\s+(\[(?:TC|OPT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
+    const failMatch = trimmed.match(/^✖\s+(\[(?:TC|OPT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
 
     if (passMatch) {
       const fullTitle = passMatch[1];
       const durationMs = parseFloat(passMatch[2]);
-      const idMatch = fullTitle.match(/\[(TC-[^\]]+)\]/);
+      const idMatch = fullTitle.match(/\[((?:TC|OPT)-[^\]]+)\]/);
       const testId = idMatch ? idMatch[1] : 'TC-GEN';
-      const title = fullTitle.replace(/\[TC-[^\]]+\]\s*/, '');
+      const title = fullTitle.replace(/\[(?:TC|OPT)-[^\]]+\]\s*/, '');
 
       tests.push({
         id: testId,

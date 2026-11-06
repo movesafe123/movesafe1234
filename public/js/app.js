@@ -394,29 +394,28 @@ class GoogleMapsApp {
   async init() {
     console.log('[MoveSafe Cloud 24/7] Đang khởi động hệ thống...');
 
-    // 1. Tải cấu hình từ Backend (TomTom key, OpenWeather key)
-    await this.fetchServerConfig();
-
-    // 2. Khởi tạo bản đồ chiếm toàn màn hình
+    // 1. Khởi tạo bản đồ chiếm toàn màn hình & gán sự kiện tương tác NGAY LẬP TỨC (0ms Time-to-Interactive)
     const city = this.citiesConfig[this.currentCity];
     window.mapEngine.init('map-container', [city.lat, city.lng], city.zoom);
-
-    // 3. Tải dữ liệu rốn ngập & kẹt xe từ Cloud Cache
-    await this.fetchLiveData();
-
-    // 4. Cập nhật thời tiết trung tâm & trạm thời tiết các quận huyện trên bản đồ
-    await this.updateWeather();
-    await this.updateWeatherStations();
-
-    // 5. Gán các sự kiện tương tác UI & Tìm kiếm địa chỉ ngõ ngách
     this.bindEvents();
     this.setupAddressAutocomplete();
     this.initQuickCommutePresets();
 
-    // 6. Kích hoạt động cơ tự động đồng bộ 24/24 trên Cloud
+    // 2. Tải cấu hình & nạp dữ liệu song song không chặn UI
+    await this.fetchServerConfig();
+    if (window.supabaseService && typeof window.supabaseService.init === 'function') {
+      window.supabaseService.init();
+    }
+    await Promise.allSettled([
+      this.fetchLiveData(),
+      this.updateWeather()
+    ]);
+    await this.updateWeatherStations();
+
+    // 3. Kích hoạt động cơ tự động đồng bộ 24/24 trên Cloud
     this.start247CloudSync();
 
-    // 7. Tự động khôi phục lộ trình chia sẻ từ URL (nếu người dùng mở từ link chia sẻ)
+    // 4. Tự động khôi phục lộ trình chia sẻ từ URL (nếu người dùng mở từ link chia sẻ)
     this.checkSharedRouteFromUrl();
 
     console.log('[MoveSafe Cloud 24/7] Đã kích hoạt hoàn tất vòng lặp cập nhật liên tục 24/24!');
@@ -427,7 +426,8 @@ class GoogleMapsApp {
     const savedOwm = localStorage.getItem('movesafe_owm_key');
 
     try {
-      const res = await fetch('/api/config');
+      const cfgUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function') ? window.getApiUrl('/api/config') : '/api/config';
+      const res = await fetch(cfgUrl);
       if (res.ok) {
         const data = await res.json();
         if (data.status === 'success') {
@@ -471,7 +471,10 @@ class GoogleMapsApp {
 
     // 1. Thử gọi backend Node.js
     try {
-      const res = await fetch('/api/live-data' + cacheBuster);
+      const liveUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl('/api/live-data' + cacheBuster)
+        : ('/api/live-data' + cacheBuster);
+      const res = await fetch(liveUrl);
       if (res.ok) {
         const json = await res.json();
         if (json.status === 'success' && json.data) {
@@ -906,7 +909,10 @@ class GoogleMapsApp {
   connectCloudStream() {
     if (!window.EventSource) return;
     try {
-      const sse = new EventSource('/api/live-stream');
+      const streamUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+        ? window.getApiUrl('/api/live-stream')
+        : '/api/live-stream';
+      const sse = new EventSource(streamUrl);
       let isInitialConnect = true;
 
       sse.onopen = () => {
@@ -918,7 +924,25 @@ class GoogleMapsApp {
         try {
           const payload = JSON.parse(event.data);
           if (payload && payload.data) {
-            this.liveData = payload.data;
+            const incoming = payload.data;
+            if (Array.isArray(incoming.floodPoints)) {
+              incoming.floodPoints = incoming.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
+            }
+            if (window.crowdsourceService && typeof window.crowdsourceService.getLocalReports === 'function') {
+              const localReports = window.crowdsourceService.getLocalReports();
+              if (Array.isArray(localReports) && localReports.length > 0) {
+                if (!incoming.floodPoints) incoming.floodPoints = [];
+                if (!incoming.trafficIncidents) incoming.trafficIncidents = [];
+                localReports.forEach(report => {
+                  if (report.type === 'flood') {
+                    if (!incoming.floodPoints.some(f => f.id === report.id)) incoming.floodPoints.unshift(report);
+                  } else {
+                    if (!incoming.trafficIncidents.some(t => t.id === report.id)) incoming.trafficIncidents.unshift(report);
+                  }
+                });
+              }
+            }
+            this.liveData = incoming;
             this.renderAllData();
             // Reset đếm ngược 30s khi nhận cập nhật realtime
             this.remainingSeconds = this.syncIntervalSeconds;
@@ -1410,7 +1434,10 @@ class GoogleMapsApp {
         this.showToast('Đang kích hoạt Bot quét dữ liệu mới từ các nguồn...', 'info', 2500);
         // Gọi server crawl trước
         try {
-          const resp = await fetch('/api/bot/refresh', { method: 'POST' });
+          const refreshUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+            ? window.getApiUrl('/api/bot/refresh')
+            : '/api/bot/refresh';
+          const resp = await fetch(refreshUrl, { method: 'POST' });
           if (resp.status === 429) {
             const data = await resp.json().catch(() => ({}));
             this.showToast(`${data.message || 'Vui lòng đợi thêm giây lát trước khi quét lại.'}`, 'warning', 4000);
@@ -2351,7 +2378,35 @@ class GoogleMapsApp {
         const isHot = (data.roadRealFeel >= 35);
 
         let lifestylePills = [];
-        if (isRainy) {
+        if (this.currentCity === 'hcm') {
+          if (isRainy) {
+            lifestylePills = [
+              { title: 'Trú mưa & Xem phim: Vincom Center Landmark 81', note: 'Hầm cao ráo, CGV & sạc EV', lat: 10.7950, lng: 106.7218 },
+              { title: 'Tổ hợp mua sắm: Aeon Mall Tân Phú Celadon', note: 'Bãi đỗ xe nổi an toàn', lat: 10.8016, lng: 106.6175 },
+              { title: 'Cafe tránh mưa: Takashimaya Saigon Centre', note: 'Trung tâm Q.1 cốt nền cao', lat: 10.7731, lng: 106.7011 }
+            ];
+          } else {
+            lifestylePills = [
+              { title: 'Hóng mát ven sông: Công viên Bến Bạch Đằng', note: 'Gió sông Sài Gòn thoáng mát', lat: 10.7745, lng: 106.7068 },
+              { title: 'Dạo phố & Cafe: Phố đi bộ Nguyễn Huệ', note: 'Không gian trung tâm sôi động', lat: 10.7742, lng: 106.7035 },
+              { title: 'Ẩm thực & Mua sắm: TTTM Crescent Mall Q.7', note: 'Hồ Bán Nguyệt thoáng đãng', lat: 10.7289, lng: 106.7185 }
+            ];
+          }
+        } else if (this.currentCity === 'danang') {
+          if (isRainy) {
+            lifestylePills = [
+              { title: 'Trú mưa & Xem phim: Vincom Plaza Ngô Quyền', note: 'Hầm gửi xe khô ráo & CGV', lat: 16.0718, lng: 108.2305 },
+              { title: 'Tổ hợp mua sắm: Lotte Mart Đà Nẵng', note: 'Bãi xe có mái che rộng rãi', lat: 16.0345, lng: 108.2285 },
+              { title: 'Cafe & Sạc xe: Indochina Riverside Bạch Đằng', note: 'Ngắm sông Hàn từ sảnh kính', lat: 16.0695, lng: 108.2245 }
+            ];
+          } else {
+            lifestylePills = [
+              { title: 'Hóng gió biển: Bãi biển Mỹ Khê - Võ Nguyên Giáp', note: 'Cung đường biển thoáng mát', lat: 16.0598, lng: 108.2465 },
+              { title: 'Dạo mát & Cafe: Cầu Rồng - Đường Bạch Đằng', note: 'Gió sông Hàn dịu mát', lat: 16.0611, lng: 108.2275 },
+              { title: 'Ẩm thực đặc sản: Chợ Cồn - Hùng Vương', note: 'Thiên đường ẩm thực Đà Nẵng', lat: 16.0680, lng: 108.2145 }
+            ];
+          }
+        } else if (isRainy) {
           lifestylePills = [
             { title: 'Trú mưa & Xem phim: TTTM The Garden', note: 'Hầm gửi xe cao ráo, CGV & cafe', lat: 21.0141, lng: 105.7764 },
             { title: 'Tổ hợp mua sắm hầm cao: Aeon Mall Long Biên', note: 'Bãi xe nổi không ngập', lat: 21.0268, lng: 105.8992 },
@@ -3460,7 +3515,10 @@ class GoogleMapsApp {
 
         // 1. Thử lấy từ API Dự báo Tương lai (/api/predictions) của Backend
         try {
-          const res = await fetch(`/api/predictions?city=${this.currentCity}&offset=${offset}`);
+          const predUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+            ? window.getApiUrl(`/api/predictions?city=${this.currentCity}&offset=${offset}`)
+            : `/api/predictions?city=${this.currentCity}&offset=${offset}`;
+          const res = await fetch(predUrl);
           if (res.ok) {
             const data = await res.json();
             if (data && data.status === 'success') {
@@ -3671,10 +3729,12 @@ class GoogleMapsApp {
       if (this._shouldAnnounceRouteVoice && result.routes && result.routes[0]) {
         this._shouldAnnounceRouteVoice = false;
         const bestRoute = result.routes.find(r => r.isRecommended) || result.routes[0];
-        const spoken = `MoveSafe đã tìm thấy lộ trình an toàn nhất dài ${bestRoute.distanceKm} ki lô mét, thời gian dự kiến ${bestRoute.estimatedMinutes} phút, chỉ số an toàn ${bestRoute.safetyScore} trên 100, đã né toàn bộ các rốn ngập sâu.`;
+        const estMin = bestRoute.durationMin ?? bestRoute.estimatedMinutes ?? 15;
+        const safeScore = bestRoute.rpi ?? bestRoute.safetyScore ?? 95;
+        const spoken = `MoveSafe đã tìm thấy lộ trình an toàn nhất dài ${bestRoute.distanceKm} ki lô mét, thời gian dự kiến ${estMin} phút, chỉ số an toàn ${safeScore} trên 100, đã né toàn bộ các rốn ngập sâu.`;
         if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
           setTimeout(() => {
-            window.aiChat.toggleSpeakText(spoken, null);
+            window.aiChat.toggleSpeakText(null, spoken);
           }, 500);
         }
       }
@@ -4195,7 +4255,7 @@ class GoogleMapsApp {
                   <div class="ev-station-info">
                     <div class="ev-station-name">${st.name}</div>
                     <div class="ev-station-meta">
-                      <span class="ev-meta-power">⚡ ${st.maxPowerKw ? st.maxPowerKw + 'kW' : 'Đổi pin'}</span>
+                      <span class="ev-meta-power">${st.maxPowerKw ? st.maxPowerKw + 'kW' : 'Đổi pin'}</span>
                       <span class="ev-meta-dist">Cách tuyến ~${st.routeDistMeters < 1000 ? st.routeDistMeters + 'm' : (st.routeDistMeters/1000).toFixed(1) + 'km'}</span>
                       <span class="ev-meta-op">${st.operator || 'VinFast'}</span>
                     </div>
@@ -4323,8 +4383,8 @@ class GoogleMapsApp {
       let rpiHtml = '';
       if (route.rpi !== undefined) {
         const rpiClass = route.rpi >= 85 ? 'gm-rpi-high' : (route.rpi >= 65 ? 'gm-rpi-med' : 'gm-rpi-low');
-        const rpiIcon = route.rpi >= 85 ? '✓' : (route.rpi >= 65 ? '~' : '⚠️');
-        rpiHtml = `<span class="gm-route-rpi-badge ${rpiClass}" title="Độ tin cậy lộ trình: ${route.rpi}% (xác suất đến đúng giờ dự kiến)">${rpiIcon} Tin cậy ${route.rpi}%</span>`;
+        const rpiIcon = route.rpi >= 85 ? '' : (route.rpi >= 65 ? '~ ' : '! ');
+        rpiHtml = `<span class="gm-route-rpi-badge ${rpiClass}" title="Độ tin cậy lộ trình: ${route.rpi}% (xác suất đến đúng giờ dự kiến)">${rpiIcon}Tin cậy ${route.rpi}%</span>`;
       }
 
       // Thẻ tốc độ thực tế dòng xe & độ trễ
@@ -4598,6 +4658,12 @@ class GoogleMapsApp {
         work: { name: dName, lat: dLat, lng: dLng }
       };
       localStorage.setItem('movesafe_commute_presets_v1', JSON.stringify(saved));
+      localStorage.setItem('movesafe_commute_presets', JSON.stringify({ home: { title: oName, lat: oLat, lng: oLng }, work: { title: dName, lat: dLat, lng: dLng } }));
+      if (window.aiChat && window.aiChat.sessionMemory) {
+        window.aiChat.sessionMemory.homePlace = oName;
+        window.aiChat.sessionMemory.workPlace = dName;
+        window.aiChat.updateMemoryBarUI?.();
+      }
       this.updateCommutePlacesLabel();
       this.showToast(`Đã lưu lộ trình cố định: Nhà (${oName}) ↔ Cơ quan (${dName})`, 'success', 3500);
     } catch (e) {
@@ -4661,7 +4727,7 @@ class GoogleMapsApp {
     window.history.replaceState({}, '', shareUrl);
 
     const route = this.lastRouteResult?.routes?.[routeIndex];
-    const safetyScore = route ? route.safetyScore : 95;
+    const safetyScore = route ? (route.rpi ?? route.safetyScore ?? 95) : 95;
     const shareSummary = `[MoveSafe VN] Lộ trình an toàn (${safetyScore}/100): ${originInput.value} → ${destInput.value}. Xem bản đồ né ngập & kẹt xe: ${shareUrl}`;
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -4700,8 +4766,9 @@ class GoogleMapsApp {
       const veh = params.get('veh');
       if (veh) {
         this.currentVehicle = veh;
-        document.querySelectorAll('.gm-veh-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.vehicle === veh);
+        document.querySelectorAll('.gm-mode-tab, .gm-veh-btn').forEach(b => {
+          const modeVal = b.getAttribute('data-mode') || b.dataset.vehicle;
+          b.classList.toggle('active', modeVal === veh);
         });
       }
 
@@ -4762,32 +4829,39 @@ class GoogleMapsApp {
     // Mở danh sách các bước đi của thẻ này
     const cardEl = document.querySelector(`.gm-route-card[data-route-index="${routeIndex}"]`);
     if (cardEl) {
-      const stepsEl = cardEl.querySelector('.gm-route-steps');
+      const stepsEl = cardEl.querySelector('.gm-route-steps-list, .gm-route-steps');
       if (stepsEl) stepsEl.style.display = 'block';
     }
 
+    const poly = route.polyline || route.geometry || [];
     // Phóng bản đồ tới điểm xuất phát
-    if (route.geometry && route.geometry.length > 0 && window.mapEngine && window.mapEngine.map) {
-      window.mapEngine.map.flyTo(route.geometry[0], 15, { duration: 1.0 });
+    if (poly.length > 0 && window.mapEngine && window.mapEngine.map) {
+      window.mapEngine.map.flyTo(poly[0], 15, { duration: 1.0 });
     }
 
     const originName = document.getElementById('gm-route-origin')?.value || 'Điểm xuất phát';
     const destName = document.getElementById('gm-route-dest')?.value || 'Điểm đến';
     const firstSteps = (route.steps || []).slice(0, 3).map(s => {
-      return `${s.instruction}${s.distance > 0 ? ` trong ${s.distanceText}` : ''}`;
+      const transObj = this.translateStepInstruction ? this.translateStepInstruction(s) : null;
+      const stepTitle = (transObj && typeof transObj === 'object') ? transObj.text : (transObj || s.instruction || 'Đi thẳng');
+      const distStr = s.distance >= 1000 ? `${(s.distance / 1000).toFixed(1)} ki lô mét` : `${Math.round(s.distance || 0)} mét`;
+      return `${stepTitle}${s.distance > 0 ? ` trong ${distStr}` : ''}`;
     }).join('. Tiếp theo, ');
 
-    const floodNotice = route.floodRiskCount > 0
-      ? `Chú ý có ${route.floodRiskCount} điểm nguy cơ ngập trên tuyến.`
+    const floodCount = (route.floodsOnRoute ? route.floodsOnRoute.length : route.floodRiskCount) || 0;
+    const floodNotice = floodCount > 0
+      ? `Chú ý có ${floodCount} điểm nước nông trên tuyến.`
       : `Tuyến đường hoàn toàn khô ráo, không qua điểm ngập.`;
 
-    const voiceScript = `Bắt đầu dẫn đường lộ trình ${route.label} từ ${originName} đến ${destName}. Tổng quãng đường ${route.distanceKm} ki lô mét, thời gian dự kiến ${route.estimatedMinutes} phút, chỉ số an toàn ${route.safetyScore} trên 100. ${floodNotice} Hướng dẫn chặng đầu: ${firstSteps}. Bạn có thể bấm vào từng chặng bên dưới để nghe đọc chi tiết.`;
+    const estMin = route.durationMin ?? route.estimatedMinutes ?? 15;
+    const safeScore = route.rpi ?? route.safetyScore ?? 95;
+    const voiceScript = `Bắt đầu dẫn đường lộ trình ${route.label} từ ${originName} đến ${destName}. Tổng quãng đường ${route.distanceKm} ki lô mét, thời gian dự kiến ${estMin} phút, chỉ số an toàn ${safeScore} trên 100. ${floodNotice} Hướng dẫn chặng đầu: ${firstSteps}. Bạn có thể bấm vào từng chặng bên dưới để nghe đọc chi tiết.`;
 
     this.showToast(`Đang phát giọng nói dẫn đường: ${route.label} (${route.distanceKm} km)`, 'info', 4000);
 
     if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
       const targetBtn = btnEl || cardEl?.querySelector('.gm-btn-voice-nav');
-      window.aiChat.toggleSpeakText(voiceScript, targetBtn);
+      window.aiChat.toggleSpeakText(targetBtn, voiceScript);
     }
   }
 
@@ -4804,12 +4878,13 @@ class GoogleMapsApp {
       stepEls[stepIndex].classList.add('active-voice-step');
     }
 
-    // Ước lượng vị trí bước đi dọc theo geometry của route để flyTo
+    // Ước lượng vị trí bước đi dọc theo polyline của route để flyTo
+    const poly = route.polyline || route.geometry || [];
     let stepCoord = null;
-    if (route.geometry && route.geometry.length > 1 && window.mapEngine && window.mapEngine.map) {
+    if (poly.length > 1 && window.mapEngine && window.mapEngine.map) {
       const ratio = stepIndex / Math.max(1, route.steps.length - 1);
-      const geoIdx = Math.min(route.geometry.length - 1, Math.floor(ratio * route.geometry.length));
-      stepCoord = route.geometry[geoIdx];
+      const geoIdx = Math.min(poly.length - 1, Math.floor(ratio * poly.length));
+      stepCoord = poly[geoIdx];
       if (stepCoord) {
         window.mapEngine.map.flyTo(stepCoord, 16, { duration: 0.8 });
       }
@@ -4820,10 +4895,10 @@ class GoogleMapsApp {
     if (stepCoord) {
       const sLat = stepCoord[0];
       const sLng = stepCoord[1];
-      const floods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
-      const traffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
+      const floods = this.getCurrentFloods ? this.getCurrentFloods() : (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
+      const traffics = this.getCurrentTraffics ? this.getCurrentTraffics() : (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
 
-      const nearbyFlood = floods.find(f => this._calcDistanceKm(sLat, sLng, f.lat, f.lng) <= 0.25);
+      const nearbyFlood = floods.find(f => (f.depth_cm || 0) > 0 && this._calcDistanceKm(sLat, sLng, f.lat, f.lng) <= 0.25);
       const nearbyJam = traffics.find(t => (t.isJam || t.type === 'accident' || t.type === 'road_closure') && this._calcDistanceKm(sLat, sLng, t.lat, t.lng) <= 0.25);
 
       if (nearbyFlood) {
@@ -4833,10 +4908,13 @@ class GoogleMapsApp {
       }
     }
 
-    const textToSpeak = `Chặng ${stepIndex + 1}: ${step.instruction}${step.distance > 0 ? `, đi tiếp ${step.distanceText}` : ''}.${warningVoice}`;
+    const transObj = this.translateStepInstruction ? this.translateStepInstruction(step) : null;
+    const stepTitle = (transObj && transObj.text) ? transObj.text : (typeof transObj === 'string' ? transObj : (step.instruction || 'Đi thẳng'));
+    const distStr = step.distance >= 1000 ? `${(step.distance / 1000).toFixed(1)} ki lô mét` : `${Math.round(step.distance || 0)} mét`;
+    const textToSpeak = `Chặng ${stepIndex + 1}: ${stepTitle}${step.distance > 0 ? `, đi tiếp ${distStr}` : ''}.${warningVoice}`;
     this.showToast(textToSpeak, warningVoice ? 'warning' : 'info', 3500);
     if (window.aiChat && typeof window.aiChat.toggleSpeakText === 'function') {
-      window.aiChat.toggleSpeakText(textToSpeak, null);
+      window.aiChat.toggleSpeakText(null, textToSpeak);
     }
   }
 

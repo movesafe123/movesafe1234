@@ -77,6 +77,12 @@ class MapEngine {
       this.handleZoomLevel();
     });
 
+    this.map.on('moveend', () => {
+      if (this.map && this.map.getZoom() >= 15 && this.weatherVisible) {
+        this.handleZoomLevel(true);
+      }
+    });
+
     // Kích hoạt nạp trước bộ đệm ảnh vệ tinh trong thời gian rảnh rỗi (Pre-warm)
     this.prewarmSatellite();
   }
@@ -481,7 +487,7 @@ class MapEngine {
       const safeAdvice = this.escapeHtml(point.advice || 'Khuyến nghị vòng tránh qua tuyến khác.');
       const safePump = this.escapeHtml(point.pump_status || 'Đang vận hành');
 
-      const isCrowdsource = String(point.source || '').toLowerCase().includes('cộng đồng') || String(point.id || '').includes('cs-');
+      const isCrowdsource = String(point.source || '').toLowerCase().includes('cộng đồng') || String(point.id || '').includes('cs-') || String(point.id || '').includes('crowd-') || String(point.id || '').includes('local-');
       const verifyButtons = isCrowdsource ? `
         <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
           <button style="flex: 1; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
@@ -645,7 +651,7 @@ class MapEngine {
       const safeDesc = this.escapeHtml(cleanDesc);
       const safeSource = this.escapeHtml(inc.source || 'TomTom Traffic v5');
 
-      const isCrowdsource = String(inc.source || '').toLowerCase().includes('cộng đồng') || incId.includes('cs-');
+      const isCrowdsource = String(inc.source || '').toLowerCase().includes('cộng đồng') || incId.includes('cs-') || incId.includes('crowd-') || incId.includes('local-');
       const verifyButtons = isCrowdsource ? `
         <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
           <button style="flex: 1; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;"
@@ -948,7 +954,7 @@ class MapEngine {
               const isDc = (c.current === 'DC') || (c.powerKw && c.powerKw >= 50);
               const tagClass = isDc ? 'tag-dc' : 'tag-ac';
               const pLabel = c.powerKw ? `${c.powerKw}kW` : '';
-              return `<span class="ev-connector-tag ${tagClass}">⚡ ${c.type || 'Tiêu chuẩn'} ${pLabel}</span>`;
+              return `<span class="ev-connector-tag ${tagClass}">${c.type || 'Tiêu chuẩn'} ${pLabel}</span>`;
             }).join('')}
           </div>
         </div>
@@ -1078,7 +1084,7 @@ class MapEngine {
     }
   }
 
-  renderFoodPlaces(spots = [], centerLat = null, centerLng = null) {
+  renderFoodPlaces(spots = [], centerLat = null, centerLng = null, options = {}) {
     if (!this.map || !Array.isArray(spots) || spots.length === 0) return;
     if (!this.layers.foodMarkers) {
       this.layers.foodMarkers = L.layerGroup().addTo(this.map);
@@ -1192,13 +1198,16 @@ class MapEngine {
       this.layers.foodMarkers.addLayer(marker);
     });
 
-    if (validCoords.length > 1) {
-      const bounds = L.latLngBounds(validCoords);
-      this.map.flyToBounds(bounds, { padding: [70, 70], maxZoom: 15, duration: 0.9 });
-    } else if (validCoords.length === 1) {
-      this.map.flyTo(validCoords[0], 15, { duration: 0.9 });
-    } else if (centerLat && centerLng) {
-      this.map.flyTo([centerLat, centerLng], 14, { duration: 0.9 });
+    const shouldPreserve = options.preserveViewport || (window.appState && window.appState.isDirectionsOpen && window.appState.lastRouteResult);
+    if (!shouldPreserve) {
+      if (validCoords.length > 1) {
+        const bounds = L.latLngBounds(validCoords);
+        this.map.flyToBounds(bounds, { padding: [70, 70], maxZoom: 15, duration: 0.9 });
+      } else if (validCoords.length === 1) {
+        this.map.flyTo(validCoords[0], 15, { duration: 0.9 });
+      } else if (centerLat && centerLng) {
+        this.map.flyTo([centerLat, centerLng], 14, { duration: 0.9 });
+      }
     }
   }
 

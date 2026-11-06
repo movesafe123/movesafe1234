@@ -559,9 +559,9 @@ class LocalUrbanBot extends EventEmitter {
               lng: loc.lng,
               type: isJam ? 'traffic_jam' : 'slow_traffic',
               categoryName: isJam ? 'Ùn ứ phương tiện (VOV Giao Thông)' : 'Lưu lượng đông (VOV Giao Thông)',
-              icon: '🚗',
+              icon: '',
               isJam: isJam,
-              description: `📻 ${news.title}`,
+              description: `[VOV] ${news.title}`,
               rawDescription: news.summary,
               delaySeconds: isJam ? 450 : 180,
               speedKmh: isJam ? 10 : 25,
@@ -886,7 +886,7 @@ class LocalUrbanBot extends EventEmitter {
 
         let type = 'hazard';
         let categoryName = 'Cảnh báo đường bộ';
-        let icon = '⚠️';
+        let icon = '';
         let isJam = false;
         let speedKmh = 45;
         let delaySec = 0;
@@ -896,7 +896,7 @@ class LocalUrbanBot extends EventEmitter {
         if (iconCategory === 9 || rawDesc.toLowerCase().includes('roadwork')) {
           type = 'roadwork';
           categoryName = isNightTime ? 'Công trường thi công ban đêm' : 'Công trường thi công';
-          icon = '🚧';
+          icon = '';
           isJam = false;
           speedKmh = isNightTime ? 40 : 25;
           delaySec = 90;
@@ -906,7 +906,7 @@ class LocalUrbanBot extends EventEmitter {
         } else if (iconCategory === 8 || rawDesc.toLowerCase().includes('closed')) {
           type = 'road_closure';
           categoryName = 'Đoạn đường rào chắn tạm cấm';
-          icon = '⛔';
+          icon = '';
           isJam = false;
           speedKmh = 0;
           delaySec = 600;
@@ -914,7 +914,7 @@ class LocalUrbanBot extends EventEmitter {
         } else if (iconCategory === 1 || rawDesc.toLowerCase().includes('accident')) {
           type = 'accident';
           categoryName = 'Sự cố va chạm phương tiện';
-          icon = '⚠️';
+          icon = '';
           isJam = false;
           speedKmh = 20;
           delaySec = 300;
@@ -923,7 +923,7 @@ class LocalUrbanBot extends EventEmitter {
           if (isNightTime) {
             type = 'slow_traffic';
             categoryName = 'Phương tiện giảm tốc';
-            icon = '🚗';
+            icon = '';
             isJam = false;
             speedKmh = 35;
             delaySec = 0;
@@ -931,7 +931,7 @@ class LocalUrbanBot extends EventEmitter {
           } else if (isPeakHour || delayLevel >= 2) {
             type = 'traffic_jam';
             categoryName = delayLevel >= 3 ? 'Kẹt xe nghiêm trọng' : 'Ùn ứ phương tiện';
-            icon = '🚗';
+            icon = '';
             isJam = true;
             speedKmh = delayLevel >= 3 ? 5 : 12;
             delaySec = delayLevel >= 3 ? 900 : 450;
@@ -939,7 +939,7 @@ class LocalUrbanBot extends EventEmitter {
           } else {
             type = 'slow_traffic';
             categoryName = 'Phương tiện di chuyển chậm';
-            icon = '🚗';
+            icon = '';
             isJam = false;
             speedKmh = 25;
             delaySec = 60;
@@ -948,7 +948,7 @@ class LocalUrbanBot extends EventEmitter {
         } else {
           type = 'hazard';
           categoryName = 'Cảnh báo an toàn';
-          icon = '⚠️';
+          icon = '';
           isJam = false;
           speedKmh = 35;
           delaySec = 0;
@@ -1379,15 +1379,24 @@ class LocalUrbanBot extends EventEmitter {
         const finalDepth = Math.max(projectedRainDepth, residualDepth);
 
         if (finalDepth >= 10) {
+          const locName = st.name || 'Điểm ngập';
           predictedFloods.push({
             id: `ai-pred-${st.id}`,
-            location_name: st.name,
+            name: locName.startsWith('[DỰ BÁO') ? locName : `[DỰ BÁO +${offsetHours}h] ${locName}`,
+            location_name: locName,
             city: cityKey,
             lat: st.lat,
             lng: st.lng,
-            target_hour: offsetHours,
+            depth_cm: finalDepth,
             predicted_depth_cm: finalDepth,
-            confidence: Math.round((0.92 - offsetHours * 0.04) * 100) / 100
+            danger_level: finalDepth > 30 ? 'critical' : (finalDepth >= 15 ? 'medium' : 'low'),
+            passable_motorbike: finalDepth < 20,
+            passable_car: finalDepth < 35,
+            target_hour: offsetHours,
+            confidence: Math.round((0.92 - offsetHours * 0.04) * 100) / 100,
+            advice: finalDepth > 0
+              ? `Dự báo sau +${offsetHours}h mực nước còn ~${finalDepth}cm.`
+              : `Dự báo sau +${offsetHours}h nước đã rút hết.`
           });
         }
       });
@@ -1407,6 +1416,7 @@ class LocalUrbanBot extends EventEmitter {
           lng: inc.lng,
           roadName: inc.roadName || inc.description,
           type: inc.type,
+          isJam: false,
           level: 4,
           speedKmh: inc.speedKmh || 12,
           delaySeconds: inc.delaySeconds || 600,
@@ -1451,6 +1461,7 @@ class LocalUrbanBot extends EventEmitter {
           lng: inc.lng,
           roadName: inc.roadName || inc.description,
           type: 'traffic_jam',
+          isJam: true,
           level: futureLevel,
           speedKmh: futureSpeed,
           delaySeconds: futureDelay,
@@ -1464,14 +1475,16 @@ class LocalUrbanBot extends EventEmitter {
     if (isPeakHour || baseline.congestionIndex >= 3.2 || maxForecastRain >= 12) {
       const candidateIntersections = CORE_INTERSECTIONS_GEO.filter(s => s.city === cityKey);
       candidateIntersections.forEach((item, idx) => {
-        // Kiểm tra xem vị trí này đã có trong danh sách tiêu tán chưa
+        // Kiểm tra xem vị trí này đã có điểm ùn tắc nào trong danh sách dự báo chưa
         const alreadyHas = predictedTraffic.some(p => {
+          if (!p.isJam) return false;
           const dLat = Math.abs(p.lat - item.lat);
           const dLng = Math.abs(p.lng - item.lng);
           return (dLat < 0.005 && dLng < 0.005);
         });
 
-        if (!alreadyHas && predictedTraffic.length < 15) {
+        const currentJamCount = predictedTraffic.filter(p => p.isJam).length;
+        if (!alreadyHas && currentJamCount < 15) {
           const peakLevel = (isPeakHour && maxForecastRain >= 10) ? 5 : (isPeakHour ? 4 : 3);
           const estSpeed = peakLevel === 5 ? 8 : (peakLevel === 4 ? 14 : 20);
           predictedTraffic.push({
@@ -1480,6 +1493,7 @@ class LocalUrbanBot extends EventEmitter {
             lng: item.lng,
             roadName: item.name,
             type: 'traffic_jam',
+            isJam: true,
             level: peakLevel,
             speedKmh: estSpeed,
             delaySeconds: peakLevel >= 4 ? 600 : 300,
@@ -1497,6 +1511,8 @@ class LocalUrbanBot extends EventEmitter {
       clockHour: vnHour,
       maxForecastRain,
       historicalBaseline: baseline,
+      floodPoints: predictedFloods,
+      trafficIncidents: predictedTraffic,
       floods: predictedFloods,
       floodPredictions: predictedFloods,
       traffic: predictedTraffic,

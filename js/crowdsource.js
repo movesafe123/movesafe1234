@@ -110,8 +110,8 @@ class CrowdsourceService {
         }
         if (data.action === 'removed') {
           if (window.appState && window.appState.liveData) {
-            window.appState.liveData.floodPoints = window.appState.liveData.floodPoints.filter(p => p.id !== reportId);
-            window.appState.liveData.trafficIncidents = window.appState.liveData.trafficIncidents.filter(p => p.id !== reportId);
+            window.appState.liveData.floodPoints = (window.appState.liveData.floodPoints || []).filter(p => String(p.id) !== String(reportId));
+            window.appState.liveData.trafficIncidents = (window.appState.liveData.trafficIncidents || []).filter(p => String(p.id) !== String(reportId));
             window.appState.renderAllData();
           }
         }

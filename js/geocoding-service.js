@@ -414,11 +414,13 @@ class GeocodingService {
       }
     }
 
-    // 1c. Tìm trong 63+ Trạm sạc Xe điện & Đổi pin (EV_STATIONS_DATA)
-    if (typeof window !== 'undefined' && window.EV_STATIONS_DATA) {
-      const evList = Array.isArray(window.EV_STATIONS_DATA)
-        ? window.EV_STATIONS_DATA
-        : (window.EV_STATIONS_DATA[cityKey] || []);
+    // 1c. Tìm trong 63+ Trạm sạc Xe điện & Đổi pin (MOVE_SAFE_EV_STATIONS / EV_STATIONS_DATA)
+    if (typeof window !== 'undefined' && (window.MOVE_SAFE_EV_STATIONS || window.EV_STATIONS_DATA)) {
+      const evList = (window.MOVE_SAFE_EV_STATIONS && Array.isArray(window.MOVE_SAFE_EV_STATIONS))
+        ? window.MOVE_SAFE_EV_STATIONS
+        : (Array.isArray(window.EV_STATIONS_DATA)
+            ? window.EV_STATIONS_DATA
+            : ((window.EV_STATIONS_DATA && window.EV_STATIONS_DATA[cityKey]) || []));
       for (const st of evList) {
         if (st.city && st.city !== cityKey) continue;
         const nameNoAccent = this.removeAccents(st.name || '');
@@ -426,7 +428,7 @@ class GeocodingService {
         if (nameNoAccent.includes(qNoAccent) || addrNoAccent.includes(qNoAccent)) {
           pushUnique({
             title: st.name,
-            subtitle: `${st.address || ''} • ${st.powerKw ? st.powerKw + 'kW' : 'Trạm sạc EV'}`,
+            subtitle: `${st.address || ''} • ${st.maxPowerKw ? st.maxPowerKw + 'kW' : (st.powerKw ? st.powerKw + 'kW' : 'Trạm sạc EV')}`,
             fullAddress: `${st.name}, ${st.address || ''}`,
             lat: st.lat,
             lng: st.lng,
@@ -711,7 +713,19 @@ class GeocodingService {
       }
     };
 
-    // 0. TẦNG 0: Thử Google Maps Stream Search nếu backend Node.js đang chạy (Tốc độ cao ~300ms, dữ liệu chính xác 100%)
+    // 1. TẦNG TỨC THÌ (0ms): Tìm trong CSDL 76 phường, 299 đường lớn, trường ĐH, bệnh viện, TTTM, quán ăn & trạm sạc nội bộ
+    const localMatches = this.searchLocalIndex(normalizedQ, cityKey);
+    addCandidates(localMatches);
+
+    // Nếu đã khớp đủ kết quả độ tin cậy cao từ CSDL nội bộ (đặc biệt khi Geocode nhanh limit=1 cho lộ trình), trả về ngay lập tức (0ms)!
+    const hasExactLocalMatch = localMatches.some(m => (m.score || 0) >= 85);
+    if (merged.length >= limit && (hasExactLocalMatch || limit === 1)) {
+      if (this.cache.size > 200) this.cache.clear();
+      this.cache.set(cacheKey, merged);
+      return merged.slice(0, limit);
+    }
+
+    // 2. TẦNG GOOGLE MAPS STREAM SEARCH (Nếu cần tìm chi tiết số nhà/ngõ ngách chưa có trong từ điển nội bộ)
     try {
       const searchApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
         ? window.getApiUrl(`/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`)
@@ -739,10 +753,6 @@ class GeocodingService {
         }
       }
     } catch {}
-
-    // 1. TẦNG 1: Tìm tức thì trong CSDL nội bộ (0ms - Hỗ trợ cả có dấu, không dấu & viết tắt)
-    const localMatches = this.searchLocalIndex(normalizedQ, cityKey);
-    addCandidates(localMatches);
 
     // 2. TẦNG 2 & 3: Chạy song song TomTom Commercial Search + Esri ArcGIS Geocoder + Photon Bounded
     const fallbackQueries = this.buildFallbackQueries(normalizedQ, center.name);

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 const config = require('./config');
 const botService = require('./bot-service');
 const aiService = require('./ai-service');
@@ -16,7 +17,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
-app.use(express.json({ limit: '25kb' }));
+app.use(express.json({ limit: '512kb' }));
 
 // 1. Phục vụ file tĩnh theo danh sách cho phép (Whitelist), từ chối dotfiles
 const rootDir = path.join(__dirname, '..');
@@ -237,7 +238,11 @@ app.post('/api/crowdsource/vote', reportLimiter, (req, res) => {
     if (!result) {
       return res.status(404).json({ status: 'error', message: 'Không tìm thấy báo cáo sự cố hoặc đã hết hiệu lực' });
     }
-    res.json({ status: 'success', report: result });
+    res.json({
+      status: 'success',
+      action: result.removed ? 'removed' : 'updated',
+      report: result
+    });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });
   }

@@ -7,9 +7,9 @@
  * 2. Xét ĐẶC TÍNH KỸ THUẬT & NGƯỠNG AN TOÀN của từng phương tiện (Xe máy xăng, Xe máy điện, Ô tô xăng, Ô tô điện).
  * 3. Điểm ngập vượt ngưỡng kỹ thuật = VẬT CẢN BẤT KHẢ DỤNG -> Tự động tính toán tuyến đường vòng (Bypass Detour).
  * 4. Cả 3 chế độ (An toàn, Cân bằng, Nhanh nhất) PHẢI LÀ CÁC TUYẾN ĐI ĐƯỢC:
- *    - Tuyến 1 (🛡️ An toàn tuyệt đối): Ưu tiên 100% Khô ráo (0cm ngập) & né kẹt xe tối đa.
- *    - Tuyến 2 (⚖️ Cân bằng thông minh): Tối ưu hài hòa giữa thời gian di chuyển và mức độ an toàn.
- *    - Tuyến 3 (⚡ Nhanh nhất): Tuyến có thời gian di chuyển ngắn nhất TRONG SỐ CÁC TUYẾN XE ĐI ĐƯỢC HỢP LỆ.
+ *    - Tuyến 1 (An toàn tuyệt đối): Ưu tiên 100% Khô ráo (0cm ngập) & né kẹt xe tối đa.
+ *    - Tuyến 2 (Cân bằng thông minh): Tối ưu hài hòa giữa thời gian di chuyển và mức độ an toàn.
+ *    - Tuyến 3 (Nhanh nhất): Tuyến có thời gian di chuyển ngắn nhất TRONG SỐ CÁC TUYẾN XE ĐI ĐƯỢC HỢP LỆ.
  */
 
 class RoutingService {
@@ -65,6 +65,42 @@ class RoutingService {
         hazardRisk: 'Mất lái trôi xe do bồng bềnh & ngắt an toàn pin cao áp',
         allowAlleys: false,
         speedFactor: 0.95
+      },
+      scooter: {
+        type: 'scooter',
+        name: 'Xe tay ga',
+        icon: '',
+        maxPassableDepth: 18, // cm - Hốc gió nồi CVT & pô xe tay ga thấp, quá 18cm dễ hút nước trượt dây curoa & chết máy
+        safeDepth: 10,
+        corridorBuffer: 115,
+        detourOffsets: [450, 750, 1100],
+        hazardRisk: 'Ngập bộ nồi CVT & hút nước vào lọc gió gây chết máy',
+        allowAlleys: true,
+        speedFactor: 1.12
+      },
+      sedan: {
+        type: 'sedan',
+        name: 'Ô tô Sedan gầm thấp',
+        icon: '',
+        maxPassableDepth: 22, // cm - Cổ hút gió sedan thấp, quá 22cm sóng nước ngược dễ tràn vào buồng đốt gây thủy kích
+        safeDepth: 12,
+        corridorBuffer: 130,
+        detourOffsets: [650, 1000, 1400],
+        hazardRisk: 'Nguy cơ THỦY KÍCH cao do cổ hút gió gầm thấp',
+        allowAlleys: false,
+        speedFactor: 0.95
+      },
+      suv: {
+        type: 'suv',
+        name: 'Ô tô SUV / Bán tải gầm cao',
+        icon: '',
+        maxPassableDepth: 35, // cm - Khoảng sáng gầm cao hơn sedan nhưng quá 35cm vẫn nguy hiểm cho hệ thống điện & vi sai
+        safeDepth: 20,
+        corridorBuffer: 125,
+        detourOffsets: [600, 950, 1300],
+        hazardRisk: 'Ngập sâu quá 35cm gây mất bám đường & hư hại cảm biến gầm',
+        allowAlleys: false,
+        speedFactor: 0.98
       }
     };
 
@@ -109,12 +145,25 @@ class RoutingService {
     return R * c;
   }
 
+  // Tính khoảng cách ngắn nhất từ điểm P(pLat, pLng) tới đoạn thẳng nối A(lat1, lng1) - B(lat2, lng2) (mét)
+  getPointToSegmentDistanceMeters(pLat, pLng, lat1, lng1, lat2, lng2) {
+    const dx = lat2 - lat1;
+    const dy = lng2 - lng1;
+    if (dx === 0 && dy === 0) {
+      return this.getDistanceMeters(pLat, pLng, lat1, lng1);
+    }
+    const t = Math.max(0, Math.min(1, ((pLat - lat1) * dx + (pLng - lng1) * dy) / (dx * dx + dy * dy)));
+    const projLat = lat1 + t * dx;
+    const projLng = lng1 + t * dy;
+    return this.getDistanceMeters(pLat, pLng, projLat, projLng);
+  }
+
   // Kiểm tra quy định giao thông đường bộ Việt Nam theo loại phương tiện
   checkVehicleRoadRestrictions(route, vehicleType) {
     if (!route.steps || route.steps.length === 0) return { allowed: true };
 
-    const isTwoWheeler = (vehicleType === 'motorbike' || vehicleType === 'ebike');
-    const isFourWheeler = (vehicleType === 'car' || vehicleType === 'ecar');
+    const isTwoWheeler = (vehicleType === 'motorbike' || vehicleType === 'ebike' || vehicleType === 'scooter');
+    const isFourWheeler = (vehicleType === 'car' || vehicleType === 'ecar' || vehicleType === 'sedan' || vehicleType === 'suv');
 
     // Các tuyến cao tốc cấm hoàn toàn xe 2 bánh tại VN
     const expresswayKeywords = [
@@ -291,17 +340,26 @@ class RoutingService {
       return { isPassable: true, blockedBy };
     }
 
-    const degMargin = 0.004; // ~440m
+    const degMargin = 0.006; // ~660m bao phủ cả đoạn thẳng dài giữa 2 đỉnh OSRM
 
     for (let i = 0; i < polyline.length; i++) {
       const pt = polyline[i];
       const pLat = pt[0];
       const pLng = pt[1];
+      const nextPt = (i + 1 < polyline.length) ? polyline[i + 1] : null;
+      const minLat = nextPt ? Math.min(pLat, nextPt[0]) : pLat;
+      const maxLat = nextPt ? Math.max(pLat, nextPt[0]) : pLat;
+      const minLng = nextPt ? Math.min(pLng, nextPt[1]) : pLng;
+      const maxLng = nextPt ? Math.max(pLng, nextPt[1]) : pLng;
 
       for (let j = 0; j < blockedFloods.length; j++) {
         const f = blockedFloods[j];
-        if (Math.abs(pLat - f.lat) > degMargin || Math.abs(pLng - f.lng) > degMargin) continue;
-        const d = this.getDistanceMeters(pLat, pLng, f.lat, f.lng);
+        if (f.lat < minLat - degMargin || f.lat > maxLat + degMargin) continue;
+        if (f.lng < minLng - degMargin || f.lng > maxLng + degMargin) continue;
+
+        const d = nextPt
+          ? this.getPointToSegmentDistanceMeters(f.lat, f.lng, pLat, pLng, nextPt[0], nextPt[1])
+          : this.getDistanceMeters(pLat, pLng, f.lat, f.lng);
         const radius = f.radius || corridorBuffer;
         if (d <= radius && !blockedBy.some(b => b.id === f.id)) {
           blockedBy.push({
@@ -314,8 +372,12 @@ class RoutingService {
 
       for (let k = 0; k < blockedTraffics.length; k++) {
         const t = blockedTraffics[k];
-        if (Math.abs(pLat - t.lat) > 0.002 || Math.abs(pLng - t.lng) > 0.002) continue;
-        const d = this.getDistanceMeters(pLat, pLng, t.lat, t.lng);
+        if (t.lat < minLat - 0.004 || t.lat > maxLat + 0.004) continue;
+        if (t.lng < minLng - 0.004 || t.lng > maxLng + 0.004) continue;
+
+        const d = nextPt
+          ? this.getPointToSegmentDistanceMeters(t.lat, t.lng, pLat, pLng, nextPt[0], nextPt[1])
+          : this.getDistanceMeters(pLat, pLng, t.lat, t.lng);
         if (d <= 150 && !blockedBy.some(b => b.id === t.id)) {
           blockedBy.push({
             ...t,
@@ -400,13 +462,20 @@ class RoutingService {
       const pt = polyline[i];
       const pLat = pt[0];
       const pLng = pt[1];
+      const nextPt = (i + 1 < totalPoints) ? polyline[i + 1] : null;
+      const minLat = nextPt ? Math.min(pLat, nextPt[0]) : pLat;
+      const maxLat = nextPt ? Math.max(pLat, nextPt[0]) : pLat;
+      const minLng = nextPt ? Math.min(pLng, nextPt[1]) : pLng;
+      const maxLng = nextPt ? Math.max(pLng, nextPt[1]) : pLng;
       let isPointCongested = false;
 
       // Kẹt xe / sự cố
       for (let j = 0; j < trafficIncidents.length; j++) {
         const inc = trafficIncidents[j];
-        if (Math.abs(pLat - inc.lat) > degLimit || Math.abs(pLng - inc.lng) > degLimit) continue;
-        const dist = this.getDistanceMeters(pLat, pLng, inc.lat, inc.lng);
+        if (inc.lat < minLat - degLimit || inc.lat > maxLat + degLimit || inc.lng < minLng - degLimit || inc.lng > maxLng + degLimit) continue;
+        const dist = nextPt
+          ? this.getPointToSegmentDistanceMeters(inc.lat, inc.lng, pLat, pLng, nextPt[0], nextPt[1])
+          : this.getDistanceMeters(pLat, pLng, inc.lat, inc.lng);
         if (dist <= 250) {
           if (inc.isJam) {
             isPointCongested = true;
@@ -425,8 +494,10 @@ class RoutingService {
       // Ngập nhẹ / nước nông
       for (let k = 0; k < allShallowFloods.length; k++) {
         const fl = allShallowFloods[k];
-        if (Math.abs(pLat - fl.lat) > degLimit || Math.abs(pLng - fl.lng) > degLimit) continue;
-        const dist = this.getDistanceMeters(pLat, pLng, fl.lat, fl.lng);
+        if (fl.lat < minLat - degLimit || fl.lat > maxLat + degLimit || fl.lng < minLng - degLimit || fl.lng > maxLng + degLimit) continue;
+        const dist = nextPt
+          ? this.getPointToSegmentDistanceMeters(fl.lat, fl.lng, pLat, pLng, nextPt[0], nextPt[1])
+          : this.getDistanceMeters(pLat, pLng, fl.lat, fl.lng);
         if (dist <= (fl.radius || specs.corridorBuffer)) {
           if (!matchedFloods.some(f => f.id === fl.id)) {
             matchedFloods.push({
@@ -570,7 +641,7 @@ class RoutingService {
       throw new Error(`Không có tuyến đường khả dụng cho ${specs.name}`);
     }
 
-        // 1. Tuyến 1: ⚡ Nhanh thực tế (Dynamic Flow)
+    // 1. Tuyến 1: Nhanh thực tế (Dynamic Flow)
     // Sắp xếp theo realDurationMin (thời gian thực tế đã tính BPR delay và vận tốc dòng xe)
     const sortedByFastest = [...passableCandidates].sort((a, b) => {
       if (a.durationMin !== b.durationMin) return a.durationMin - b.durationMin;
@@ -595,7 +666,7 @@ class RoutingService {
       return false;
     };
 
-    // 2. Tuyến 2: 🛡️ An toàn hành lang lớn (Resilient Corridor)
+    // 2. Tuyến 2: An toàn hành lang lớn (Resilient Corridor)
     // Ưu tiên: 0 ngập, CẤM BẪY NGÕ HẸP, cốt nền cao, RPI cao nhất
     const sortedBySafety = [...passableCandidates].sort((a, b) => {
       // Ưu tiên 1: Không dính bẫy ngõ hẹp
@@ -625,7 +696,7 @@ class RoutingService {
       safeRoute = sortedBySafety[0];
     }
 
-    // 3. Tuyến 3: ⚖️ Trục chính êm ái (Major Road & Eco-Smooth)
+    // 3. Tuyến 3: Trục chính êm ái (Major Road & Eco-Smooth)
     // Ưu tiên: Điểm êm ái EcoScore cao nhất, dòng xe đều đặn, ít khúc cua gấp, tiết kiệm nhiên liệu/pin
     const sortedByBalanced = [...passableCandidates].sort((a, b) => {
       // Ưu tiên 1: EcoScore cao hơn
@@ -868,6 +939,18 @@ return {
     return [directRoute, detourRoute];
   }
 
+  doesRouteViolateAvoidRoads(route, cleanAvoidRoads = []) {
+    if (!route || !Array.isArray(cleanAvoidRoads) || cleanAvoidRoads.length === 0) return false;
+    return (route.steps || []).some(s => {
+      const sName = (s.name || '').toLowerCase();
+      return cleanAvoidRoads.some(ar => sName.includes(ar));
+    });
+  }
+
+  doesRouteviolateAvoidRoads(route, cleanAvoidRoads = []) {
+    return this.doesRouteViolateAvoidRoads(route, cleanAvoidRoads);
+  }
+
   /**
    * THUẬT TOÁN ĐỊNH TUYẾN CHÍNH:
    * Tìm kiếm lộ trình xét Đặc tính Kỹ thuật & Nguy cơ của Phương tiện
@@ -981,19 +1064,41 @@ return {
     if (directPassableCount < 2 && hazardsForDetours.length > 0) {
       const customOffsets = cleanAvoidRoads.length > 0 ? [1800, 2600, 3400] : null;
       const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs, customOffsets);
-      // Giới hạn tối đa 8 detour song song để tìm đủ nhánh vòng qua đường khác (như QL32 hay Đại lộ Thăng Long)
-      const detourPromises = detourWaypoints.slice(0, 8).map(wp =>
+
+      // Pha 1: Thử 4 waypoint ưu tiên cao nhất trước để tránh lỗi Rate-Limit 429 từ OSRM
+      const tier1Waypoints = detourWaypoints.slice(0, 4);
+      const tier1Results = await Promise.all(tier1Waypoints.map(wp =>
         this.fetchOsrmRoute([
           [origin.lng, origin.lat],
           [wp.lng, wp.lat],
           [destination.lng, destination.lat]
         ]).catch(() => [])
-      );
-
-      const detourResults = await Promise.all(detourPromises);
-      detourResults.forEach(res => {
-        if (res && res.length > 0) allRawCandidates.push(res[0]);
+      ));
+      let foundPassableDetour = 0;
+      tier1Results.forEach(res => {
+        if (res && res.length > 0) {
+          allRawCandidates.push(res[0]);
+          const chk = this.checkRoutePassability(res[0].polyline, blockedFloods, blockedTraffics, specs.corridorBuffer);
+          if (chk.isPassable && !this.doesRouteviolateAvoidRoads(res[0], cleanAvoidRoads)) {
+            foundPassableDetour++;
+          }
+        }
       });
+
+      // Pha 2: Chỉ khi Pha 1 chưa đủ tuyến sạch mới gọi tiếp tối đa 4 waypoint mở rộng
+      if (directPassableCount + foundPassableDetour < 2 && detourWaypoints.length > 4) {
+        const tier2Waypoints = detourWaypoints.slice(4, 8);
+        const tier2Results = await Promise.all(tier2Waypoints.map(wp =>
+          this.fetchOsrmRoute([
+            [origin.lng, origin.lat],
+            [wp.lng, wp.lat],
+            [destination.lng, destination.lat]
+          ]).catch(() => [])
+        ));
+        tier2Results.forEach(res => {
+          if (res && res.length > 0) allRawCandidates.push(res[0]);
+        });
+      }
     }
 
     if (allRawCandidates.length === 0) {
