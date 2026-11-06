@@ -11,6 +11,10 @@ Thumbs.db
 ~$*
 *.tmp
 *.temp
+*.zip
+*.docx
+docx_text.txt
+public/screenshots/
 preview_page_*.png
 baocao_preview.pdf
 baocaobaithi_preview.pdf
