@@ -1652,10 +1652,12 @@
         if (currentCity === 'danang' && key !== 'danang') continue;
         if (currentCity === 'hanoi' && (key === 'hcm' || key === 'danang')) continue;
 
-        for (const alias of area.aliases) {
-          if (q.includes(alias) && alias.length > bestAreaAliasLen) {
-            bestAreaKey = key;
-            bestAreaAliasLen = alias.length;
+        if (Array.isArray(area.aliases)) {
+          for (const alias of area.aliases) {
+            if (q.includes(alias) && alias.length > bestAreaAliasLen) {
+              bestAreaKey = key;
+              bestAreaAliasLen = alias.length;
+            }
           }
         }
       }

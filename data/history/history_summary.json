@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 108,
+  "totalSnapshots": 129,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-09T09:25:42.296Z",
+  "updatedAt": "2026-11-09T09:31:46.437Z",
   "snapshots": [
     {
       "timestamp": "2026-11-04T13:49:20.137Z",
@@ -3501,7 +3501,535 @@
       }
     },
     {
-      "timestamp": "2026-11-09T09:25:42.296Z",
+      "timestamp": "2026-11-09T09:10:47.558Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:04.297Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:13.976Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:18.349Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:22.222Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:42.368Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:11:57.507Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:12:58.318Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:14:51.519Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:16:16.559Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 15,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:20:59.122Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.8,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 15,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:27:11.809Z",
       "date": "2026-11-09",
       "hour": 16,
       "hanoi": {
@@ -3517,7 +4045,487 @@
         "activeFloodSpots": []
       },
       "danang": {
-        "avgSpeedKmh": 16,
+        "avgSpeedKmh": 15,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:28:14.492Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 14,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:30:09.221Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 12,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:30:35.206Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:30:54.833Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 11,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:12.708Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:24.846Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:32.691Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:37.526Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:42.257Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T09:31:46.437Z",
+      "date": "2026-11-09",
+      "hour": 16,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 3.4,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
         "congestionIndex": 5,
         "maxRainMm": 15,
         "activeFloodSpots": [

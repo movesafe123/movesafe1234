@@ -180,6 +180,7 @@ class AIChat {
     }
     document.body.classList.remove('place-card-open');
     this.updateMemoryBarUI();
+    this.updateDynamicQuickPrompts();
     if (this.messages.length === 0) {
       this.addBotMessage(
         `Xin chào! Tôi là **Trợ lý AI MoveSafe VN (Agentic Spatial Copilot)**.\n` +
@@ -423,6 +424,36 @@ class AIChat {
     const cost = rec.fuelCostVnd ? `~${rec.fuelCostVnd.toLocaleString('vi-VN')}đ` : 'Chi phí tiết kiệm';
     const riskShield = rec.riskSavedText ? `<div class="gm-card-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg><span>Bảo vệ ví: Tránh rủi ro thủy kích</span></div>` : '';
 
+    let corridorXRayHtml = '';
+    if (Array.isArray(rec.corridorWarnings) && rec.corridorWarnings.length > 0) {
+      corridorXRayHtml = `
+        <div class="gm-corridor-xray-box">
+          <div class="xray-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <strong>Cắt lớp nguy cơ dọc tuyến:</strong>
+          </div>
+          <div class="xray-list">
+            ${rec.corridorWarnings.slice(0, 3).map(w => `
+              <div class="xray-item clickable-hazard" onclick="window.appState && window.appState.focusAndPulseHazardOnMap && window.appState.focusAndPulseHazardOnMap(${w.lat || 21.0285}, ${w.lng || 105.8542}, '${this.escapeHtml(w.name).replace(/'/g, "\\'")}')">
+                <span>Tại km ${w.atKm || 1.2} (~${w.etaMinutes || 4}p): <strong>${this.escapeHtml(w.name)}</strong> ${w.depth_cm > 0 ? `(ngập ~${w.depth_cm}cm)` : '(ùn tắc)'}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else if (Array.isArray(route.blockedReasons) && route.blockedReasons.length > 0) {
+      const b = route.blockedReasons[0];
+      corridorXRayHtml = `
+        <div class="gm-corridor-xray-box safe-avoid">
+          <div class="xray-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <strong>Đã tự động né ngập & tắc:</strong>
+          </div>
+          <div class="xray-desc">${this.escapeHtml(b.reason || 'Đã loại bỏ trục ngập sâu')}</div>
+        </div>
+      `;
+    }
+
     return `
       <div class="gm-chat-route-card">
         <div class="gm-route-card-top">
@@ -447,14 +478,15 @@ class AIChat {
           </div>
         </div>
         ${riskShield}
+        ${corridorXRayHtml}
         <div class="gm-route-card-btns">
           <button type="button" class="btn-card-act primary" onclick="window.appState && window.appState.toggleDirectionsPanel(true)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
             <span>Mở chỉ đường trên bản đồ</span>
           </button>
-          <button type="button" class="btn-card-act" onclick="window.appState && window.appState.openSosRescueModal()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <span>Bãi trú mưa gần đây</span>
+          <button type="button" class="btn-card-act" onclick="window.appState && window.appState.selectRouteOnMap && window.appState.selectRouteOnMap(0)" title="Chọn tuyến An toàn 0cm ngập">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Tuyến An toàn</span>
           </button>
         </div>
       </div>
@@ -564,8 +596,9 @@ class AIChat {
               : (c.type === 'ev'
                 ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`
                 : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`);
+            const safeLabel = this.escapeHtml(c.label).replace(/'/g, "\\'");
             return `
-              <button type="button" class="gm-citation-pill pill-${c.type || 'poi'}" onclick="window.mapEngine && window.mapEngine.map && window.mapEngine.map.flyTo([${c.lat}, ${c.lng}], 16)">
+              <button type="button" class="gm-citation-pill pill-${c.type || 'poi'}" onclick="window.appState && window.appState.focusAndPulseHazardOnMap ? window.appState.focusAndPulseHazardOnMap(${c.lat}, ${c.lng}, '${safeLabel}') : (window.mapEngine && window.mapEngine.map && window.mapEngine.map.flyTo([${c.lat}, ${c.lng}], 16))">
                 ${iconSvg}
                 <span>${this.escapeHtml(c.label)}</span>
               </button>
@@ -622,15 +655,25 @@ class AIChat {
         <div class="gm-chat-spots-actions">
           ${m.spots.map((sp, sIdx) => {
             if (typeof sp.lat !== 'number' || typeof sp.lng !== 'number') return '';
-            const shortLabel = this.escapeHtml(String(sp.name || '').split('(')[0].split('&')[0].trim().slice(0, 26));
+            const shortLabel = this.escapeHtml(String(sp.name || '').split('(')[0].split('&')[0].trim().slice(0, 24));
             const fullSafe = this.escapeHtml(sp.name || 'Địa điểm').replace(/'/g, "\\'");
+            const corridorBadge = sp.corridorTag ? `<span class="spot-corridor-tag">${this.escapeHtml(sp.corridorTag)}</span>` : '';
             return `
-              <button type="button" class="btn-spot-route"
-                onclick="window.appState && window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
-                title="Chỉ đường an toàn đến ${this.escapeHtml(sp.name || '')}">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                <span>Đi tới #${sIdx + 1}: ${shortLabel}</span>
-              </button>
+              <div class="gm-spot-action-row">
+                <button type="button" class="btn-spot-route"
+                  onclick="window.appState && window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
+                  title="Chỉ đường an toàn đến ${this.escapeHtml(sp.name || '')}">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                  <span>Đi tới #${sIdx + 1}: ${shortLabel}</span>
+                </button>
+                <button type="button" class="btn-spot-waypoint"
+                  onclick="window.appState && window.appState.insertWaypointToRoute ? window.appState.insertWaypointToRoute(${sp.lat}, ${sp.lng}, '${fullSafe}') : window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
+                  title="Chèn ${this.escapeHtml(sp.name || '')} làm điểm dừng chân vào lộ trình hiện tại">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>+ Ghé qua</span>
+                </button>
+                ${corridorBadge}
+              </div>
             `;
           }).join('')}
         </div>
@@ -773,8 +816,21 @@ class AIChat {
             ? '15 – 40 triệu đ (Rủi ro thủy kích ô tô)'
             : '150.000đ – 500.000đ (Rủi ro chết máy xe)',
           mainStreets: rec.mainStreets || rec.streetNames || [],
-          avoidedFloods: rec.avoidedFloods || []
+          avoidedFloods: rec.avoidedFloods || [],
+          corridorWarnings: (rec.warnings || []).slice(0, 6).map(w => ({
+            name: w.name || w.description || w.categoryName || 'Điểm cảnh báo',
+            hazardType: w.hazardType || 'hazard',
+            depth_cm: w.depth_cm || 0,
+            atKm: w.atKm || 1.2,
+            etaMinutes: w.etaMinutes || 4
+          }))
         },
+        polyline: (Array.isArray(rec.polyline) ? rec.polyline : (Array.isArray(rec.coordinates) ? rec.coordinates : [])).slice(0, 150),
+        blockedReasons: (app.lastRouteResult.blockedRoutes || []).slice(0, 3).map(b => ({
+          distanceKm: b.distanceKm,
+          reason: b.reason,
+          firstHazard: b.blockedBy?.[0] || null
+        })),
         alternatives: (app.lastRouteResult.routes || []).filter(r => r !== rec).map(r => ({
           label: r.label,
           name: r.label,
@@ -1194,6 +1250,7 @@ class AIChat {
           if (r.action) {
             this.handleMapActionsPipeline(r.action, r.secondaryActions);
           }
+          this.updateDynamicQuickPrompts();
         }
       }
     } catch (_serverErr) {}
@@ -1247,6 +1304,7 @@ class AIChat {
           vehiclePhysicsMeter: physicsMeter,
           verificationBadge: verified.verification
         });
+        this.updateDynamicQuickPrompts();
         return;
       } catch (_clientErr) {}
     }
@@ -1288,6 +1346,7 @@ class AIChat {
     if (smartReply.action) {
       this.handleMapActionsPipeline(smartReply.action, smartReply.secondaryActions);
     }
+    this.updateDynamicQuickPrompts();
   }
 
   // =========================================================================
@@ -1296,6 +1355,8 @@ class AIChat {
 
   prepareSpatialRagAndSafety(query, currentCity, webState) {
     const q = (query || '').toLowerCase().trim();
+    currentCity = currentCity || (window.appState?.currentCity || 'hanoi');
+    webState = webState || (this.collectLiveWebSnapshot ? this.collectLiveWebSnapshot() : {});
     const fe = (typeof window !== 'undefined' && window.FOOD_ENTERTAINMENT_DATA)
       ? window.FOOD_ENTERTAINMENT_DATA
       : null;
@@ -1399,6 +1460,10 @@ class AIChat {
         return Number((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1));
       };
 
+      const activePolyline = (Array.isArray(webState.activeRoute?.polyline) && webState.activeRoute.polyline.length >= 2)
+        ? webState.activeRoute.polyline
+        : null;
+
       const withDist = pool.map(sp => {
         const distKm = (typeof sp.lat === 'number' && typeof sp.lng === 'number')
           ? _calcDistKm(centerPoint.lat, centerPoint.lng, sp.lat, sp.lng)
@@ -1416,12 +1481,46 @@ class AIChat {
           }
         }
 
+        // Tính độ lệch dọc theo hành lang lộ trình (nếu đang mở lộ trình)
+        let minDetourKm = 99.9;
+        let alongKm = 0;
+        if (activePolyline && typeof sp.lat === 'number' && typeof sp.lng === 'number') {
+          let cumKm = 0;
+          for (let pIdx = 0; pIdx < activePolyline.length; pIdx++) {
+            const p = activePolyline[pIdx];
+            if (pIdx > 0) {
+              cumKm += _calcDistKm(activePolyline[pIdx - 1][0], activePolyline[pIdx - 1][1], p[0], p[1]);
+            }
+            const dToSeg = _calcDistKm(sp.lat, sp.lng, p[0], p[1]);
+            if (dToSeg < minDetourKm) {
+              minDetourKm = dToSeg;
+              alongKm = Number(cumKm.toFixed(1));
+            }
+          }
+        }
+
+        const isAlongCorridor = (minDetourKm <= 0.65);
+        const corridorTag = isAlongCorridor
+          ? `Thuận đường (lệch tuyến ~${Math.round(minDetourKm * 1000)}m tại km ${alongKm})`
+          : `Cách tâm ~${distKm} km`;
+
         return {
           ...sp,
           distKm,
+          minDetourKm,
+          alongKm,
+          isAlongCorridor,
+          corridorTag,
           floodStatus: nearFlood ? `Gần rốn ngập ${nearFlood}` : 'Đường vào khô ráo'
         };
-      }).sort((a, b) => a.distKm - b.distKm);
+      }).sort((a, b) => {
+        if (activePolyline) {
+          if (a.isAlongCorridor && !b.isAlongCorridor) return -1;
+          if (!a.isAlongCorridor && b.isAlongCorridor) return 1;
+          if (a.isAlongCorridor && b.isAlongCorridor) return a.minDetourKm - b.minDetourKm;
+        }
+        return a.distKm - b.distKm;
+      });
 
       verifiedSpots = withDist.slice(0, 5).map((sp, idx) => ({
         ...sp,
@@ -2267,19 +2366,61 @@ ${query}
 
   startLiveThinkingAnimation() {
     this._thinkingStepIndex = 0;
-    const steps = [
+    const stages = [
       'Định vị tọa độ & quét hành lang lộ trình 2.5km...',
-      'Đối chiếu trạm ngập HSDC, TomTom & 87 trạm thời tiết...',
-      'Phân tích vật lý gầm xe, tính toán rủi ro & kiểm chứng...'
+      'Đã định vị tọa độ\nĐang đối chiếu trạm ngập HSDC, TomTom & trạm thời tiết...',
+      'Đã đối chiếu trạm ngập & TomTom\nĐang phân tích vật lý gầm xe & cắt lớp km...',
+      'Đã hoàn tất phân tích gầm xe & cắt lớp km\nĐang tổng hợp phương án tối ưu & điểm dừng chân...'
     ];
     this._thinkingInterval = setInterval(() => {
-      this._thinkingStepIndex = (this._thinkingStepIndex + 1) % steps.length;
+      this._thinkingStepIndex = (this._thinkingStepIndex + 1) % stages.length;
       const loadingMsg = this.messages[this.messages.length - 1];
       if (loadingMsg && loadingMsg.sender === 'bot' && loadingMsg.isThinking) {
-        loadingMsg.text = steps[this._thinkingStepIndex];
+        loadingMsg.text = stages[this._thinkingStepIndex];
         this.renderMessages();
       }
-    }, 900);
+    }, 750);
+  }
+
+  updateDynamicQuickPrompts() {
+    const el = document.getElementById('ai-quick-prompts');
+    if (!el) return;
+
+    const app = window.appState;
+    const hasRoute = Boolean(app && app.lastRouteResult && app.lastRouteResult.routes && app.lastRouteResult.routes.length > 0);
+    const hasFloods = Boolean(app && app.liveData && app.liveData.floodPoints && app.liveData.floodPoints.some(f => f.depth_cm > 0));
+    const isSimulation = Boolean(app && app.isSimulationMode);
+
+    let chips = [];
+    if (hasRoute) {
+      chips = [
+        { text: 'Cắt lớp ngập & kẹt xe lộ trình này', query: 'Cắt lớp chi tiết các điểm ngập và sự cố kẹt xe trên lộ trình này, ở km thứ mấy và mất mấy phút?' },
+        { text: 'Gợi ý quán cafe / ăn uống thuận chiều', query: 'Gợi ý cho tôi các quán cafe hoặc quán ăn cao ráo thuận chiều đi dọc lộ trình này' },
+        { text: 'Đợi 30 phút nữa đi có nhanh hơn?', query: 'Nếu tôi đợi 30 phút nữa mới xuất phát thì đường có đỡ tắc và rút ngập hơn không?' },
+        { text: 'Nếu đổi sang Ô tô thì mất bao lâu?', query: 'Nếu lộ trình này đổi sang đi Ô tô thì hết bao nhiêu phút và có dính ngập không?' }
+      ];
+    } else if (hasFloods || isSimulation) {
+      chips = [
+        { text: 'Top điểm đang ngập sâu nhất', query: 'Hiện tại toàn thành phố những điểm nào đang ngập sâu nhất và độ sâu bao nhiêu cm?' },
+        { text: 'Từ Bách Khoa đi Cầu Giấy né ngập', query: 'Từ Đại học Bách Khoa về Cầu Giấy đi đường nào thông thoáng né hết điểm ngập?' },
+        { text: 'Bãi gửi xe & trú mưa cao ráo', query: 'Gợi ý các bãi gửi xe cao ráo và điểm trú mưa an toàn tránh thủy kích gần đây' },
+        { text: 'Dự báo thời tiết & mưa 15P', query: 'Dự báo thời tiết và diễn biến mưa ngập trong 15 phút tới thế nào?' }
+      ];
+    } else {
+      chips = [
+        { text: 'Tình hình hiện tại', query: 'Tình hình ngập úng và kẹt xe hiện tại thế nào?' },
+        { text: 'Cầu Giấy đi Mỹ Đình', query: 'Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?' },
+        { text: 'Ăn chơi Mỹ Đình', query: 'Quanh Mỹ Đình có quán ăn hay chỗ vui chơi nào nổi tiếng không?' },
+        { text: 'Dự báo thời tiết', query: 'Dự báo thời tiết và nguy cơ ngập hôm nay?' }
+      ];
+    }
+
+    el.innerHTML = chips.map(c => `
+      <button type="button" class="gm-ai-prompt-chip" onclick="window.aiChat && window.aiChat.sendMessage('${this.escapeHtml(c.query).replace(/'/g, "\\'")}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+        <span>${this.escapeHtml(c.text)}</span>
+      </button>
+    `).join('');
   }
 
   stopLiveThinkingAnimation() {
@@ -2294,18 +2435,23 @@ ${query}
     const lower = query.toLowerCase().trim();
 
     let avoidRoad = null;
+    let avoidRoads = [];
     const avoidPatterns = [
       /giả\s+sử(?:\s+như)?\s+(?:đường\s+|tuyến\s+|phố\s+|cầu\s+|nút\s+giao\s+)?(.+?)\s+(?:bị\s+)?(?:cấm\s+đường|cấm|đóng\s+đường|ngập\s+sâu|ngập|tắc\s+cứng|kẹt\s+xe|tắc|không\s+đi\s+được)/i,
       /nếu(?:\s+như)?\s+(?:đường\s+|tuyến\s+|phố\s+|cầu\s+)?(.+?)\s+(?:bị\s+)?(?:cấm\s+đường|cấm|đóng\s+đường|ngập\s+sâu|ngập|tắc)/i,
-      /(?:tránh|né|không\s+đi\s+qua|không\s+muốn\s+đi\s+qua|bỏ\s+qua)\s+(?:đường\s+|tuyến\s+|phố\s+)?(.+?)(?:\s+(?:thì|tôi|mình|đi|bạn|nhé)|[,.?]|$)/i
+      /(?:tránh|né|không\s+đi\s+qua|không\s+muốn\s+đi\s+qua|bỏ\s+qua)\s+(?:đoạn\s+|đường\s+|tuyến\s+|phố\s+)?(.+?)(?:\s+(?:ra|thì|tôi|mình|đi|bạn|nhé)|[,.?]|$)/i
     ];
 
     for (const pat of avoidPatterns) {
       const m = query.match(pat);
       if (m && m[1]) {
-        const candidate = m[1].replace(/^(?:đường|phố|tuyến)\s+/i, '').trim();
-        if (candidate.length >= 2 && !candidate.match(/^(?:tôi|mình|bạn|gì|nào|ngập|tắc)$/i)) {
-          avoidRoad = candidate;
+        const rawCandidate = m[1].replace(/^(?:đoạn|đường|phố|tuyến)\s+/i, '').trim();
+        const parts = rawCandidate.split(/(?:\s+và\s+|\s+với\s+|,)/i)
+          .map(p => p.replace(/^(?:đoạn|đường|phố|tuyến)\s+/i, '').trim())
+          .filter(p => p.length >= 2 && !p.match(/^(?:tôi|mình|bạn|gì|nào|ngập|tắc|nhé|ạ)$/i));
+        if (parts.length > 0) {
+          avoidRoad = parts[0];
+          avoidRoads = parts;
           break;
         }
       }
@@ -2323,13 +2469,21 @@ ${query}
     else if (/(?:đi\s+ô\s*tô|bằng\s+ô\s*tô|xe\s+ô\s*tô|xe\s+hơi|4\s+bánh)/i.test(lower)) requestedVehicle = 'car';
     else if (/(?:đi\s+xe\s*máy|bằng\s+xe\s*máy|2\s+bánh|xe\s+gắn\s+máy)/i.test(lower)) requestedVehicle = 'motorbike';
 
+    let hasPitstopIntent = false;
+    let pitstopKeyword = null;
+    const pitstopMatch = query.match(/(?:tiện\s*đường|ghé|dừng)\s*(?:vào|qua|ở)?\s*(tìm\s*quán\s*cafe|quán\s*cafe|cafe|quán\s*ăn|ăn\s*tối|trạm\s*sạc|cây\s*xăng|chỗ\s*trú\s*mưa|uống\s*nước|[a-zA-Z0-9\s\u00C0-\u1EF9]+)?/i);
+    if (pitstopMatch) {
+      hasPitstopIntent = true;
+      pitstopKeyword = (pitstopMatch[1] || 'quán xá').trim();
+    }
+
     const destFirstRegex = /(?:tại|ở|đến|tới)\s+([^,?.!]+?)\s+(?:đi\s+)?từ\s+([^,?.!]+)/i;
     const matchA = query.match(destFirstRegex);
     if (matchA && matchA[1] && matchA[2]) {
       let rawDest = matchA[1].replace(/^(?:tôi|mình|bạn)\s+/i, '').trim();
       let rawOrig = matchA[2].replace(/\s+(?:ra|vào|đến|theo|qua|đường|thế nào).*$/i, '').trim();
       if (rawDest.length >= 2 && rawOrig.length >= 2 && !rawDest.match(/^(?:đường|đường nào)$/i)) {
-        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, requestedVehicle };
+        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
       }
     }
 
@@ -2342,12 +2496,14 @@ ${query}
         .trim();
 
       let dest = matchB[2]
+        .replace(/[,;]\s*(?:tiện\s*đường|ghé|dừng|tìm\s*quán|ăn\s*tối|ngồi\s*cafe|sạc\s*xe|uống\s*nước).*$/i, '')
+        .replace(/\s+(?:tiện\s*đường|ghé\s+quán|tìm\s*quán|ăn\s*tối|ngồi\s*cafe|sạc\s*xe|uống\s*nước).*$/i, '')
         .replace(/\s+(?:có\s+sợ|sợ|có\s+bị|bị|đang|có\s+thể|đi\s+được|được|hay\s+nên|hay|nên|liệu|ngồi|xem|uống|ăn|né|tránh|không|nhỉ|ạ|nhé|nào|đường\s+nào).*$/i, '')
         .replace(/\s+(?:hết\s+bao\s+lâu|mất\s+bao\s+lâu|mất\s+mấy\s+phút).*$/i, '')
         .trim();
 
       if (orig.length >= 2 && dest.length >= 2 && !dest.match(/^(?:đường|đường nào)$/i)) {
-        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, requestedVehicle };
+        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
       }
     }
 

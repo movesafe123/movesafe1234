@@ -66,3 +66,4 @@ if (unbound.length > 0) {
     console.log(`[${i+1}] ID: "${b.id}", Class: "${b.className}", Text: "${b.text}"`);
   });
 }
+

@@ -341,11 +341,15 @@ class RoutingService {
     }
 
     const degMargin = 0.006; // ~660m bao phủ cả đoạn thẳng dài giữa 2 đỉnh OSRM
+    let cumulativeMeters = 0;
 
     for (let i = 0; i < polyline.length; i++) {
       const pt = polyline[i];
       const pLat = pt[0];
       const pLng = pt[1];
+      if (i > 0) {
+        cumulativeMeters += this.getDistanceMeters(polyline[i - 1][0], polyline[i - 1][1], pLat, pLng);
+      }
       const nextPt = (i + 1 < polyline.length) ? polyline[i + 1] : null;
       const minLat = nextPt ? Math.min(pLat, nextPt[0]) : pLat;
       const maxLat = nextPt ? Math.max(pLat, nextPt[0]) : pLat;
@@ -362,10 +366,25 @@ class RoutingService {
           : this.getDistanceMeters(pLat, pLng, f.lat, f.lng);
         const radius = f.radius || corridorBuffer;
         if (d <= radius && !blockedBy.some(b => b.id === f.id)) {
+          let segProgressMeters = 0;
+          if (nextPt) {
+            const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+            const dLatSeg = nextPt[0] - pLat;
+            const dLngSeg = nextPt[1] - pLng;
+            const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
+            if (segLenSq > 0) {
+              const u = Math.max(0, Math.min(1, ((f.lat - pLat) * dLatSeg + (f.lng - pLng) * dLngSeg) / segLenSq));
+              segProgressMeters = segDist * u;
+            }
+          }
+          const hazardAtMeters = cumulativeMeters + segProgressMeters;
           blockedBy.push({
             ...f,
             hazardType: 'blocked_flood',
-            distanceToRoute: Math.round(d)
+            distanceToRoute: Math.round(d),
+            cumulativeMeters: Math.round(hazardAtMeters),
+            atKm: Number((hazardAtMeters / 1000).toFixed(1)),
+            etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
           });
         }
       }
@@ -379,10 +398,25 @@ class RoutingService {
           ? this.getPointToSegmentDistanceMeters(t.lat, t.lng, pLat, pLng, nextPt[0], nextPt[1])
           : this.getDistanceMeters(pLat, pLng, t.lat, t.lng);
         if (d <= 150 && !blockedBy.some(b => b.id === t.id)) {
+          let segProgressMeters = 0;
+          if (nextPt) {
+            const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+            const dLatSeg = nextPt[0] - pLat;
+            const dLngSeg = nextPt[1] - pLng;
+            const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
+            if (segLenSq > 0) {
+              const u = Math.max(0, Math.min(1, ((t.lat - pLat) * dLatSeg + (t.lng - pLng) * dLngSeg) / segLenSq));
+              segProgressMeters = segDist * u;
+            }
+          }
+          const hazardAtMeters = cumulativeMeters + segProgressMeters;
           blockedBy.push({
             ...t,
             hazardType: 'blocked_traffic',
-            distanceToRoute: Math.round(d)
+            distanceToRoute: Math.round(d),
+            cumulativeMeters: Math.round(hazardAtMeters),
+            atKm: Number((hazardAtMeters / 1000).toFixed(1)),
+            etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
           });
         }
       }
@@ -452,6 +486,7 @@ class RoutingService {
     const polyline = route.polyline;
     const totalPoints = polyline.length;
     let affectedPoints = 0;
+    let cumulativeMeters = 0;
 
     const matchedFloods = [];
     const matchedTraffics = [];
@@ -462,6 +497,9 @@ class RoutingService {
       const pt = polyline[i];
       const pLat = pt[0];
       const pLng = pt[1];
+      if (i > 0) {
+        cumulativeMeters += this.getDistanceMeters(polyline[i - 1][0], polyline[i - 1][1], pLat, pLng);
+      }
       const nextPt = (i + 1 < totalPoints) ? polyline[i + 1] : null;
       const minLat = nextPt ? Math.min(pLat, nextPt[0]) : pLat;
       const maxLat = nextPt ? Math.max(pLat, nextPt[0]) : pLat;
@@ -481,10 +519,25 @@ class RoutingService {
             isPointCongested = true;
           }
           if (!matchedTraffics.some(t => t.id === inc.id)) {
+            let segProgressMeters = 0;
+            if (nextPt) {
+              const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+              const dLatSeg = nextPt[0] - pLat;
+              const dLngSeg = nextPt[1] - pLng;
+              const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
+              if (segLenSq > 0) {
+                const u = Math.max(0, Math.min(1, ((inc.lat - pLat) * dLatSeg + (inc.lng - pLng) * dLngSeg) / segLenSq));
+                segProgressMeters = segDist * u;
+              }
+            }
+            const hazardAtMeters = cumulativeMeters + segProgressMeters;
             matchedTraffics.push({
               ...inc,
               hazardType: 'traffic',
-              distanceToRoute: Math.round(dist)
+              distanceToRoute: Math.round(dist),
+              cumulativeMeters: Math.round(hazardAtMeters),
+              atKm: Number((hazardAtMeters / 1000).toFixed(1)),
+              etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
             });
           }
           break;
@@ -500,11 +553,26 @@ class RoutingService {
           : this.getDistanceMeters(pLat, pLng, fl.lat, fl.lng);
         if (dist <= (fl.radius || specs.corridorBuffer)) {
           if (!matchedFloods.some(f => f.id === fl.id)) {
+            let segProgressMeters = 0;
+            if (nextPt) {
+              const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+              const dLatSeg = nextPt[0] - pLat;
+              const dLngSeg = nextPt[1] - pLng;
+              const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
+              if (segLenSq > 0) {
+                const u = Math.max(0, Math.min(1, ((fl.lat - pLat) * dLatSeg + (fl.lng - pLng) * dLngSeg) / segLenSq));
+                segProgressMeters = segDist * u;
+              }
+            }
+            const hazardAtMeters = cumulativeMeters + segProgressMeters;
             matchedFloods.push({
               ...fl,
               hazardType: 'flood',
               distanceToRoute: Math.round(dist),
-              isSafeShallow: (fl.depth_cm <= specs.safeDepth)
+              isSafeShallow: (fl.depth_cm <= specs.safeDepth),
+              cumulativeMeters: Math.round(hazardAtMeters),
+              atKm: Number((hazardAtMeters / 1000).toFixed(1)),
+              etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
             });
           }
           break;
@@ -956,7 +1024,7 @@ return {
    * Tìm kiếm lộ trình xét Đặc tính Kỹ thuật & Nguy cơ của Phương tiện
    * Hỗ trợ cấm đường / né đường giả định (avoidRoads) theo yêu cầu tự nhiên của người dùng
    */
-  async calculateMultiRoutes({ origin, destination, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [] }) {
+  async calculateMultiRoutes({ origin, destination, viaWaypoint = null, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [] }) {
     const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } =
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
 
@@ -989,11 +1057,18 @@ return {
       };
     }
 
-    // 2. Lấy tuyến trực tiếp từ OSRM (đã bao gồm các alternative routes)
-    const directRoutes = await this.fetchOsrmRoute([
-      [origin.lng, origin.lat],
-      [destination.lng, destination.lat]
-    ]).catch(() => []);
+    // 2. Lấy tuyến trực tiếp từ OSRM (hỗ trợ chèn điểm dừng chân viaWaypoint)
+    const osrmCoords = (viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number')
+      ? [
+          [origin.lng, origin.lat],
+          [viaWaypoint.lng, viaWaypoint.lat],
+          [destination.lng, destination.lat]
+        ]
+      : [
+          [origin.lng, origin.lat],
+          [destination.lng, destination.lat]
+        ];
+    const directRoutes = await this.fetchOsrmRoute(osrmCoords).catch(() => []);
 
     // Kiểm tra sơ bộ các tuyến trực tiếp xem có tuyến nào đi được an toàn không
     let directPassableCount = 0;

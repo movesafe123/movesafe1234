@@ -26,3 +26,4 @@ console.log('Tổng số nút <button> trong index.html:', buttons.length);
 buttons.forEach((b, i) => {
   console.log(`[${i+1}] ID: "${b.id || '(no-id)'}", Class: "${b.className || ''}", Text: "${b.text}", Onclick: ${b.onclick ? 'YES' : 'NO'}`);
 });
+

@@ -6748,3 +6748,156 @@ body.dark-mode .gm-verification-badge.info,
   border-color: #1e40af;
   color: #93c5fd;
 }
+
+/* =========================================================================
+   MOVE SAFE AI COPILOT UPGRADE V4: CORRIDOR X-RAY, WAYPOINT & SPATIAL RADAR
+   ========================================================================= */
+
+.gm-spot-action-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.btn-spot-waypoint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  color: #047857;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-spot-waypoint:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+}
+
+.spot-corridor-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.gm-corridor-xray-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 7px;
+  padding: 7px 10px;
+  margin: 7px 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.gm-corridor-xray-box.safe-avoid {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.gm-corridor-xray-box .xray-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #c2410c;
+  margin-bottom: 4px;
+}
+
+.gm-corridor-xray-box.safe-avoid .xray-header {
+  color: #15803d;
+}
+
+.gm-corridor-xray-box .xray-item {
+  padding: 3px 0;
+  color: #7c2d12;
+}
+
+.gm-corridor-xray-box .clickable-hazard {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: background 0.15s;
+}
+
+.gm-corridor-xray-box .clickable-hazard:hover {
+  background: #ffedd5;
+  text-decoration: underline;
+}
+
+.gm-corridor-xray-box .xray-desc {
+  color: #14532d;
+  font-size: 11.5px;
+}
+
+/* Dark mode for AI Copilot Upgrade */
+body.dark-mode .btn-spot-waypoint,
+[data-theme="dark"] .btn-spot-waypoint {
+  background: rgba(5, 150, 105, 0.2);
+  border-color: #065f46;
+  color: #6ee7b7;
+}
+
+body.dark-mode .btn-spot-waypoint:hover,
+[data-theme="dark"] .btn-spot-waypoint:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+body.dark-mode .spot-corridor-tag,
+[data-theme="dark"] .spot-corridor-tag {
+  background: rgba(5, 150, 105, 0.3);
+  border-color: #065f46;
+  color: #a7f3d0;
+}
+
+body.dark-mode .gm-corridor-xray-box,
+[data-theme="dark"] .gm-corridor-xray-box {
+  background: rgba(154, 52, 18, 0.2);
+  border-color: #9a3412;
+  color: #fdba74;
+}
+
+body.dark-mode .gm-corridor-xray-box.safe-avoid,
+[data-theme="dark"] .gm-corridor-xray-box.safe-avoid {
+  background: rgba(6, 95, 70, 0.2);
+  border-color: #065f46;
+  color: #86efac;
+}
+
+body.dark-mode .gm-corridor-xray-box .xray-header,
+[data-theme="dark"] .gm-corridor-xray-box .xray-header {
+  color: #fb923c;
+}
+
+body.dark-mode .gm-corridor-xray-box.safe-avoid .xray-header,
+[data-theme="dark"] .gm-corridor-xray-box.safe-avoid .xray-header {
+  color: #4ade80;
+}
+
+body.dark-mode .gm-corridor-xray-box .xray-item,
+[data-theme="dark"] .gm-corridor-xray-box .xray-item {
+  color: #fed7aa;
+}
+
+body.dark-mode .gm-corridor-xray-box .xray-desc,
+[data-theme="dark"] .gm-corridor-xray-box .xray-desc {
+  color: #bbf7d0;
+}

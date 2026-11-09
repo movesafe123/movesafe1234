@@ -765,6 +765,12 @@ class AIAssistantService {
         if (rec.matchedTraffics && rec.matchedTraffics.length > 0) {
           lines.push(`  - Mật độ giao thông trên tuyến: Có ${rec.matchedTraffics.length} điểm đông xe (${rec.matchedTraffics.slice(0, 3).map(t => this.stripEmojis(t.description)).join('; ')})`);
         }
+        if (rec.corridorWarnings && rec.corridorWarnings.length > 0) {
+          lines.push(`  - Cắt lớp chi tiết nguy cơ dọc tuyến: ${rec.corridorWarnings.map(w => `Tại km ${w.atKm} (~${w.etaMinutes} phút): ${w.name} ${w.depth_cm > 0 ? `(ngập ~${w.depth_cm}cm)` : '(kẹt xe)'}`).join('; ')}`);
+        }
+        if (ar.blockedReasons && ar.blockedReasons.length > 0) {
+          lines.push(`  - Các trục đường ngắn nhất đã bị loại bỏ vì nguy hiểm: ${ar.blockedReasons.map(b => `Tuyến ${b.distanceKm}km: ${b.reason}`).join('; ')}`);
+        }
         if (ar.alternatives && ar.alternatives.length > 0) {
           lines.push(`  - Phương án lộ trình thay thế: ${ar.alternatives.map(a => `${a.label || a.name}: ${a.distanceKm}km (~${a.durationMin || a.estimatedMinutes} phút)`).join(' | ')}`);
         }
@@ -1349,9 +1355,15 @@ QUY TẮC CẤM:
         const avoidedLine = (rec.avoidedFloods && rec.avoidedFloods.length > 0)
           ? `\n• **Điểm ngập đã vòng tránh**: ${rec.avoidedFloods.join(', ')}`
           : '';
+        let xrayLine = '';
+        if (rec.corridorWarnings && rec.corridorWarnings.length > 0) {
+          xrayLine = `\n• **Cắt lớp nguy cơ dọc tuyến**: ${rec.corridorWarnings.slice(0, 2).map(w => `Tại km ${w.atKm} (~${w.etaMinutes}p): ${w.name} ${w.depth_cm > 0 ? `(ngập ~${w.depth_cm}cm)` : '(ùn tắc)'}`).join('; ')}`;
+        } else if (activeRoute.blockedReasons && activeRoute.blockedReasons.length > 0) {
+          xrayLine = `\n• **Đã tự động né ngập & tắc**: ${activeRoute.blockedReasons[0].reason}`;
+        }
         routeDetailsText =
           `• **Tuyến tối ưu (${rec.name || 'Lộ trình An toàn'})**: Dài **${rec.distanceKm} km** — Thời gian dự kiến **${rec.estimatedMinutes} phút** (Chỉ số an toàn: **${rec.safetyScore}/100**)` +
-          streetsLine + avoidedLine + '\n';
+          streetsLine + avoidedLine + xrayLine + '\n';
       }
 
       const timeNote = (timeOffsetHours || predictionOffsetHours) > 0

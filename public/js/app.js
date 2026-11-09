@@ -2951,6 +2951,57 @@ class GoogleMapsApp {
     this.calculateSmartRoute();
   }
 
+  // Chèn điểm dừng chân (Pitstop Waypoint) vào giữa lộ trình đang mở (A -> Điểm dừng -> B)
+  async insertWaypointToRoute(lat, lng, title) {
+    this.toggleDirectionsPanel(true);
+    if (!this.routeLocations) this.routeLocations = {};
+    if (!this.routeLocations.origin && this.origin) this.routeLocations.origin = this.origin;
+    if (!this.routeLocations.destination && this.destination) this.routeLocations.destination = this.destination;
+    if (!this.routeLocations.origin || !this.routeLocations.destination) {
+      return this.routeToLocation(lat, lng, title);
+    }
+    this.currentViaWaypoint = { lat: Number(lat), lng: Number(lng), title: title || 'Điểm dừng chân' };
+    if (this._viaWaypointMarker && window.mapEngine?.map) {
+      window.mapEngine.map.removeLayer(this._viaWaypointMarker);
+      this._viaWaypointMarker = null;
+    }
+    if (window.mapEngine?.map && typeof L !== 'undefined') {
+      const icon = L.divIcon({
+        className: 'gm-marker-container',
+        html: `<div class="gm-route-pin" style="background:#059669;color:#fff;border:2px solid #fff;box-shadow:0 3px 10px rgba(5,150,105,0.4);font-size:11px;font-weight:700;">P</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+      this._viaWaypointMarker = L.marker([lat, lng], { icon }).addTo(window.mapEngine.map);
+      this._viaWaypointMarker.bindPopup(`<strong>Điểm dừng chân (Pitstop):</strong><br>${title}`);
+    }
+    this.showToast(`Đã chèn điểm dừng chân "${title}" vào lộ trình hiện tại!`, 'info', 3500);
+    await this.calculateSmartRoute();
+  }
+
+  // Phóng tới và tạo hiệu ứng sóng Radar nổi bật tại điểm ngập / kẹt xe / POI từ Chatbox
+  focusAndPulseHazardOnMap(lat, lng, label = '') {
+    if (!window.mapEngine || !window.mapEngine.map) return;
+    const map = window.mapEngine.map;
+    map.flyTo([lat, lng], 16, { duration: 0.9 });
+    if (this._chatPulseMarker) {
+      map.removeLayer(this._chatPulseMarker);
+      this._chatPulseMarker = null;
+    }
+    if (typeof L !== 'undefined') {
+      const pulseIcon = L.divIcon({
+        className: 'gm-spatial-radar-icon',
+        html: `<div class="gm-radar-ring"></div><div class="gm-radar-dot"></div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      this._chatPulseMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+      if (label) {
+        this._chatPulseMarker.bindPopup(`<strong>${label}</strong>`).openPopup();
+      }
+    }
+  }
+
   // Dịch các chỉ dẫn rẽ sang tiếng Việt tự nhiên chuẩn Google Maps kèm Icon SVG tối giản
   translateStepInstruction(step) {
     const raw = (step.instruction || '').toLowerCase();
@@ -3728,6 +3779,7 @@ class GoogleMapsApp {
       const result = await window.routingService.calculateMultiRoutes({
         origin: { lat: origin.lat, lng: origin.lng },
         destination: { lat: dest.lat, lng: dest.lng },
+        viaWaypoint: this.currentViaWaypoint || null,
         floodPoints: effectiveFloods,
         trafficIncidents: effectiveTraffic,
         vehicleType: this.currentVehicle,
@@ -4050,6 +4102,17 @@ class GoogleMapsApp {
         this.routeMarkers.destination = null;
       }
     }
+
+    if (this._viaWaypointMarker && mapEng.map) {
+      mapEng.map.removeLayer(this._viaWaypointMarker);
+      this._viaWaypointMarker = null;
+    }
+    this.currentViaWaypoint = null;
+
+    if (this._chatPulseMarker && mapEng.map) {
+      mapEng.map.removeLayer(this._chatPulseMarker);
+      this._chatPulseMarker = null;
+    }
   }
 
   // Render thẻ cảnh báo khi KHÔNG CÓ ĐƯỜNG ĐI ĐƯỢC
@@ -4180,6 +4243,10 @@ class GoogleMapsApp {
       `);
 
       mapEng.map.fitBounds(mapEng.layers.routeSafe.getBounds(), { padding: [60, 60] });
+    }
+
+    if (window.aiChat && typeof window.aiChat.updateDynamicQuickPrompts === 'function') {
+      window.aiChat.updateDynamicQuickPrompts();
     }
   }
 
