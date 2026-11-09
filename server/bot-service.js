@@ -454,7 +454,7 @@ class LocalUrbanBot extends EventEmitter {
       weatherAlerts: [],
       weatherStations: {},
       vovTrafficNews: [],
-      floodPoints: LOCAL_FLOOD_STATIONS.map(s => ({ ...s, depth_cm: 0, danger_level: 'safe', passable_motorbike: true, passable_car: true })),
+      floodPoints: LOCAL_FLOOD_STATIONS.map(s => ({ ...s, base_depth_cm: s.depth_cm, depth_cm: 0, danger_level: 'safe', passable_motorbike: true, passable_car: true })),
       trafficIncidents: [],
       stats: {
         totalFloods: 0,
@@ -1148,6 +1148,25 @@ class LocalUrbanBot extends EventEmitter {
     return report;
   }
 
+  // Trích xuất lượng mưa an toàn đa nguồn (chống nuốt mất mưa rào/dông và bù suy diễn theo mã WMO)
+  extractSafeRain(curr = {}) {
+    if (!curr) return 0;
+    const p = typeof curr.precipitation === 'number' ? curr.precipitation : 0;
+    const r = typeof curr.rain === 'number' ? curr.rain : 0;
+    const s = typeof curr.showers === 'number' ? curr.showers : 0;
+    let maxRain = Math.max(p, r, s);
+
+    // Dự phòng WMO Code: Nếu có dông sét hoặc mưa to mà cảm biến đo trễ thấp, gán ngưỡng sàn bảo vệ an toàn
+    const wCode = curr.weather_code || 0;
+    if (wCode >= 95 && maxRain < 15) maxRain = Math.max(maxRain, 15); // Dông kèm sấm chớp nguy hiểm
+    else if ((wCode === 81 || wCode === 82) && maxRain < 10) maxRain = Math.max(maxRain, 10); // Mưa rào rất to
+    else if (wCode === 80 && maxRain < 1.0) maxRain = 5; // Mưa rào vừa nhưng cảm biến đo trễ
+    else if (wCode >= 61 && wCode <= 65 && maxRain < 1.0) maxRain = 2.5; // Mưa rào nhưng cảm biến đo trễ
+
+    if (maxRain < 0.1) return 0;
+    return Math.round(maxRain * 10) / 10;
+  }
+
   // Cào thời tiết trạm các quận từ Open-Meteo Cloud Radar (Bao gồm is_day và dự báo mưa 3 giờ tới)
   async crawlWeatherStations(cityKey = 'hanoi') {
     const stations = WEATHER_STATION_PRESETS[cityKey];
@@ -1156,7 +1175,7 @@ class LocalUrbanBot extends EventEmitter {
     try {
       const lats = stations.map(s => s.lat).join(',');
       const lngs = stations.map(s => s.lng).join(',');
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&hourly=precipitation,rain&forecast_hours=6&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,is_day&hourly=precipitation,rain,showers&forecast_hours=6&timezone=Asia%2FBangkok`;
 
       let response = null;
       for (let attempt = 1; attempt <= 2; attempt++) {
@@ -1174,9 +1193,7 @@ class LocalUrbanBot extends EventEmitter {
       const mapped = stations.map((st, idx) => {
         const item = resultsArray[idx] || {};
         const curr = item.current || {};
-        let rain = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
-        if (rain < 0.5) rain = 0;
-        else rain = Math.round(rain * 10) / 10;
+        let rain = this.extractSafeRain(curr);
 
         const hourlyRain = item.hourly?.precipitation || item.hourly?.rain || [];
         const forecastRain = [
@@ -1283,6 +1300,7 @@ class LocalUrbanBot extends EventEmitter {
         return { ...st, updated_at: new Date().toISOString() };
       }
 
+      const baseDepth = st.base_depth_cm || st.depth_cm || 30;
       const prev = this.floodMemory.get(st.id) || { depth_cm: 0, updatedMs: nowMs };
       const elapsedHours = Math.max(0, (nowMs - prev.updatedMs) / 3600000);
       const DRAINAGE_RATE_CM_PER_HOUR = 12; // Rút 12cm nước mỗi giờ khi ngớt mưa
@@ -1290,11 +1308,11 @@ class LocalUrbanBot extends EventEmitter {
       // Tính mức ngập mục tiêu dựa trên lượng mưa
       let targetDepth = 0;
       if (localRain >= 25) {
-        targetDepth = Math.max(30, Math.min(55, Math.round(st.depth_cm * (localRain / 30))));
+        targetDepth = Math.max(30, Math.min(55, Math.round(baseDepth * (localRain / 30))));
       } else if (localRain >= 10) {
-        targetDepth = Math.max(15, Math.min(28, Math.round(st.depth_cm * 0.65)));
+        targetDepth = Math.max(15, Math.min(28, Math.round(baseDepth * 0.65)));
       } else if (localRain >= 2.5) {
-        targetDepth = Math.max(10, Math.round(st.depth_cm * 0.35));
+        targetDepth = Math.max(10, Math.round(baseDepth * 0.35));
       }
 
       // Kiểm tra triều cường TP.HCM
@@ -1313,28 +1331,31 @@ class LocalUrbanBot extends EventEmitter {
       if (finalDepth >= 30) {
         return {
           ...st,
+          base_depth_cm: baseDepth,
           depth_cm: finalDepth,
           danger_level: 'critical',
           passable_motorbike: false,
           passable_car: false,
-          advice: `Ngập sâu ~${finalDepth}cm do mưa lớn tích lũy. Nước đang rút dần, tuyệt đối tránh qua.`,
+          advice: `Ngập sâu ~${finalDepth}cm do mưa lớn tích lũy (${localRain}mm/h). Nước đang rút dần, tuyệt đối tránh qua.`,
           pump_status: 'Trạm bơm dã chiến đang xả tối đa công suất',
           updated_at: new Date().toISOString()
         };
       } else if (finalDepth >= 10) {
         return {
           ...st,
+          base_depth_cm: baseDepth,
           depth_cm: finalDepth,
           danger_level: 'medium',
           passable_motorbike: finalDepth < 20,
           passable_car: true,
-          advice: `Nước đọng ~${finalDepth}cm, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.`,
+          advice: `Nước đọng ~${finalDepth}cm do mưa ${localRain}mm/h, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.`,
           pump_status: 'Cống ngầm đang điều tiết thoát nước',
           updated_at: new Date().toISOString()
         };
       } else {
         return {
           ...st,
+          base_depth_cm: baseDepth,
           depth_cm: 0,
           danger_level: 'safe',
           passable_motorbike: true,

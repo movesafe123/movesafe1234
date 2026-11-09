@@ -122,4 +122,74 @@ describe('Module TC-WTH: Weather Parser & Meteorological Services', () => {
     assert.ok(html.includes('id="btn-comfort-route"'), 'Thiếu id btn-comfort-route');
     assert.ok(html.includes('id="gm-weather-pill"'), 'Thiếu id gm-weather-pill');
   });
+
+  // TC-WTH-007: Trích xuất an toàn lượng mưa đa nguồn & Dự phòng WMO Floor Rain
+  it('[TC-WTH-007] extractSafeRain accurately parses precipitation/showers and preserves tropical convective rain', () => {
+    // 1. Trường hợp Open-Meteo trả về rain: 0 nhưng precipitation: 4.5 (Mưa rào đối lưu)
+    const convectiveSample = { rain: 0, precipitation: 4.5, showers: 3.8, weather_code: 80 };
+    assert.strictEqual(weather.extractSafeRain(convectiveSample), 4.5, 'Phải trích xuất được 4.5mm thay vì bị nuốt về 0');
+
+    // 2. Trường hợp chỉ có showers lớn
+    const showerSample = { rain: 0, precipitation: 0, showers: 8.2, weather_code: 63 };
+    assert.strictEqual(weather.extractSafeRain(showerSample), 8.2, 'Phải ưu tiên giá trị showers lớn nhất');
+
+    // 3. Dự phòng WMO Code: Dông bão nguy hiểm (code 95) nhưng cảm biến lag 0mm -> Gán ngưỡng sàn bảo vệ 15mm
+    const stormLagSample = { rain: 0, precipitation: 0, showers: 0, weather_code: 95 };
+    assert.strictEqual(weather.extractSafeRain(stormLagSample), 15.0, 'Mã WMO 95 dông bão phải kích hoạt ngưỡng sàn tối thiểu 15mm');
+
+    // 4. Dự phòng WMO Code: Mưa rào rất to (code 81) nhưng cảm biến lag 0.2mm -> Gán ngưỡng sàn bảo vệ 10mm
+    const heavyShowerLag = { rain: 0, precipitation: 0.2, showers: 0, weather_code: 81 };
+    assert.strictEqual(weather.extractSafeRain(heavyShowerLag), 10.0, 'Mã WMO 81 mưa to phải kích hoạt ngưỡng sàn tối thiểu 10mm');
+
+    // 5. Trời khô ráo hoàn toàn (code 0, mưa 0mm) -> Trả về 0
+    const drySample = { rain: 0, precipitation: 0, showers: 0, weather_code: 0 };
+    assert.strictEqual(weather.extractSafeRain(drySample), 0, 'Trời khô ráo phải trả về 0');
+  });
+
+  // TC-WTH-008: Động cơ Thủy văn Độc lập phía Client tính toán độ sâu ngập chính xác
+  it('[TC-WTH-008] computeFloodPointsFromWeather calculates dynamic flood depths and hazard levels on client side', () => {
+    const baseFloods = [
+      {
+        id: 'hsdc-01',
+        name: 'Phố Nguyễn Khuyến (Khu vực trước cổng trường Lý Thường Kiệt)',
+        city: 'hanoi',
+        lat: 21.0268,
+        lng: 105.8409,
+        base_depth_cm: 35,
+        depth_cm: 0,
+        danger_level: 'safe'
+      }
+    ];
+
+    // Trạm thời tiết ngay gần Nguyễn Khuyến có mưa to 28mm/h
+    const heavyRainStations = [
+      { id: 'st-01', city: 'hanoi', lat: 21.0270, lng: 105.8415, rain1h: 28 }
+    ];
+
+    const criticalResult = weather.computeFloodPointsFromWeather(baseFloods, heavyRainStations, 'hanoi');
+    assert.strictEqual(criticalResult.length, 1);
+    const criticalFlood = criticalResult[0];
+    assert.ok(criticalFlood.depth_cm >= 30, 'Độ sâu ngập phải >= 30cm khi mưa 28mm/h');
+    assert.strictEqual(criticalFlood.danger_level, 'critical', 'Trạng thái phải là critical');
+    assert.strictEqual(criticalFlood.passable_motorbike, false, 'Xe máy không thể qua được');
+
+    // Trạm thời tiết có mưa vừa 12mm/h
+    const moderateRainStations = [
+      { id: 'st-01', city: 'hanoi', lat: 21.0270, lng: 105.8415, rain1h: 12 }
+    ];
+    const mediumResult = weather.computeFloodPointsFromWeather(baseFloods, moderateRainStations, 'hanoi');
+    const mediumFlood = mediumResult[0];
+    assert.ok(mediumFlood.depth_cm >= 15 && mediumFlood.depth_cm <= 28, 'Mưa vừa độ sâu phải từ 15-28cm');
+    assert.strictEqual(mediumFlood.danger_level, 'medium');
+
+    // Trạm thời tiết tạnh mưa 0mm/h
+    const dryStations = [
+      { id: 'st-01', city: 'hanoi', lat: 21.0270, lng: 105.8415, rain1h: 0 }
+    ];
+    const safeResult = weather.computeFloodPointsFromWeather(baseFloods, dryStations, 'hanoi');
+    const safeFlood = safeResult[0];
+    assert.strictEqual(safeFlood.depth_cm, 0);
+    assert.strictEqual(safeFlood.danger_level, 'safe');
+    assert.strictEqual(safeFlood.passable_motorbike, true);
+  });
 });

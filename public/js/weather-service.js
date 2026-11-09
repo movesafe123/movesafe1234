@@ -53,6 +53,115 @@ class WeatherService {
     }
   }
 
+  // Trích xuất lượng mưa an toàn đa nguồn (chống nuốt mất mưa rào/dông và bù suy diễn theo mã WMO)
+  extractSafeRain(curr = {}) {
+    if (!curr) return 0;
+    const p = typeof curr.precipitation === 'number' ? curr.precipitation : 0;
+    const r = typeof curr.rain === 'number' ? curr.rain : 0;
+    const s = typeof curr.showers === 'number' ? curr.showers : 0;
+    let maxRain = Math.max(p, r, s);
+
+    // Dự phòng WMO Code: Nếu có dông sét hoặc mưa to mà cảm biến đo trễ thấp, gán ngưỡng sàn bảo vệ an toàn
+    const wCode = curr.weather_code || 0;
+    if (wCode >= 95 && maxRain < 15) maxRain = Math.max(maxRain, 15); // Dông kèm sấm chớp nguy hiểm
+    else if ((wCode === 81 || wCode === 82) && maxRain < 10) maxRain = Math.max(maxRain, 10); // Mưa rào rất to
+    else if (wCode === 80 && maxRain < 1.0) maxRain = 5; // Mưa rào vừa nhưng cảm biến đo trễ
+    else if (wCode >= 61 && wCode <= 65 && maxRain < 1.0) maxRain = 2.5; // Mưa rào nhưng cảm biến đo trễ
+
+    if (maxRain < 0.1) return 0;
+    return Math.round(maxRain * 10) / 10;
+  }
+
+  // Động cơ thủy văn tính toán độ ngập tức thời theo mạng lưới trạm thời tiết (Client-side Hydrological Engine)
+  computeFloodPointsFromWeather(floodPoints = [], weatherStations = [], cityKey = 'hanoi') {
+    if (!Array.isArray(floodPoints) || floodPoints.length === 0) return floodPoints;
+    if (!Array.isArray(weatherStations) || weatherStations.length === 0) return floodPoints;
+
+    const NOMINAL_FLOOD_DEPTHS = {
+      'hsdc-01': 35, 'hsdc-02': 25, 'hsdc-03': 30, 'hsdc-04': 20, 'hsdc-05': 40,
+      'hsdc-06': 28, 'hsdc-07': 45, 'hsdc-08': 35, 'hsdc-09': 32, 'hsdc-10': 30, 'hsdc-11': 30,
+      'udi-01': 45, 'udi-02': 35, 'udi-03': 30, 'udi-04': 25, 'udi-05': 22,
+      'udi-06': 35, 'udi-07': 38, 'udi-08': 30,
+      'dn-01': 30, 'dn-02': 38, 'dn-03': 22, 'dn-04': 32
+    };
+
+    const cityStations = weatherStations.filter(s => (s.city || cityKey) === cityKey);
+    if (cityStations.length === 0) return floodPoints;
+
+    return floodPoints.map(st => {
+      // Bảo toàn các báo cáo người dùng (Crowdsource)
+      const isCrowdsource = String(st.id || '').startsWith('crowd-') || String(st.id || '').startsWith('cs-') || String(st.id || '').startsWith('local-');
+      if (isCrowdsource || st.city !== cityKey) return st;
+
+      const baseDepth = st.base_depth_cm || NOMINAL_FLOOD_DEPTHS[st.id] || st.depth_cm || 30;
+
+      // Tìm 3 trạm quan trắc gần nhất với rốn ngập
+      const sorted = [...cityStations].sort((a, b) => {
+        const dA = Math.hypot((a.lat || 0) - st.lat, (a.lng || 0) - st.lng);
+        const dB = Math.hypot((b.lat || 0) - st.lat, (b.lng || 0) - st.lng);
+        return dA - dB;
+      });
+      const top3 = sorted.slice(0, 3);
+      const localRain = top3.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+
+      // Mô hình tiêu thoát & ngưỡng tích lũy nước
+      let targetDepth = 0;
+      if (localRain >= 25) {
+        targetDepth = Math.max(30, Math.min(55, Math.round(baseDepth * (localRain / 30))));
+      } else if (localRain >= 10) {
+        targetDepth = Math.max(15, Math.min(28, Math.round(baseDepth * 0.65)));
+      } else if (localRain >= 2.5) {
+        targetDepth = Math.max(10, Math.round(baseDepth * 0.35));
+      }
+
+      // Triều cường TP.HCM
+      const isTidalStation = st.id === 'udi-01' || st.id === 'udi-03';
+      const vnHour = (new Date().getUTCHours() + 7) % 24;
+      const isPeakTide = (vnHour >= 17 && vnHour <= 19) || (vnHour >= 5 && vnHour <= 7);
+      if (isTidalStation && isPeakTide && localRain >= 2) {
+        targetDepth = Math.max(targetDepth, 25);
+      }
+
+      if (targetDepth >= 30) {
+        return {
+          ...st,
+          base_depth_cm: baseDepth,
+          depth_cm: targetDepth,
+          danger_level: 'critical',
+          passable_motorbike: false,
+          passable_car: false,
+          advice: `Ngập sâu ~${targetDepth}cm do mưa lớn tích lũy (${localRain}mm/h). Tuyệt đối tránh qua.`,
+          pump_status: 'Trạm bơm dã chiến đang xả tối đa công suất',
+          updated_at: new Date().toISOString()
+        };
+      } else if (targetDepth >= 10) {
+        return {
+          ...st,
+          base_depth_cm: baseDepth,
+          depth_cm: targetDepth,
+          danger_level: 'medium',
+          passable_motorbike: targetDepth < 20,
+          passable_car: true,
+          advice: `Nước đọng ~${targetDepth}cm do mưa ${localRain}mm/h, xe máy chú ý rẽ vòng tránh chết máy bugi.`,
+          pump_status: 'Cống ngầm đang điều tiết thoát nước',
+          updated_at: new Date().toISOString()
+        };
+      } else {
+        return {
+          ...st,
+          base_depth_cm: baseDepth,
+          depth_cm: 0,
+          danger_level: 'safe',
+          passable_motorbike: true,
+          passable_car: true,
+          advice: 'Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.',
+          pump_status: 'Hệ thống thoát nước thông thoáng',
+          updated_at: new Date().toISOString()
+        };
+      }
+    });
+  }
+
   // 1. Lấy thời tiết trung tâm thành phố
   async getWeather(lat, lng, cityName = 'Hà Nội') {
     // Thử OpenWeatherMap nếu có key
@@ -63,7 +172,11 @@ class WeatherService {
         if (res.ok) {
           const data = await res.json();
           let rain1h = (data.rain && data.rain['1h']) || 0;
-          if (rain1h < 0.5) rain1h = 0;
+          const weatherId = (data.weather && data.weather[0] && data.weather[0].id) || 800;
+          if (weatherId >= 200 && weatherId < 300 && rain1h < 15) rain1h = Math.max(rain1h, 15);
+          else if (weatherId >= 502 && weatherId <= 504 && rain1h < 10) rain1h = Math.max(rain1h, 10);
+          else if (weatherId >= 520 && weatherId <= 531 && rain1h < 5) rain1h = Math.max(rain1h, 5);
+          if (rain1h < 0.1) rain1h = 0;
           else rain1h = Math.round(rain1h * 10) / 10;
 
           return {
@@ -87,13 +200,11 @@ class WeatherService {
 
     // Fallback sang Open-Meteo Cloud Radar (Miễn phí 100%, chuẩn xác từng mm mưa)
     try {
-      const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
+      const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
       const res = await fetch(omUrl);
       const data = await res.json();
       const current = data.current;
-      let rain = current.precipitation || current.rain || 0;
-      if (rain < 0.5) rain = 0;
-      else rain = Math.round(rain * 10) / 10;
+      let rain = this.extractSafeRain(current);
 
       const isDay = current.is_day !== undefined ? (current.is_day === 1) : (new Date().getHours() >= 6 && new Date().getHours() < 18);
       let desc = this.getWmoDescription(current.weather_code, isDay);
@@ -157,7 +268,7 @@ class WeatherService {
     try {
       const lats = stations.map(s => s.lat).join(',');
       const lngs = stations.map(s => s.lng).join(',');
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,is_day&timezone=Asia%2FBangkok`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
@@ -168,9 +279,7 @@ class WeatherService {
       const mappedStations = stations.map((st, idx) => {
         const item = resultsArray[idx] || {};
         const curr = item.current || {};
-        let rain = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
-        if (rain < 0.5) rain = 0;
-        else rain = Math.round(rain * 10) / 10;
+        let rain = this.extractSafeRain(curr);
 
         const temp = typeof curr.temperature_2m === 'number' ? Math.round(curr.temperature_2m) : 26;
         const feelsLike = typeof curr.apparent_temperature === 'number' ? Math.round(curr.apparent_temperature) : temp;
@@ -310,7 +419,7 @@ class WeatherService {
     }
 
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,uv_index,is_day&minutely_15=temperature_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&hourly=uv_index&forecast_minutely_15=8&forecast_days=1&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,wind_gusts_10m,uv_index,is_day&minutely_15=temperature_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m&hourly=uv_index&forecast_minutely_15=8&forecast_days=1&timezone=Asia%2FBangkok`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
       const data = await res.json();
@@ -324,7 +433,7 @@ class WeatherService {
       const humidity = Math.round(curr.relative_humidity_2m || 75);
       const windSpeed = Math.round(curr.wind_speed_10m || 10);
       const windGusts = Math.round(curr.wind_gusts_10m || (windSpeed * 1.3));
-      const rainNow = typeof curr.rain === 'number' ? curr.rain : (curr.precipitation || 0);
+      const rainNow = this.extractSafeRain(curr);
 
       // Ước tính chỉ số UV: ưu tiên từ current.uv_index, nếu 0 ban ngày thì lấy từ hourly
       const currentHour = new Date().getHours();

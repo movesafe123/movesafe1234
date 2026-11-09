@@ -17,7 +17,8 @@ const testSuites = [
   { file: 'tests/unit/web-event.test.js', category: 'Unit: Tra cứu Sự kiện Web & Tin tức Báo chí', prefix: 'TC-EVT' },
   { file: 'tests/unit/optimization-18.test.js', category: 'Unit: 18 Hạng mục Tối ưu Toàn diện', prefix: 'OPT' },
   { file: 'tests/api/server-api.test.js', category: 'Integration: Backend REST API & Bảo mật', prefix: 'TC-API' },
-  { file: 'tests/e2e/browser-e2e.test.js', category: 'E2E: Trải nghiệm Người dùng & Giao diện Bản đồ', prefix: 'TC-E2E' }
+  { file: 'tests/e2e/browser-e2e.test.js', category: 'E2E: Trải nghiệm Người dùng & Giao diện Bản đồ', prefix: 'TC-E2E' },
+  { file: 'tests/adaptive/adaptive-flood-detection.test.js', category: 'Adaptive: Kiểm thử Thích ứng Dự báo & Né ngập', prefix: 'AFT' }
 ];
 
 async function runCommand(cmd, args) {
@@ -48,15 +49,15 @@ function parseTestOutput(stdout) {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    const passMatch = trimmed.match(/^✔\s+(\[(?:TC|OPT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
-    const failMatch = trimmed.match(/^✖\s+(\[(?:TC|OPT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
+    const passMatch = trimmed.match(/^✔\s+(\[(?:TC|OPT|AFT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
+    const failMatch = trimmed.match(/^✖\s+(\[(?:TC|OPT|AFT)-[^\]]+\]\s+.*)\s+\(([\d.]+)ms\)/);
 
     if (passMatch) {
       const fullTitle = passMatch[1];
       const durationMs = parseFloat(passMatch[2]);
-      const idMatch = fullTitle.match(/\[((?:TC|OPT)-[^\]]+)\]/);
+      const idMatch = fullTitle.match(/\[((?:TC|OPT|AFT)-[^\]]+)\]/);
       const testId = idMatch ? idMatch[1] : 'TC-GEN';
-      const title = fullTitle.replace(/\[(?:TC|OPT)-[^\]]+\]\s*/, '');
+      const title = fullTitle.replace(/\[(?:TC|OPT|AFT)-[^\]]+\]\s*/, '');
 
       tests.push({
         id: testId,
@@ -67,9 +68,9 @@ function parseTestOutput(stdout) {
     } else if (failMatch) {
       const fullTitle = failMatch[1];
       const durationMs = parseFloat(failMatch[2]);
-      const idMatch = fullTitle.match(/\[(TC-[^\]]+)\]/);
+      const idMatch = fullTitle.match(/\[((?:TC|OPT|AFT)-[^\]]+)\]/);
       const testId = idMatch ? idMatch[1] : 'TC-GEN';
-      const title = fullTitle.replace(/\[TC-[^\]]+\]\s*/, '');
+      const title = fullTitle.replace(/\[(?:TC|OPT|AFT)-[^\]]+\]\s*/, '');
 
       tests.push({
         id: testId,

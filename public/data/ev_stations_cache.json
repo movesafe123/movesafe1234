@@ -4432,7 +4432,8 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-06-21T03:35:00Z"
+    "lastUpdated": "2026-06-21T03:35:00Z",
+    "ocmId": "ocm-494307"
   },
   {
     "id": "ocm-492405",
@@ -4457,7 +4458,8 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-06-07T02:52:00Z"
+    "lastUpdated": "2026-06-07T02:52:00Z",
+    "ocmId": "ocm-492405"
   },
   {
     "id": "ocm-461673",
@@ -4482,7 +4484,8 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2025-10-03T05:39:00Z"
+    "lastUpdated": "2025-10-03T05:39:00Z",
+    "ocmId": "ocm-461673"
   },
   {
     "id": "ocm-461659",
@@ -4507,7 +4510,8 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2025-10-02T09:54:00Z"
+    "lastUpdated": "2025-10-02T09:54:00Z",
+    "ocmId": "ocm-461659"
   },
   {
     "id": "ocm-208970",

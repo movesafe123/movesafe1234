@@ -829,6 +829,25 @@ class GoogleMapsApp {
       this.latestWeatherStations = stations;
       window.mapEngine.renderWeatherStations(stations);
       console.log(`[Cloud Weather] Đã cập nhật ${stations.length} trạm thời tiết tại ${this.currentCity}`);
+
+      // [CLIENT HYDROLOGICAL ENGINE]: Khi không có Server SSE stream, tự suy diễn độ ngập ngay trên trình duyệt
+      if (!this.isSseConnected && window.weatherService && typeof window.weatherService.computeFloodPointsFromWeather === 'function') {
+        const rawFloods = this.liveData.floodPoints || [];
+        const updatedFloods = window.weatherService.computeFloodPointsFromWeather(
+          rawFloods,
+          stations,
+          this.currentCity
+        );
+        this.liveData.floodPoints = updatedFloods;
+
+        // Cập nhật ngay lớp bản đồ và bảng thống kê nếu đang xem hiện tại (không bật giả lập)
+        if (this.currentPredictionOffset === 0 && !this.isSimulationMode) {
+          const cityFloods = updatedFloods.filter(f => f.city === this.currentCity);
+          window.mapEngine.renderFloodPoints(cityFloods);
+          this.updateStatsCounters();
+        }
+      }
+
       const streetsModal = document.getElementById('modal-hanoi-streets');
       if (streetsModal && streetsModal.classList.contains('open')) {
         this.filterHanoiStreets();
