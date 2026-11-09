@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 129,
+  "totalSnapshots": 130,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-09T09:31:46.437Z",
+  "updatedAt": "2026-11-09T19:58:09.871Z",
   "snapshots": [
     {
       "timestamp": "2026-11-04T13:49:20.137Z",
@@ -4528,6 +4528,54 @@
         "avgSpeedKmh": 10,
         "congestionIndex": 5,
         "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-09T19:58:09.871Z",
+      "date": "2026-11-10",
+      "hour": 2,
+      "hanoi": {
+        "avgSpeedKmh": 40,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 38,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 40,
+        "congestionIndex": 1,
+        "maxRainMm": 10,
         "activeFloodSpots": [
           {
             "id": "dn-01",
