@@ -278,12 +278,14 @@ class AIAssistantService {
 
     // Đánh đổi 3 phương án (Trade-off Matrix)
     const recRoute = activeRoute?.recommended;
+    const baseDist = parseFloat(recRoute?.distanceKm) || 6.5;
+    const baseDur = Math.round(parseFloat(recRoute?.durationMin || recRoute?.estimatedMinutes) || 18);
     const tradeoffOptions = [
       {
         id: 'direct',
         name: 'Tuyến Ngắn Nhất / Đi Thẳng',
-        distanceKm: recRoute?.distanceKm || 6.5,
-        durationMin: recRoute?.durationMin || 18,
+        distanceKm: baseDist,
+        durationMin: baseDur,
         safetyScore: isSafe ? 92 : 45,
         costVnd: isSafe ? 3500 : 1500000,
         riskDescription: isCritical ? `Nguy cơ chết máy/thủy kích (${spec.damageRisk}), sửa chữa ước tính ${spec.riskCostRangeVnd}` : 'Lưu thông tương đối thuận lợi',
@@ -292,8 +294,8 @@ class AIAssistantService {
       {
         id: 'bypass_safe',
         name: 'Tuyến Vòng Tránh An Toàn',
-        distanceKm: Number(((recRoute?.distanceKm || 6.5) + (isCritical ? 1.2 : 0)).toFixed(1)),
-        durationMin: (recRoute?.durationMin || 18) + (isCritical ? 4 : 0),
+        distanceKm: Number((baseDist + (isCritical ? 1.2 : 0)).toFixed(1)),
+        durationMin: baseDur + (isCritical ? 4 : 0),
         safetyScore: 96,
         costVnd: 4500,
         riskDescription: `Đã tự động loại bỏ rốn ngập sâu, bảo toàn 100% động cơ (${spec.riskCostRangeVnd})`,

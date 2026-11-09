@@ -1880,8 +1880,8 @@ ${query}
     const isCritical = maxFloodCm > maxPassable;
 
     const recRoute = webState.activeRoute?.recommended;
-    const baseDist = recRoute?.distanceKm || 6.5;
-    const baseDur = recRoute?.durationMin || recRoute?.estimatedMinutes || 18;
+    const baseDist = parseFloat(recRoute?.distanceKm) || 6.5;
+    const baseDur = Math.round(parseFloat(recRoute?.durationMin || recRoute?.estimatedMinutes) || 18);
 
     const options = [
       {

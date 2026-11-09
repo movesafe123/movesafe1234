@@ -1287,6 +1287,14 @@ class GoogleMapsApp {
           await window.mapEngine.toggleEV(true, true);
         }
       }
+
+      const chipFood = document.getElementById('chip-food-places');
+      if (chipFood && chipFood.classList.contains('active')) {
+        const topSpots = this.getAllFoodSpots().filter(sp => !sp.city || sp.city === this.currentCity);
+        if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+          window.mapEngine.renderFoodPlaces(topSpots.slice(0, 30));
+        }
+      }
       if (this.currentPredictionOffset > 0) {
         await this.applyPredictionOffset(this.currentPredictionOffset);
       } else {
@@ -1320,6 +1328,26 @@ class GoogleMapsApp {
         this.showToast(`Đang hiển thị ${count} trạm sạc xe điện & tủ đổi pin tại ${this.getCityName(this.currentCity)}`, 'info', 2500);
       } else {
         this.showToast('Đã ẩn lớp trạm sạc xe điện', 'info', 1800);
+      }
+    });
+
+    // 4c2. Chip Quán ăn & Cà phê giải trí (Bật/Tắt trực tiếp trên thanh công cụ)
+    document.getElementById('chip-food-places')?.addEventListener('click', () => {
+      const chip = document.getElementById('chip-food-places');
+      const isNowActive = !chip.classList.contains('active');
+      chip.classList.toggle('active', isNowActive);
+
+      if (isNowActive) {
+        const topSpots = this.getAllFoodSpots().filter(sp => !sp.city || sp.city === this.currentCity);
+        if (window.mapEngine && typeof window.mapEngine.renderFoodPlaces === 'function') {
+          window.mapEngine.renderFoodPlaces(topSpots.slice(0, 30));
+        }
+        this.showToast(`Đang hiển thị ${Math.min(30, topSpots.length)} điểm ăn uống, cafe & giải trí tại ${this.getCityName(this.currentCity)}`, 'info', 3000);
+      } else {
+        if (window.mapEngine && typeof window.mapEngine.clearFoodPlaces === 'function') {
+          window.mapEngine.clearFoodPlaces();
+        }
+        this.showToast('Đã ẩn các điểm ăn uống & cafe', 'info', 1800);
       }
     });
 
