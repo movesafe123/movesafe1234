@@ -1,9 +1,9 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 131,
+  "totalSnapshots": 132,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-10T02:39:28.725Z",
+  "updatedAt": "2026-11-10T10:52:58.319Z",
   "snapshots": [
     {
       "timestamp": "2026-11-04T13:49:20.137Z",
@@ -4647,6 +4647,42 @@
             "id": "dn-04",
             "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
             "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-10T10:52:58.319Z",
+      "date": "2026-11-10",
+      "hour": 17,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 4.6,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 5,
+        "activeFloodSpots": [
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 13,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 11,
             "danger_level": "medium"
           }
         ]
