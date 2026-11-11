@@ -1,95 +1,108 @@
 {
-  "lastUpdated": "2026-11-11T05:54:06.542Z",
-  "weatherAlerts": [],
+  "lastUpdated": "2026-11-11T13:51:09.593Z",
+  "weatherAlerts": [
+    {
+      "id": "nchmf-real-2",
+      "content": "Cảnh báo mưa vừa rải rác một số khu vực đô thị (~10 mm/h). Phương tiện chú ý giảm tốc độ qua đoạn trũng.",
+      "source": "Radar thời tiết MoveSafe (Tổng hợp từ trạm quan trắc)",
+      "level": "warning"
+    }
+  ],
   "vovTrafficNews": [
     {
       "id": "vov-1",
-      "title": "Phú Vinh - Đan hồn Việt từ những sợi tre",
-      "summary": "Từ những sợi tre, sợi mây mộc mạc, người Phú Vinh đã tạo nên những tác phẩm thủ công tinh xảo, mang theo câu chuyện của một làng nghề trăm tuổi. Điều gì đã giúp nghề đan mây tre nơi đây bền bỉ qua nhiều thế hệ?",
-      "link": "https://vovgiaothong.vn/newsaudio/phu-vinh--dan-hon-viet-tu-nhung-soi-tre-d56656.html",
+      "title": "Đầu tư 3 tuyến cao tốc: Khơi thông dòng chảy hàng hóa, mở rộng không gian phát triển",
+      "summary": "Việc Chính phủ trình Quốc hội chủ trương đầu tư 3 tuyến cao tốc Bảo Hà – Lai Châu, Quảng Ngãi – Kon Tum và Mộc Châu – Sơn La – Điện Biên được kỳ vọng sẽ mở thêm những hành lang kinh tế, tạo động lực phát triển cho các vùng đất còn rất nhiều tiềm năng của đất nước.",
+      "link": "https://vovgiaothong.vn/newsaudio/dau-tu-3-tuyen-cao-toc-khoi-thong-dong-chay-hang-hoa-mo-rong-khong-gian-phat-trien-d56692.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-2",
-      "title": "Chống khai thác IUU ở Vĩnh Long: Khép lỗ hổng quản lý, mở hướng sinh kế cho ngư dân",
-      "summary": "Chống khai thác IUU ở Vĩnh Long: Khép lỗ hổng quản lý, mở hướng sinh kế cho ngư dân",
-      "link": "https://vovgiaothong.vn/newsaudio/chong-khai-thac-iuu-o-vinh-long-khep-lo-hong-quan-ly-mo-huong-sinh-ke-cho-ngu-dan-d56672.html",
+      "title": "Khắc phục sạt lở và ngập lụt, bảo đảm giao thông qua các tỉnh Trung Bộ sau mưa lớn",
+      "summary": "Khắc phục sạt lở và ngập lụt, bảo đảm giao thông qua các tỉnh Trung Bộ sau mưa lớn",
+      "link": "https://vovgiaothong.vn/newsaudio/khac-phuc-sat-lo-va-ngap-lut-bao-dam-giao-thong-qua-cac-tinh-trung-bo-sau-mua-lon-d56694.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-3",
-      "title": "Hà Nội: Nhiều bất cập từ tuyến đường triển khai chậm",
-      "summary": "Hà Nội: Nhiều bất cập từ tuyến đường triển khai chậm",
-      "link": "https://vovgiaothong.vn/newsaudio/ha-noi-nhieu-bat-cap-tu-tuyen-duong-trien-khai-cham-d56670.html",
+      "title": "Dùng AI để xác định dị vật trên đường băng, liệu có hiệu quả?",
+      "summary": "Dùng AI để xác định dị vật trên đường băng, liệu có hiệu quả?",
+      "link": "https://vovgiaothong.vn/newsaudio/dung-ai-de-xac-dinh-di-vat-tren-duong-bang-lieu-co-hieu-qua-d56631.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-4",
-      "title": "Tiền mất, tật mang",
-      "summary": "Tiền mất, tật mang",
-      "link": "https://vovgiaothong.vn/newsaudio/tien-mat-tat-mang-d56669.html",
+      "title": "Hà Nội gấp rút giải phóng mặt bằng triển khai Dự án trục không gian Quốc lộ 1A",
+      "summary": "Hà Nội gấp rút giải phóng mặt bằng triển khai Dự án trục không gian Quốc lộ 1A",
+      "link": "https://vovgiaothong.vn/ha-noi-gap-rut-giai-phong-mat-bang-trien-khai-du-an-truc-khong-gian-quoc-lo-1a-d56688.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
-      "detectedLocation": null
+      "time": "13:51",
+      "detectedLocation": {
+        "name": "Đường Giải Phóng",
+        "city": "hanoi",
+        "lat": 20.965,
+        "lng": 105.837,
+        "area": "P. Hoàng Liệt (Hoàng Mai)"
+      }
     },
     {
       "id": "vov-5",
-      "title": "Quảng Trị tạnh mưa, nước rút dần, khẩn trương khắc phục các điểm sạt lở",
-      "summary": "Quảng Trị tạnh mưa, nước rút dần, khẩn trương khắc phục các điểm sạt lở",
-      "link": "https://vovgiaothong.vn/newsaudio/quang-tri-tanh-mua-nuoc-rut-dan-khan-truong-khac-phuc-cac-diem-sat-lo-d56677.html",
+      "title": "Pin xe điện hết vòng đời: Bài toán thu gom và tái chế",
+      "summary": "Pin xe điện hết vòng đời: Bài toán thu gom và tái chế",
+      "link": "https://vovgiaothong.vn/newsaudio/pin-xe-dien-het-vong-doi-bai-toan-thu-gom-va-tai-che-d56684.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-6",
-      "title": "Cháy tại đại lý xe máy, thiêu rụi nhiều tài sản",
-      "summary": "Cháy tại đại lý xe máy, thiêu rụi nhiều tài sản",
-      "link": "https://vovgiaothong.vn/newsaudio/chay-tai-dai-ly-xe-may-thieu-rui-nhieu-tai-san-d56675.html",
+      "title": "Các tỉnh ĐBSCL tăng ưu đãi, hút vốn đầu tư, “chạy đua” tăng trưởng cuối năm",
+      "summary": "Các tỉnh ĐBSCL tăng ưu đãi, hút vốn đầu tư, “chạy đua” tăng trưởng cuối năm",
+      "link": "https://vovgiaothong.vn/newsaudio/cac-tinh-dbscl-tang-uu-dai-hut-von-dau-tu-chay-dua-tang-truong-cuoi-nam-d56678.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-7",
-      "title": "Mưa lớn tiếp diễn, nguy cơ sạt lở nhiều khu vực miền núi Đà Nẵng",
-      "summary": "Mưa lớn tiếp diễn, nguy cơ sạt lở nhiều khu vực miền núi Đà Nẵng",
-      "link": "https://vovgiaothong.vn/newsaudio/mua-lon-tiep-dien-nguy-co-sat-lo-nhieu-khu-vuc-mien-nui-da-nang-d56676.html",
+      "title": "Phú Vinh - Đan hồn Việt từ những sợi tre",
+      "summary": "Phú Vinh - Đan hồn Việt từ những sợi tre",
+      "link": "https://vovgiaothong.vn/newsaudio/phu-vinh--dan-hon-viet-tu-nhung-soi-tre-d56656.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-8",
-      "title": "Thuốc lá điện tử và đằng sau những ngộ nhận của giới trẻ",
-      "summary": "Thuốc lá điện tử và đằng sau những ngộ nhận của giới trẻ",
-      "link": "https://vovgiaothong.vn/newsaudio/thuoc-la-dien-tu-va-dang-sau-nhung-ngo-nhan-cua-gioi-tre-d56665.html",
+      "title": "Ấn Độ: Máy bay Air India bị đe dọa không tặc trước giờ khởi hành",
+      "summary": "Ấn Độ: Máy bay Air India bị đe dọa không tặc trước giờ khởi hành",
+      "link": "https://vovgiaothong.vn/newsaudio/an-do-may-bay-air-india-bi-de-doa-khong-tac-truoc-gio-khoi-hanh-d56687.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-9",
-      "title": "Quản lý thị trường Hà Nội: Siết hàng giả dịp cao điểm cuối năm",
-      "summary": "Quản lý thị trường Hà Nội: Siết hàng giả dịp cao điểm cuối năm",
-      "link": "https://vovgiaothong.vn/newsaudio/quan-ly-thi-truong-ha-noi-siet-hang-gia-dip-cao-diem-cuoi-nam-d56671.html",
+      "title": "Mưa lũ chia cắt nhiều tuyến đường ở Quảng Ngãi, 115 hộ dân phải sơ tán",
+      "summary": "Mưa lũ chia cắt nhiều tuyến đường ở Quảng Ngãi, 115 hộ dân phải sơ tán",
+      "link": "https://vovgiaothong.vn/newsaudio/mua-lu-chia-cat-nhieu-tuyen-duong-o-quang-ngai-115-ho-dan-phai-so-tan-d56685.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     },
     {
       "id": "vov-10",
-      "title": "Bộ trưởng Bộ Tài chính sẽ trả lời chất vấn về quản lý thuế thương mại điện tử ngày 12/11",
-      "summary": "Dự kiến ngày mai (12/11), Bộ trưởng Bộ Tài chính Ngô Văn Tuấn sẽ trả lời chất vấn tại Kỳ họp thứ 2, Quốc hội khóa 16. Trong đó có nội dung quản lý thuế đối với hoạt động thương mại điện tử, kinh doanh trên nền tảng số và nhà cung cấp ở nước ngoài.",
-      "link": "https://vovgiaothong.vn/newsaudio/bo-truong-bo-tai-chinh-se-tra-loi-chat-van-ve-quan-ly-thue-thuong-mai-dien-tu-ngay-12-11-d56674.html",
+      "title": "Sẵn sàng cho Festival Quốc tế Ngành hàng Lúa gạo Việt Nam lần thứ II – Cần Thơ năm 2026",
+      "summary": "Chiều ngày 11/11, tại TP. Cần Thơ, UBND TP. Cần Thơ phối hợp với Bộ Nông nghiệp và Môi trường tổ chức Họp báo thông tin về Festival Quốc tế Ngành hàng Lúa gạo Việt Nam lần thứ II – Cần Thơ năm 2026, với chủ đề “Gạo xanh Việt Nam – Vươn tầm quốc tế”.",
+      "link": "https://vovgiaothong.vn/newsaudio/san-sang-cho-festival-quoc-te-nganh-hang-lua-gao-viet-nam-lan-thu-ii-can-tho-nam-2026-d56683.html",
       "source": "VOV Giao Thông",
-      "time": "05:54",
+      "time": "13:51",
       "detectedLocation": null
     }
   ],
@@ -107,7 +120,7 @@
       "source": "HSDC Hà Nội (Trạm đo tự động)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.541Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 35
     },
     {
@@ -123,7 +136,7 @@
       "source": "HSDC Hà Nội (Cảm biến mực nước)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.541Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 25
     },
     {
@@ -139,7 +152,7 @@
       "source": "HSDC Hà Nội (Trạm quan trắc Hồ Tây)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.541Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 30
     },
     {
@@ -155,7 +168,7 @@
       "source": "HSDC Hà Nội (Camera giám sát thoát nước)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 20
     },
     {
@@ -171,7 +184,7 @@
       "source": "HSDC Hà Nội (Cảnh báo úng ngập)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 40
     },
     {
@@ -187,7 +200,7 @@
       "source": "HSDC Hà Nội (Trạm đo)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 28
     },
     {
@@ -203,7 +216,7 @@
       "source": "HSDC Hà Nội (Rốn trũng Tân Triều)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 45
     },
     {
@@ -219,7 +232,7 @@
       "source": "HSDC Hà Nội (Vùng trũng Phùng Khoang)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.592Z",
       "base_depth_cm": 35
     },
     {
@@ -235,7 +248,7 @@
       "source": "HSDC Hà Nội (Vùng trũng sông Tô Lịch)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 32
     },
     {
@@ -251,7 +264,7 @@
       "source": "HSDC Hà Nội (Trạm quan trắc sông Lừ)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 30
     },
     {
@@ -267,7 +280,7 @@
       "source": "HSDC Hà Nội (Trục hướng tâm Nam Từ Liêm)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 30
     },
     {
@@ -283,7 +296,7 @@
       "source": "UDi Maps TP.HCM (Triều cường kết hợp mưa)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 45
     },
     {
@@ -299,7 +312,7 @@
       "source": "UDi Maps TP.HCM (Cảm biến rốn ngập Thảo Điền)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 35
     },
     {
@@ -315,7 +328,7 @@
       "source": "UDi Maps TP.HCM (Trạm đo triều dâng)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 30
     },
     {
@@ -331,7 +344,7 @@
       "source": "UDi Maps TP.HCM (Cảm biến thoát nước)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 25
     },
     {
@@ -347,7 +360,7 @@
       "source": "UDi Maps TP.HCM (Trạm quan trắc)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 22
     },
     {
@@ -363,7 +376,7 @@
       "source": "UDi Maps TP.HCM (Rốn trũng Nguyễn Hữu Cảnh)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 35
     },
     {
@@ -379,7 +392,7 @@
       "source": "UDi Maps TP.HCM (Rốn trũng Chợ Thủ Đức)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 38
     },
     {
@@ -395,7 +408,7 @@
       "source": "UDi Maps TP.HCM (Trạm quan trắc Tham Lương)",
       "pump_status": "Hệ thống thoát nước thông thoáng",
       "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 30
     },
     {
@@ -404,14 +417,14 @@
       "city": "danang",
       "lat": 16.0615,
       "lng": 108.214,
-      "depth_cm": 0,
-      "danger_level": "safe",
-      "passable_motorbike": true,
+      "depth_cm": 20,
+      "danger_level": "medium",
+      "passable_motorbike": false,
       "passable_car": true,
       "source": "Trạm đo ngập Đà Nẵng (Hồ Thạc Gián)",
-      "pump_status": "Hệ thống thoát nước thông thoáng",
-      "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "pump_status": "Cống ngầm đang điều tiết thoát nước",
+      "advice": "Nước đọng ~20cm do mưa 10mm/h, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 30
     },
     {
@@ -420,14 +433,14 @@
       "city": "danang",
       "lat": 16.0592,
       "lng": 108.1583,
-      "depth_cm": 0,
-      "danger_level": "safe",
-      "passable_motorbike": true,
+      "depth_cm": 25,
+      "danger_level": "medium",
+      "passable_motorbike": false,
       "passable_car": true,
       "source": "Cảm biến thoát nước Liên Chiểu",
-      "pump_status": "Hệ thống thoát nước thông thoáng",
-      "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "pump_status": "Cống ngầm đang điều tiết thoát nước",
+      "advice": "Nước đọng ~25cm do mưa 10mm/h, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 38
     },
     {
@@ -436,14 +449,14 @@
       "city": "danang",
       "lat": 16.0702,
       "lng": 108.2165,
-      "depth_cm": 0,
-      "danger_level": "safe",
+      "depth_cm": 15,
+      "danger_level": "medium",
       "passable_motorbike": true,
       "passable_car": true,
       "source": "Trạm quan trắc Hải Châu",
-      "pump_status": "Hệ thống thoát nước thông thoáng",
-      "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "pump_status": "Cống ngầm đang điều tiết thoát nước",
+      "advice": "Nước đọng ~15cm do mưa 10mm/h, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 22
     },
     {
@@ -452,18 +465,34 @@
       "city": "danang",
       "lat": 16.0595,
       "lng": 108.1725,
-      "depth_cm": 0,
-      "danger_level": "safe",
-      "passable_motorbike": true,
+      "depth_cm": 21,
+      "danger_level": "medium",
+      "passable_motorbike": false,
       "passable_car": true,
       "source": "Trạm đo ngập Hòa An - Bến xe",
-      "pump_status": "Hệ thống thoát nước thông thoáng",
-      "advice": "Mặt đường khô ráo, nước đã rút hoàn toàn. Phương tiện lưu thông bình thường an toàn.",
-      "updated_at": "2026-11-11T05:54:06.542Z",
+      "pump_status": "Cống ngầm đang điều tiết thoát nước",
+      "advice": "Nước đọng ~21cm do mưa 10mm/h, xe máy chú ý giảm tốc độ hoặc rẽ vòng tránh chết máy bugi.",
+      "updated_at": "2026-11-11T13:51:09.593Z",
       "base_depth_cm": 32
     }
   ],
   "trafficIncidents": [
+    {
+      "id": "vov-inc-vov-4",
+      "city": "hanoi",
+      "lat": 20.965,
+      "lng": 105.837,
+      "type": "slow_traffic",
+      "categoryName": "Lưu lượng đông (VOV Giao Thông)",
+      "icon": "",
+      "isJam": false,
+      "description": "[VOV] Hà Nội gấp rút giải phóng mặt bằng triển khai Dự án trục không gian Quốc lộ 1A",
+      "rawDescription": "Hà Nội gấp rút giải phóng mặt bằng triển khai Dự án trục không gian Quốc lộ 1A",
+      "delaySeconds": 180,
+      "speedKmh": 25,
+      "source": "VOV Giao Thông Trực Tiếp",
+      "updated_at": "2026-11-11T13:51:09.591Z"
+    },
     {
       "id": "tomtom-danang-0",
       "city": "danang",
@@ -478,7 +507,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-1",
@@ -494,7 +523,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-2",
@@ -510,7 +539,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-3",
@@ -526,7 +555,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-4",
@@ -542,7 +571,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-5",
@@ -558,7 +587,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-6",
@@ -574,7 +603,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-7",
@@ -590,7 +619,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-8",
@@ -606,13 +635,13 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-9",
       "city": "danang",
-      "lat": 16.0670824395,
-      "lng": 108.2034833562,
+      "lat": 16.0465367865,
+      "lng": 108.2387731802,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -622,13 +651,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-10",
       "city": "danang",
-      "lat": 16.0341369221,
-      "lng": 108.2289026511,
+      "lat": 16.048162183,
+      "lng": 108.2411898506,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -638,13 +667,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-11",
       "city": "danang",
-      "lat": 16.048628904,
-      "lng": 108.146542741,
+      "lat": 16.062612549,
+      "lng": 108.2419703734,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -654,29 +683,29 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-12",
       "city": "danang",
-      "lat": 16.0089750618,
-      "lng": 108.1382480096,
+      "lat": 16.070691383,
+      "lng": 108.2157236171,
       "type": "traffic_jam",
-      "categoryName": "Kẹt xe nghiêm trọng",
+      "categoryName": "Ùn ứ phương tiện",
       "icon": "",
       "isJam": true,
-      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Đà Nẵng",
-      "rawDescription": "Stationary traffic",
-      "delaySeconds": 900,
-      "speedKmh": 5,
+      "description": " Lưu lượng xe đông, di chuyển chậm - Khu vực Đà Nẵng",
+      "rawDescription": "Queuing traffic",
+      "delaySeconds": 450,
+      "speedKmh": 12,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-13",
       "city": "danang",
-      "lat": 16.0681352394,
-      "lng": 108.218238188,
+      "lat": 16.057575415,
+      "lng": 108.2231814992,
       "type": "traffic_jam",
       "categoryName": "Ùn ứ phương tiện",
       "icon": "",
@@ -686,13 +715,13 @@
       "delaySeconds": 450,
       "speedKmh": 12,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-14",
       "city": "danang",
-      "lat": 16.0705022668,
-      "lng": 108.2240505349,
+      "lat": 16.0714799824,
+      "lng": 108.2215735149,
       "type": "traffic_jam",
       "categoryName": "Ùn ứ phương tiện",
       "icon": "",
@@ -702,13 +731,13 @@
       "delaySeconds": 450,
       "speedKmh": 12,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-15",
       "city": "danang",
-      "lat": 16.0715765536,
-      "lng": 108.2309129667,
+      "lat": 16.0825024887,
+      "lng": 108.2365254891,
       "type": "traffic_jam",
       "categoryName": "Ùn ứ phương tiện",
       "icon": "",
@@ -718,13 +747,13 @@
       "delaySeconds": 450,
       "speedKmh": 12,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-16",
       "city": "danang",
-      "lat": 16.073932828,
-      "lng": 108.2306018305,
+      "lat": 16.007568252,
+      "lng": 108.1405520272,
       "type": "traffic_jam",
       "categoryName": "Ùn ứ phương tiện",
       "icon": "",
@@ -734,13 +763,13 @@
       "delaySeconds": 450,
       "speedKmh": 12,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-17",
       "city": "danang",
-      "lat": 16.0671160267,
-      "lng": 108.213400824,
+      "lat": 16.043888098,
+      "lng": 108.2479235363,
       "type": "slow_traffic",
       "categoryName": "Phương tiện di chuyển chậm",
       "icon": "",
@@ -750,7 +779,7 @@
       "delaySeconds": 60,
       "speedKmh": 25,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-18",
@@ -766,7 +795,7 @@
       "delaySeconds": 90,
       "speedKmh": 25,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-19",
@@ -782,7 +811,7 @@
       "delaySeconds": 90,
       "speedKmh": 25,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-danang-20",
@@ -798,7 +827,7 @@
       "delaySeconds": 90,
       "speedKmh": 25,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.167Z"
+      "updated_at": "2026-11-11T13:51:06.238Z"
     },
     {
       "id": "tomtom-hanoi-0",
@@ -814,7 +843,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-1",
@@ -830,7 +859,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-2",
@@ -846,7 +875,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-3",
@@ -862,7 +891,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-4",
@@ -878,26 +907,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-5",
-      "city": "hanoi",
-      "lat": 21.0506885443,
-      "lng": 105.8399489349,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-6",
       "city": "hanoi",
       "lat": 21.0520724982,
       "lng": 105.8387647397,
@@ -910,10 +923,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-7",
+      "id": "tomtom-hanoi-6",
       "city": "hanoi",
       "lat": 21.0522066531,
       "lng": 105.8385354108,
@@ -926,10 +939,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-8",
+      "id": "tomtom-hanoi-7",
       "city": "hanoi",
       "lat": 21.052606301,
       "lng": 105.8365639872,
@@ -942,26 +955,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-9",
-      "city": "hanoi",
-      "lat": 20.9959660696,
-      "lng": 105.8529563076,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-10",
+      "id": "tomtom-hanoi-8",
       "city": "hanoi",
       "lat": 21.0233286442,
       "lng": 105.8201139993,
@@ -974,10 +971,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-11",
+      "id": "tomtom-hanoi-9",
       "city": "hanoi",
       "lat": 21.0234064144,
       "lng": 105.8197411722,
@@ -990,10 +987,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-12",
+      "id": "tomtom-hanoi-10",
       "city": "hanoi",
       "lat": 21.0574517417,
       "lng": 105.8346743709,
@@ -1006,10 +1003,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-13",
+      "id": "tomtom-hanoi-11",
       "city": "hanoi",
       "lat": 21.0564190559,
       "lng": 105.8772088415,
@@ -1022,10 +1019,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-14",
+      "id": "tomtom-hanoi-12",
       "city": "hanoi",
       "lat": 21.0590221112,
       "lng": 105.834316296,
@@ -1038,10 +1035,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-15",
+      "id": "tomtom-hanoi-13",
       "city": "hanoi",
       "lat": 21.062820153,
       "lng": 105.8822312779,
@@ -1054,10 +1051,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-16",
+      "id": "tomtom-hanoi-14",
       "city": "hanoi",
       "lat": 21.0256996756,
       "lng": 105.9139175541,
@@ -1070,10 +1067,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-17",
+      "id": "tomtom-hanoi-15",
       "city": "hanoi",
       "lat": 21.023685338,
       "lng": 105.9169471091,
@@ -1086,10 +1083,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-18",
+      "id": "tomtom-hanoi-16",
       "city": "hanoi",
       "lat": 21.0765329237,
       "lng": 105.9075727886,
@@ -1102,10 +1099,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-19",
+      "id": "tomtom-hanoi-17",
       "city": "hanoi",
       "lat": 21.0624151354,
       "lng": 105.7898734337,
@@ -1118,10 +1115,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-20",
+      "id": "tomtom-hanoi-18",
       "city": "hanoi",
       "lat": 20.9805286683,
       "lng": 105.795087648,
@@ -1134,26 +1131,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-21",
-      "city": "hanoi",
-      "lat": 20.9816243324,
-      "lng": 105.7941824025,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-22",
+      "id": "tomtom-hanoi-19",
       "city": "hanoi",
       "lat": 21.073546305,
       "lng": 105.9155644304,
@@ -1166,26 +1147,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-23",
-      "city": "hanoi",
-      "lat": 20.9822519878,
-      "lng": 105.7936419374,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-24",
+      "id": "tomtom-hanoi-20",
       "city": "hanoi",
       "lat": 21.0737568547,
       "lng": 105.9154799408,
@@ -1198,10 +1163,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-25",
+      "id": "tomtom-hanoi-21",
       "city": "hanoi",
       "lat": 20.982693145,
       "lng": 105.7932610637,
@@ -1214,42 +1179,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-26",
-      "city": "hanoi",
-      "lat": 21.1070645394,
-      "lng": 105.8436557478,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-27",
-      "city": "hanoi",
-      "lat": 21.1075339465,
-      "lng": 105.8431085772,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực Hà Nội",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
-    },
-    {
-      "id": "tomtom-hanoi-28",
+      "id": "tomtom-hanoi-22",
       "city": "hanoi",
       "lat": 21.0902698461,
       "lng": 105.7933965153,
@@ -1262,10 +1195,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-29",
+      "id": "tomtom-hanoi-23",
       "city": "hanoi",
       "lat": 21.0902846267,
       "lng": 105.7917161113,
@@ -1278,10 +1211,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-30",
+      "id": "tomtom-hanoi-24",
       "city": "hanoi",
       "lat": 20.9399173004,
       "lng": 105.7815880901,
@@ -1294,10 +1227,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-31",
+      "id": "tomtom-hanoi-25",
       "city": "hanoi",
       "lat": 20.9401788445,
       "lng": 105.78092022,
@@ -1310,10 +1243,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-32",
+      "id": "tomtom-hanoi-26",
       "city": "hanoi",
       "lat": 21.0100409389,
       "lng": 105.7303498512,
@@ -1326,10 +1259,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-33",
+      "id": "tomtom-hanoi-27",
       "city": "hanoi",
       "lat": 20.9109387306,
       "lng": 105.7621863312,
@@ -1342,10 +1275,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
-      "id": "tomtom-hanoi-34",
+      "id": "tomtom-hanoi-28",
       "city": "hanoi",
       "lat": 20.9107710936,
       "lng": 105.7605461603,
@@ -1358,13 +1291,109 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-29",
+      "city": "hanoi",
+      "lat": 21.0282263609,
+      "lng": 105.8497966653,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-30",
+      "city": "hanoi",
+      "lat": 21.0299885607,
+      "lng": 105.8476804024,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-31",
+      "city": "hanoi",
+      "lat": 21.0260041788,
+      "lng": 105.8469293839,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-32",
+      "city": "hanoi",
+      "lat": 21.0326935484,
+      "lng": 105.8463741666,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-33",
+      "city": "hanoi",
+      "lat": 21.0336282931,
+      "lng": 105.8459316021,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
+    },
+    {
+      "id": "tomtom-hanoi-34",
+      "city": "hanoi",
+      "lat": 21.033110695,
+      "lng": 105.8445744044,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực Hà Nội",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-35",
       "city": "hanoi",
-      "lat": 21.0277475497,
-      "lng": 105.8499897844,
+      "lat": 21.0304673647,
+      "lng": 105.8421349353,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1374,13 +1403,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-36",
       "city": "hanoi",
-      "lat": 21.0234949032,
-      "lng": 105.8554614908,
+      "lat": 21.0426070358,
+      "lng": 105.8446629173,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1390,13 +1419,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-37",
       "city": "hanoi",
-      "lat": 21.0323838171,
-      "lng": 105.8484180099,
+      "lat": 20.9987179999,
+      "lng": 105.8511391109,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1406,13 +1435,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-38",
       "city": "hanoi",
-      "lat": 21.0323971952,
-      "lng": 105.8483348614,
+      "lat": 20.9869028948,
+      "lng": 105.8269429034,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1422,13 +1451,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-39",
       "city": "hanoi",
-      "lat": 21.036789311,
-      "lng": 105.8494922346,
+      "lat": 21.0140361538,
+      "lng": 105.8035996384,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1438,13 +1467,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-40",
       "city": "hanoi",
-      "lat": 21.0189767393,
-      "lng": 105.8536845273,
+      "lat": 21.06988776,
+      "lng": 105.8102917498,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1454,13 +1483,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-41",
       "city": "hanoi",
-      "lat": 21.0355340652,
-      "lng": 105.8470822698,
+      "lat": 21.0028003759,
+      "lng": 105.7939745313,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1470,13 +1499,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-42",
       "city": "hanoi",
-      "lat": 21.0192195236,
-      "lng": 105.8495043045,
+      "lat": 21.004683302,
+      "lng": 105.7924590832,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1486,13 +1515,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-43",
       "city": "hanoi",
-      "lat": 21.042145716,
-      "lng": 105.8461287445,
+      "lat": 21.0744394969,
+      "lng": 105.7983921295,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1502,13 +1531,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hanoi-44",
       "city": "hanoi",
-      "lat": 21.0291249101,
-      "lng": 105.835201425,
+      "lat": 21.0040033136,
+      "lng": 105.7792317694,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -1518,7 +1547,7 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.187Z"
+      "updated_at": "2026-11-11T13:51:06.240Z"
     },
     {
       "id": "tomtom-hcm-0",
@@ -1534,7 +1563,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-1",
@@ -1550,7 +1579,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-2",
@@ -1566,7 +1595,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-3",
@@ -1582,13 +1611,13 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-4",
       "city": "hcm",
-      "lat": 10.7789611885,
-      "lng": 106.7242611774,
+      "lat": 10.7786809026,
+      "lng": 106.7229375073,
       "type": "road_closure",
       "categoryName": "Đoạn đường rào chắn tạm cấm",
       "icon": "",
@@ -1598,7 +1627,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-5",
@@ -1614,7 +1643,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-6",
@@ -1630,13 +1659,13 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-7",
       "city": "hcm",
-      "lat": 10.7846917598,
-      "lng": 106.7286023327,
+      "lat": 10.7851236252,
+      "lng": 106.729440523,
       "type": "road_closure",
       "categoryName": "Đoạn đường rào chắn tạm cấm",
       "icon": "",
@@ -1646,7 +1675,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-8",
@@ -1662,7 +1691,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-9",
@@ -1678,7 +1707,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-10",
@@ -1694,7 +1723,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-11",
@@ -1710,7 +1739,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-12",
@@ -1726,7 +1755,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-13",
@@ -1742,7 +1771,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-14",
@@ -1758,7 +1787,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-15",
@@ -1774,7 +1803,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-16",
@@ -1790,7 +1819,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-17",
@@ -1806,7 +1835,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-18",
@@ -1822,7 +1851,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-19",
@@ -1838,7 +1867,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-20",
@@ -1854,7 +1883,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-21",
@@ -1870,13 +1899,13 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-22",
       "city": "hcm",
-      "lat": 10.797264595,
-      "lng": 106.6434958406,
+      "lat": 10.7955439508,
+      "lng": 106.6429821976,
       "type": "road_closure",
       "categoryName": "Đoạn đường rào chắn tạm cấm",
       "icon": "",
@@ -1886,7 +1915,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-23",
@@ -1902,7 +1931,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-24",
@@ -1918,7 +1947,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-25",
@@ -1934,7 +1963,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-26",
@@ -1950,7 +1979,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-27",
@@ -1966,7 +1995,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-28",
@@ -1982,7 +2011,7 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-29",
@@ -1998,26 +2027,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-30",
-      "city": "hcm",
-      "lat": 10.8041337352,
-      "lng": 106.637558771,
-      "type": "road_closure",
-      "categoryName": "Đoạn đường rào chắn tạm cấm",
-      "icon": "",
-      "isJam": false,
-      "description": " Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng - Khu vực TP. Hồ Chí Minh",
-      "rawDescription": "Closed",
-      "delaySeconds": 600,
-      "speedKmh": 0,
-      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
-    },
-    {
-      "id": "tomtom-hcm-31",
       "city": "hcm",
       "lat": 10.803645581,
       "lng": 106.633837206,
@@ -2030,10 +2043,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-32",
+      "id": "tomtom-hcm-31",
       "city": "hcm",
       "lat": 10.8765963282,
       "lng": 106.8031784722,
@@ -2046,10 +2059,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-33",
+      "id": "tomtom-hcm-32",
       "city": "hcm",
       "lat": 10.878650861,
       "lng": 106.8024569579,
@@ -2062,10 +2075,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-34",
+      "id": "tomtom-hcm-33",
       "city": "hcm",
       "lat": 10.8745337145,
       "lng": 106.8065365979,
@@ -2078,10 +2091,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-35",
+      "id": "tomtom-hcm-34",
       "city": "hcm",
       "lat": 10.8741688992,
       "lng": 106.8072943219,
@@ -2094,10 +2107,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-36",
+      "id": "tomtom-hcm-35",
       "city": "hcm",
       "lat": 10.8737142789,
       "lng": 106.8078803846,
@@ -2110,10 +2123,10 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
-      "id": "tomtom-hcm-37",
+      "id": "tomtom-hcm-36",
       "city": "hcm",
       "lat": 10.8754054171,
       "lng": 106.8071226605,
@@ -2126,13 +2139,29 @@
       "delaySeconds": 600,
       "speedKmh": 0,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
+    },
+    {
+      "id": "tomtom-hcm-37",
+      "city": "hcm",
+      "lat": 10.7792589302,
+      "lng": 106.7046300896,
+      "type": "traffic_jam",
+      "categoryName": "Kẹt xe nghiêm trọng",
+      "icon": "",
+      "isJam": true,
+      "description": " Ùn tắc kéo dài, các phương tiện di chuyển rất chậm - Khu vực TP. Hồ Chí Minh",
+      "rawDescription": "Stationary traffic",
+      "delaySeconds": 900,
+      "speedKmh": 5,
+      "source": "TomTom Live Traffic API v5 (Vệ tinh)",
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-38",
       "city": "hcm",
-      "lat": 10.7779486502,
-      "lng": 106.7010131308,
+      "lat": 10.7742405096,
+      "lng": 106.7050444909,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2142,13 +2171,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-39",
       "city": "hcm",
-      "lat": 10.7789532015,
-      "lng": 106.6999375649,
+      "lat": 10.778686337,
+      "lng": 106.695947779,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2158,13 +2187,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-40",
       "city": "hcm",
-      "lat": 10.772481033,
-      "lng": 106.6994923183,
+      "lat": 10.7720143188,
+      "lng": 106.6990041562,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2174,13 +2203,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-41",
       "city": "hcm",
-      "lat": 10.7788834594,
-      "lng": 106.7050646075,
+      "lat": 10.7747233593,
+      "lng": 106.7061924764,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2190,13 +2219,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-42",
       "city": "hcm",
-      "lat": 10.7826345239,
-      "lng": 106.7017668315,
+      "lat": 10.7841834834,
+      "lng": 106.6942351886,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2206,13 +2235,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-43",
       "city": "hcm",
-      "lat": 10.7717366613,
-      "lng": 106.6978521474,
+      "lat": 10.7826707531,
+      "lng": 106.6916374692,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2222,13 +2251,13 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     },
     {
       "id": "tomtom-hcm-44",
       "city": "hcm",
-      "lat": 10.7702722034,
-      "lng": 106.6972929069,
+      "lat": 10.7677576175,
+      "lng": 106.6947501727,
       "type": "traffic_jam",
       "categoryName": "Kẹt xe nghiêm trọng",
       "icon": "",
@@ -2238,15 +2267,15 @@
       "delaySeconds": 900,
       "speedKmh": 5,
       "source": "TomTom Live Traffic API v5 (Vệ tinh)",
-      "updated_at": "2026-11-11T05:54:02.191Z"
+      "updated_at": "2026-11-11T13:51:06.241Z"
     }
   ],
   "stats": {
-    "totalFloods": 0,
+    "totalFloods": 4,
     "criticalFloods": 0,
-    "trafficJams": 25,
-    "roadworks": 85,
-    "trafficAlerts": 121
+    "trafficJams": 32,
+    "roadworks": 78,
+    "trafficAlerts": 122
   },
   "weatherStations": {
     "hcm": [
@@ -2266,25 +2295,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0,
-          4.4
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 61,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 88,
+        "windSpeed": 2,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-bt",
@@ -2302,25 +2331,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0,
-          4.4
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 61,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 88,
+        "windSpeed": 2,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-td",
@@ -2338,25 +2367,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0,
-          4.4
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 61,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 88,
+        "windSpeed": 2,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-tp",
@@ -2374,25 +2403,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.3,
-          5.2
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 60,
-        "windSpeed": 8,
+        "isDay": false,
+        "humidity": 85,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-p15",
@@ -2410,25 +2439,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 33,
-        "feelsLike": 39,
+        "temp": 26,
+        "feelsLike": 32,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.1,
-          3.2
+          0,
+          0
         ],
-        "isDay": true,
-        "humidity": 56,
-        "windSpeed": 5,
+        "isDay": false,
+        "humidity": 95,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-hx",
@@ -2446,25 +2475,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0,
-          4.4
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 61,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 88,
+        "windSpeed": 2,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-q5",
@@ -2482,25 +2511,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 38,
+        "temp": 27,
+        "feelsLike": 33,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.3,
-          5.2
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 60,
-        "windSpeed": 8,
+        "isDay": false,
+        "humidity": 85,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-apd",
@@ -2518,25 +2547,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 33,
-        "feelsLike": 39,
+        "temp": 26,
+        "feelsLike": 32,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.3,
-          4
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 58,
+        "isDay": false,
+        "humidity": 93,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
-        "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "icon": "🌙",
+        "description": "Đêm tạnh ráo, mát mẻ",
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-btd",
@@ -2554,25 +2583,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 33,
-        "feelsLike": 39,
+        "temp": 26,
+        "feelsLike": 32,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.1,
-          3.2
+          0,
+          0
         ],
-        "isDay": true,
-        "humidity": 56,
-        "windSpeed": 5,
+        "isDay": false,
+        "humidity": 95,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "updated_at": "2026-11-11T13:51:06.659Z"
       },
       {
         "id": "hcm-hbc",
@@ -2590,25 +2619,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 32,
-        "feelsLike": 39,
+        "temp": 26,
+        "feelsLike": 32,
         "rain1h": 0,
         "forecastRain": [
           0,
-          0.4,
-          7
+          0.1,
+          0
         ],
-        "isDay": true,
-        "humidity": 63,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 92,
+        "windSpeed": 2,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
-        "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.357Z"
+        "icon": "🌙",
+        "description": "Đêm tạnh ráo, mát mẻ",
+        "updated_at": "2026-11-11T13:51:06.659Z"
       }
     ],
     "hanoi": [
@@ -2635,25 +2664,25 @@
           "Đường sắt giao cắt Phú Diễn"
         ],
         "floodVulnerability": "Vùng trũng cục bộ ven ngõ Hoàng Công Chất & đoạn giao sông Nhuệ khi mưa lớn",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-phd",
@@ -2676,25 +2705,25 @@
           "Khu vực UBND Quận Bắc Từ Liêm"
         ],
         "floodVulnerability": "Trục Văn Tiến Dũng và QL32 thoát nước tốt, một số ngõ ven sông Nhuệ ngập nhẹ",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-tt",
@@ -2717,25 +2746,25 @@
           "Nút giao ngã 4 Tây Tựu"
         ],
         "floodVulnerability": "Vùng bãi hoa bằng phẳng, ngập trũng cục bộ tại một số đồng trũng khi mưa xối xả",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-mk",
@@ -2759,25 +2788,25 @@
           "Cầu Ngà"
         ],
         "floodVulnerability": "Khu vực cổng ĐH Công Nghiệp & đường gom ga Nhổn trũng nước khi mưa trên 30mm",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-cn1",
@@ -2800,25 +2829,25 @@
           "Đường Trần Cung đoạn gần Bệnh viện E"
         ],
         "floodVulnerability": "Đường Trần Cung và ngõ 145 Cổ Nhuế trũng thấp, thoát nước chậm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-cn2",
@@ -2841,25 +2870,25 @@
           "Nút vào KĐT Resco Cổ Nhuế"
         ],
         "floodVulnerability": "Rốn ngập Resco Cổ Nhuế (HSDC-05) khi mưa dông lớn nước dồn từ Phạm Văn Đồng vào",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-xd",
@@ -2882,25 +2911,25 @@
           "Nút giao Xuân Đỉnh - Phạm Văn Đồng"
         ],
         "floodVulnerability": "Đường Xuân Đỉnh đoạn chợ trũng ngập nhẹ, trục Phạm Văn Đồng thông thoáng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-xt",
@@ -2921,25 +2950,25 @@
           "Nút giao Nguyễn Văn Huyên - Xuân Tảo"
         ],
         "floodVulnerability": "Hệ thống hạ tầng thoát nước hiện đại bậc nhất, hiếm khi ngập úng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-dn",
@@ -2962,25 +2991,25 @@
           "Nút giao Tân Xuân - An Dương Vương"
         ],
         "floodVulnerability": "Đoạn chân dốc cầu Thăng Long ven sông Hồng ngập cục bộ khi triều cường hoặc mưa to",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-dt",
@@ -3001,25 +3030,25 @@
           "Khu vực cổng Học viện Tài chính & ĐH Mỏ Địa chất"
         ],
         "floodVulnerability": "Đường nội bộ trũng nhẹ quanh các hồ chứa",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-tp",
@@ -3039,25 +3068,25 @@
           "Đường đê Thụy Phương giao Hoàng Xá"
         ],
         "floodVulnerability": "Khu vực ven sông Hồng, thoát nước tự nhiên tốt",
-        "temp": 23,
-        "feelsLike": 23,
+        "temp": 20,
+        "feelsLike": 21,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 41,
+        "isDay": false,
+        "humidity": 76,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-lm",
@@ -3078,25 +3107,25 @@
           "Đường xe tải cảng Liên Mạc"
         ],
         "floodVulnerability": "Cống Liên Mạc điều tiết nước sông Nhuệ ra sông Hồng",
-        "temp": 23,
-        "feelsLike": 23,
+        "temp": 20,
+        "feelsLike": 21,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 41,
+        "isDay": false,
+        "humidity": 76,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-btl-tc",
@@ -3116,25 +3145,25 @@
           "Khu vực bến đò Thượng Cát"
         ],
         "floodVulnerability": "Vùng bãi bồi sông Hồng, an toàn mùa kiệt",
-        "temp": 23,
-        "feelsLike": 23,
+        "temp": 20,
+        "feelsLike": 21,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 41,
+        "isDay": false,
+        "humidity": 76,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-cd",
@@ -3159,25 +3188,25 @@
           "Đoạn Metro Cầu Diễn"
         ],
         "floodVulnerability": "Đoạn chân Cầu Diễn và ngõ Nguyễn Đổng Chi ngập 15-20cm khi mưa rất to",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-xp",
@@ -3201,25 +3230,25 @@
           "Đoạn chợ Hòe Thị"
         ],
         "floodVulnerability": "Vùng trũng dọc đường 70 cũ đoạn qua cầu đường sắt ngập khi mưa to",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-pc",
@@ -3242,25 +3271,25 @@
           "Đường vào KĐT Hateco Apollo & Foresa"
         ],
         "floodVulnerability": "Khu vực cụm công nghiệp thoát nước ổn định, ngõ Tu Hoàng trũng nhẹ",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-md1",
@@ -3284,25 +3313,25 @@
           "Phố Đình Thôn"
         ],
         "floodVulnerability": "Ngã tư Keangnam - Mễ Trì từng là rốn ngập, nay đã cải tạo cống ngầm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-md2",
@@ -3325,25 +3354,25 @@
           "Ngã tư Lê Đức Thọ - Nguyễn Hoàng"
         ],
         "floodVulnerability": "Đường Trần Bình ngập cục bộ 20-30cm khi mưa rào mùa hè",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-mt",
@@ -3366,25 +3395,25 @@
           "Khách sạn JW Marriott"
         ],
         "floodVulnerability": "Đoạn hầm chui số 3 Đại lộ Thăng Long ngập sâu khi mưa bão",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-pd",
@@ -3406,25 +3435,25 @@
           "Cổng Cung thể thao dưới nước"
         ],
         "floodVulnerability": "Khu dân cư Phú Đô vùng trong trũng nước",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-tm",
@@ -3446,25 +3475,25 @@
           "Cầu Cốc - Smart City"
         ],
         "floodVulnerability": "Cầu vượt ĐT70 giao cắt trũng nước khi mưa kéo dài",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
+          0.1,
           0,
-          0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 43,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 3,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-dm",
@@ -3487,25 +3516,25 @@
           "Ngã tư Vạn Phúc - ĐT70"
         ],
         "floodVulnerability": "Ven sông Nhuệ ngập trũng khi lũ sông dâng cao kết hợp mưa lớn",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-ntl-tv",
@@ -3528,25 +3557,25 @@
           "Tuyến BRT Tố Hữu"
         ],
         "floodVulnerability": "Đoạn Tố Hữu trũng ngập cục bộ 20cm mép đường",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-dvh",
@@ -3570,25 +3599,25 @@
           "Phố công nghệ thông tin Duy Tân giờ tan tầm"
         ],
         "floodVulnerability": "Đường Trần Thái Tông và Duy Tân thoát nước tốt sau khi thông cống Mễ Trì",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-md",
@@ -3611,25 +3640,25 @@
           "Cổng ĐH Thương Mại"
         ],
         "floodVulnerability": "Phố Doãn Kế Thiện và ngõ Trần Vỹ ngập nhẹ 15-20cm cục bộ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-dv",
@@ -3652,25 +3681,25 @@
           "Khu vực Công viên Cầu Giấy"
         ],
         "floodVulnerability": "Khu đô thị mới Dịch Vọng cao ráo, ít ngập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-nt",
@@ -3693,25 +3722,25 @@
           "Phố ẩm thực Tô Hiệu"
         ],
         "floodVulnerability": "Chợ Nghĩa Tân và ngõ Trần Tử Bình thoát nước chậm khi mưa dồn dập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-nd",
@@ -3733,25 +3762,25 @@
           "Dốc Bưởi - Lạc Long Quân"
         ],
         "floodVulnerability": "Phố Phùng Chí Kiên có đoạn dốc trũng nước cục bộ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-qh",
@@ -3774,25 +3803,25 @@
           "Đường ven sông Tô Lịch"
         ],
         "floodVulnerability": "Đường Quan Hoa sát bờ kè sông Tô Lịch an toàn",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-th",
@@ -3815,25 +3844,25 @@
           "Hầm chui Trung Hòa (Đại lộ Thăng Long)"
         ],
         "floodVulnerability": "Đường Vũ Phạm Hàm ngập nhẹ 15-20cm tại các điểm trũng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-cg-yh",
@@ -3857,25 +3886,25 @@
           "Đường Mạc Thái Tổ"
         ],
         "floodVulnerability": "Rốn ngập phố Hoa Bằng (HSDC-06, ngập sâu 25-30cm xe máy khó đi)",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-qt",
@@ -3898,25 +3927,25 @@
           "Nút giao Cửa Bắc - Quán Thánh"
         ],
         "floodVulnerability": "Hệ thống thoát nước tốt ra hồ Trúc Bạch, hiếm khi ngập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-km",
@@ -3938,25 +3967,25 @@
           "Ngã ba Kim Mã - Giang Văn Minh"
         ],
         "floodVulnerability": "Đường Kim Mã cao ráo, dốc thoải",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-gv",
@@ -3979,25 +4008,25 @@
           "Tuyến BRT Giảng Võ"
         ],
         "floodVulnerability": "Khu vực hồ Giảng Võ thoát nước ổn định",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-lg",
@@ -4019,25 +4048,25 @@
           "Nút giao Văn Cao - Hoàng Hoa Thám"
         ],
         "floodVulnerability": "Khu vực Lotte cao ráo, đường Đội Cấn trũng nhẹ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-nk",
@@ -4060,25 +4089,25 @@
           "Đường Đê La Thành đoạn viện Nhi"
         ],
         "floodVulnerability": "Phố Đào Tấn đoạn hồ Thủ Lệ an toàn, La Thành ùn tắc",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-tc",
@@ -4099,25 +4128,25 @@
           "Cầu vượt Láng Hạ - Huỳnh Thúc Kháng"
         ],
         "floodVulnerability": "Hồ Thành Công điều tiết tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hk-tt",
@@ -4141,25 +4170,25 @@
           "Ngã tư Hàng Bài - Tràng Tiền"
         ],
         "floodVulnerability": "Cao ráo, hệ thống thoát nước hồ Hoàn Kiếm ổn định",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hk-ht",
@@ -4182,25 +4211,25 @@
           "Phố đi bộ Hồ Gươm cuối tuần"
         ],
         "floodVulnerability": "Không ngập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hk-cn",
@@ -4223,25 +4252,25 @@
           "Cửa Nam - Lê Duẩn - Ga Hà Nội"
         ],
         "floodVulnerability": "Rốn ngập HSDC-01 Phố Nguyễn Khuyến (trước trường Lý Thường Kiệt ngập 35cm) & HSDC-02 Phan Bội Châu",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hk-dx",
@@ -4264,25 +4293,25 @@
           "Ngã tư Hàng Đậu - Hàng Giấy"
         ],
         "floodVulnerability": "Thoát nước ra cửa khẩu Tân Ấp sông Hồng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-ocd",
@@ -4305,25 +4334,25 @@
           "Đường Đê La Thành đoạn Hoàng Cầu"
         ],
         "floodVulnerability": "Hồ Hoàng Cầu điều hòa nước, hiếm khi ngập sâu",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-lh",
@@ -4346,25 +4375,25 @@
           "Cầu vượt Láng Hạ qua đường Láng"
         ],
         "floodVulnerability": "Rốn ngập HSDC-04 Đường Thái Hà (trước rạp Chiếu phim Quốc Gia ngập 20cm)",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-kt",
@@ -4386,25 +4415,25 @@
           "Cổng Bệnh viện Đại học Y Hà Nội trên phố Tôn Thất Tùng"
         ],
         "floodVulnerability": "Thoát nước sông Tô Lịch tốt, chủ yếu là điểm nghẽn ùn tắc giao thông cực nặng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-cl",
@@ -4427,25 +4456,25 @@
           "Ngã tư Hào Nam - Cát Linh"
         ],
         "floodVulnerability": "Cao ráo, thoát nước tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-kl",
@@ -4467,25 +4496,25 @@
           "Ngã tư Phạm Ngọc Thạch - Chùa Bộc"
         ],
         "floodVulnerability": "Hầm chui Kim Liên có hệ thống máy bơm tự động công suất lớn",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hbt-bm",
@@ -4507,25 +4536,25 @@
           "Chợ Mơ"
         ],
         "floodVulnerability": "Sau khi mở rộng Vành Đai 2 ngầm hóa cống, thoát nước rất tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hbt-vt",
@@ -4548,25 +4577,25 @@
           "Lối vào KĐT Times City"
         ],
         "floodVulnerability": "Phố Mạc Thị Bưởi và Lạc Trung ngập cục bộ 20cm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hbt-bk",
@@ -4588,25 +4617,25 @@
           "Phố Trần Đại Nghĩa"
         ],
         "floodVulnerability": "Khu vực hồ Bách Khoa thoát nước ổn định",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-kd",
@@ -4628,25 +4657,25 @@
           "Cầu Khương Đình"
         ],
         "floodVulnerability": "Vũ Tông Phan ven sông Tô Lịch, Bùi Xương Trạch trũng nước khi mưa trên 40mm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-nc",
@@ -4669,25 +4698,25 @@
           "Nút giao Hoàng Đạo Thúy - Lê Văn Lương"
         ],
         "floodVulnerability": "Đường Quan Nhân trũng ngập nhẹ, Lê Văn Lương thông thoáng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-txb",
@@ -4709,25 +4738,25 @@
           "Ga Metro Phùng Khoang"
         ],
         "floodVulnerability": "Hầm chui Nguyễn Trãi trang bị trạm bơm tự động",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-td",
@@ -4749,25 +4778,25 @@
           "Ga Metro Thượng Đình"
         ],
         "floodVulnerability": "Cao ráo, thoát nước tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-th-buoi",
@@ -4790,25 +4819,25 @@
           "Đường ven hồ Trích Sài"
         ],
         "floodVulnerability": "Đoạn ngõ Võng Thị trũng nước sát mép hồ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-th-tk",
@@ -4831,25 +4860,25 @@
           "Đường Thanh Niên (cổ ngư) giờ tan tầm"
         ],
         "floodVulnerability": "Rốn ngập HSDC-03 Phố Thụy Khuê (Đoạn dốc La Pho ngập sâu 30cm dồn từ Hoàng Hoa Thám xuống)",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-th-xl",
@@ -4871,25 +4900,25 @@
           "Bùng binh Cầu Nhật Tân"
         ],
         "floodVulnerability": "Trục Võ Chí Công cao ráo, ngõ Xuân La trũng nhẹ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-th-qa",
@@ -4912,25 +4941,25 @@
           "Phố Tây Xuân Diệu"
         ],
         "floodVulnerability": "Bán đảo cao ráo, view trọn Hồ Tây",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-th-nt",
@@ -4953,25 +4982,25 @@
           "Đường đê Âu Cơ đang mở rộng"
         ],
         "floodVulnerability": "Làng đào Nhật Tân thoát nước tự nhiên ra sông Hồng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hm-hl",
@@ -4995,25 +5024,25 @@
           "Bến xe Nước Ngầm"
         ],
         "floodVulnerability": "Hồ Linh Đàm điều tiết chính, đường Nguyễn Hữu Thọ đoạn trũng ngập nhẹ khi mưa bão",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hm-gb",
@@ -5035,25 +5064,25 @@
           "Ngã ba Giải Phóng - Kim Đồng (Đang thi công hầm chui Kim Đồng)"
         ],
         "floodVulnerability": "Đoạn ngã ba Kim Đồng - Giải Phóng ngập 20cm khi mưa to dồn dập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hm-dc",
@@ -5076,25 +5105,25 @@
           "Đường Định Công hẹp"
         ],
         "floodVulnerability": "Khu vực ven sông Lừ trũng nước khi mưa trên 35mm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hm-dk",
@@ -5116,25 +5145,25 @@
           "Đoạn chung cư Kim Văn Kim Lũ"
         ],
         "floodVulnerability": "Nguyễn Xiển ven đường gom trũng nước mép vỉa hè",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-ml",
@@ -5157,25 +5186,25 @@
           "Ga Metro Phùng Khoang & Văn Quán"
         ],
         "floodVulnerability": "Trục Trần Phú cao ráo, một số ngõ ven sông Nhuệ ngập nhẹ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-vq",
@@ -5198,25 +5227,25 @@
           "Ngã tư Nguyễn Khuyến - Trần Phú"
         ],
         "floodVulnerability": "Hồ Văn Quán điều hòa nước tốt, ngõ Chiến Thắng trũng nhẹ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-vp",
@@ -5239,25 +5268,25 @@
           "Cầu Am"
         ],
         "floodVulnerability": "Ven sông Nhuệ đoạn cầu Am ngập khi mưa to kéo dài",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-qt",
@@ -5279,25 +5308,25 @@
           "Khu vực Chợ Hà Đông"
         ],
         "floodVulnerability": "Thoát nước sông Đáy và sông Nhuệ",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-dn",
@@ -5319,25 +5348,25 @@
           "Bùng binh Lê Trọng Tấn - Tố Hữu"
         ],
         "floodVulnerability": "Hệ thống hồ Thiên Văn Học thoát nước tốt",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
+          0.1,
           0,
-          0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 43,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 3,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-yn",
@@ -5359,25 +5388,25 @@
           "Ga cuối tuyến Metro 2A Cát Linh - Hà Đông"
         ],
         "floodVulnerability": "Ven đê sông Đáy an toàn",
-        "temp": 22,
-        "feelsLike": 21,
-        "rain1h": 0,
+        "temp": 19,
+        "feelsLike": 19,
+        "rain1h": 0.1,
         "forecastRain": [
-          0,
+          0.2,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 44,
+        "isDay": false,
+        "humidity": 66,
         "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
-        "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "icon": "🌙",
+        "description": "Đêm tạnh ráo, mát mẻ",
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-lb-bd",
@@ -5400,25 +5429,25 @@
           "Nút giao Nguyễn Văn Cừ - Hồng Tiến"
         ],
         "floodVulnerability": "Khu vực hồ Bồ Đề thoát nước ổn định",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 73,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-lb-nl",
@@ -5441,25 +5470,25 @@
           "Cổng Bến xe Gia Lâm"
         ],
         "floodVulnerability": "Cao ráo sát đê sông Hồng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 73,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-lb-sd",
@@ -5481,25 +5510,25 @@
           "Cầu chui QL5"
         ],
         "floodVulnerability": "Thoát nước công nghiệp tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 73,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-lb-vh",
@@ -5521,25 +5550,25 @@
           "Nút giao Đoàn Khuê"
         ],
         "floodVulnerability": "Hệ thống kênh đào Vinhomes Riverside tiêu thoát nước cực tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 73,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-kc",
@@ -5561,25 +5590,25 @@
           "Nút giao Vành Đai 3.5 - QL32"
         ],
         "floodVulnerability": "Khu vực Lai Xá giáp Nhổn trũng nước khi mưa dông lớn",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-tt",
@@ -5601,25 +5630,25 @@
           "Cổng KĐT Tân Tây Đô"
         ],
         "floodVulnerability": "Đoạn rẽ ĐT422 trũng nước cục bộ khi mưa lớn",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-vc",
@@ -5641,25 +5670,25 @@
           "Đoạn ngã ba Vân Canh"
         ],
         "floodVulnerability": "Ven sông Nhuệ và sông Đáy",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-ak",
@@ -5682,25 +5711,25 @@
           "Hầm chui An Khánh trên Đại lộ Thăng Long"
         ],
         "floodVulnerability": "Hầm chui dân sinh Đại lộ Thăng Long ngập sâu khi mưa to",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
+          0.1,
           0,
-          0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 43,
-        "windSpeed": 4,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 3,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-cv",
@@ -5723,25 +5752,25 @@
           "Phố Đào Tấn"
         ],
         "floodVulnerability": "Khu vực Lotte Center và Daewoo cao ráo, hoàn toàn không ngập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-dc",
@@ -5762,25 +5791,25 @@
           "Nút giao Đội Cấn - Giang Văn Minh"
         ],
         "floodVulnerability": "Thoát nước tốt, một số ngõ sâu trũng nhẹ khi mưa rào",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-db",
@@ -5803,25 +5832,25 @@
           "Đoạn đường tàu Lê Duẩn - Điện Biên Phủ"
         ],
         "floodVulnerability": "Khu vực chính trị trung tâm, cao ráo, không ngập úng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-bd-tb",
@@ -5842,25 +5871,25 @@
           "Đường Thanh Niên giờ tan tầm"
         ],
         "floodVulnerability": "Ven hồ Trúc Bạch, thoát nước trực tiếp ra hồ điều hòa",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-pm",
@@ -5882,25 +5911,25 @@
           "Ngã tư Phương Mai - Giải Phóng"
         ],
         "floodVulnerability": "Phố Lương Định Của trũng nước cục bộ khi mưa lớn trên 50mm",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-dd-lt",
@@ -5922,25 +5951,25 @@
           "Cổng Bệnh viện Nhi Trung ương"
         ],
         "floodVulnerability": "Khu vực dốc thoải ra sông Tô Lịch, phố Chùa Láng cao ráo",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hbt-dt",
@@ -5962,25 +5991,25 @@
           "Cổng Trường ĐH Kinh tế Quốc dân"
         ],
         "floodVulnerability": "Đã hoàn thành cống ngầm đường Vành đai 2, thoát nước tốt",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 47,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 70,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-km",
@@ -6002,25 +6031,25 @@
           "Nút giao Hoàng Văn Thái"
         ],
         "floodVulnerability": "Khu sân bay Bạch Mai cũ cốt nền cao ráo, rất hiếm khi ngập",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-tx-txt",
@@ -6042,25 +6071,25 @@
           "Phố Vũ Trọng Phụng"
         ],
         "floodVulnerability": "Phố Nguyễn Tuân trũng nhẹ đoạn giao Nguyễn Trãi",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 19,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 45,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 69,
+        "windSpeed": 5,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hk-hb",
@@ -6082,25 +6111,25 @@
           "Ngã tư Hàng Bông - Quán Sứ"
         ],
         "floodVulnerability": "Phố cổ cao ráo, không bị ngập úng",
-        "temp": 22,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
           0
         ],
-        "isDay": true,
-        "humidity": 46,
-        "windSpeed": 3,
+        "isDay": false,
+        "humidity": 74,
+        "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       },
       {
         "id": "hn-hd-dt",
@@ -6120,25 +6149,25 @@
           "Nút giao Vành Đai 3.5 qua Di Trạch"
         ],
         "floodVulnerability": "Thoát nước ra hệ thống mương thủy lợi Hoài Đức",
-        "temp": 23,
-        "feelsLike": 22,
+        "temp": 19,
+        "feelsLike": 20,
         "rain1h": 0,
         "forecastRain": [
           0,
           0,
-          0.1
+          0
         ],
-        "isDay": true,
-        "humidity": 42,
+        "isDay": false,
+        "humidity": 71,
         "windSpeed": 4,
         "floodRisk": {
           "level": "safe",
           "text": "Khô ráo",
           "color": "#1e8e3e"
         },
-        "icon": "⛅",
+        "icon": "☁️",
         "description": "Trời nhiều mây, tạnh ráo",
-        "updated_at": "2026-11-11T05:54:02.425Z"
+        "updated_at": "2026-11-11T13:51:06.717Z"
       }
     ],
     "danang": [
@@ -6158,25 +6187,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 25,
-        "feelsLike": 26,
-        "rain1h": 0.1,
+        "temp": 24,
+        "feelsLike": 28,
+        "rain1h": 10,
         "forecastRain": [
-          0.2,
-          0.3,
-          0.2
+          2.8,
+          3.4,
+          2.2
         ],
-        "isDay": true,
-        "humidity": 77,
-        "windSpeed": 24,
+        "isDay": false,
+        "humidity": 87,
+        "windSpeed": 12,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       },
       {
         "id": "dn-pm",
@@ -6194,25 +6223,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 25,
-        "feelsLike": 26,
-        "rain1h": 0.1,
+        "temp": 24,
+        "feelsLike": 28,
+        "rain1h": 10,
         "forecastRain": [
-          0.2,
-          0.3,
-          0.2
+          2.8,
+          3.4,
+          2.2
         ],
-        "isDay": true,
-        "humidity": 77,
-        "windSpeed": 24,
+        "isDay": false,
+        "humidity": 87,
+        "windSpeed": 12,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       },
       {
         "id": "dn-ma",
@@ -6230,25 +6259,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 25,
-        "feelsLike": 26,
-        "rain1h": 0.1,
+        "temp": 24,
+        "feelsLike": 28,
+        "rain1h": 10,
         "forecastRain": [
-          0.2,
-          0.3,
-          0.2
+          2.8,
+          3.4,
+          2.2
         ],
-        "isDay": true,
-        "humidity": 77,
-        "windSpeed": 24,
+        "isDay": false,
+        "humidity": 87,
+        "windSpeed": 12,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       },
       {
         "id": "dn-hk",
@@ -6266,25 +6295,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 25,
-        "feelsLike": 27,
-        "rain1h": 0.1,
+        "temp": 23,
+        "feelsLike": 28,
+        "rain1h": 10,
         "forecastRain": [
-          0.3,
-          0.3,
-          0.4
+          3,
+          3.2,
+          2.3
         ],
-        "isDay": true,
-        "humidity": 79,
-        "windSpeed": 18,
+        "isDay": false,
+        "humidity": 93,
+        "windSpeed": 5,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       },
       {
         "id": "dn-kt",
@@ -6302,25 +6331,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 26,
-        "feelsLike": 27,
-        "rain1h": 0.1,
+        "temp": 24,
+        "feelsLike": 29,
+        "rain1h": 10,
         "forecastRain": [
-          0.2,
-          0.2,
-          0.3
+          5.4,
+          5.2,
+          3.7
         ],
-        "isDay": true,
-        "humidity": 77,
-        "windSpeed": 24,
+        "isDay": false,
+        "humidity": 92,
+        "windSpeed": 4,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       },
       {
         "id": "dn-ahb",
@@ -6338,25 +6367,25 @@
         ],
         "trafficHotspots": [],
         "floodVulnerability": "",
-        "temp": 25,
-        "feelsLike": 26,
-        "rain1h": 0.1,
+        "temp": 24,
+        "feelsLike": 28,
+        "rain1h": 10,
         "forecastRain": [
-          0.2,
-          0.3,
-          0.2
+          2.8,
+          3.4,
+          2.2
         ],
-        "isDay": true,
-        "humidity": 77,
-        "windSpeed": 24,
+        "isDay": false,
+        "humidity": 87,
+        "windSpeed": 12,
         "floodRisk": {
-          "level": "safe",
-          "text": "Khô ráo",
-          "color": "#1e8e3e"
+          "level": "warning",
+          "text": "Nguy cơ ngập trũng",
+          "color": "#f9ab00"
         },
-        "icon": "☀️",
-        "description": "Trời tạnh ráo, không mưa",
-        "updated_at": "2026-11-11T05:54:02.691Z"
+        "icon": "🌧️",
+        "description": "Mưa vừa đến mưa to",
+        "updated_at": "2026-11-11T13:51:06.702Z"
       }
     ]
   }
