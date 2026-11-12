@@ -3,31 +3,8 @@
   "retentionDays": 7,
   "totalSnapshots": 94,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-12T10:07:39.426Z",
+  "updatedAt": "2026-11-12T18:31:39.071Z",
   "snapshots": [
-    {
-      "timestamp": "2026-11-05T15:42:54.038Z",
-      "date": "2026-11-05",
-      "hour": 22,
-      "hanoi": {
-        "avgSpeedKmh": 37,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 35,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 38,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-11-05T21:50:27.499Z",
       "date": "2026-11-06",
@@ -3861,6 +3838,96 @@
         "avgSpeedKmh": 5,
         "congestionIndex": 5,
         "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-11-12T18:31:39.071Z",
+      "date": "2026-11-13",
+      "hour": 1,
+      "hanoi": {
+        "avgSpeedKmh": 37,
+        "congestionIndex": 1.4,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "hsdc-01",
+            "name": "Phố Nguyễn Khuyến (Khu vực trước cổng trường Lý Thường Kiệt)",
+            "depth_cm": 23,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-02",
+            "name": "Ngã tư Phan Bội Châu - Lý Thường Kiệt",
+            "depth_cm": 16,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-03",
+            "name": "Phố Thụy Khuê (Đoạn dốc La Pho - Tam Đa)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-04",
+            "name": "Đường Thái Hà (Đoạn trước rạp Chiếu phim Quốc Gia)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-05",
+            "name": "KĐT Resco Cổ Nhuế (Đường Phạm Văn Đồng rẽ vào)",
+            "depth_cm": 26,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-06",
+            "name": "Phố Hoa Bằng (Đoạn qua ngõ 99)",
+            "depth_cm": 18,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-07",
+            "name": "Khu vực Triều Khúc - Tân Triều (\"Vịnh Triều Khúc\")",
+            "depth_cm": 28,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-08",
+            "name": "Đường Phùng Khoang - Chợ Phùng Khoang",
+            "depth_cm": 23,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-09",
+            "name": "Phố Bùi Xương Trạch (Khương Đình)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-10",
+            "name": "Khu vực Định Công (Phố Định Công - Cầu Định Công)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "hsdc-11",
+            "name": "Đường Tố Hữu (Đoạn Lương Thế Vinh - Trung Văn)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "hcm": {
+        "avgSpeedKmh": 35,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 40,
+        "congestionIndex": 1,
+        "maxRainMm": 0.3,
         "activeFloodSpots": []
       }
     }
