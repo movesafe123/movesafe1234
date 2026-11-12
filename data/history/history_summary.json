@@ -3,31 +3,8 @@
   "retentionDays": 7,
   "totalSnapshots": 94,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-11T21:08:12.935Z",
+  "updatedAt": "2026-11-12T02:24:22.826Z",
   "snapshots": [
-    {
-      "timestamp": "2026-11-05T00:13:40.780Z",
-      "date": "2026-11-05",
-      "hour": 7,
-      "hanoi": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 16,
-        "congestionIndex": 2.6,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-11-05T07:12:49.178Z",
       "date": "2026-11-05",
@@ -3837,6 +3814,54 @@
         "congestionIndex": 1,
         "maxRainMm": 0.3,
         "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-11-12T02:24:22.826Z",
+      "date": "2026-11-12",
+      "hour": 9,
+      "hanoi": {
+        "avgSpeedKmh": 6,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 4.2,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 10,
+        "congestionIndex": 5,
+        "maxRainMm": 10,
+        "activeFloodSpots": [
+          {
+            "id": "dn-01",
+            "name": "Nút giao Hàm Nghi - Nguyễn Văn Linh (Thanh Khê)",
+            "depth_cm": 11,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-02",
+            "name": "Đường Mẹ Suốt (Liên Chiểu)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-03",
+            "name": "Nút giao Lê Duẩn - Ông Ích Khiêm (Hải Châu)",
+            "depth_cm": 10,
+            "danger_level": "medium"
+          },
+          {
+            "id": "dn-04",
+            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
+            "depth_cm": 21,
+            "danger_level": "medium"
+          }
+        ]
       }
     }
   ]
