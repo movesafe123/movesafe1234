@@ -3,31 +3,8 @@
   "retentionDays": 7,
   "totalSnapshots": 94,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-12T23:59:41.144Z",
+  "updatedAt": "2026-11-13T06:26:28.100Z",
   "snapshots": [
-    {
-      "timestamp": "2026-11-06T02:05:54.993Z",
-      "date": "2026-11-06",
-      "hour": 9,
-      "hanoi": {
-        "avgSpeedKmh": 7,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 11,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-11-06T09:42:52.526Z",
       "date": "2026-11-06",
@@ -3954,6 +3931,78 @@
             "danger_level": "medium"
           }
         ]
+      }
+    },
+    {
+      "timestamp": "2026-11-13T06:26:28.100Z",
+      "date": "2026-11-13",
+      "hour": 13,
+      "hanoi": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 5,
+        "congestionIndex": 4.2,
+        "maxRainMm": 15,
+        "activeFloodSpots": [
+          {
+            "id": "udi-01",
+            "name": "Đường Huỳnh Tấn Phát (Quận 7 - Đoạn gần cầu Phú Mỹ)",
+            "depth_cm": 28,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-02",
+            "name": "Đường Quốc Hương - Thảo Điền (TP. Thủ Đức)",
+            "depth_cm": 23,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-03",
+            "name": "Đường Trần Xuân Soạn (Quận 7 - Dọc Kênh Tẻ)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-04",
+            "name": "Đường Nguyễn Văn Quá (Quận 12)",
+            "depth_cm": 16,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-05",
+            "name": "Đường Ung Văn Khiêm (Quận Bình Thạnh)",
+            "depth_cm": 15,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-06",
+            "name": "Đường Nguyễn Hữu Cảnh (Bình Thạnh - Chân cầu Sài Gòn)",
+            "depth_cm": 23,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-07",
+            "name": "Đường Kha Vạn Cân - Tô Ngọc Vân (Chợ Thủ Đức)",
+            "depth_cm": 25,
+            "danger_level": "medium"
+          },
+          {
+            "id": "udi-08",
+            "name": "Đường Phan Huy Ích (Gò Vấp - Tân Bình)",
+            "depth_cm": 20,
+            "danger_level": "medium"
+          }
+        ]
+      },
+      "danang": {
+        "avgSpeedKmh": 15,
+        "congestionIndex": 2.6,
+        "maxRainMm": 0.2,
+        "activeFloodSpots": []
       }
     }
   ]
