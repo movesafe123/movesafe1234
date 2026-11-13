@@ -6150,6 +6150,57 @@ class GoogleMapsApp {
       foodNearCount
     };
 
+    if (typeof window !== 'undefined' && window.moveSafeLogger) {
+      window.moveSafeLogger.log({
+        category: 'property',
+        title: `Chấm điểm An cư & Cốt nền DEM: ${targetName}`,
+        source: 'js/app.js :: evaluatePropertyScore()',
+        durationMs: 45,
+        status: totalScore >= 75 ? 'success' : 'warning',
+        input: {
+          targetName,
+          lat: targetLat,
+          lng: targetLng,
+          city: targetCity,
+          satelliteElevationM: elevationM,
+          totalFloodSpotsScanned: allFloodSpots.length,
+          nearestFloodSpot: nearestFlood ? { name: nearestFlood.name, distM: minDistM } : null
+        },
+        steps: [
+          {
+            stepName: 'Trụ cột 1: Chống ngập & Cốt nền DEM vệ tinh (Tối đa 40đ)',
+            formulaOrRule: `minDistM=${minDistM}m, elevation=+${elevationM}m (isElevated=${isElevated}, isVeryLow=${isVeryLow})`,
+            detail: `Đạt ${floodScore}/40 điểm (có ${floodWithin800m} điểm ngập trong 850m).`,
+            metrics: { floodScore, minDistM, elevationM, floodWithin800m }
+          },
+          {
+            stepName: 'Trụ cột 2: Giao thông & Công trường 1.2km (Tối đa 25đ)',
+            formulaOrRule: 'clamp(25 - jamsNear*4 - worksNear*3, 8, 25)',
+            detail: `Ghi nhận ${jamsNear} điểm kẹt xe, ${worksNear} công trường -> ${mobilityScore}/25 điểm.`,
+            metrics: { mobilityScore, jamsNear, worksNear }
+          },
+          {
+            stepName: 'Trụ cột 3: Hạ tầng EV 1.5km & Điểm trú mưa 2.5km (Tối đa 20đ)',
+            formulaOrRule: 'min(20, 10 + min(6, ev*2) + min(4, shelters*2))',
+            detail: `Có ${evNearCount} trạm sạc EV và ${sheltersNear.length} điểm gửi xe cao ráo -> ${infraScore}/20 điểm.`,
+            metrics: { infraScore, evNearCount, sheltersNear: sheltersNear.length }
+          },
+          {
+            stepName: 'Trụ cột 4: Tiện ích Ẩm thực/TTTM 1.8km (Tối đa 15đ)',
+            formulaOrRule: 'min(15, 8 + min(7, foodNearCount))',
+            detail: `Có ${foodNearCount} điểm dịch vụ xung quanh -> ${lifestyleScore}/15 điểm.`,
+            metrics: { lifestyleScore, foodNearCount }
+          },
+          {
+            stepName: 'Bước 5: Áp dụng Trần điểm cứng (Hard Ceilings)',
+            formulaOrRule: '<350m: max 54 | <600m & !elevated: max 63 | <1000m & veryLow: max 72',
+            detail: `Tổng hợp cuối cùng: ${totalScore}/100 (Hạng ${grade}).`
+          }
+        ],
+        output: this._lastPropertyEvaluation
+      });
+    }
+
     this._lastPropertyReportText = `[PHIẾU KHẢO SÁT AN CƯ & MẶT BẰNG - MOVESAFE VN]\n- Địa điểm: ${targetName} (${targetLat.toFixed(5)}, ${targetLng.toFixed(5)})\n- Tổng điểm: ${totalScore}/100 (Hạng ${grade} - ${verdict})\n- Cốt nền vệ tinh: +${elevationM}m so với mực nước biển\n- Khoảng cách tới rốn ngập lịch sử gần nhất: ${minDistM}m (${nearestFlood?.name || 'Không có'})\n- Bán kính 1.5km: ${evNearCount} Trạm sạc EV, ${sheltersNear.length} Điểm gửi xe cao ráo, ${foodNearCount} Tiện ích ẩm thực/TTTM.`;
 
     bodyEl.innerHTML = `

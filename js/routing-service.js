@@ -1025,6 +1025,7 @@ return {
    * Hỗ trợ cấm đường / né đường giả định (avoidRoads) theo yêu cầu tự nhiên của người dùng
    */
   async calculateMultiRoutes({ origin, destination, viaWaypoint = null, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [] }) {
+    const _routeStartMs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } =
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
 
@@ -1045,7 +1046,7 @@ return {
 
     if (originInDeepFlood || destInDeepFlood) {
       const badSpot = originInDeepFlood || destInDeepFlood;
-      return {
+      const failRes = {
         noPassableRoute: true,
         vehicleSpecs: specs,
         vehicleType,
@@ -1055,6 +1056,22 @@ return {
         advice: `Nguy cơ: ${specs.hazardRisk}. Bạn nên tạm hoãn xuất phát hoặc đổi sang xe gầm cao / xe cứu hộ.`,
         routes: []
       };
+      if (typeof window !== 'undefined' && window.moveSafeLogger) {
+        window.moveSafeLogger.log({
+          category: 'routing',
+          title: `Định tuyến Né ngập (${specs.name}) - Tạm dừng an toàn`,
+          source: 'js/routing-service.js :: calculateMultiRoutes()',
+          durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _routeStartMs,
+          status: 'warning',
+          input: { origin, destination, vehicleType, avoidRoads: cleanAvoidRoads, activeFloodPointsCount: floodPoints.length, activeTrafficIncidentsCount: trafficIncidents.length, directDistanceMeters: Math.round(directDistMeters) },
+          steps: [
+            { stepName: 'Bước 1: Phân loại Ngập theo Vật lý Phương tiện (classifyHazards)', formulaOrRule: `blocked >= ${specs.maxPassableDepth}cm | safe <= ${specs.safeDepth}cm`, detail: `Phát hiện ${blockedFloods.length} điểm ngập vượt ngưỡng cho ${specs.name}.` },
+            { stepName: 'Bước 2: Kiểm tra Tâm rốn ngập tại Điểm đầu / Điểm cuối', formulaOrRule: `getDistanceMeters <= radius (${specs.corridorBuffer}m)`, detail: `${badSpot.name} đang ngập ${badSpot.depth_cm}cm > ${specs.maxPassableDepth}cm -> Ngắt sớm để bảo vệ động cơ.` }
+          ],
+          output: { noPassableRoute: true, message: failRes.message, advice: failRes.advice }
+        });
+      }
+      return failRes;
     }
 
     // 2. Lấy tuyến trực tiếp từ OSRM (hỗ trợ chèn điểm dừng chân viaWaypoint)
@@ -1254,7 +1271,7 @@ return {
       const depths = blockedFloods.map(f => f.depth_cm);
       const minD = depths.length > 0 ? Math.min(...depths) : specs.maxPassableDepth;
       const maxD = depths.length > 0 ? Math.max(...depths) : specs.maxPassableDepth;
-      return {
+      const blockedResult = {
         noPassableRoute: true,
         vehicleSpecs: specs,
         vehicleType,
@@ -1265,6 +1282,23 @@ return {
         advice: `Tất cả các ngả đường tiếp cận đều đang ngập sâu từ ${minD}cm - ${maxD}cm (vượt quá giới hạn an toàn ${specs.maxPassableDepth}cm). Nguy cơ cao ${specs.hazardRisk.toLowerCase()}.`,
         routes: []
       };
+      if (typeof window !== 'undefined' && window.moveSafeLogger) {
+        window.moveSafeLogger.log({
+          category: 'routing',
+          title: `Định tuyến Né ngập (${specs.name}) - Toàn bộ lộ trình bị chặn`,
+          source: 'js/routing-service.js :: calculateMultiRoutes()',
+          durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _routeStartMs,
+          status: 'warning',
+          input: { origin, destination, viaWaypoint, vehicleType, avoidRoads: cleanAvoidRoads, activeFloodPointsCount: floodPoints.length, activeTrafficIncidentsCount: trafficIncidents.length, directDistanceMeters: Math.round(directDistMeters) },
+          steps: [
+            { stepName: 'Bước 1: Phân loại Chướng ngại (classifyHazards)', formulaOrRule: `maxPassable=${specs.maxPassableDepth}cm, safe=${specs.safeDepth}cm`, detail: `${blockedFloods.length} ngập cấm, ${cautionFloods.length} ngập cảnh báo, ${blockedTraffics.length} điểm kẹt cứng/đóng đường.` },
+            { stepName: 'Bước 2: Truy vấn OSRM & Sinh Waypoint Pháp tuyến', formulaOrRule: 'perpLat = -dLng/len; perpLng = dLat/len', detail: `OSRM trực tiếp: ${directRoutes.length} tuyến | Tổng ứng viên sau Detour Waypoints: ${allRawCandidates.length} tuyến.` },
+            { stepName: 'Bước 3: Lọc Hình học & Quét Hành lang Corridor X-Ray', formulaOrRule: `detectBacktracking + isExcessiveDetour(2.2x) + buffer ${specs.corridorBuffer}m`, detail: `Sau lọc hình học còn ${goodCandidates.length} tuyến -> Tất cả ${blockedRoutes.length} tuyến đều cắt qua điểm ngập/cấm.` }
+          ],
+          output: { noPassableRoute: true, blockedCount: blockedRoutes.length, blockedReasons: blockedRoutes.slice(0, 5).map(b => b.reason), advice: blockedResult.advice }
+        });
+      }
+      return blockedResult;
     }
 
     // 7. Đánh giá chi tiết lưu thông & nước nông trên các tuyến ĐI ĐƯỢC
@@ -1273,7 +1307,89 @@ return {
     );
 
     // 8. Xây dựng 3 chế độ từ các tuyến ĐI ĐƯỢC
-    return this.buildThreePassableModes(analyzedPassableRoutes, avoidLevel, specs, blockedRoutes, cleanAvoidRoads);
+    const finalOutput = this.buildThreePassableModes(analyzedPassableRoutes, avoidLevel, specs, blockedRoutes, cleanAvoidRoads);
+
+    if (typeof window !== 'undefined' && window.moveSafeLogger) {
+      window.moveSafeLogger.log({
+        category: 'routing',
+        title: `Định tuyến Đa mục tiêu (${specs.name})`,
+        source: 'js/routing-service.js :: calculateMultiRoutes()',
+        durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _routeStartMs,
+        status: 'success',
+        input: {
+          origin,
+          destination,
+          viaWaypoint,
+          vehicleType,
+          vehicleSpecs: {
+            safeDepth: specs.safeDepth,
+            maxPassableDepth: specs.maxPassableDepth,
+            corridorBuffer: specs.corridorBuffer,
+            allowAlleys: specs.allowAlleys,
+            speedFactor: specs.speedFactor
+          },
+          avoidRoads: cleanAvoidRoads,
+          activeFloodPointsCount: floodPoints.length,
+          activeTrafficIncidentsCount: trafficIncidents.length,
+          directDistanceMeters: Math.round(directDistMeters)
+        },
+        steps: [
+          {
+            stepName: 'Bước 1: Phân loại Chướng ngại theo Vật lý Xe (classifyHazards)',
+            formulaOrRule: `safe <= ${specs.safeDepth}cm | caution < ${specs.maxPassableDepth}cm | blocked >= ${specs.maxPassableDepth}cm`,
+            detail: `Ghi nhận ${blockedFloods.length} rốn ngập cấm, ${cautionFloods.length} ngập thận trọng, ${safeFloods.length} nước nông và ${blockedTraffics.length} kẹt xe cứng.`,
+            metrics: { blockedFloods: blockedFloods.length, cautionFloods: cautionFloods.length, blockedTraffics: blockedTraffics.length }
+          },
+          {
+            stepName: 'Bước 2: Truy vấn OSRM & Sinh Waypoint Né Pháp tuyến (generateDetourWaypoints)',
+            formulaOrRule: 'perpLat = -(dLng/len), perpLng = dLat/len @ 40% & 60%',
+            detail: `Tuyến trực tiếp OSRM: ${directRoutes.length} (${directPassableCount} sạch). Tổng số tuyến ứng viên sau pha Detour: ${allRawCandidates.length}.`,
+            metrics: { directRoutes: directRoutes.length, directPassableCount, rawCandidates: allRawCandidates.length }
+          },
+          {
+            stepName: 'Bước 3: Lọc Hình học & Quét Hành lang Corridor X-Ray (checkRoutePassability)',
+            formulaOrRule: `BBox(0.006°) + Projection u∈[0,1] <= ${specs.corridorBuffer}m | Detour <= 2.2x`,
+            detail: `Sau loại đi vòng & trùng lặp còn ${goodCandidates.length} tuyến -> ${passableCandidates.length} tuyến khả dụng, ${blockedRoutes.length} tuyến bị chặn.`,
+            metrics: { afterGeometryFilter: goodCandidates.length, passableCount: passableCandidates.length, blockedCount: blockedRoutes.length }
+          },
+          {
+            stepName: 'Bước 4: Mô hình Phi tuyến BPR, Anti-Alley Trap & Chấm điểm (evaluatePassableRoute)',
+            formulaOrRule: 'bprDelay = round(4*0.15*(V/C)^4*8) * (peak ? 1.35 : 1); RPI[35..98]; Eco[40..99]',
+            detail: `Tính thời gian thực, kiểm tra hẻm (>250m hoặc >15% bị gắn bẫy với 4 bánh), điểm RPI & Eco-Smooth trên ${analyzedPassableRoutes.length} tuyến.`,
+            metrics: analyzedPassableRoutes.slice(0, 4).map(r => ({
+              distanceKm: r.distanceKm,
+              durationMin: r.durationMin,
+              realAvgSpeedKmh: r.realAvgSpeedKmh,
+              jamPercent: r.jamPercent,
+              hasAlleyTrap: r.hasAlleyTrap,
+              rpi: r.rpi,
+              ecoScore: r.ecoScore
+            }))
+          },
+          {
+            stepName: 'Bước 5: Tối ưu Đa mục tiêu thành 3 Chế độ (buildThreePassableModes)',
+            formulaOrRule: 'Dynamic Flow (min duration) | Resilient (no alley, 0 flood, max RPI) | Eco-Smooth (max EcoScore)',
+            detail: `Chọn ra ${(finalOutput.routes || []).length} phương án đại diện tốt nhất theo tiêu chí tách biệt hình học.`
+          }
+        ],
+        output: {
+          selectedRoutes: (finalOutput.routes || []).map(r => ({
+            routeType: r.routeType,
+            label: r.label,
+            distanceKm: r.distanceKm,
+            durationMin: r.durationMin,
+            realAvgSpeedKmh: r.realAvgSpeedKmh,
+            jamPercent: r.jamPercent,
+            rpi: r.rpi,
+            ecoScore: r.ecoScore,
+            matchedFloodsCount: (r.matchedFloods || []).length
+          })),
+          blockedRoutes: blockedRoutes.slice(0, 5).map(b => ({ reason: b.reason, distanceKm: b.distanceKm }))
+        }
+      });
+    }
+
+    return finalOutput;
   }
 }
 

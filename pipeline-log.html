@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoveSafe VN — Nhật ký Luồng Xử lý Thuật toán (/system-log)</title>
+  <link rel="stylesheet" href="css/pipeline-log.css?v=1.0" />
+</head>
+<body>
+  <div class="pl-shell">
+    <!-- HEADER -->
+    <header class="pl-header">
+      <div class="pl-brand">
+        <div class="pl-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1 class="pl-title">MoveSafe VN — Giám sát Luồng Dữ liệu &amp; Thuật toán</h1>
+          <div class="pl-subtitle">
+            <span class="pl-route-pill">
+              <span class="pl-status-dot" id="sse-dot"></span>
+              <span id="sse-status-text">Đang kết nối SSE + BroadcastChannel...</span>
+            </span>
+            <span>Trang kỹ thuật độc lập (/system-log) — Không có liên kết từ giao diện web chính</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pl-actions">
+        <button type="button" class="pl-btn active" id="btn-autoscroll" title="Tự động cuộn lên bản ghi mới nhất">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
+          <span>Theo dõi trực tiếp</span>
+        </button>
+        <button type="button" class="pl-btn" id="btn-refresh-server">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Đồng bộ Server</span>
+        </button>
+        <button type="button" class="pl-btn" id="btn-export-json">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Xuất JSON</span>
+        </button>
+        <button type="button" class="pl-btn danger" id="btn-clear-logs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Xóa Log</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- LIVE SIMULATOR BAR -->
+    <section class="pl-sim-bar">
+      <div class="pl-sim-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Chạy thử thuật toán trực tiếp tại đây:</span>
+      </div>
+      <div class="pl-sim-buttons">
+        <button type="button" class="pl-sim-btn" id="sim-routing">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          <span>Định tuyến Né ngập (Ngã Tư Sở → Hồ Gươm)</span>
+        </button>
+        <button type="button" class="pl-sim-btn" id="sim-forecast">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Dự báo Spatio-Temporal (+2h Hà Nội)</span>
+        </button>
+        <button type="button" class="pl-sim-btn" id="sim-ai">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          <span>AI Copilot &amp; Staggered Hedge Race</span>
+        </button>
+        <button type="button" class="pl-sim-btn" id="sim-cci">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+          <span>Chỉ số Thoải mái (CCI) &amp; An cư DEM</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- FILTERS & KPI -->
+    <section class="pl-toolbar">
+      <div class="pl-filters" id="filter-bar">
+        <button type="button" class="pl-filter-chip active" data-cat="all">Tất cả <span class="pl-count-badge" id="cnt-all">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="routing">Định tuyến <span class="pl-count-badge" id="cnt-routing">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="ai">AI Copilot <span class="pl-count-badge" id="cnt-ai">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="forecast">Dự báo (+1h..+3h) <span class="pl-count-badge" id="cnt-forecast">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="bot">Bot &amp; Cảm biến <span class="pl-count-badge" id="cnt-bot">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="property">An cư &amp; DEM <span class="pl-count-badge" id="cnt-property">0</span></button>
+        <button type="button" class="pl-filter-chip" data-cat="weather">Thời tiết CCI <span class="pl-count-badge" id="cnt-weather">0</span></button>
+      </div>
+
+      <div class="pl-search-stats">
+        <div class="pl-search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="pl-search-input" id="search-input" placeholder="Lọc theo tên đường, công thức, model..." />
+        </div>
+        <div class="pl-stat-pill">Hiển thị: <strong id="stat-total">0</strong></div>
+        <div class="pl-stat-pill">TB xử lý: <strong id="stat-avg-ms">0 ms</strong></div>
+      </div>
+    </section>
+
+    <!-- LOG STREAM -->
+    <main class="pl-feed" id="log-feed">
+      <div class="pl-empty" id="empty-state">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg>
+        <h3>Chưa có bản ghi luồng xử lý nào</h3>
+        <p>Mở tab trang web chính để tìm đường / hỏi AI / chấm điểm An cư, hoặc bấm các nút <strong>Chạy thử thuật toán</strong> ở thanh phía trên.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Core Scripts để chạy thử thuật toán ngay tại trang Log -->
+  <script src="js/pipeline-logger.js?v=4.0"></script>
+  <script src="js/routing-service.js?v=4.0"></script>
+  <script src="js/weather-service.js?v=4.0"></script>
+  <script>
+    (function () {
+      const CAT_LABELS = {
+        routing: 'Định tuyến',
+        ai: 'AI Copilot',
+        forecast: 'Dự báo +1h..+3h',
+        bot: 'Bot Thu thập',
+        property: 'An cư & DEM',
+        weather: 'Thời tiết CCI'
+      };
+
+      const state = {
+        logs: [],
+        activeCat: 'all',
+        searchText: '',
+        autoScroll: true,
+        openRawIds: new Set()
+      };
+
+      const feedEl = document.getElementById('log-feed');
+      const sseDot = document.getElementById('sse-dot');
+      const sseText = document.getElementById('sse-status-text');
+
+      function escapeHtml(str) {
+        return String(str ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function formatValue(val) {
+        if (val === null || val === undefined) return 'null';
+        if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+          return String(val);
+        }
+        return JSON.stringify(val, null, 2);
+      }
+
+      function mergeLogEntry(entry) {
+        if (!entry || !entry.id) return;
+        const idx = state.logs.findIndex(x => x.id === entry.id);
+        if (idx >= 0) {
+          state.logs[idx] = entry;
+        } else {
+          state.logs.unshift(entry);
+        }
+        state.logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        if (state.logs.length > 150) state.logs.length = 150;
+      }
+
+      function renderKeyValueBlock(obj) {
+        if (!obj || typeof obj !== 'object') {
+          return `<div class="pl-kv-item"><div class="pl-kv-val">${escapeHtml(formatValue(obj))}</div></div>`;
+        }
+        const entries = Object.entries(obj);
+        if (entries.length === 0) {
+          return `<div class="pl-kv-item"><div class="pl-kv-val">(Không có tham số)</div></div>`;
+        }
+        return `<div class="pl-kv-list">${entries.map(([k, v]) => `
+          <div class="pl-kv-item">
+            <div class="pl-kv-key">${escapeHtml(k)}</div>
+            <div class="pl-kv-val">${escapeHtml(formatValue(v))}</div>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      function renderStepsBlock(steps) {
+        if (!Array.isArray(steps) || steps.length === 0) {
+          return `<div class="pl-kv-item"><div class="pl-kv-val">Xử lý trực tiếp một bước</div></div>`;
+        }
+        return `<div class="pl-step-list">${steps.map((st, idx) => `
+          <div class="pl-step-item">
+            <div class="pl-step-title">${escapeHtml(st.stepName || ('Bước ' + (idx + 1)))}</div>
+            ${st.formulaOrRule ? `<div class="pl-step-formula">${escapeHtml(st.formulaOrRule)}</div>` : ''}
+            <div class="pl-step-detail">${escapeHtml(st.detail || '')}</div>
+            ${st.metrics ? `<pre class="pl-step-metrics">${escapeHtml(JSON.stringify(st.metrics, null, 2))}</pre>` : ''}
+          </div>
+        `).join('')}</div>`;
+      }
+
+      function updateCounts() {
+        const counts = { all: state.logs.length, routing: 0, ai: 0, forecast: 0, bot: 0, property: 0, weather: 0 };
+        let totalMs = 0;
+        state.logs.forEach(l => {
+          if (counts[l.category] !== undefined) counts[l.category]++;
+          totalMs += Number(l.durationMs) || 0;
+        });
+        Object.entries(counts).forEach(([cat, val]) => {
+          const el = document.getElementById('cnt-' + cat);
+          if (el) el.textContent = String(val);
+        });
+        const avgEl = document.getElementById('stat-avg-ms');
+        if (avgEl) avgEl.textContent = state.logs.length ? `${Math.round(totalMs / state.logs.length)} ms` : '0 ms';
+      }
+
+      function renderFeed() {
+        updateCounts();
+        const q = state.searchText.trim().toLowerCase();
+        const visible = state.logs.filter(item => {
+          if (state.activeCat !== 'all' && item.category !== state.activeCat) return false;
+          if (!q) return true;
+          return JSON.stringify(item).toLowerCase().includes(q);
+        });
+
+        document.getElementById('stat-total').textContent = String(visible.length);
+
+        if (visible.length === 0) {
+          feedEl.innerHTML = `
+            <div class="pl-empty">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg>
+              <h3>Không có bản ghi phù hợp</h3>
+              <p>Hãy thao tác bên web chính hoặc bấm một trong 4 nút <strong>Chạy thử thuật toán</strong> ở thanh phía trên.</p>
+            </div>
+          `;
+          return;
+        }
+
+        feedEl.innerHTML = visible.map(log => {
+          const catClass = 'cat-' + (CAT_LABELS[log.category] ? log.category : 'bot');
+          const catLabel = CAT_LABELS[log.category] || log.category.toUpperCase();
+          const timeStr = new Date(log.timestamp).toLocaleTimeString('vi-VN', { hour12: false });
+          const isRawOpen = state.openRawIds.has(log.id);
+
+          return `
+            <article class="pl-card" data-log-id="${escapeHtml(log.id)}">
+              <div class="pl-card-head">
+                <div class="pl-card-title-row">
+                  <span class="pl-cat-badge ${catClass}">${escapeHtml(catLabel)}</span>
+                  <span class="pl-origin-badge">${escapeHtml((log.origin || 'server').toUpperCase())}</span>
+                  <span class="pl-card-title">${escapeHtml(log.title)}</span>
+                  ${log.source ? `<span class="pl-card-source">${escapeHtml(log.source)}</span>` : ''}
+                </div>
+                <div class="pl-card-meta">
+                  <span class="pl-duration-pill">${log.durationMs || 0} ms</span>
+                  <span>${escapeHtml(timeStr)}</span>
+                  <button type="button" class="pl-raw-toggle" data-toggle-raw="${escapeHtml(log.id)}">${isRawOpen ? 'Ẩn JSON' : 'Xem JSON gốc'}</button>
+                </div>
+              </div>
+
+              <div class="pl-columns">
+                <section class="pl-col col-input">
+                  <div class="pl-col-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    <span>1. Dữ liệu Đầu vào (Input)</span>
+                  </div>
+                  ${renderKeyValueBlock(log.input)}
+                </section>
+
+                <section class="pl-col col-process">
+                  <div class="pl-col-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>2. Quá trình Xử lý Thuật toán</span>
+                  </div>
+                  ${renderStepsBlock(log.steps)}
+                </section>
+
+                <section class="pl-col col-output">
+                  <div class="pl-col-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>3. Dữ liệu Đầu ra (Output)</span>
+                  </div>
+                  ${renderKeyValueBlock(log.output)}
+                </section>
+              </div>
+
+              <div class="pl-raw-json-drawer ${isRawOpen ? 'open' : ''}">
+                <pre class="pl-raw-pre">${escapeHtml(JSON.stringify(log, null, 2))}</pre>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      const apiUrl = (p) => (typeof window.getApiUrl === 'function' ? window.getApiUrl(p) : p);
+
+      async function fetchServerLogs() {
+        try {
+          const res = await fetch(apiUrl('/api/system-logs?limit=80'));
+          if (!res.ok) return;
+          const json = await res.json();
+          if (Array.isArray(json.logs)) {
+            json.logs.forEach(mergeLogEntry);
+            renderFeed();
+          }
+        } catch (_e) {}
+      }
+
+      function initRealtimeStreams() {
+        if (window.moveSafeLogger) {
+          window.moveSafeLogger.getLocalLogs().forEach(mergeLogEntry);
+          window.moveSafeLogger.subscribe((evType, payload) => {
+            if (evType === 'log:new' && payload) {
+              mergeLogEntry(payload);
+              renderFeed();
+              if (state.autoScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (evType === 'log:cleared') {
+              state.logs = [];
+              renderFeed();
+            } else if (evType === 'log:sync' && Array.isArray(payload)) {
+              payload.forEach(mergeLogEntry);
+              renderFeed();
+            }
+          });
+        }
+
+        if (typeof EventSource !== 'undefined') {
+          const es = new EventSource(apiUrl('/api/live-stream'));
+          es.onopen = () => {
+            sseDot.classList.remove('offline');
+            sseText.textContent = 'SSE + BroadcastChannel đang đồng bộ trực tiếp';
+          };
+          es.onmessage = (ev) => {
+            try {
+              const msg = JSON.parse(ev.data);
+              if (msg.type === 'system_log' && msg.log) {
+                mergeLogEntry(msg.log);
+                renderFeed();
+                if (state.autoScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            } catch (_e) {}
+          };
+          es.onerror = () => {
+            sseDot.classList.add('offline');
+            sseText.textContent = 'SSE gián đoạn — đang dùng BroadcastChannel & localStorage';
+          };
+        }
+      }
+
+      // Event bindings
+      document.getElementById('filter-bar').addEventListener('click', (e) => {
+        const btn = e.target.closest('.pl-filter-chip');
+        if (!btn) return;
+        document.querySelectorAll('.pl-filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.activeCat = btn.dataset.cat || 'all';
+        renderFeed();
+      });
+
+      document.getElementById('search-input').addEventListener('input', (e) => {
+        state.searchText = e.target.value || '';
+        renderFeed();
+      });
+
+      feedEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-raw]');
+        if (!btn) return;
+        const id = btn.getAttribute('data-toggle-raw');
+        if (state.openRawIds.has(id)) state.openRawIds.delete(id);
+        else state.openRawIds.add(id);
+        renderFeed();
+      });
+
+      document.getElementById('btn-autoscroll').addEventListener('click', (e) => {
+        state.autoScroll = !state.autoScroll;
+        e.currentTarget.classList.toggle('active', state.autoScroll);
+      });
+
+      document.getElementById('btn-refresh-server').addEventListener('click', fetchServerLogs);
+
+      document.getElementById('btn-export-json').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state.logs, null, 2)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `movesafe_pipeline_logs_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('btn-clear-logs').addEventListener('click', async () => {
+        state.logs = [];
+        if (window.moveSafeLogger) window.moveSafeLogger.clear();
+        try { await fetch(apiUrl('/api/system-logs'), { method: 'DELETE' }); } catch (_e) {}
+        renderFeed();
+      });
+
+      // Live Pipeline Simulators
+      document.getElementById('sim-routing').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        try {
+          let floodPoints = [
+            { id: 'sim-f1', name: 'Ngã ba Thái Hà - Chùa Bộc', lat: 21.0085, lng: 105.8225, depth_cm: 35, radius: 180, danger_level: 'critical' }
+          ];
+          let trafficIncidents = [
+            { id: 'sim-t1', roadName: 'Đường Láng', lat: 21.012, lng: 105.805, isJam: true, speedKmh: 9, delaySeconds: 420 }
+          ];
+          try {
+            const rLive = await fetch(apiUrl('/api/live-data'));
+            if (rLive.ok) {
+              const j = await rLive.json();
+              if (j.data?.floodPoints?.length) floodPoints = j.data.floodPoints.concat(floodPoints);
+              if (j.data?.trafficIncidents?.length) trafficIncidents = j.data.trafficIncidents;
+            }
+          } catch (_e) {}
+          await window.routingService.calculateMultiRoutes({
+            origin: { lat: 21.0031, lng: 105.8201, name: 'Ngã Tư Sở' },
+            destination: { lat: 21.0285, lng: 105.8542, name: 'Hồ Gươm' },
+            floodPoints,
+            trafficIncidents,
+            vehicleType: 'motorbike',
+            avoidLevel: 1
+          });
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById('sim-forecast').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        const t0 = performance.now();
+        try {
+          const r = await fetch(apiUrl('/api/predictions?city=hanoi&offsetHours=2'));
+          const data = r.ok ? await r.json() : null;
+          await fetchServerLogs();
+          if (!data || !state.logs.some(l => l.category === 'forecast')) {
+            window.moveSafeLogger.log({
+              category: 'forecast',
+              title: 'Dự báo Không gian - Thời gian (+2h) tại HANOI',
+              source: 'api/predictions (Fallback Trace)',
+              durationMs: performance.now() - t0,
+              input: { city: 'hanoi', offsetHours: 2, clockHour: data?.clockHour ?? ((new Date().getHours() + 2) % 24), maxForecastRainMm: data?.maxForecastRain ?? 0 },
+              steps: [
+                { stepName: 'Bước 1: Mô hình Dự báo Ngập (Rain Boost & Residual Decay)', formulaOrRule: 'residual = max(0, currDepth - 12 * offsetHours)', detail: `Trả về ${data?.floodPoints?.length ?? 0} điểm ngập dự báo >= 10cm.` },
+                { stepName: 'Bước 2: Lan truyền Kẹt xe & Baseline 7 ngày', formulaOrRule: 'HistoryService + isPeakHour / isNightTime', detail: `Tổng hợp ${data?.trafficIncidents?.length ?? 0} điểm kẹt xe tương lai.` }
+              ],
+              output: { floodCount: data?.floodPoints?.length ?? 0, trafficCount: data?.trafficIncidents?.length ?? 0, status: data?.status || 'offline' }
+            });
+          }
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById('sim-ai').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        const t0 = performance.now();
+        const sampleQuery = 'Từ Ngã Tư Sở đi Hồ Gươm bằng xe máy có điểm ngập nào không?';
+        try {
+          const r = await fetch(apiUrl('/api/ai/chat'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: sampleQuery,
+              city: 'hanoi',
+              context: { currentCity: 'hanoi', history: [] }
+            })
+          });
+          const data = r.ok ? await r.json() : null;
+          await fetchServerLogs();
+          if (data?.response) {
+            window.moveSafeLogger.log({
+              category: 'ai',
+              title: `AI Copilot & Spatial RAG (${data.response.modelUsed || 'Backend AI'})`,
+              source: 'pipeline-log :: POST /api/ai/chat',
+              durationMs: performance.now() - t0,
+              input: { query: sampleQuery, city: 'hanoi' },
+              steps: [
+                { stepName: 'Bước 1: Spatial RAG & Định lượng gầm xe', formulaOrRule: 'prepareSpatialRagAndSafety + Deterministic Brief', detail: 'Đo mực nước sâu nhất đối chiếu ngưỡng xe máy (10..20cm).' },
+                { stepName: 'Bước 2: Điều phối Model LLM', formulaOrRule: 'Staggered Hedge Race (2.5-flash vs 3-flash-preview @ 900ms)', detail: `Model phản hồi: ${data.response.modelUsed || 'Smart Engine'}.` }
+              ],
+              output: { replyPreview: String(data.response.text || data.response.reply || '').slice(0, 300), action: data.response.action || null }
+            });
+          }
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById('sim-cci').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        try {
+          if (window.weatherService && typeof window.weatherService.getCommuteComfortData === 'function') {
+            await window.weatherService.getCommuteComfortData(21.0285, 105.8542, 'Hà Nội (Hồ Gươm)');
+          }
+          // Mô phỏng chấm điểm An cư & DEM
+          let elev = 12.5;
+          try {
+            const er = await fetch('https://api.open-meteo.com/v1/elevation?latitude=21.0285&longitude=105.8542');
+            const ed = await er.json();
+            if (Array.isArray(ed.elevation) && typeof ed.elevation[0] === 'number') elev = ed.elevation[0];
+          } catch (_e) {}
+          const floodScore = elev >= 14 ? 38 : 34;
+          const mobilityScore = 21;
+          const infraScore = 18;
+          const lifestyleScore = 15;
+          const totalScore = floodScore + mobilityScore + infraScore + lifestyleScore;
+          window.moveSafeLogger.log({
+            category: 'property',
+            title: 'Chấm điểm An cư & Cốt nền DEM: Khu vực Hồ Gươm (Mẫu)',
+            source: 'pipeline-log :: Simulator (Open-Meteo DEM)',
+            durationMs: 32,
+            input: { targetName: 'Hồ Gươm, Hoàn Kiếm', lat: 21.0285, lng: 105.8542, city: 'hanoi', satelliteElevationM: elev },
+            steps: [
+              { stepName: 'Trụ cột 1: Chống ngập & Cốt nền DEM', formulaOrRule: `elevation=+${elev}m (ngưỡng cao ráo HN >= 14m)`, detail: `Đạt ${floodScore}/40 điểm.` },
+              { stepName: 'Trụ cột 2-4: Giao thông (21/25) + Hạ tầng EV (18/20) + Tiện ích (15/15)', formulaOrRule: 'total = flood + mobility + infra + lifestyle', detail: `Tổng hợp ${totalScore}/100 điểm.` }
+            ],
+            output: { totalScore, grade: totalScore >= 88 ? 'A+' : 'A', elevationM: elev }
+          });
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      initRealtimeStreams();
+      fetchServerLogs();
+    })();
+  </script>
+</body>
+</html>

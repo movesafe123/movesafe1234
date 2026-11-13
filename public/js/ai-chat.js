@@ -183,7 +183,7 @@ class AIChat {
     this.updateDynamicQuickPrompts();
     if (this.messages.length === 0) {
       this.addBotMessage(
-        `Xin chào! Tôi là **Trợ lý AI MoveSafe VN (Agentic Spatial Copilot)**.\n` +
+        `Xin chào! Tôi là **Trợ lý AI Giao thông MoveSafe VN (Google Gemini Spatial AI)**.\n` +
         `Tôi đồng bộ trực tiếp 100% dữ liệu thực từ các trạm đo ngập HSDC/UDi, lưu lượng TomTom, 87 trạm thời tiết và mô hình giả lập mưa bão.\n\n` +
         `Bạn có thể hỏi lộ trình thông minh, khảo sát chấm điểm thuê trọ an cư, cứu hộ SOS thủy kích hoặc bấm nút **Chấm Bản Đồ** để tôi phân tích thực địa ngay!`
       );
@@ -670,7 +670,7 @@ class AIChat {
                   onclick="window.appState && window.appState.insertWaypointToRoute ? window.appState.insertWaypointToRoute(${sp.lat}, ${sp.lng}, '${fullSafe}') : window.appState.routeToLocation(${sp.lat}, ${sp.lng}, '${fullSafe}')"
                   title="Chèn ${this.escapeHtml(sp.name || '')} làm điểm dừng chân vào lộ trình hiện tại">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                  <span>+ Ghé qua</span>
+                  <span>Ghé qua</span>
                 </button>
                 ${corridorBadge}
               </div>
@@ -1141,6 +1141,7 @@ class AIChat {
   // =========================================================================
 
   async sendMessage(queryText) {
+    const _aiStartMs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const input = document.getElementById('ai-chat-input');
     const rawQuery = queryText || (input ? input.value.trim() : '');
     if (!rawQuery) return;
@@ -1231,6 +1232,54 @@ class AIChat {
           const spatialCitations = r.spatialCitations || this.buildSpatialCitations(serverSpots, webState, r.text || r.reply);
           const verified = this.verifyAndEnrichAiResponse(r.text || r.reply, webState, ragInfo);
 
+          if (typeof window !== 'undefined' && window.moveSafeLogger) {
+            window.moveSafeLogger.log({
+              category: 'ai',
+              title: `AI Copilot & Spatial RAG (${r.modelUsed || 'Server Gemini'})`,
+              source: 'js/ai-chat.js :: sendMessage() -> Server',
+              durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
+              status: verified.verification?.type === 'warning' ? 'warning' : 'success',
+              input: {
+                query: rawQuery,
+                resolvedQuery: query,
+                city: currentCity,
+                activeRoute: webState.activeRoute ? { label: webState.activeRoute.label, distanceKm: webState.activeRoute.distanceKm } : null,
+                visibleFloodsCount: (webState.visibleFloods || []).length,
+                visibleTrafficsCount: (webState.visibleTraffics || []).length
+              },
+              steps: [
+                {
+                  stepName: 'Bước 1: NLU & Tiền xử lý Hành động (resolveCoreference + preActions)',
+                  formulaOrRule: 'parseRouteQuery + triggerChatRoute / propertyScore',
+                  detail: executedResults?.preActionSummary || 'Phân tích đại từ và ý định đa mục tiêu.',
+                  metrics: multiIntent ? { hasFloodQuery: multiIntent.hazardIntent?.hasFloodQuery, poiCategory: multiIntent.poiCategory } : null
+                },
+                {
+                  stepName: 'Bước 2: Spatial RAG & Thủy động lực học Gầm xe (prepareSpatialRagAndSafety)',
+                  formulaOrRule: 'Chiếu POI lên activePolyline (minDetourKm <= 0.65km)',
+                  detail: `Quét hành lang 2.5km, gầm xe an toàn ${tradeoff?.safeLimit || 15}cm (${tradeoff?.vehicleDisplayName || 'Xe máy'}).`,
+                  metrics: { poiFoundCount: (ragInfo.poiMatches || ragInfo.spots || []).length, maxFloodCm: tradeoff?.maxFloodCm || 0 }
+                },
+                {
+                  stepName: 'Bước 3: Điều phối LLM Server (Staggered Hedge Race)',
+                  formulaOrRule: 'POST /api/ai/chat -> 2.5-flash vs 3-flash-preview (+900ms)',
+                  detail: `Model phản hồi: ${r.modelUsed || 'Gemini Backend'}.`
+                },
+                {
+                  stepName: 'Bước 4: Hậu kiểm Cảm biến Thực địa (verifyAndEnrichAiResponse)',
+                  formulaOrRule: 'Đối chiếu câu trả lời AI với visibleFloods >= 15cm',
+                  detail: verified.verification?.badgeText || 'Đã kiểm chứng'
+                }
+              ],
+              output: {
+                replyPreview: verified.text.slice(0, 320),
+                verificationBadge: verified.verification,
+                suggestedSpotsCount: serverSpots.length,
+                mapAction: r.action || null
+              }
+            });
+          }
+
           this.addBotMessage(verified.text, {
             spots: serverSpots.length > 0 ? serverSpots : null,
             followUps: r.followUps || null,
@@ -1292,6 +1341,34 @@ class AIChat {
         const spatialCitations = this.buildSpatialCitations(spotsToRender, webState, clientReply);
         const verified = this.verifyAndEnrichAiResponse(clientReply, webState, ragInfo);
 
+        if (typeof window !== 'undefined' && window.moveSafeLogger) {
+          window.moveSafeLogger.log({
+            category: 'ai',
+            title: 'AI Copilot & Spatial RAG (Client Direct Gemini)',
+            source: 'js/ai-chat.js :: sendMessage() -> Client Fallback',
+            durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
+            status: verified.verification?.type === 'warning' ? 'warning' : 'success',
+            input: {
+              query: rawQuery,
+              resolvedQuery: query,
+              city: currentCity,
+              visibleFloodsCount: (webState.visibleFloods || []).length,
+              visibleTrafficsCount: (webState.visibleTraffics || []).length
+            },
+            steps: [
+              { stepName: 'Bước 1: NLU & Tiền xử lý (resolveCoreferenceAndExecutePreActions)', formulaOrRule: 'parseRouteQuery', detail: executedResults?.preActionSummary || 'Phân tích câu hỏi đa ràng buộc.' },
+              { stepName: 'Bước 2: Spatial RAG & Chiếu Hành lang', formulaOrRule: 'minDetourKm <= 0.65km', detail: `Quét hành lang ${scanMeta.stats}.` },
+              { stepName: 'Bước 3: Gọi trực tiếp Gemini Client Balanced', formulaOrRule: '2.5-flash -> 3-flash-preview -> 2.5-flash-lite', detail: 'Server không khả dụng, chuyển hướng sang Gemini API Client.' },
+              { stepName: 'Bước 4: Hậu kiểm Cảm biến Thực địa', formulaOrRule: 'verifyAndEnrichAiResponse', detail: verified.verification?.badgeText || 'Đã kiểm chứng' }
+            ],
+            output: {
+              replyPreview: verified.text.slice(0, 320),
+              verificationBadge: verified.verification,
+              suggestedSpotsCount: spotsToRender.length
+            }
+          });
+        }
+
         this.addBotMessage(verified.text, {
           spots: spotsToRender.length > 0 ? spotsToRender : null,
           routeSummary: webState.activeRoute || null,
@@ -1329,6 +1406,33 @@ class AIChat {
     const multiStopTimeline = this.buildMultiStopTimeline(webState, query, localSpots);
     const spatialCitations = this.buildSpatialCitations(localSpots, webState, smartReply.text);
     const verified = this.verifyAndEnrichAiResponse(smartReply.text, webState, ragInfo);
+
+    if (typeof window !== 'undefined' && window.moveSafeLogger) {
+      window.moveSafeLogger.log({
+        category: 'ai',
+        title: 'AI Copilot & Spatial RAG (Local Smart Engine)',
+        source: 'js/ai-chat.js :: sendMessage() -> Offline Engine',
+        durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
+        status: 'info',
+        input: {
+          query: rawQuery,
+          resolvedQuery: query,
+          city: currentCity,
+          visibleFloodsCount: (webState.visibleFloods || []).length,
+          visibleTrafficsCount: (webState.visibleTraffics || []).length
+        },
+        steps: [
+          { stepName: 'Bước 1: NLU & Pre-Actions', formulaOrRule: 'parseRouteQuery', detail: executedResults?.preActionSummary || 'Phân tích truy vấn nội bộ.' },
+          { stepName: 'Bước 2: Sinh phản hồi Smart Spatial AI Engine (Offline)', formulaOrRule: 'generateClientSmartLocalResponse', detail: `Xử lý cục bộ không cần API ngoài dựa trên ${webState.visibleFloods.length} trạm ngập & ${localSpots.length} POI.` },
+          { stepName: 'Bước 3: Hậu kiểm Cảm biến Thực địa', formulaOrRule: 'verifyAndEnrichAiResponse', detail: verified.verification?.badgeText || 'Đã kiểm chứng' }
+        ],
+        output: {
+          replyPreview: verified.text.slice(0, 320),
+          verificationBadge: verified.verification,
+          suggestedSpotsCount: localSpots.length
+        }
+      });
+    }
 
     this.addBotMessage(verified.text, {
       spots: localSpots.length > 0 ? localSpots : null,

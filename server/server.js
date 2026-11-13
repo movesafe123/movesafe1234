@@ -7,6 +7,7 @@ const botService = require('./bot-service');
 const aiService = require('./ai-service');
 const historyService = require('./history-service');
 const evService = require('./ev-service');
+const systemLogger = require('./system-logger');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -49,6 +50,12 @@ app.get('/manifest.json', (req, res) => {
 // Phục vụ trang chủ
 app.get(['/', '/index.html'], (req, res) => {
   res.sendFile(path.join(rootDir, 'index.html'));
+});
+
+// Trang Nhật ký Luồng Xử lý Thuật toán Độc lập (Ẩn hoàn toàn khỏi UI chính)
+app.get(['/system-log', '/pipeline-log', '/pipeline-log.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache');
+  res.sendFile(path.join(rootDir, 'pipeline-log.html'));
 });
 
 // Rate Limiter trong bộ nhớ kèm cơ chế tự động dọn dẹp chống rò rỉ RAM (Zero dependency)
@@ -403,7 +410,35 @@ app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
   }
 });
 
-// 6. API Server-Sent Events (SSE) Phát trực tiếp cập nhật 24/7 tới Client
+// 6. API Nhật ký Luồng Xử lý Thuật toán (Đầu vào -> Xử lý -> Đầu ra)
+app.get('/api/system-logs', (req, res) => {
+  const limit = req.query.limit || 60;
+  const category = req.query.category || 'all';
+  res.json({
+    status: 'success',
+    logs: systemLogger.getLogs(limit, category)
+  });
+});
+
+app.post('/api/system-logs/client', (req, res) => {
+  try {
+    const body = req.body || {};
+    const entry = systemLogger.record({
+      ...body,
+      origin: 'client'
+    });
+    res.json({ status: 'success', id: entry.id });
+  } catch (err) {
+    res.status(400).json({ status: 'error', message: err.message });
+  }
+});
+
+app.delete('/api/system-logs', (req, res) => {
+  systemLogger.clearLogs();
+  res.json({ status: 'success', message: 'Đã xóa nhật ký hệ thống' });
+});
+
+// 6b. API Server-Sent Events (SSE) Phát trực tiếp cập nhật 24/7 tới Client
 app.get('/api/live-stream', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -418,8 +453,12 @@ app.get('/api/live-stream', (req, res) => {
   const onUpdate = (data) => {
     res.write(`data: ${JSON.stringify({ type: 'update', data })}\n\n`);
   };
+  const onLogNew = (entry) => {
+    res.write(`data: ${JSON.stringify({ type: 'system_log', log: entry })}\n\n`);
+  };
 
   botService.on('data:updated', onUpdate);
+  systemLogger.on('log:new', onLogNew);
 
   // Ping giữ kết nối mỗi 20 giây
   const keepAlive = setInterval(() => {
@@ -429,6 +468,7 @@ app.get('/api/live-stream', (req, res) => {
   req.on('close', () => {
     clearInterval(keepAlive);
     botService.removeListener('data:updated', onUpdate);
+    systemLogger.removeListener('log:new', onLogNew);
   });
 });
 

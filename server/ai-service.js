@@ -3,6 +3,7 @@ const botService = require('./bot-service');
 const HANOI_WARDS_DATA = require('../js/hanoi-wards-streets');
 const FOOD_ENTERTAINMENT_DATA = require('../js/food-entertainment-data');
 const webEventService = require('./web-event-service');
+const systemLogger = require('./system-logger');
 
 function normalizeVi(str) {
   if (!str) return '';
@@ -1040,6 +1041,7 @@ class AIAssistantService {
    * Cân bằng hoàn hảo giữa Trí tuệ (Gemini 3 / 3.6 Flash) và Tốc độ phản hồi (~1.8s - 2.5s)
    */
   async callGeminiAPI(query, mergedData, city, apiKey, context = {}, liveEvents = null) {
+    const aiStartMs = Date.now();
     const cityName = city === 'hanoi' ? 'Hà Nội' : (city === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
     const sessionMemory = context.sessionMemory || {};
     const multiIntent = this.analyzeMultiIntentProfile(query, sessionMemory);
@@ -1297,7 +1299,7 @@ QUY TẮC CẤM:
     const cleanReply = this.stripEmojis(reply);
     const spatialCitations = this.extractSpatialCitations(cleanReply, mergedData, rag.anchor);
 
-    return {
+    const responsePayload = {
       text: cleanReply,
       reply: cleanReply,
       action,
@@ -1309,6 +1311,58 @@ QUY TẮC CẤM:
       modelUsed,
       source: modelUsed
     };
+
+    try {
+      systemLogger.record({
+        category: 'ai',
+        title: `Điều phối Gemini AI & Spatial RAG (${modelUsed})`,
+        source: 'server/ai-service.js :: callGeminiAPI()',
+        durationMs: Date.now() - aiStartMs,
+        input: {
+          query,
+          city,
+          activeFloodsInContext: (mergedData.floodPoints || []).filter(f => (f.depth_cm || 0) > 0).length,
+          activeTrafficsInContext: (mergedData.trafficIncidents || []).length,
+          hasActiveRoute: Boolean(mergedData.activeRoute),
+          liveEventsFound: liveEvents?.articlesCount || 0
+        },
+        steps: [
+          {
+            stepName: 'Bước 1: Phân tích Đa ý định & Thủy động lực học (Deterministic Brief)',
+            formulaOrRule: 'analyzeMultiIntentProfile + buildDeterministicDecisionBrief',
+            detail: `Phương tiện: ${decisionBrief.vehicleDisplayName} (An toàn <= ${decisionBrief.safeLimit}cm, Tối đa ${decisionBrief.maxPassable}cm) | Ngập sâu nhất: ${decisionBrief.maxFloodCm}cm -> ${decisionBrief.recommendedVerdict}`,
+            metrics: { maxFloodCm: decisionBrief.maxFloodCm, safeLimit: decisionBrief.safeLimit, parsedOrigin: parsedRoute?.origin || null, parsedDest: parsedRoute?.destination || null }
+          },
+          {
+            stepName: 'Bước 2: Xây dựng Spatial RAG Context',
+            formulaOrRule: 'buildComprehensiveSpatialContext + EV / Food POI Injection',
+            detail: `Đóng gói dữ liệu bản đồ quanh điểm neo (${rag.anchor?.name || cityName}), kèm ${extraDomainContext ? 'dữ liệu chuyên biệt EV/Ẩm thực' : 'dữ liệu ngập & TomTom'}.`,
+            metrics: { anchorName: rag.anchor?.name || null, promptChars: finalUserPrompt.length }
+          },
+          {
+            stepName: 'Bước 3: Đua Model Song song có Độ trễ (Staggered Hedge Race)',
+            formulaOrRule: 'gemini-2.5-flash (0ms) vs gemini-3-flash-preview (+900ms) -> Fallback Lite',
+            detail: `Model chiến thắng phản hồi nhanh nhất: ${modelUsed} (thinkingBudget: 0).`,
+            metrics: { modelUsed, googleSearchGrounding: enableSearch }
+          },
+          {
+            stepName: 'Bước 4: Bóc tách Lệnh Bản đồ & Trích dẫn Không gian',
+            formulaOrRule: '[ACTION_ROUTE / FOCUS / LAYER] + extractSpatialCitations',
+            detail: `Bóc tách action: ${action?.type || 'NONE'}, ${secondaryActions.length} secondaryActions, ${spatialCitations.length} trích dẫn thực địa.`,
+            metrics: { primaryAction: action?.type || null, secondaryActionsCount: secondaryActions.length, citationsCount: spatialCitations.length }
+          }
+        ],
+        output: {
+          modelUsed,
+          replyPreview: cleanReply.slice(0, 320),
+          action,
+          secondaryActions,
+          followUps
+        }
+      });
+    } catch (_logErr) {}
+
+    return responsePayload;
   }
 
   /**

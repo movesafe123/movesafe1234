@@ -5,6 +5,7 @@ const path = require('path');
 const EventEmitter = require('events');
 const config = require('./config');
 const historyService = require('./history-service');
+const systemLogger = require('./system-logger');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const PUBLIC_DATA_DIR = path.join(__dirname, '..', 'public', 'data');
@@ -503,6 +504,7 @@ class LocalUrbanBot extends EventEmitter {
 
   async crawlAll() {
     if (this.crawlPromise) return this.crawlPromise;
+    const crawlStartMs = Date.now();
     console.log('[Bot] >>> Bắt đầu tiến trình cào dữ liệu từ hệ thống địa phương (VOV, NCHMF, HSDC, UDi, TomTom, Open-Meteo)...');
 
     this.crawlPromise = (async () => {
@@ -592,6 +594,68 @@ class LocalUrbanBot extends EventEmitter {
           roadworks: roadworks.length,
           trafficAlerts: this.cachedData.trafficIncidents.length + this.cachedData.vovTrafficNews.length
         };
+
+        // Ghi nhật ký luồng xử lý Bot Thu thập & Hợp nhất dữ liệu
+        try {
+          const stationSummary = {};
+          Object.entries(this.cachedData.weatherStations || {}).forEach(([ck, list]) => {
+            const arr = Array.isArray(list) ? list : [];
+            const maxRain = arr.reduce((mx, s) => Math.max(mx, Number(s.rain) || 0), 0);
+            stationSummary[ck] = { stationsCount: arr.length, maxCurrentRainMm: maxRain };
+          });
+          const deepestSamples = [...actuallyFlooded]
+            .sort((a, b) => (b.depth_cm || 0) - (a.depth_cm || 0))
+            .slice(0, 5)
+            .map(f => ({ name: f.name, city: f.city, depth_cm: f.depth_cm, danger_level: f.danger_level, source: f.source }));
+          const trafficSamples = (this.cachedData.trafficIncidents || [])
+            .slice(0, 5)
+            .map(t => ({ city: t.city, type: t.type, roadName: t.roadName || t.description, speedKmh: t.speedKmh, delaySeconds: t.delaySeconds }));
+
+          systemLogger.record({
+            category: 'bot',
+            title: 'Chu trình Thu thập & Hợp nhất Dữ liệu Đô thị (Crawl & Sensor Fusion)',
+            source: 'server/bot-service.js :: crawlAll()',
+            durationMs: Date.now() - crawlStartMs,
+            input: {
+              sources: ['VOV Giao thông', 'Cổng ngập HSDC & UDi', 'TomTom Traffic Incident API v5', 'Open-Meteo Weather API', 'Crowdsource Reports'],
+              rawCrowdReportsTotal: crowdsourced.length,
+              portalOverridesCount: this.portalFloodOverrides.size,
+              weatherSummaryByCity: stationSummary
+            },
+            steps: [
+              {
+                stepName: 'Bước 1: Quét đa luồng song song (Promise.allSettled)',
+                formulaOrRule: 'VOV Crawler + HSDC/UDi + TomTom BBox + Open-Meteo Forecast',
+                detail: `Thu thập ${(this.cachedData.vovTrafficNews || []).length} bản tin VOV, dữ liệu sự cố TomTom 3 đô thị và mạng lưới trạm mưa Open-Meteo.`,
+                metrics: { vovNews: (this.cachedData.vovTrafficNews || []).length, portalOverrides: this.portalFloodOverrides.size }
+              },
+              {
+                stepName: 'Bước 2: Lọc báo cáo cộng đồng theo cửa sổ hiệu lực TTL 2 giờ',
+                formulaOrRule: 'Date.now() - updated_at < 7200s -> Tách flood vs traffic',
+                detail: `Giữ lại ${activeCrowdsourced.length}/${crowdsourced.length} báo cáo còn hiệu lực (${crowdFloods.length} điểm ngập, ${crowdTraffics.length} sự cố giao thông).`,
+                metrics: { activeCrowdsourced: activeCrowdsourced.length, crowdFloods: crowdFloods.length, crowdTraffics: crowdTraffics.length }
+              },
+              {
+                stepName: 'Bước 3: Trích xuất tọa độ bản tin VOV Giao thông',
+                formulaOrRule: 'detectLocation + Keyword Classifier (ùn/tắc/kẹt/va chạm)',
+                detail: `Ánh xạ thành ${vovIncidents.length} điểm sự cố giao thông gắn tọa độ trực tiếp lên bản đồ.`,
+                metrics: { vovMappedIncidents: vovIncidents.length, baseTraffics: baseTraffics.length }
+              },
+              {
+                stepName: 'Bước 4: Mô hình Thủy văn Trạm ngập (computeRealtimeFloodPoints)',
+                formulaOrRule: 'Mưa thực tế trạm gần nhất + HSDC/UDi Override + Trí nhớ rút nước floodMemory',
+                detail: `Đánh giá ${allFloodPoints.length} trạm đo ngập -> phát hiện ${actuallyFlooded.length} điểm đang ngập (${this.cachedData.stats.criticalFloods} điểm sâu nguy hiểm).`,
+                metrics: { evaluatedStations: allFloodPoints.length, activeFloods: actuallyFlooded.length }
+              }
+            ],
+            output: {
+              stats: this.cachedData.stats,
+              topFloodSamples: deepestSamples,
+              topTrafficSamples: trafficSamples,
+              lastUpdated: this.cachedData.lastUpdated
+            }
+          });
+        } catch (_logErr) {}
 
         // Lưu vào đĩa cache thời gian thực
         try {
@@ -1373,6 +1437,7 @@ class LocalUrbanBot extends EventEmitter {
   // Dự báo ngập lụt và kẹt xe tương lai (+1h, +2h, +3h)
   // Ứng dụng Mô hình Spatio-Temporal: Tiêu tán/Duy trì sự cố hiện tại + Khởi phát điểm nghẽn theo Lịch sử 7 ngày & Mưa
   getFuturePredictions(cityKey = 'hanoi', offsetHours = 1) {
+    const predStartMs = Date.now();
     const stations = (this.cachedData.weatherStations || {})[cityKey] || [];
     const maxForecastRain = stations.reduce((max, s) => {
       const rains = s.forecastRain || [0, 0, 0];
@@ -1525,7 +1590,7 @@ class LocalUrbanBot extends EventEmitter {
       });
     }
 
-    return {
+    const resultPayload = {
       status: 'success',
       city: cityKey,
       targetHour: offsetHours,
@@ -1540,6 +1605,54 @@ class LocalUrbanBot extends EventEmitter {
       trafficPredictions: predictedTraffic,
       updated_at: new Date().toISOString()
     };
+
+    try {
+      systemLogger.record({
+        category: 'forecast',
+        title: `Dự báo Không gian - Thời gian (+${offsetHours}h) tại ${cityKey.toUpperCase()}`,
+        source: 'server/bot-service.js :: getFuturePredictions()',
+        durationMs: Date.now() - predStartMs,
+        input: {
+          cityKey,
+          offsetHours,
+          targetVnHour: `${vnHour}:00`,
+          isPeakHour,
+          isNightTime,
+          maxForecastRainMm: maxForecastRain,
+          currentActiveFloodsCount: currentCityFloods.length,
+          currentTrafficIncidentsCount: currentCityTraffics.length,
+          historyBaseline7Days: baseline
+        },
+        steps: [
+          {
+            stepName: 'Bước 1: Mô hình Dự báo Ngập (Rain Boost & Residual Decay)',
+            formulaOrRule: 'rainBoost = (rain>=25 ? 1.2 : rain>=10 ? 0.8 : 0); residual = currDepth - 12 * offsetHours',
+            detail: `Lượng mưa dự báo tối đa ${maxForecastRain}mm; tính mực nước cực đại giữa mưa mới và nước rút dư, giữ lại điểm >= 10cm.`,
+            metrics: { predictedFloodsCount: predictedFloods.length, confidence: Math.round((0.92 - offsetHours * 0.04) * 100) / 100 }
+          },
+          {
+            stepName: 'Bước 2: Lan truyền & Tiêu tán Kẹt xe theo Khung giờ',
+            formulaOrRule: 'roadwork duy trì (0.95); đêm: 3-offset; cao điểm/mưa: delay*1.25; thường: 4-offset',
+            detail: `Áp dụng động học giao thông cho ${currentCityTraffics.length} sự cố hiện hữu theo trạng thái ${isNightTime ? 'Ban đêm (tiêu tán nhanh)' : (isPeakHour || maxForecastRain >= 10 ? 'Cao điểm/Mưa (khuếch đại)' : 'Giờ bình thường (giảm dần)')}.`,
+            metrics: { activeTrafficCount: currentCityTraffics.length }
+          },
+          {
+            stepName: 'Bước 3: Đối chiếu Chuỗi Lịch sử 7 ngày (HistoryService Baseline)',
+            formulaOrRule: 'isPeakHour || baseline.congestionIndex >= 3.2 || maxForecastRain >= 12',
+            detail: `Chỉ số ùn tắc lịch sử khung ${vnHour}h là ${baseline?.congestionIndex ?? 'N/A'} -> tổng hợp nút giao trọng điểm từ CORE_INTERSECTIONS_GEO.`,
+            metrics: { predictedTrafficTotal: predictedTraffic.length }
+          }
+        ],
+        output: {
+          predictedFloodsCount: predictedFloods.length,
+          predictedTrafficCount: predictedTraffic.length,
+          sampleFloods: predictedFloods.slice(0, 4).map(f => ({ name: f.location_name || f.name, depth_cm: f.depth_cm, danger_level: f.danger_level, confidence: f.confidence })),
+          sampleTraffic: predictedTraffic.slice(0, 4).map(t => ({ roadName: t.roadName, level: t.level, speedKmh: t.speedKmh, delaySeconds: t.delaySeconds, confidence: t.confidence }))
+        }
+      });
+    } catch (_logErr) {}
+
+    return resultPayload;
   }
 
   getData() {

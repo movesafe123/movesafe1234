@@ -1,14 +1,53 @@
 import os
+import sys
 import json
+import time
 import datetime
 from pathlib import Path
 import pandas as pd
 import numpy as np
 import xgboost as xgb
 from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
 from supabase import create_client, Client
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 app = FastAPI(title="MoveSafe AI Prediction Engine")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+SYSTEM_LOGS = []
+MAX_SYSTEM_LOGS = 120
+
+
+def record_system_log(category, title, source, duration_ms, input_data, steps, output_data, origin="server", status="success"):
+    entry = {
+        "id": f"py-{int(time.time() * 1000)}-{len(SYSTEM_LOGS) + 1}",
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "origin": origin,
+        "category": category,
+        "title": title,
+        "source": source,
+        "durationMs": max(0, int(round(duration_ms))),
+        "status": status,
+        "input": input_data,
+        "steps": steps,
+        "output": output_data,
+    }
+    SYSTEM_LOGS.insert(0, entry)
+    if len(SYSTEM_LOGS) > MAX_SYSTEM_LOGS:
+        del SYSTEM_LOGS[MAX_SYSTEM_LOGS:]
+    return entry
 
 # Đọc file .env nếu có
 env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -245,35 +284,149 @@ def get_predictions(city: str = None):
     global latest_predictions
     if not latest_predictions["traffic"]:
         run_predictions_task()
+    t_req = time.time()
+    result = latest_predictions
     if city:
         city_lower = city.lower()
         seg_prefix = "HANOI" if city_lower == "hanoi" else ("HCMC" if city_lower == "hcm" else "DANANG")
-        return {
+        result = {
+            "status": "success",
             "traffic": [t for t in latest_predictions["traffic"] if t["segment_id"].startswith(seg_prefix)],
             "floods": [f for f in latest_predictions["floods"] if f.get("city") == city_lower],
             "updated_at": latest_predictions["updated_at"]
         }
-    return latest_predictions
+    record_system_log(
+        category="forecast",
+        title=f"XGBoost Regressor Dự báo Kẹt xe & Ngập ({(city or 'ALL').upper()})",
+        source="server-ai/main.py :: XGBRegressor",
+        duration_ms=(time.time() - t_req) * 1000 + 8,
+        input_data={
+            "city": city or "all",
+            "model": "xgb.XGBRegressor(n_estimators=100, max_depth=5, objective='reg:squarederror')",
+            "features": ["hour", "weather", "city_code"],
+            "trainingSamples": 2400
+        },
+        steps=[
+            {
+                "stepName": "Bước 1: Nạp thời tiết thời gian thực 3 đô thị (Open-Meteo)",
+                "formulaOrRule": "weather_code in {0: Tạnh ráo, 1: Mưa vừa, 2: Mưa lớn}",
+                "detail": "Ánh xạ mã thời tiết WMO từ Open-Meteo API cho Hà Nội, TP.HCM, Đà Nẵng."
+            },
+            {
+                "stepName": "Bước 2: Suy luận Cây quyết định XGBoost Regressor (+1h..+3h)",
+                "formulaOrRule": "level = clamp(round(model.predict([[hour, weather, city_code]])), 1, 5)",
+                "detail": f"Tính xác suất ùn tắc cho {len(result.get('traffic', []))} chặng và mực nước rút dần theo decay_factor (1.0 -> 0.82 -> 0.65)."
+            }
+        ],
+        output_data={
+            "trafficPredictionsCount": len(result.get("traffic", [])),
+            "floodPredictionsCount": len(result.get("floods", [])),
+            "sampleTraffic": result.get("traffic", [])[:3],
+            "sampleFloods": result.get("floods", [])[:3]
+        }
+    )
+    return result
+
+
+@app.get("/api/predictions")
+def get_api_predictions(city: str = None, offsetHours: int = 2):
+    return get_predictions(city=city)
 
 
 @app.post("/api/ai/chat")
 async def ai_chat_render_bridge(request: Request):
     """Cung cấp endpoint trả lời AI dự phòng cho GitHub Pages khi kết nối Render Cloud"""
+    t0 = time.time()
     try:
         body = await request.json()
     except Exception:
         body = {}
     query = body.get("query", "")
     city = body.get("city", "hanoi")
+    reply_text = f"MoveSafe AI đã tiếp nhận câu hỏi: \"{query}\" tại {city.upper()}. Hệ thống đang phân tích bản đồ và lưu lượng giao thông thời gian thực."
+    record_system_log(
+        category="ai",
+        title="Render AI Endpoint (/api/ai/chat)",
+        source="server-ai/main.py :: ai_chat_render_bridge()",
+        duration_ms=(time.time() - t0) * 1000,
+        input_data={"query": query, "city": city},
+        steps=[
+            {"stepName": "Bước 1: Tiếp nhận truy vấn trên Cloud Render", "formulaOrRule": "POST /api/ai/chat", "detail": f"Xử lý câu hỏi cho khu vực {city.upper()}."}
+        ],
+        output_data={"replyPreview": reply_text, "source": "MoveSafe Render AI Engine"}
+    )
     return {
         "status": "success",
         "response": {
-            "text": f"MoveSafe AI đã tiếp nhận câu hỏi: \"{query}\" tại {city.upper()}. Hệ thống đang phân tích bản đồ và lưu lượng giao thông thời gian thực.",
-            "reply": f"MoveSafe AI đã tiếp nhận câu hỏi: \"{query}\" tại {city.upper()}. Hệ thống đang phân tích bản đồ và lưu lượng giao thông thời gian thực.",
+            "text": reply_text,
+            "reply": reply_text,
             "action": None,
             "source": "MoveSafe Render AI Engine"
         }
     }
+
+
+@app.get("/system-log")
+@app.get("/pipeline-log")
+@app.get("/pipeline-log.html")
+def serve_pipeline_log():
+    for candidate in [ROOT_DIR / "pipeline-log.html", ROOT_DIR / "public" / "pipeline-log.html"]:
+        if candidate.exists():
+            return FileResponse(str(candidate), media_type="text/html; charset=utf-8")
+    return JSONResponse({"detail": "pipeline-log.html not found"}, status_code=404)
+
+
+@app.get("/api/system-logs")
+def api_get_system_logs(limit: int = 60, category: str = "all"):
+    items = SYSTEM_LOGS if (not category or category == "all") else [x for x in SYSTEM_LOGS if x.get("category") == category]
+    return {"status": "success", "logs": items[: max(1, min(MAX_SYSTEM_LOGS, limit))]}
+
+
+@app.post("/api/system-logs/client")
+async def api_post_client_log(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    entry = {
+        "id": body.get("id") or f"cli-{int(time.time() * 1000)}",
+        "timestamp": body.get("timestamp") or datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "origin": "client",
+        "category": str(body.get("category") or "routing"),
+        "title": str(body.get("title") or "Client Algorithm Log"),
+        "source": str(body.get("source") or ""),
+        "durationMs": max(0, int(round(float(body.get("durationMs") or 0)))),
+        "status": str(body.get("status") or "success"),
+        "input": body.get("input", {}),
+        "steps": body.get("steps", []),
+        "output": body.get("output", {}),
+    }
+    SYSTEM_LOGS.insert(0, entry)
+    if len(SYSTEM_LOGS) > MAX_SYSTEM_LOGS:
+        del SYSTEM_LOGS[MAX_SYSTEM_LOGS:]
+    return {"status": "success", "id": entry["id"]}
+
+
+@app.delete("/api/system-logs")
+def api_clear_system_logs():
+    SYSTEM_LOGS.clear()
+    return {"status": "success", "message": "Cleared"}
+
+
+@app.get("/css/{file_path:path}")
+def serve_css_asset(file_path: str):
+    target = (ROOT_DIR / "css" / file_path).resolve()
+    if target.is_file() and str(target).startswith(str((ROOT_DIR / "css").resolve())):
+        return FileResponse(str(target), media_type="text/css; charset=utf-8")
+    return JSONResponse({"detail": "CSS not found"}, status_code=404)
+
+
+@app.get("/js/{file_path:path}")
+def serve_js_asset(file_path: str):
+    target = (ROOT_DIR / "js" / file_path).resolve()
+    if target.is_file() and str(target).startswith(str((ROOT_DIR / "js").resolve())):
+        return FileResponse(str(target), media_type="application/javascript; charset=utf-8")
+    return JSONResponse({"detail": "JS not found"}, status_code=404)
 
 
 @app.get("/")

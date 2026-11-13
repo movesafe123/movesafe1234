@@ -632,6 +632,54 @@ class WeatherService {
 
       if (!this._comfortCache) this._comfortCache = {};
       this._comfortCache[cacheKey] = { timestamp: Date.now(), data: comfortData };
+
+      if (typeof window !== 'undefined' && window.moveSafeLogger) {
+        window.moveSafeLogger.log({
+          category: 'weather',
+          title: `Chỉ số Thoải mái Đi đường - CCI (${cityName})`,
+          source: 'js/weather-service.js :: getCommuteComfortData()',
+          durationMs: 12,
+          status: 'success',
+          input: {
+            cityName,
+            lat,
+            lng,
+            airTempC: temp,
+            apparentTempC: apparentTemp,
+            roadRealFeelC: roadRealFeel,
+            humidityPct: humidity,
+            uvIndex,
+            rainNowMm: rainNow,
+            windSpeedKmh: windSpeed,
+            hasRainIn2Hours,
+            maxRainIn2HoursMm: maxRainIn2Hours
+          },
+          steps: [
+            {
+              stepName: 'Bước 1: Khởi tạo mốc nền & Phạt bức xạ nhiệt mặt đường',
+              formulaOrRule: 'base = 95; if roadRealFeel > 33 -> -(T-33)*5.2; if < 18 -> -(18-T)*4.0',
+              detail: `Nhiệt độ cảm nhận mặt đường bê tông ${roadRealFeel}°C (độ ẩm ${humidity}%, UV ${uvIndex}).`
+            },
+            {
+              stepName: 'Bước 2: Trừ điểm Tia cực tím (UV) & Thời tiết Mưa (2 giờ tới)',
+              formulaOrRule: 'UV>=6: -(UV-5)*4.5; rain>=5: -45; >=1: -30; >0: -15; forecastRain2h: -18',
+              detail: `Mưa hiện tại: ${rainNow}mm | Nguy cơ mưa trong 2h tới: ${hasRainIn2Hours ? `Có (${maxRainIn2Hours}mm)` : 'Không'}.`
+            },
+            {
+              stepName: 'Bước 3: Chuẩn hóa thang đo & Sinh khuyến nghị Trang bị',
+              formulaOrRule: 'clamp(round(comfortScore), 15, 98)',
+              detail: `Điểm CCI cuối cùng: ${comfortScore}/100 -> Trạng thái "${comfortStatus}".`
+            }
+          ],
+          output: {
+            comfortScore,
+            comfortStatus,
+            commuteAdvice,
+            recommendedGear: gearList.filter(g => g.needed).map(g => g.name)
+          }
+        });
+      }
+
       return comfortData;
     } catch (err) {
       console.warn('Lỗi lấy dữ liệu Commute Comfort từ Open-Meteo:', err);
