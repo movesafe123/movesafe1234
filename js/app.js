@@ -1109,6 +1109,76 @@ class GoogleMapsApp {
       document.getElementById('modal-report')?.classList.add('open');
     });
 
+    document.getElementById('mnav-ev')?.addEventListener('click', () => {
+      this.toggleDirectionsPanel(false);
+      window.aiChat?.close();
+      document.getElementById('modal-report')?.classList.remove('open');
+      document.getElementById('modal-urban-insights')?.classList.remove('open');
+      this.locateAndFindNearestEV();
+      this.setMobileActiveTab('ev');
+    });
+
+    // Thanh thao tác nhanh Smartphone cho người đang di chuyển (Thumb-Zone)
+    document.getElementById('btn-mobile-ev-near')?.addEventListener('click', () => {
+      this.locateAndFindNearestEV();
+    });
+
+    document.getElementById('btn-mobile-flex-route')?.addEventListener('click', () => {
+      this.toggleDirectionsPanel(true);
+      const viaRow = document.getElementById('field-row-via');
+      if (viaRow) viaRow.style.display = 'flex';
+      this.showToast('Chế độ lộ trình linh hoạt: Có thể thêm điểm ghé qua & đổi 7 loại xe', 'info', 3000);
+    });
+
+    document.getElementById('btn-mobile-hud-toggle')?.addEventListener('click', () => {
+      this.toggleCommuteHud();
+    });
+
+    document.getElementById('btn-exit-hud')?.addEventListener('click', () => {
+      this.toggleCommuteHud(false);
+    });
+
+    document.getElementById('btn-hud-find-ev')?.addEventListener('click', () => {
+      this.locateAndFindNearestEV();
+    });
+
+    document.getElementById('btn-hud-reroute')?.addEventListener('click', () => {
+      if (this.routeLocations?.origin && this.routeLocations?.destination) {
+        this.calculateSmartRoute();
+        this.showToast('Đang cập nhật lộ trình né ngập & né tắc mới nhất...', 'info', 2500);
+      } else {
+        this.toggleDirectionsPanel(true);
+      }
+    });
+
+    // Bảng Trạm Sạc EV & e-Scooter Thông Minh (Mục tiêu 2)
+    document.getElementById('btn-close-ev-finder')?.addEventListener('click', () => {
+      this.closeEVStationFinderPanel();
+    });
+
+    document.getElementById('ev-finder-filters')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ev-filter-pill');
+      if (!btn) return;
+      document.querySelectorAll('.ev-filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      this._evFinderFilter = btn.getAttribute('data-ev-filter') || 'all';
+      this.renderEVFinderList();
+    });
+
+    // Nút bật/tắt ô nhập Điểm ghé qua linh hoạt (+ Ghé qua - Mục tiêu 1)
+    document.getElementById('btn-toggle-via-waypoint')?.addEventListener('click', () => {
+      const viaRow = document.getElementById('field-row-via');
+      const viaInput = document.getElementById('gm-route-via');
+      if (!viaRow) return;
+      const isHidden = viaRow.style.display === 'none' || !viaRow.style.display;
+      viaRow.style.display = isHidden ? 'flex' : 'none';
+      if (isHidden && viaInput) {
+        viaInput.focus();
+      } else if (!isHidden) {
+        this.clearViaWaypoint();
+      }
+    });
+
     document.getElementById('mnav-ai')?.addEventListener('click', () => {
       this.toggleDirectionsPanel(false);
       document.getElementById('modal-report')?.classList.remove('open');
@@ -2517,14 +2587,14 @@ class GoogleMapsApp {
 
   // Thiết lập hệ thống tìm kiếm & gợi ý địa chỉ ngõ ngách chuẩn Google Maps
   setupAddressAutocomplete() {
-    ['origin', 'dest'].forEach(type => {
+    ['origin', 'via', 'dest'].forEach(type => {
       const input = document.getElementById(`gm-route-${type}`);
       const dropdown = document.getElementById(`dropdown-${type}`);
       const clearBtn = document.getElementById(`btn-clear-${type}`);
       if (!input || !dropdown) return;
 
       const updateClearBtn = () => {
-        if (clearBtn) clearBtn.style.display = input.value.trim() ? 'flex' : 'none';
+        if (clearBtn) clearBtn.style.display = (input.value.trim() || type === 'via') ? 'flex' : 'none';
       };
       input.addEventListener('input', updateClearBtn);
       updateClearBtn();
@@ -2532,6 +2602,13 @@ class GoogleMapsApp {
       // Nút Xóa (Clear)
       clearBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (type === 'via') {
+          this.clearViaWaypoint();
+          const viaRow = document.getElementById('field-row-via');
+          if (viaRow) viaRow.style.display = 'none';
+          dropdown.style.display = 'none';
+          return;
+        }
         const stateKey = type === 'dest' ? 'destination' : type;
         input.value = '';
         this.routeLocations[stateKey] = null;
@@ -2588,8 +2665,9 @@ class GoogleMapsApp {
 
     // Đóng dropdown khi click ra ngoài
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('#field-row-origin') && !e.target.closest('#field-row-dest')) {
+      if (!e.target.closest('#field-row-origin') && !e.target.closest('#field-row-via') && !e.target.closest('#field-row-dest')) {
         document.getElementById('dropdown-origin')?.style.setProperty('display', 'none');
+        document.getElementById('dropdown-via')?.style.setProperty('display', 'none');
         document.getElementById('dropdown-dest')?.style.setProperty('display', 'none');
       }
     });
@@ -2742,6 +2820,17 @@ class GoogleMapsApp {
 
   selectLocation(type, item) {
     const inputId = type === 'destination' ? 'dest' : type;
+    if (inputId === 'via') {
+      const viaInput = document.getElementById('gm-route-via');
+      if (viaInput) {
+        viaInput.value = item.fullAddress || item.title;
+        const clearViaBtn = document.getElementById('btn-clear-via');
+        if (clearViaBtn) clearViaBtn.style.display = 'flex';
+      }
+      this.insertWaypointToRoute(item.lat, item.lng, item.title || item.fullAddress);
+      return;
+    }
+
     const stateKey = type === 'dest' ? 'destination' : type;
 
     const input = document.getElementById(`gm-route-${inputId}`);
@@ -3216,10 +3305,39 @@ class GoogleMapsApp {
       }
     }
 
-    // 2b. Gợi ý Trạm sạc Xe điện khớp tên / thương hiệu (VinFast, Selex, v.v.)
+    // 2b. Gợi ý Trạm sạc Xe điện & Tìm kiếm trạm sạc theo ngữ cảnh địa lý ("trạm sạc quanh chợ xuân mai", "trạm sạc gần đây")
     const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
-    const isEVQuery = lower.includes('sạc') || lower.includes('sac') || lower.includes('vinfast') || lower.includes('selex') || lower.includes('đổi pin') || lower.includes('doi pin') || lower.includes('ev');
-    if (isEVQuery || lower.length >= 3) {
+    const evIntent = typeof this.parseEVSearchIntent === 'function' ? this.parseEVSearchIntent(clean) : { isEVIntent: false };
+    const isEVQuery = evIntent.isEVIntent || lower.includes('sạc') || lower.includes('sac') || lower.includes('vinfast') || lower.includes('selex') || lower.includes('đổi pin') || lower.includes('doi pin') || lower.includes('ev');
+
+    if (evIntent.isEVIntent && evIntent.anchorText && this.geocoder) {
+      const anchor = await this.resolveEVAnchorLocation(evIntent.anchorText);
+      if (anchor) {
+        const rankedEV = this.rankEVStationsAround(anchor.lat, anchor.lng, { limit: 6, radiusKm: 12 });
+        if (rankedEV.length > 0) {
+          suggestions.push({
+            type: 'ev-search-all',
+            title: `Trạm sạc quanh "${anchor.title}" (${rankedEV.length} trạm an toàn)`,
+            subtitle: `Tâm neo: ${anchor.lat.toFixed(4)}, ${anchor.lng.toFixed(4)} • Gần nhất ${(rankedEV[0]._distKm * 1000).toFixed(0)}m`,
+            lat: anchor.lat,
+            lng: anchor.lng,
+            query: clean
+          });
+          for (const st of rankedEV.slice(0, 5)) {
+            const distLabel = st._distKm < 1 ? `${Math.round(st._distKm * 1000)}m` : `${st._distKm.toFixed(2)}km`;
+            const floodTag = st._floodDanger ? ' • Cẩn trọng ngập' : ' • An toàn ngập';
+            suggestions.push({
+              type: 'ev',
+              title: st.name,
+              subtitle: `Cách ${anchor.title} ${distLabel}${floodTag} • ${st.operator || 'EV'} (${st.maxPowerKw || 60}kW)`,
+              lat: st.lat,
+              lng: st.lng,
+              stationId: st.id
+            });
+          }
+        }
+      }
+    } else if (isEVQuery || lower.length >= 3) {
       for (const st of allEV) {
         if (st.city && st.city !== this.currentCity) continue;
         const nameLower = (st.name || '').toLowerCase();
@@ -3353,6 +3471,10 @@ class GoogleMapsApp {
           window.aiChat.sendMessage(item.query);
           return;
         }
+        if (item.type === 'ev-search-all') {
+          this.executeEVContextualSearch(item.query || clean);
+          return;
+        }
         if (item.type === 'ev') {
           if (window.mapEngine && window.mapEngine.toggleEV) {
             window.mapEngine.toggleEV(true);
@@ -3425,6 +3547,15 @@ class GoogleMapsApp {
     if (parsedRoute && parsedRoute.origin && targetDest) {
       await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0, parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []);
       return;
+    }
+
+    // 0b. Nếu hỏi tìm trạm sạc theo ngữ cảnh địa lý hoặc GPS ("trạm sạc quanh chợ xuân mai", "trạm sạc gần đây")
+    if (typeof this.parseEVSearchIntent === 'function') {
+      const evIntent = this.parseEVSearchIntent(query);
+      if (evIntent.isEVIntent) {
+        await this.executeEVContextualSearch(query, evIntent);
+        return;
+      }
     }
 
     // 0a. Nếu người dùng tìm kiếm trực tiếp một địa điểm ẩm thực / POI cụ thể trong CSDL (ví dụ: Bunenu Minh Khai, Phở Thìn, CGV, Sà Bì Chưởng...)
@@ -6354,6 +6485,372 @@ class GoogleMapsApp {
 
     this.showToast(`Đang trình diễn Demo Né ngập qua "${shortFloodName}" (Ngập sâu ${deepest.depth_cm}cm)...`, 'warning', 4500);
     await this.calculateSmartRoute();
+  }
+
+  // ==================== GVHD UPGRADE: VIA WAYPOINT, SMART EV SEARCH & COMMUTE HUD ====================
+
+  clearViaWaypoint(recalculate = true) {
+    const viaInput = document.getElementById('gm-route-via');
+    const clearBtn = document.getElementById('btn-clear-via');
+    if (viaInput) viaInput.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (this._viaWaypointMarker && window.mapEngine?.map) {
+      window.mapEngine.map.removeLayer(this._viaWaypointMarker);
+      this._viaWaypointMarker = null;
+    }
+    this.currentViaWaypoint = null;
+    if (recalculate && this.routeLocations?.origin && this.routeLocations?.destination) {
+      this.calculateSmartRoute();
+    }
+  }
+
+  /**
+   * Nhận diện ý định tìm trạm sạc theo ngữ cảnh địa lý ("trạm sạc quanh chợ xuân mai")
+   * hoặc theo GPS hiện tại ("trạm sạc gần đây")
+   */
+  parseEVSearchIntent(rawQuery = '') {
+    const clean = String(rawQuery || '').trim().normalize('NFC');
+    const lower = clean.toLowerCase();
+    const noAcc = this.geocoder && typeof this.geocoder.removeAccents === 'function'
+      ? this.geocoder.removeAccents(lower)
+      : lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+
+    const hasEVKeyword = /(tram sac|diem sac|cho sac|sac xe|sac dien|pin xe|doi pin|vinfast|selex|eboost|\bev\b|e-scooter|escooter)/.test(noAcc);
+    if (!hasEVKeyword) {
+      return { isEVIntent: false, isNearbyGPS: false, anchorText: '' };
+    }
+
+    const isNearbyGPS = /(gan day|gan toi|quanh day|xung quanh toi|gan nhat|o dau gan)/.test(noAcc);
+
+    let anchorText = '';
+    const relMatch = clean.match(/(?:quanh|gần|gan|ở|tai|tại|khu vực|khu vuc|cạnh|canh|ngay|vùng|vung|around|near)\s+(.+)$/i);
+    if (relMatch && relMatch[1]) {
+      const candidate = relMatch[1].trim().replace(/^["']|["']$/g, '');
+      const candNoAcc = (this.geocoder?.removeAccents ? this.geocoder.removeAccents(candidate.toLowerCase()) : candidate.toLowerCase());
+      if (!/^(day|toi|minh|ban|vi tri nay|hien tai)$/.test(candNoAcc)) {
+        anchorText = candidate;
+      }
+    }
+
+    if (!anchorText && !isNearbyGPS) {
+      const stripped = noAcc
+        .replace(/^(tim|tim kiem|kiem|tra|co|nhung|cac|danh sach)?\s*/i, '')
+        .replace(/(tram sac|diem sac|cho sac|sac xe dien|sac o to dien|sac xe may dien|xe dien|doi pin|vinfast|selex|eboost|o to|xe may|gan|quanh|khu vuc|tai|o)\s*/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (stripped.length >= 3) {
+        anchorText = stripped;
+      }
+    }
+
+    return {
+      isEVIntent: true,
+      isNearbyGPS: isNearbyGPS || !anchorText,
+      anchorText,
+      rawQuery: clean
+    };
+  }
+
+  async resolveEVAnchorLocation(anchorText) {
+    if (!anchorText) return null;
+    if (this.geocoder && typeof this.geocoder.searchLocalIndex === 'function') {
+      const localMatches = this.geocoder.searchLocalIndex(anchorText, this.currentCity || 'hanoi', null, 5);
+      const nonEv = localMatches.find(m => m.type !== 'ev') || localMatches[0];
+      if (nonEv && Number.isFinite(nonEv.lat) && Number.isFinite(nonEv.lng)) {
+        return {
+          title: nonEv.title || anchorText,
+          subtitle: nonEv.fullAddress || nonEv.subtitle || anchorText,
+          lat: nonEv.lat,
+          lng: nonEv.lng,
+          source: nonEv.source || 'local-index'
+        };
+      }
+    }
+    if (this.geocoder && typeof this.geocoder.searchAddresses === 'function') {
+      const remote = await this.geocoder.searchAddresses(anchorText, {
+        city: this.currentCity || 'hanoi',
+        limit: 5
+      });
+      if (Array.isArray(remote) && remote.length > 0) {
+        const best = remote.find(m => m.type !== 'ev') || remote[0];
+        return {
+          title: best.title || anchorText,
+          subtitle: best.fullAddress || best.subtitle || anchorText,
+          lat: best.lat,
+          lng: best.lng,
+          source: best.source || 'multi-engine-geocoder'
+        };
+      }
+    }
+    return null;
+  }
+
+  rankEVStationsAround(lat, lng, options = {}) {
+    const {
+      radiusKm = 15,
+      limit = 15,
+      filterType = 'all'
+    } = options;
+
+    const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
+    const floods = (window.mapEngine && window.mapEngine._lastFloodPoints) || window.currentFloodPoints || [];
+
+    const enriched = [];
+    for (const st of allEV) {
+      if (!Number.isFinite(st.lat) || !Number.isFinite(st.lng)) continue;
+      const distKm = this._calcDistanceKm(lat, lng, st.lat, st.lng);
+      if (distKm > radiusKm) continue;
+
+      const isEscooter = Boolean(
+        st.supportsEscooter ||
+        (Array.isArray(st.vehicleTypes) && st.vehicleTypes.some(v => v === 'ebike' || v === 'escooter')) ||
+        /selex|e-scooter|xe máy điện|đổi pin/i.test(`${st.name} ${st.operator} ${st.connectors}`)
+      );
+      const isEcar = Boolean(
+        !Array.isArray(st.vehicleTypes) ||
+        st.vehicleTypes.includes('ecar') ||
+        (st.maxPowerKw || 0) >= 11
+      );
+      const isFast = (st.maxPowerKw || 0) >= 60 || Boolean(st.isFastCharge);
+
+      if (filterType === 'ecar' && !isEcar) continue;
+      if (filterType === 'escooter' && !isEscooter) continue;
+      if (filterType === 'fast' && !isFast) continue;
+
+      const nearbyFlood = floods.find(f => (f.depth_cm || 0) >= 15 && this._calcDistanceKm(st.lat, st.lng, f.lat, f.lng) <= 0.25);
+      const distScore = Math.max(0, 100 - distKm * 6);
+      const floodPenalty = nearbyFlood ? 30 : 0;
+      const confidencePct = Math.min(99.5, Math.max(85, Number((98.2 - distKm * 0.45 - (nearbyFlood ? 4 : 0)).toFixed(1))));
+
+      enriched.push({
+        ...st,
+        _distKm: distKm,
+        _isEscooter: isEscooter,
+        _isEcar: isEcar,
+        _isFast: isFast,
+        _floodDanger: Boolean(nearbyFlood),
+        _floodDepthCm: nearbyFlood ? nearbyFlood.depth_cm : 0,
+        _score: distScore - floodPenalty,
+        _confidencePct: confidencePct
+      });
+    }
+
+    enriched.sort((a, b) => a._distKm - b._distKm || b._score - a._score);
+    return enriched.slice(0, limit);
+  }
+
+  async executeEVContextualSearch(rawQuery, preParsedIntent = null) {
+    const startTime = performance.now();
+    const intent = preParsedIntent || this.parseEVSearchIntent(rawQuery);
+    let anchor = null;
+
+    if (intent.anchorText) {
+      anchor = await this.resolveEVAnchorLocation(intent.anchorText);
+    }
+
+    if (!anchor) {
+      const gpsLatLng = window.mapEngine && window.mapEngine._userLocation;
+      if (gpsLatLng && Number.isFinite(gpsLatLng.lat) && Number.isFinite(gpsLatLng.lng)) {
+        anchor = {
+          title: 'Vị trí GPS hiện tại của bạn',
+          subtitle: `${gpsLatLng.lat.toFixed(5)}, ${gpsLatLng.lng.toFixed(5)}`,
+          lat: gpsLatLng.lat,
+          lng: gpsLatLng.lng,
+          source: 'gps-device'
+        };
+      } else if (this.routeLocations?.origin && Number.isFinite(this.routeLocations.origin.lat)) {
+        anchor = {
+          title: this.routeLocations.origin.title || 'Điểm xuất phát hiện tại',
+          subtitle: this.routeLocations.origin.fullAddress || '',
+          lat: this.routeLocations.origin.lat,
+          lng: this.routeLocations.origin.lng,
+          source: 'route-origin'
+        };
+      } else if (window.mapEngine?.map) {
+        const c = window.mapEngine.map.getCenter();
+        anchor = {
+          title: 'Trung tâm bản đồ đang xem',
+          subtitle: `${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}`,
+          lat: c.lat,
+          lng: c.lng,
+          source: 'map-center'
+        };
+      }
+    }
+
+    if (!anchor) {
+      this.showToast('Chưa xác định được tọa độ tâm tìm kiếm trạm sạc.', 'warning');
+      return [];
+    }
+
+    const results = this.rankEVStationsAround(anchor.lat, anchor.lng, { radiusKm: 18, limit: 20 });
+    this._evFinderContext = { anchor, query: rawQuery, results };
+
+    if (window.mapEngine && typeof window.mapEngine.toggleEV === 'function') {
+      window.mapEngine.toggleEV(true, true);
+    }
+    if (window.mapEngine?.map) {
+      window.mapEngine.map.flyTo([anchor.lat, anchor.lng], results.length && results[0]._distKm <= 2 ? 14 : 13, { duration: 0.9 });
+    }
+
+    this.openEVStationFinderPanel(anchor, results, rawQuery);
+
+    if (window.moveSafeLogger && typeof window.moveSafeLogger.log === 'function') {
+      window.moveSafeLogger.log({
+        category: 'ev',
+        title: `Tìm trạm sạc quanh "${anchor.title}" (${results.length} trạm đạt chuẩn)`,
+        source: `app.js :: executeEVContextualSearch (${anchor.source})`,
+        durationMs: Math.round(performance.now() - startTime),
+        input: {
+          query: rawQuery,
+          anchorName: anchor.title,
+          anchorCoords: { lat: anchor.lat, lng: anchor.lng },
+          source: anchor.source
+        },
+        steps: [
+          {
+            stepName: '1. Phân tích ý định & Neo địa danh',
+            formulaOrRule: 'parseEVSearchIntent + resolveEVAnchorLocation',
+            detail: `Trích xuất cụm neo "${intent.anchorText || 'GPS/Hiện tại'}" -> (${anchor.lat.toFixed(4)}, ${anchor.lng.toFixed(4)})`
+          },
+          {
+            stepName: '2. Tính khoảng cách Haversine & Rà soát ngập 250m',
+            formulaOrRule: 'Haversine(d) + FloodBuffer(250m, depth >= 15cm)',
+            detail: `Quét toàn bộ kho ${((window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || []).length || 171} trạm EV/e-Scooter, xếp hạng tăng dần theo cự ly thực`
+          }
+        ],
+        output: {
+          matchedCount: results.length,
+          nearestStation: results[0] ? `${results[0].name} (${(results[0]._distKm * 1000).toFixed(0)}m)` : null,
+          precisionEstimate: results.length ? `${results[0]._confidencePct}%` : '0%'
+        }
+      });
+    }
+
+    return results;
+  }
+
+  openEVStationFinderPanel(anchor, stations, queryText = '') {
+    const drawer = document.getElementById('gm-ev-finder-drawer');
+    const titleEl = document.getElementById('ev-finder-title');
+    const subEl = document.getElementById('ev-finder-subtitle');
+    if (!drawer) return;
+
+    this._evFinderContext = { anchor, results: stations, query: queryText };
+    if (titleEl) {
+      titleEl.textContent = `Trạm sạc quanh ${anchor?.title || 'vị trí của bạn'}`.normalize('NFC');
+    }
+    if (subEl) {
+      const topDist = stations[0]
+        ? (stations[0]._distKm < 1 ? `${Math.round(stations[0]._distKm * 1000)}m` : `${stations[0]._distKm.toFixed(1)}km`)
+        : '—';
+      subEl.textContent = `${stations.length} trạm EV & e-Scooter • Gần nhất ${topDist} • Kiểm định ngập 250m`.normalize('NFC');
+    }
+
+    drawer.style.display = 'flex';
+    this.renderEVFinderList();
+  }
+
+  renderEVFinderList() {
+    const listEl = document.getElementById('ev-finder-list');
+    if (!listEl || !this._evFinderContext) return;
+    const { anchor } = this._evFinderContext;
+    const filter = this._evFinderFilter || 'all';
+
+    const stations = this.rankEVStationsAround(anchor.lat, anchor.lng, {
+      radiusKm: 20,
+      limit: 20,
+      filterType: filter
+    });
+
+    if (!stations.length) {
+      listEl.innerHTML = `
+        <div class="ev-station-card">
+          <div class="ev-card-name">Chưa có trạm phù hợp bộ lọc trong bán kính 20km</div>
+          <div class="ev-card-addr">Hãy chuyển sang bộ lọc "Tất cả trạm" để xem cả trạm Ô tô điện và tủ đổi pin Xe máy điện.</div>
+        </div>`;
+      return;
+    }
+
+    listEl.innerHTML = stations.map(st => {
+      const distText = st._distKm < 1 ? `${Math.round(st._distKm * 1000)} m` : `${st._distKm.toFixed(2)} km`;
+      const floodBadge = st._floodDanger
+        ? `<span class="ev-tag warn">Cần lưu ý ngập (${st._floodDepthCm}cm)</span>`
+        : `<span class="ev-tag safe">An toàn ngập 250m</span>`;
+      const typeTag = st._isEscooter && st._isEcar
+        ? '<span class="ev-tag">Ô tô EV + e-Scooter</span>'
+        : (st._isEscooter ? '<span class="ev-tag">Xe máy điện / Đổi pin</span>' : '<span class="ev-tag">Ô tô điện EV</span>');
+      const safeName = String(st.name || '').replace(/'/g, "\\'");
+
+      return `
+        <article class="ev-station-card">
+          <div class="ev-card-top">
+            <div class="ev-card-name">${st.name}</div>
+            <span class="ev-card-dist">${distText}</span>
+          </div>
+          <div class="ev-card-addr">${st.address || ''}</div>
+          <div class="ev-card-tags">
+            <span class="ev-tag power">${st.maxPowerKw || 60} kW • ${st.operator || 'EV'}</span>
+            ${typeTag}
+            ${floodBadge}
+          </div>
+          <div class="ev-card-actions">
+            <button type="button" class="ev-card-btn primary" onclick="window.appState.routeToLocation(${st.lat}, ${st.lng}, '${safeName}'); window.appState.closeEVStationFinderPanel();">Đi thẳng tới đây</button>
+            <button type="button" class="ev-card-btn via" onclick="window.appState.insertWaypointToRoute(${st.lat}, ${st.lng}, '${safeName}'); window.appState.closeEVStationFinderPanel();">+ Ghé sạc giữa đường</button>
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  closeEVStationFinderPanel() {
+    const drawer = document.getElementById('gm-ev-finder-drawer');
+    if (drawer) drawer.style.display = 'none';
+  }
+
+  toggleCommuteHud(forceState = null) {
+    const hud = document.getElementById('gm-commute-hud');
+    if (!hud) return;
+    const isVisible = hud.style.display !== 'none';
+    const nextVisible = forceState !== null ? Boolean(forceState) : !isVisible;
+    hud.style.display = nextVisible ? 'block' : 'none';
+    if (nextVisible) {
+      const instr = document.getElementById('hud-next-instruction');
+      const meta = document.getElementById('hud-route-meta');
+      if (instr && this.routeLocations?.destination) {
+        instr.textContent = `Đang dẫn đường tới: ${this.routeLocations.destination.title || 'Điểm đến'}`;
+      }
+      if (meta && this.currentViaWaypoint) {
+        meta.textContent = `Có ghé qua: ${this.currentViaWaypoint.title} • Giám sát ngập 24/7`;
+      }
+      this.showToast('Đã bật Chế độ Di chuyển Rảnh tay (HUD) cho Smartphone', 'info', 2500);
+    }
+  }
+
+  locateAndFindNearestEV() {
+    if (navigator.geolocation) {
+      this.showToast('Đang xác định GPS để tìm trạm sạc gần nhất...', 'info', 2000);
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (window.mapEngine) {
+            window.mapEngine._userLocation = { lat, lng };
+          }
+          await this.executeEVContextualSearch('trạm sạc gần đây', {
+            isEVIntent: true,
+            isNearbyGPS: true,
+            anchorText: '',
+            rawQuery: 'trạm sạc gần đây'
+          });
+        },
+        async () => {
+          await this.executeEVContextualSearch('trạm sạc gần đây');
+        },
+        { enableHighAccuracy: true, timeout: 4500 }
+      );
+    } else {
+      this.executeEVContextualSearch('trạm sạc gần đây');
+    }
   }
 }
 

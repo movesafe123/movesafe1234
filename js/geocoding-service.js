@@ -43,6 +43,76 @@ class GeocodingService {
     // Kho địa danh trọng điểm 3 miền (Đại sứ quán, Bệnh viện, Trường ĐH, Bến xe, Ga tàu, Công viên, Khách sạn lớn)
     this.builtinLandmarks = [
       {
+        title: 'Chợ Xuân Mai',
+        subtitle: 'Ngã tư Xuân Mai, QL6 & QL21A, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội',
+        lat: 20.8928,
+        lng: 105.5752,
+        city: 'hanoi',
+        category: 'Chợ / Trung tâm khu vực',
+        type: 'landmark',
+        aliases: ['cho xuan mai', 'xuan mai', 'thi tran xuan mai', 'tt xuan mai', 'chuong my xuan mai']
+      },
+      {
+        title: 'Trường Đại Học Lâm Nghiệp (Xuân Mai)',
+        subtitle: 'QL21A, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội',
+        lat: 20.9036,
+        lng: 105.5735,
+        city: 'hanoi',
+        category: 'Trường đại học',
+        type: 'university',
+        aliases: ['dai hoc lam nghiep', 'dh lam nghiep', 'lam nghiep xuan mai', 'vnuf']
+      },
+      {
+        title: 'Ngã Tư Xuân Mai (Giao QL6 - QL21A)',
+        subtitle: 'Nút giao Quốc lộ 6 & Quốc lộ 21A, Xuân Mai, Chương Mỹ, Hà Nội',
+        lat: 20.8942,
+        lng: 105.5761,
+        city: 'hanoi',
+        category: 'Nút giao thông trọng điểm',
+        type: 'landmark',
+        aliases: ['nga tu xuan mai', 'ql6 xuan mai', 'ql21 xuan mai', 'cau xuan mai']
+      },
+      {
+        title: 'KĐT Vệ Tinh Xuân Mai / Ngã ba Miếu Môn',
+        subtitle: 'Khu vực KĐT Vệ tinh Xuân Mai - Thủy Xuân Tiên, Chương Mỹ, Hà Nội',
+        lat: 20.8855,
+        lng: 105.5798,
+        city: 'hanoi',
+        category: 'Khu đô thị vệ tinh',
+        type: 'landmark',
+        aliases: ['kdt xuan mai', 've tinh xuan mai', 'mieu mon', 'thuy xuan tien']
+      },
+      {
+        title: 'Thị Trấn Chúc Sơn (Trung tâm Chương Mỹ)',
+        subtitle: 'Quốc lộ 6, Thị trấn Chúc Sơn, Chương Mỹ, Hà Nội',
+        lat: 20.9225,
+        lng: 105.7024,
+        city: 'hanoi',
+        category: 'Trung tâm hành chính huyện',
+        type: 'landmark',
+        aliases: ['chuc son', 'thi tran chuc son', 'chuong my', 'huyen chuong my']
+      },
+      {
+        title: 'Bến Xe Yên Nghĩa',
+        subtitle: 'Quốc lộ 6, Phường Yên Nghĩa, Hà Đông, Hà Nội',
+        lat: 20.9488,
+        lng: 105.7478,
+        city: 'hanoi',
+        category: 'Bến xe khách liên tỉnh',
+        type: 'bus_station',
+        aliases: ['ben xe yen nghia', 'yen nghia', 'bx yen nghia']
+      },
+      {
+        title: 'Khu Công Nghệ Cao Hòa Lạc',
+        subtitle: 'Đại lộ Thăng Long - QL21, Thạch Thất, Hà Nội',
+        lat: 20.9922,
+        lng: 105.5415,
+        city: 'hanoi',
+        category: 'Khu công nghệ cao',
+        type: 'landmark',
+        aliases: ['hoa lac', 'kcn hoa lac', 'fpt hoa lac', 'cong nghe cao hoa lac']
+      },
+      {
         title: 'Quán Xôi Xéo Oanh Oanh',
         subtitle: 'Số 559 Đường La Thành, Thành Công, Ba Đình, Hà Nội',
         lat: 21.023647,

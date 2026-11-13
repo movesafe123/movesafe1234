@@ -71,10 +71,10 @@
             type="text" 
             class="gm-input-search" 
             id="gm-search-input" 
-            placeholder="Nhập địa chỉ..."
+            placeholder="Tìm địa chỉ, trạm sạc quanh Chợ Xuân Mai..."
             autocomplete="off"
             spellcheck="false"
-            aria-label="Nhập địa chỉ"
+            aria-label="Tìm địa chỉ hoặc trạm sạc theo ngữ cảnh"
           >
           <button class="gm-input-clear-btn" id="btn-clear-search" title="Xóa nội dung tìm kiếm" aria-label="Xóa nội dung tìm kiếm" style="display: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -202,27 +202,45 @@
       </div>
 
       <div class="gm-directions-header" id="gm-directions-header">
-        <div class="gm-travel-modes">
-          <button class="gm-mode-tab active" data-mode="motorbike" title="Xe máy xăng: Chịu ngập tối đa 20cm">
-            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="gm-travel-modes" role="tablist" aria-label="Chọn loại phương tiện (7 chế độ chịu ngập)">
+          <button class="gm-mode-tab active" data-mode="motorbike" title="Xe máy số: Chịu ngập tối đa 20cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L9 11l3-5 3 3h4"></path><path d="M12 17.5V14"></path>
             </svg>
             <span>Xe máy</span>
           </button>
-          <button class="gm-mode-tab" data-mode="car" title="Ô tô xăng: Chịu ngập tối đa 25cm">
-            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button class="gm-mode-tab" data-mode="scooter" title="Xe tay ga: Gầm thấp, chịu ngập tối đa 18cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="17" r="3"></circle><circle cx="18" cy="17" r="3"></circle><path d="M9 17h6l1-6h-3l-1-4h-3"></path><path d="M6 14l2-4"></path>
+            </svg>
+            <span>Tay ga</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="car" title="Ô tô phổ thông: Chịu ngập tối đa 25cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11 2 11.5 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle>
             </svg>
             <span>Ô tô</span>
           </button>
-          <button class="gm-mode-tab" data-mode="ebike" title="Xe máy điện: Chịu ngập tối đa 20cm">
-            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button class="gm-mode-tab" data-mode="sedan" title="Sedan gầm thấp: Chịu ngập tối đa 22cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 13l2-4h10l4 4h2v3h-2"></path><circle cx="7" cy="16" r="2"></circle><circle cx="17" cy="16" r="2"></circle><path d="M9 16h6"></path>
+            </svg>
+            <span>Sedan</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="suv" title="SUV / Bán tải gầm cao: Chịu ngập tới 35cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 13l2-5h12l3 3h3v4h-2"></path><circle cx="7" cy="16.5" r="2.5"></circle><circle cx="17.5" cy="16.5" r="2.5"></circle><path d="M9.5 16.5H15"></path>
+            </svg>
+            <span>SUV/Bán tải</span>
+          </button>
+          <button class="gm-mode-tab" data-mode="ebike" title="Xe máy điện (VinFast e-Scooter / Selex): Chịu ngập 20cm">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><path d="M15 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 12.5L9 11l3-5 3 3h4"></path><path d="m11 14 2-3h-2l1-2" stroke-width="1.8"></path>
             </svg>
             <span>Xe máy điện</span>
           </button>
-          <button class="gm-mode-tab" data-mode="ecar" title="Ô tô điện: Chịu ngập tối đa 30cm">
-            <svg class="mode-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button class="gm-mode-tab" data-mode="ecar" title="Ô tô điện EV: Chịu ngập 30cm (pin kín IP67)">
+            <svg class="mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11 2 11.5 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="m11 13 2-2.5h-2l1-2" stroke-width="1.8"></path>
             </svg>
             <span>Ô tô điện</span>
@@ -268,6 +286,24 @@
               
               <!-- Dropdown gợi ý địa chỉ điểm đi -->
               <div class="gm-autocomplete-dropdown" id="dropdown-origin" style="display: none;"></div>
+            </div>
+
+            <!-- Điểm ghé qua linh hoạt (Pitstop / Waypoint - Mục tiêu 1) -->
+            <div class="gm-field-row gm-field-row-via" id="field-row-via" style="display: none;">
+              <input 
+                type="text" 
+                class="gm-route-text-input" 
+                id="gm-route-via" 
+                value="" 
+                placeholder="Điểm ghé qua / Trạm sạc trung gian (tùy chọn)..."
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="Chọn điểm ghé qua trung gian"
+              >
+              <button class="gm-input-clear-btn" id="btn-clear-via" title="Xóa điểm ghé qua" aria-label="Xóa điểm ghé qua">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              <div class="gm-autocomplete-dropdown" id="dropdown-via" style="display: none;"></div>
             </div>
 
             <!-- Điểm đến -->
@@ -319,6 +355,13 @@
                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
               </svg>
               <span>Về nhà ngay</span>
+            </button>
+
+            <button type="button" class="gm-qc-save-btn" id="btn-toggle-via-waypoint" title="Thêm hoặc ẩn điểm dừng chân / trạm sạc ghé qua giữa lộ trình">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Ghé qua</span>
             </button>
 
             <button type="button" class="gm-qc-save-btn" id="btn-save-commute-places" title="Lưu Điểm đi làm Nhà và Điểm đến làm Cơ quan hiện tại">
@@ -1245,6 +1288,84 @@
     </div>
   </div>
 
+<!-- ==================== 7B. BẢNG TÌM TRẠM SẠC EV & E-SCOOTER THÔNG MINH (MỤC TIÊU 2) ==================== -->
+  <section class="gm-ev-finder-drawer" id="gm-ev-finder-drawer" aria-label="Tìm trạm sạc EV và e-Scooter thông minh" style="display: none;">
+    <div class="ev-finder-header">
+      <div class="ev-finder-title-wrap">
+        <span class="ev-finder-badge-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12Z"></path>
+            <path d="M14 9h2a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.5a2.5 2.5 0 0 0-5 0"></path>
+            <polygon points="9 11 7 15 10 15 8 19 12 14 10 14 12 11" fill="currentColor"></polygon>
+          </svg>
+        </span>
+        <div>
+          <h3 id="ev-finder-title">Trạm sạc EV &amp; Đổi pin gần bạn</h3>
+          <p id="ev-finder-subtitle">Kiểm định an toàn ngập 250m &amp; độ chính xác &gt;90%</p>
+        </div>
+      </div>
+      <button type="button" class="gm-btn-close" id="btn-close-ev-finder" title="Đóng bảng trạm sạc" aria-label="Đóng bảng trạm sạc">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="ev-finder-filters" id="ev-finder-filters">
+      <button type="button" class="ev-filter-pill active" data-ev-filter="all">Tất cả trạm</button>
+      <button type="button" class="ev-filter-pill" data-ev-filter="ecar">Ô tô điện (EV)</button>
+      <button type="button" class="ev-filter-pill" data-ev-filter="escooter">Xe máy điện / Đổi pin</button>
+      <button type="button" class="ev-filter-pill" data-ev-filter="fast">Sạc nhanh ≥ 60kW</button>
+    </div>
+
+    <div class="ev-finder-benchmark-strip" id="ev-finder-benchmark-strip">
+      <span>So sánh nhanh: <strong>MoveSafe VN (223 trạm Cache)</strong> tích hợp Ô tô EV + e-Scooter + Selex + Cảnh báo ngập 250m + Ghé qua (<strong>EVCS.VN</strong> &amp; <strong>App VinFast e-Scooter</strong> chưa hỗ trợ định tuyến né ngập theo gầm xe)</span>
+    </div>
+
+    <div class="ev-finder-list" id="ev-finder-list">
+      <!-- Render động các thẻ trạm sạc tại đây -->
+    </div>
+  </section>
+
+  <!-- ==================== 7C. CHẾ ĐỘ LÁI XE RẢNH TAY (MOBILE COMMUTE HUD) ==================== -->
+  <div class="gm-commute-hud" id="gm-commute-hud" style="display: none;" role="region" aria-label="Chế độ lái xe trên Smartphone">
+    <div class="hud-top-row">
+      <div class="hud-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+        <span>CHẾ ĐỘ DI CHUYỂN RẢNH TAY</span>
+      </div>
+      <button type="button" class="hud-exit-btn" id="btn-exit-hud">Thoát HUD</button>
+    </div>
+    <div class="hud-main-card">
+      <div class="hud-instruction" id="hud-next-instruction">Sẵn sàng dẫn đường né ngập &amp; tránh kẹt xe</div>
+      <div class="hud-meta-row" id="hud-route-meta">Bán kính quét an toàn 250m • Dữ liệu 24/7</div>
+    </div>
+    <div class="hud-actions-row">
+      <button type="button" class="hud-action-btn hud-btn-ev" id="btn-hud-find-ev">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <span>Trạm sạc gần nhất</span>
+      </button>
+      <button type="button" class="hud-action-btn hud-btn-reroute" id="btn-hud-reroute">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+        <span>Cập nhật né ngập</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Thanh thao tác nhanh vùng ngón cái cho người đi đường trên Smartphone (Thumb-Zone) -->
+  <div class="mobile-commuter-bar" id="mobile-commuter-bar" aria-label="Thao tác nhanh cho người di chuyển">
+    <button type="button" class="mcommute-btn" id="btn-mobile-ev-near">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      <span>Sạc gần đây</span>
+    </button>
+    <button type="button" class="mcommute-btn mcommute-btn-primary" id="btn-mobile-flex-route">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+      <span>Lộ trình + Ghé</span>
+    </button>
+    <button type="button" class="mcommute-btn" id="btn-mobile-hud-toggle">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+      <span>Chế độ lái HUD</span>
+    </button>
+  </div>
+
 <!-- ==================== 8. THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (MOBILE BOTTOM TAB BAR) ==================== -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Điều hướng di động">
     <button class="mobile-nav-item active" id="mnav-explore" data-tab="explore">
@@ -1268,6 +1389,13 @@
         </svg>
       </div>
       <span class="mnav-label">Báo ngập</span>
+    </button>
+
+    <button class="mobile-nav-item" id="mnav-ev" data-tab="ev">
+      <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      <span class="mnav-label">Trạm sạc</span>
     </button>
 
     <button class="mobile-nav-item" id="mnav-ai" data-tab="ai">

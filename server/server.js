@@ -174,18 +174,46 @@ app.get('/api/predictions', (req, res) => {
   });
 });
 
-// 2d. API Lấy danh sách Trạm sạc Xe điện (Open Charge Map API v3 & Mạng lưới Trạm sạc Quốc gia)
+// 2d. API Lấy danh sách Trạm sạc Xe điện (Single Source of Truth: data/ev_stations_cache.json)
 app.get('/api/ev-stations', (req, res) => {
-  const city = req.query.city || 'hanoi';
+  const city = req.query.city || 'all';
   const fastOnly = req.query.fastOnly === 'true' || req.query.fastOnly === '1';
   const stations = evService.getStations(city, fastOnly);
   res.json({
     status: 'success',
-    source: 'Open Charge Map API v3 & Hybrid Network',
+    source: 'Cache EV MoveSafe VN (EVCS.VN verified + OpenChargeMap + TomTom EV)',
+    cacheFile: 'data/ev_stations_cache.json',
+    lastSyncTime: evService.lastSyncTime || null,
     count: stations.length,
     city,
     data: stations
   });
+});
+
+// 2e. API Chủ động làm mới Cache Trạm sạc EV (bảo vệ quota với cooldown 60 giây)
+app.post('/api/ev-stations/sync', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (evService.lastManualSyncAt && (now - evService.lastManualSyncAt) < 60 * 1000) {
+      const waitSec = Math.ceil((60 * 1000 - (now - evService.lastManualSyncAt)) / 1000);
+      return res.json({
+        status: 'cached',
+        message: `Cache vừa được đồng bộ, vui lòng đợi ${waitSec}s trước khi làm mới lại.`,
+        count: evService.stations.length,
+        lastSyncTime: evService.lastSyncTime
+      });
+    }
+    evService.lastManualSyncAt = now;
+    const synced = await evService.syncAllStations({ force: true });
+    res.json({
+      status: 'success',
+      message: `Đã đồng bộ & lưu cache ${synced.length} trạm sạc vào data/ev_stations_cache.json`,
+      count: synced.length,
+      lastSyncTime: evService.lastSyncTime
+    });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 });
 
 // 3. API Kích hoạt Bot cào dữ liệu ngay lập tức

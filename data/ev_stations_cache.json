@@ -1907,7 +1907,9 @@
         "quantity": 4
       }
     ],
-    "accessComments": "Tầng hầm B2 & B3 tháp Landmark 81"
+    "accessComments": "Tầng hầm B2 & B3 tháp Landmark 81",
+    "tomtomId": "tt-jPbGLf24RYcdo475sqbhfQ",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
   },
   {
     "id": "ev-hcm-dongkhoi",
@@ -1942,7 +1944,9 @@
         "quantity": 2
       }
     ],
-    "accessComments": "Tầng hầm B3 sảnh thương mại"
+    "accessComments": "Tầng hầm B3 sảnh thương mại",
+    "tomtomId": "tt-leJkaNT00SLa6QGnxDwu6A",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
   },
   {
     "id": "ev-hcm-bitexco",
@@ -2070,7 +2074,9 @@
         "quantity": 4
       }
     ],
-    "accessComments": "Hầm B1 trung tâm thương mại Thảo Điền"
+    "accessComments": "Hầm B1 trung tâm thương mại Thảo Điền",
+    "tomtomId": "tt-tbzuoWM52s7OUNWS22__FA",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
   },
   {
     "id": "ev-hcm-sala",
@@ -3983,7 +3989,8 @@
     ],
     "accessComments": "Tầng hầm B1 TTTM Vincom Plaza",
     "ocmId": "ocm-267276",
-    "lastUpdated": "2023-07-04T03:26:00Z"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "tomtomId": "tt-wqBsh1l2qn4Ihc_mP58U4A"
   },
   {
     "id": "ev-hcm-sunwahpearl",
@@ -4432,8 +4439,9 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-06-21T03:35:00Z",
-    "ocmId": "ocm-494307"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "ocmId": "ocm-494307",
+    "tomtomId": "tt-iy8DwsYtu0aQAYeTXLfWsA"
   },
   {
     "id": "ocm-492405",
@@ -4458,8 +4466,9 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-06-07T02:52:00Z",
-    "ocmId": "ocm-492405"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "ocmId": "ocm-492405",
+    "tomtomId": "tt-ofTHq-5BVQUhw0iR86Sb2w"
   },
   {
     "id": "ocm-461673",
@@ -4484,8 +4493,9 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2025-10-03T05:39:00Z",
-    "ocmId": "ocm-461673"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "ocmId": "ocm-461673",
+    "tomtomId": "tt-ekxbdDyG_nYHDx8MfvBy0w"
   },
   {
     "id": "ocm-461659",
@@ -4510,8 +4520,9 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2025-10-02T09:54:00Z",
-    "ocmId": "ocm-461659"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "ocmId": "ocm-461659",
+    "tomtomId": "tt-EDXHVNPW2XLhAEAOeau-8A"
   },
   {
     "id": "ocm-208970",
@@ -4536,7 +4547,2279 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2022-10-25T03:24:00Z",
-    "ocmId": "ocm-208969"
+    "lastUpdated": "2026-11-13T16:47:43.082Z",
+    "ocmId": "ocm-208969",
+    "tomtomId": "tt-QxmpfytGzKxDk07Xra21cw"
+  },
+  {
+    "id": "ev-hn-xuanmai-01",
+    "name": "Trạm sạc VinFast Chợ Xuân Mai - Quốc lộ 6 (Ô tô & Xe máy điện)",
+    "operator": "VinFast",
+    "address": "Tổ 3, Khu Tân Bình, Cổng Chợ Xuân Mai, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8929,
+    "lng": 105.5756,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC Fast (Ô tô điện)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "AC 11kW (Ô tô điện)",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 2
+      },
+      {
+        "type": "Tủ sạc & Đổi pin VinFast e-Scooter",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Bãi đỗ xe mặt Quốc lộ 6 ngay cạnh Chợ Xuân Mai (cách tâm chợ ~45m), cốt nền cao +18.5m không ngập",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.810Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-02",
+    "name": "Trạm sạc VinFast Petrolimex Ngã tư Xuân Mai (QL6 - Đường HCM)",
+    "operator": "VinFast",
+    "address": "Km35 Quốc lộ 6, Ngã tư Xuân Mai giao Đường Hồ Chí Minh, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8904,
+    "lng": 105.5778,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 Siêu nhanh (Ô tô điện)",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS2 Tiêu chuẩn (Ô tô điện)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Trụ sạc Xe máy điện e-Scooter",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cửa hàng Xăng dầu Petrolimex Ngã tư Xuân Mai, cách Chợ Xuân Mai ~360m, bãi đỗ rộng cho xe tải/ô tô/xe máy điện",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-03",
+    "name": "Trạm sạc & Tủ đổi pin e-Scooter Đại học Lâm Nghiệp Xuân Mai",
+    "operator": "VinFast / Selex Motors",
+    "address": "Số 10 Quốc lộ 21A, Cổng chính Trường Đại học Lâm Nghiệp, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9032,
+    "lng": 105.5746,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 30,
+    "isFastCharge": false,
+    "totalPoints": 14,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 30kW (Ô tô điện)",
+        "powerKw": 30,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Tủ đổi pin Selex & Sạc e-Scooter VinFast",
+        "powerKw": 1.5,
+        "current": "AC",
+        "quantity": 12
+      }
+    ],
+    "accessComments": "Khuôn viên bãi xe sinh viên & cán bộ ĐH Lâm Nghiệp (cách Chợ Xuân Mai ~1.15km), hỗ trợ đổi pin xe máy điện trong 2 phút",
+    "source": "MoveSafe & VinFast/Selex Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-04",
+    "name": "Trạm sạc Nhanh VinFast KĐT Xuân Mai Complex - Thủy Xuân Tiên",
+    "operator": "VinFast",
+    "address": "Mặt đường Quốc lộ 6, KĐT Xuân Mai Complex, Thủy Xuân Tiên, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8965,
+    "lng": 105.5885,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC Fast 60kW (Ô tô điện)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Trụ sạc Xe máy điện e-Scooter VinFast",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Sảnh thương mại chân tòa nhà Xuân Mai Complex, cách Chợ Xuân Mai ~1.44km về hướng Hà Đông",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-05",
+    "name": "Trạm sạc VinFast Cầu Mai Lĩnh - Đồng Mai (Hà Đông)",
+    "operator": "VinFast",
+    "address": "Km15 Quốc lộ 6, Đồng Mai (cạnh Cầu Mai Lĩnh), Quận Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9358,
+    "lng": 105.7282,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC Fast",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Điểm dừng nghỉ tiếp năng lượng cửa ngõ Hà Đông - Chương Mỹ",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-06",
+    "name": "Trạm sạc VinFast Thị trấn Chúc Sơn - Trung tâm Huyện Chương Mỹ",
+    "operator": "VinFast",
+    "address": "Số 102 Hòa Sơn, Quốc lộ 6, Thị trấn Chúc Sơn, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9228,
+    "lng": 105.7025,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 10,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC Fast 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter VinFast 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 6
+      }
+    ],
+    "accessComments": "Đối diện Bến xe / Trung tâm hành chính Thị trấn Chúc Sơn, cao ráo an toàn",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-07",
+    "name": "Trạm sạc VinFast & Tủ đổi pin Selex KCN Phú Nghĩa (QL6 Chương Mỹ)",
+    "operator": "VinFast / Selex Motors",
+    "address": "Km25 Quốc lộ 6, Khu công nghiệp Phú Nghĩa, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9082,
+    "lng": 105.6435,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 Siêu nhanh 150kW",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Tủ đổi pin Selex / Sạc e-Scooter",
+        "powerKw": 1.5,
+        "current": "AC",
+        "quantity": 10
+      }
+    ],
+    "accessComments": "Cổng chính KCN Phú Nghĩa nối tuyến Hà Đông <-> Chợ Xuân Mai",
+    "source": "MoveSafe & VinFast/Selex Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-08",
+    "name": "Trạm sạc VinFast Miếu Môn - Đường Hồ Chí Minh",
+    "operator": "VinFast",
+    "address": "Ngã tư Miếu Môn, Đường Hồ Chí Minh (QL21A), Trần Phú, Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8415,
+    "lng": 105.6012,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cách Chợ Xuân Mai 6.3km về phía Nam theo trục Đường Hồ Chí Minh",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-xuanmai-09",
+    "name": "Trạm sạc VinFast Lương Sơn - Cửa ngõ Tây Xuân Mai (QL6)",
+    "operator": "VinFast",
+    "address": "Km39 Quốc lộ 6, Thị trấn Lương Sơn (giáp ranh Xuân Mai - Hà Nội), Hòa Bình",
+    "city": "hanoi",
+    "lat": 20.8765,
+    "lng": 105.5342,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC Fast 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter VinFast 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Cách Chợ Xuân Mai ~4.6km theo Quốc lộ 6 hướng Tây",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-yennghia-10",
+    "name": "Trạm sạc Hub Bến xe Yên Nghĩa - Hà Đông (EV & e-Scooter)",
+    "operator": "VinFast",
+    "address": "Bến xe Yên Nghĩa, Quốc lộ 6, Phường Yên Nghĩa, Quận Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9505,
+    "lng": 105.7448,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 20,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 Siêu nhanh 180kW",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Trụ sạc Xe máy điện e-Scooter",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Ga cuối Metro Cát Linh - Hà Đông & đầu mối xe đi Xuân Mai - Chương Mỹ",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-hoalac-11",
+    "name": "Trạm sạc Siêu nhanh VinFast Khu Công nghệ cao Hòa Lạc",
+    "operator": "VinFast",
+    "address": "Km29 Đại lộ Thăng Long, Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0126,
+    "lng": 105.5258,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 18,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 Siêu nhanh 250kW",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "Tủ sạc Xe máy điện e-Scooter",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Cạnh Đại học FPT & Viettel Hòa Lạc, cách Ngã tư Xuân Mai 14km theo QL21A",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-hoalac-12",
+    "name": "Trạm sạc & Đổi pin EBOOST - ĐHQGHN Hòa Lạc",
+    "operator": "EBOOST / VinFast",
+    "address": "Khuôn viên Đại học Quốc gia Hà Nội tại Hòa Lạc, Thạch Hòa, Thạch Thất, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0018,
+    "lng": 105.5182,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "Sạc Xe máy điện EBOOST / e-Scooter",
+        "powerKw": 2.2,
+        "current": "AC",
+        "quantity": 10
+      }
+    ],
+    "accessComments": "Bãi gửi xe nhà điều hành HT1 ĐHQGHN Hòa Lạc",
+    "source": "MoveSafe & Partner Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-quocoai-13",
+    "name": "Trạm sạc VinFast Thị trấn Quốc Oai - Ngã ba Sài Sơn",
+    "operator": "VinFast",
+    "address": "Tỉnh lộ 421B, Thị trấn Quốc Oai, Huyện Quốc Oai, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9905,
+    "lng": 105.6422,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Bãi xe Trung tâm Văn hóa Quốc Oai",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-thanhoai-14",
+    "name": "Trạm sạc VinFast KĐT Thanh Hà Cienco 5 - Kiến Hưng",
+    "operator": "VinFast",
+    "address": "Trục đường phía Nam (Cienco 5), Cự Khê / Kiến Hưng, Thanh Oai - Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9288,
+    "lng": 105.7865,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 12,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Khu B1.4 KĐT Thanh Hà, đỗ xe thoải mái không ngập",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-thuongtin-15",
+    "name": "Trạm sạc VinFast Thị trấn Thường Tín - QL1A",
+    "operator": "VinFast",
+    "address": "Km19 Quốc lộ 1A, Thị trấn Thường Tín, Huyện Thường Tín, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8712,
+    "lng": 105.8625,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Khu vực Bưu điện Thường Tín mặt QL1A",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-hadong-16",
+    "name": "Trạm sạc & Tủ đổi pin Selex AEON Mall Hà Đông (Cổng Dương Nội)",
+    "operator": "VinFast / Selex Motors",
+    "address": "Khu dân cư Hoàng Văn Thụ, Phường Dương Nội, Quận Hà Đông, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9901,
+    "lng": 105.7519,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 180,
+    "isFastCharge": true,
+    "totalPoints": 16,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 180kW",
+        "powerKw": 180,
+        "current": "DC",
+        "quantity": 4
+      },
+      {
+        "type": "Tủ đổi pin Selex & Sạc e-Scooter",
+        "powerKw": 1.5,
+        "current": "AC",
+        "quantity": 12
+      }
+    ],
+    "accessComments": "Bãi đỗ xe ngoài trời cổng D AEON Mall Hà Đông",
+    "source": "MoveSafe & VinFast/Selex Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-longbien-17",
+    "name": "Trạm sạc VinFast Vincom Plaza Long Biên (Vinhomes Riverside)",
+    "operator": "VinFast",
+    "address": "Đường Hội Xá, Khu đô thị Vinhomes Riverside, Phúc Lợi, Long Biên, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0504,
+    "lng": 105.9152,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 150,
+    "isFastCharge": true,
+    "totalPoints": 14,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 150kW",
+        "powerKw": 150,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Bãi xe nổi mặt sảnh chính Vincom Plaza Long Biên",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "ev-hn-donganh-18",
+    "name": "Trạm sạc VinFast Vinhomes Global Gate - Cổ Loa (Đông Anh)",
+    "operator": "VinFast",
+    "address": "Đường Trường Sa (Quốc lộ 5 kéo dài), Đông Hội, Huyện Đông Anh, Hà Nội",
+    "city": "hanoi",
+    "lat": 21.1065,
+    "lng": 105.8788,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 250,
+    "isFastCharge": true,
+    "totalPoints": 20,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 Siêu nhanh 250kW",
+        "powerKw": 250,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 6
+      },
+      {
+        "type": "e-Scooter 1.2kW",
+        "powerKw": 1.2,
+        "current": "AC",
+        "quantity": 8
+      }
+    ],
+    "accessComments": "Bãi đỗ xe Trung tâm Triển lãm Cổ Loa, cốt nền cao ráo",
+    "source": "MoveSafe & VinFast Network Verified",
+    "lastUpdated": "2026-11-13T15:30:17.811Z"
+  },
+  {
+    "id": "evcs-xm-mtdt",
+    "name": "Trạm sạc VinFast - Công ty Môi trường Đô thị Xuân Mai",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Thị trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8935,
+    "lng": 105.5764,
+    "isOperational": true,
+    "statusText": "Mở cửa 24/7 (Miễn phí đỗ xe)",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "AC Type 2 7kW",
+        "powerKw": 7,
+        "current": "AC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 3.5kW",
+        "powerKw": 3.5,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Đối chiếu dữ liệu trạm công cộng EVCS.VN tại Thị trấn Xuân Mai",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-xm-vinacharger",
+    "name": "Trạm sạc VinFast - NQ VinaCharger HKD Nguyễn Văn Đoàn XMHN",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Số 1, Tổ 3, TDP Tân Bình, Thị trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8919,
+    "lng": 105.5782,
+    "isOperational": true,
+    "statusText": "Mở cửa 24/7 (Miễn phí đỗ xe)",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Trạm sạc nhượng quyền VinaCharger công cộng 24/7 (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-xm-dimec",
+    "name": "Trạm sạc VinFast - NQ DIMEC STD HKD Tống Nguyên Được",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Tỉnh lộ 412B, Thị trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8962,
+    "lng": 105.581,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Trục Tỉnh lộ 412B Xuân Mai, trụ sạc nhanh 120kW & 60kW (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-xm-hunganh",
+    "name": "Trạm sạc VinFast - NQ Công ty CP XD Giao thông Hùng Anh",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Thị trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.8895,
+    "lng": 105.574,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi xe Công ty CP XD Giao thông Hùng Anh, Xuân Mai (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-cm-chucson",
+    "name": "Trạm sạc VinFast - CHXD Chúc Sơn (EVCS.VN)",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Quốc lộ 6, Thị trấn Chúc Sơn, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9231,
+    "lng": 105.7032,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 8,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "DC 20kW",
+        "powerKw": 20,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 3.5kW",
+        "powerKw": 3.5,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Cửa hàng xăng dầu Chúc Sơn mặt Quốc lộ 6 (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-cm-congloan",
+    "name": "Trạm sạc VinFast - Công ty TNHH TM Công Loan",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "KM26+400 Quốc lộ 6, Xã Phú Nghĩa, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9085,
+    "lng": 105.6415,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 3.5kW",
+        "powerKw": 3.5,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Dọc Quốc lộ 6 đoạn KCN Phú Nghĩa - Chương Mỹ (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-cm-dongphuongyen",
+    "name": "Trạm sạc VinFast - Bãi đỗ xe Đông Phương Yên",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Quốc lộ 6, Xã Đông Phương Yên, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.9032,
+    "lng": 105.6195,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 3.5kW",
+        "powerKw": 3.5,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Bãi đỗ xe tư nhân Đông Phương Yên ven QL6 (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "evcs-cm-goev",
+    "name": "Trạm sạc VinFast - NQ GOEV HKD Hiền Nguyễn",
+    "operator": "VinFast (V-GREEN / EVCS.VN)",
+    "address": "Xã Trường Yên, Huyện Chương Mỹ, Hà Nội",
+    "city": "hanoi",
+    "lat": 20.914,
+    "lng": 105.661,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 120,
+    "isFastCharge": true,
+    "totalPoints": 6,
+    "vehicleTypes": [
+      "ecar",
+      "ebike"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "CCS2 DC 120kW",
+        "powerKw": 120,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "CCS2 DC 60kW",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 2
+      },
+      {
+        "type": "e-Scooter 3.5kW",
+        "powerKw": 3.5,
+        "current": "AC",
+        "quantity": 2
+      }
+    ],
+    "accessComments": "Trạm nhượng quyền GOEV Hiền Nguyễn khu vực Trường Yên (EVCS.VN)",
+    "source": "EVCS.VN / VinFast V-GREEN",
+    "lastUpdated": "2026-11-13T16:07:03.045Z"
+  },
+  {
+    "id": "tt-0th4I_UuA9r-9WOcRBOq9w",
+    "name": "Porsche Smart Mobility",
+    "operator": "Porsche",
+    "address": "Số 29, Phố Liễu Giai, Ngọc Khánh, Quận Ba Đình, Hanoi, 11109",
+    "city": "hanoi",
+    "lat": 21.03219,
+    "lng": 105.81392,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-9UkZuPUAoMWcxeFe67avGw",
+    "name": "CHUNG CU A3",
+    "operator": "TomTom EV Network",
+    "address": "Đường Chùa Hà, Dịch Vọng, Quận Cầu Giấy, Hà Nội, 11311",
+    "city": "hanoi",
+    "lat": 21.040856,
+    "lng": 105.791639,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-4p-IxsNwM2ap-oS4OS083A",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 8, Đường Phạm Hùng, Mễ Trì, Quận Nam Từ Liêm, Hanoi, 12012",
+    "city": "hanoi",
+    "lat": 21.010175,
+    "lng": 105.788706,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-F0gl74ZSr_QqMOyQZM6G_Q",
+    "name": "Vincom Megamall",
+    "operator": "TomTom EV Network",
+    "address": "Tầng 1, TTTM Vincom Mega Mall, Quận Nam Từ Liêm, Hanoi, 12009",
+    "city": "hanoi",
+    "lat": 21.005023,
+    "lng": 105.754888,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-HLMIDzqt2T2CRVyh9o2sKA",
+    "name": "TITAN BAC NINH",
+    "operator": "TomTom EV Network",
+    "address": "Yen Phong II-C Industrial Park, Dong Tien, Huyện Yên Phong, Bac Ninh, 16214",
+    "city": "hanoi",
+    "lat": 21.220311,
+    "lng": 105.958244,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-UbZLmaIRXwjQReKp4oXSnQ",
+    "name": "VinFast",
+    "operator": "VinFast",
+    "address": "Đường KM24, Huyện Yên Mỹ, Hung Yen, 17722",
+    "city": "hanoi",
+    "lat": 20.846931,
+    "lng": 106.060388,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.114Z"
+  },
+  {
+    "id": "tt-pOGjJBZbuaLG1SKJepECiA",
+    "name": "Vinfast Royal City",
+    "operator": "VinFast",
+    "address": "Số 72A, Đường Nguyễn Trãi, Thượng Đình, Hà Nội, Hà Nội, 11417",
+    "city": "hanoi",
+    "lat": 21.001066,
+    "lng": 105.816734,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.407Z"
+  },
+  {
+    "id": "tt-K07tVtLCfnUP-mlADOAh2w",
+    "name": "Vinfast Khôi Nguyễn",
+    "operator": "VinFast",
+    "address": "Đường Giải Phóng, Đồng Tâm, Hà Nội, Hà Nội, 11715",
+    "city": "hanoi",
+    "lat": 20.994507,
+    "lng": 105.841357,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.407Z"
+  },
+  {
+    "id": "tt-hip-rk-YgCfHDtyI-USNUQ",
+    "name": "Trạm Đổi Pin Xe Máy Điện Vinfast",
+    "operator": "VinFast",
+    "address": "Số 42, Đường Ỷ Lan, Phú Thị, Hà Nội, Hà Nội, 12428",
+    "city": "hanoi",
+    "lat": 21.017911,
+    "lng": 105.964985,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 11,
+    "isFastCharge": false,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ebike",
+      "ecar"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "e-Scooter / Đổi pin",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:42.407Z"
+  },
+  {
+    "id": "tt-UFjLvn6elJuY_C3Upqrwcw",
+    "name": "EV Pik",
+    "operator": "TomTom EV Network",
+    "address": "Số 115, Đường Hồ Tùng Mậu, Hồ Chí Minh, Ho Chi Minh City, 71006",
+    "city": "hcm",
+    "lat": 10.772752,
+    "lng": 106.703252,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-CkKPdz77IA2dpybmZoYUPQ",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 33, Đường Lê Thánh Tôn, Hồ Chí Minh, Ho Chi Minh City, 71006",
+    "city": "hcm",
+    "lat": 10.782016,
+    "lng": 106.700348,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-oTA2xQ352FNRAd67MGXL3w",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 6B, Đường Tôn Đức Thắng, Hồ Chí Minh, Ho Chi Minh City, 71006",
+    "city": "hcm",
+    "lat": 10.785072,
+    "lng": 106.703647,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-BqCCzrBBvFUnXBocJ5pDBg",
+    "name": "Saigon Finance Center",
+    "operator": "TomTom EV Network",
+    "address": "Số 9, Đường Đinh Tiên Hoàng, Đa Kao, Hồ Chí Minh, Hồ Chí Minh, 71007",
+    "city": "hcm",
+    "lat": 10.787637,
+    "lng": 106.69996,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-6spALtx4x5FWlukQBrIXCg",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 159, Đường Pasteur, Phường 6, Hồ Chí Minh, Ho Chi Minh City, 72415",
+    "city": "hcm",
+    "lat": 10.785016,
+    "lng": 106.690856,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-kiNgQNinA41PqX2rtw0i0A",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 18, Đường Nguyễn Cư Trinh, Phạm Ngũ Lão, Hồ Chí Minh, Ho Chi Minh City, 71014",
+    "city": "hcm",
+    "lat": 10.764822,
+    "lng": 106.692098,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt--0eKiX313LxbTcampar-gA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 75, Đường Trần Khánh Dư, Hồ Chí Minh, Ho Chi Minh City, 71008",
+    "city": "hcm",
+    "lat": 10.793722,
+    "lng": 106.687398,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-dY_AO0jLLl3_Td_HsBbnuA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Đường B2 132, An Lợi Đông, Thủ Đức, Ho Chi Minh City, 71111",
+    "city": "hcm",
+    "lat": 10.774586,
+    "lng": 106.728839,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-S-WTiP065GRRMnI9qlOPWA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 261, Đường Nguyễn Văn Trỗi, Phường 10, Quận Phú Nhuận, Ho Chi Minh City, 72218",
+    "city": "hcm",
+    "lat": 10.797245,
+    "lng": 106.672018,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-H18BTSLHqFkNI0pC-lioqw",
+    "name": "Vincom+ Nam Long",
+    "operator": "TomTom EV Network",
+    "address": "Số 7, Đường Trần Trọng Cung, Tân Thuận Đông, Hồ Chí Minh, Ho Chi Minh City, 72909",
+    "city": "hcm",
+    "lat": 10.744019,
+    "lng": 106.732633,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-Y9qLGB1NArEv__Acaa8c1g",
+    "name": "VinFast",
+    "operator": "VinFast",
+    "address": "Số 161, Đường Xa Lộ Hà Nội, Thảo Điền, Thủ Đức, Hồ Chí Minh, 71107",
+    "city": "hcm",
+    "lat": 10.802103,
+    "lng": 106.740044,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-aWbgnd3d5NYd7hoyNqJ8UA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Khu dân cư Lavida, Tân Phong, Quận 7, Ho Chi Minh City, 72915",
+    "city": "hcm",
+    "lat": 10.727673,
+    "lng": 106.701817,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-lWqjIoLkyI4akg1fN9i91A",
+    "name": "PRESTIGE AUTOMOBILE",
+    "operator": "TomTom EV Network",
+    "address": "Đường Số 70A 19, Thạnh Mỹ Lợi, Thủ Đức, Hồ Chí Minh, 71114",
+    "city": "hcm",
+    "lat": 10.773893,
+    "lng": 106.751131,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-9XXAKTCUeY9eepoa8BzSEA",
+    "name": "EBOOST OFFICE",
+    "operator": "TomTom EV Network",
+    "address": "Đường Số 55 6, Thạnh Mỹ Lợi, Thủ Đức, Hồ Chí Minh, 71114",
+    "city": "hcm",
+    "lat": 10.779909,
+    "lng": 106.754181,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 11,
+    "isFastCharge": false,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ebike",
+      "ecar"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "e-Scooter / Đổi pin",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-GqTdCtHz43UJieesyMFOcQ",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Đường Lê Hiến Mai 51, Thạnh Mỹ Lợi, Thủ Đức, Ho Chi Minh City, 71114",
+    "city": "hcm",
+    "lat": 10.7782,
+    "lng": 106.755088,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-Mlpehg9MHJgMjyS7IXivWg",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 364, Đường Cộng Hòa, Phường 13, Quận Tân Bình, Ho Chi Minh City, 72110",
+    "city": "hcm",
+    "lat": 10.802391,
+    "lng": 106.640396,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-BQHDvYQp9tvf2mN3Tizh2Q",
+    "name": "SATRA VO VAN KIET",
+    "operator": "TomTom EV Network",
+    "address": "Đường Lương Minh Nguyệt 156, Tân Thới Hòa, Quận Tân Phú, Hồ Chí Minh, 72015",
+    "city": "hcm",
+    "lat": 10.761036,
+    "lng": 106.627761,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-ynGpndZyNJhEU4scE6lpxA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Lô IV-22 KCN Tân Bình, Quận Tân Phú, Ho Chi Minh City, 72009",
+    "city": "hcm",
+    "lat": 10.816922,
+    "lng": 106.625725,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-NB9R2qHG274J5M22xgKgkg",
+    "name": "VinFast",
+    "operator": "VinFast",
+    "address": "Kinh Dương Vương 464, An Lạc A, Quận Bình Tân, Ho Chi Minh City, 71907",
+    "city": "hcm",
+    "lat": 10.739505,
+    "lng": 106.616031,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-aYzEK-D-GuIvbYwPDQHkvw",
+    "name": "PV Oil Station with Charger",
+    "operator": "TomTom EV Network",
+    "address": "Đường Võ Chí Công 579, Phú Hữu, Thủ Đức, Ho Chi Minh City, 71212",
+    "city": "hcm",
+    "lat": 10.803024,
+    "lng": 106.791988,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-fCkwb-dCauzZsIHgElSo8g",
+    "name": "Vincom Plaza Lê Văn Việt",
+    "operator": "TomTom EV Network",
+    "address": "Lê Văn Việt 50, Hiệp Phú, Thủ Đức, Ho Chi Minh City, 71206",
+    "city": "hcm",
+    "lat": 10.844974,
+    "lng": 106.778616,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-GHF8CZVrsqH71OHE8OOZ1w",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 2450, Quốc Lộ 1, Hồ Chí Minh, Ho Chi Minh City, 71507",
+    "city": "hcm",
+    "lat": 10.844107,
+    "lng": 106.616393,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt--OKqbYQe1LTFdHi7g3wWgA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 25C, Khu Phố Hòa Long, Thuận An, Ho Chi Minh City, 75206",
+    "city": "hcm",
+    "lat": 10.887367,
+    "lng": 106.699578,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-XEe79pMgFtEHLFeYdZDiSA",
+    "name": "Cửa hàng xăng dầu Mipec Anh Huy",
+    "operator": "TomTom EV Network",
+    "address": "Đường Nguyễn Văn Tạo 2, Long Thới, Huyện Nhà Bè, Hồ Chí Minh, 73209",
+    "city": "hcm",
+    "lat": 10.668259,
+    "lng": 106.724697,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-1VoI9eb6LGngCItwG76m2Q",
+    "name": "Mipec",
+    "operator": "TomTom EV Network",
+    "address": "Đường Nguyễn Văn Tạo 247, Long Thới, Huyện Nhà Bè, Hồ Chí Minh, 73211",
+    "city": "hcm",
+    "lat": 10.654295,
+    "lng": 106.729338,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-IVZLT5GfwVPXnJRvHlwmtw",
+    "name": "GARA AUTO 365",
+    "operator": "TomTom EV Network",
+    "address": "Số 2, Đường Tỉnh 743B, Thuận An, Ho Chi Minh City, 75208",
+    "city": "hcm",
+    "lat": 10.903816,
+    "lng": 106.721844,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-axa_pI8fsFJn6Zohrzn0xQ",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Hẻm G14 Đường Láng Le Bàu Cò G14/20, Lê Minh Xuân, Huyện Bình Chánh, Ho Chi Minh City, 71817",
+    "city": "hcm",
+    "lat": 10.754148,
+    "lng": 106.54321,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-wvl1n9xTZxpakvnz_igjog",
+    "name": "Eneco eMobility",
+    "operator": "TomTom EV Network",
+    "address": "Hẻm 629/13 Phạm Văn Thuận 703/65/2, Biên Hòa, Dong Nai, 76109",
+    "city": "hcm",
+    "lat": 10.945914,
+    "lng": 106.855599,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-I2KB34yRaJDws7cJpCTZhA",
+    "name": "Vincom Plaza Biên Hòa",
+    "operator": "TomTom EV Network",
+    "address": "Đường Phạm Văn Thuận 1096, Tân Mai, Biên Hòa, Đồng Nai, 76108",
+    "city": "hcm",
+    "lat": 10.957571,
+    "lng": 106.843283,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt--vWr0_cpzJEqwmtPqnmRUg",
+    "name": "PNJ Vincom Long Thành",
+    "operator": "TomTom EV Network",
+    "address": "Số 251, Đường Lê Duẩn, Huyện Long Thành, Dong Nai, 76206",
+    "city": "hcm",
+    "lat": 10.784284,
+    "lng": 106.950572,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.082Z"
+  },
+  {
+    "id": "tt-AoKDQGX6Xp3v45MI0nOnQA",
+    "name": "EV ONE",
+    "operator": "EV ONE",
+    "address": "Số 86, Đường Duy Tân, Hòa Thuận Tây, Quận Hải Châu, Đà Nẵng, 50216",
+    "city": "danang",
+    "lat": 16.04998,
+    "lng": 108.210907,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.287Z"
+  },
+  {
+    "id": "tt-rjEE6xJY653fMZTqXHmicw",
+    "name": "VinFast",
+    "operator": "VinFast",
+    "address": "Số 1, Đường Nguyễn Văn Linh, Nam Dương, Quận Hải Châu, Đà Nẵng, 50212",
+    "city": "danang",
+    "lat": 16.060452,
+    "lng": 108.21672,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.287Z"
+  },
+  {
+    "id": "tt-evWyIqUrozA98Me8a8EBkA",
+    "name": "PVOIL MT Hòa Xuân",
+    "operator": "TomTom EV Network",
+    "address": "Đường Trần Nam Trung 224, Quận Cẩm Lệ, Đà Nẵng, 50707",
+    "city": "danang",
+    "lat": 15.998443,
+    "lng": 108.216296,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.287Z"
+  },
+  {
+    "id": "tt-wq9yKXzTRU1NUfUYPFxQqw",
+    "name": "Marriott Resort Spa Đà Nẵng",
+    "operator": "TomTom EV Network",
+    "address": "Trường Sa 7, Hòa Hải, Quận Ngũ Hành Sơn, Đà Nẵng, 50509",
+    "city": "danang",
+    "lat": 16.006682,
+    "lng": 108.26639,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.287Z"
+  },
+  {
+    "id": "tt-YLKHOtD_RZP9WOPX0qoeYA",
+    "name": "VinFast",
+    "operator": "VinFast",
+    "address": "QL.1A, Hòa Phước, Huyện Hòa Vang, Đà Nẵng, 50816",
+    "city": "danang",
+    "lat": 15.966065,
+    "lng": 108.211043,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS2 DC / Type 2",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 4
+      }
+    ],
+    "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
+    "source": "TomTom EV Search API (Cached)",
+    "lastUpdated": "2026-11-13T16:47:43.287Z"
   }
 ]
