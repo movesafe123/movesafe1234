@@ -29,9 +29,10 @@ const TRUSTED_SOURCES_WHITELIST = [
   'zing', 'znews', 'tri thuc',
   'an ninh thu do', 'anninhthudo',
   'cong an', 'congan',
-  'ttxvn', 'vnanet',
+  'ttxvn', 'vnanet', 'vietnamplus', 'vietnam+',
   'nguoi lao dong', 'nld',
   'nhan dan',
+  'van hoa', 'chinh phu',
   'plo', 'phap luat',
   'kenh14'
 ];
@@ -162,15 +163,21 @@ class WebEventService {
    */
   filterQualityNews(articles, ctx) {
     const now = Date.now();
+    // Neo mốc thời gian theo bài mới nhất nếu đồng hồ hệ thống lệch xa RSS thực tế (>45 ngày)
+    const newestPubTime = articles.reduce((mx, a) => (a.pubTime && a.pubTime > mx ? a.pubTime : mx), 0);
+    const refNow = (newestPubTime > 0 && (now - newestPubTime) > 45 * 24 * 60 * 60 * 1000)
+      ? newestPubTime
+      : now;
     const maxAgeMs = ctx.isAskingPast 
-      ? 10 * 24 * 60 * 60 * 1000  // Sự kiện quá khứ (hôm qua/vừa qua/cuối tuần): trong vòng 10 ngày
+      ? 14 * 24 * 60 * 60 * 1000  // Sự kiện quá khứ / vừa qua: trong vòng 14 ngày
       : 14 * 24 * 60 * 60 * 1000; // Sự kiện sắp tới / tuần này: trong vòng 14 ngày
 
     const eventKeywords = [
       'concert', 'nhạc hội', 'đại nhạc hội', 'liveshow', 'bóng đá', 'khán giả', 'biển người', 
       'sốt vé', 'cháy vé', 'sự kiện', 'lễ hội', 'marathon', 'giải chạy', 'đêm nhạc', 
       'nghệ sĩ', 'ca sĩ', 'ca khúc', 'biểu diễn', 'âm nhạc', 'khuấy động', 'ùn tắc', 
-      'đông nghẹt', 'đông', 'chương trình', 'hoạt động', 'văn hóa', 'hội sách', 'hội nghị', 'triển lãm'
+      'đông nghẹt', 'đông', 'chương trình', 'hoạt động', 'văn hóa', 'hội sách', 'hội nghị', 'triển lãm',
+      'fest', 'đổ xô', 'giải trí', 'trình diễn', 'hòa nhạc'
     ];
     const venueKeywords = ctx.matchedVenue ? ctx.matchedVenue.keywords : [];
 
@@ -185,7 +192,7 @@ class WebEventService {
       if (!isTrustedSource) return false;
 
       // 2. Tiêu chí 2: Tính thời hiệu (Temporal Recency)
-      if (art.pubTime && (now - art.pubTime > maxAgeMs)) {
+      if (art.pubTime && (refNow - art.pubTime > maxAgeMs)) {
         return false;
       }
 

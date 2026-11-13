@@ -8,6 +8,7 @@ const aiService = require('./ai-service');
 const historyService = require('./history-service');
 const evService = require('./ev-service');
 const systemLogger = require('./system-logger');
+const { apiQuotaGuard } = require('./api-quota-guard');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -140,6 +141,7 @@ app.get('/api/config', (req, res) => {
       hasOpenWeather: !!config.API_KEYS.OPENWEATHER,
       hasGemini: !!config.API_KEYS.GEMINI
     },
+    quotaStatus: apiQuotaGuard.getStats(),
     cities: config.CITIES,
     systemTime: new Date().toISOString()
   });
@@ -412,6 +414,106 @@ app.get('/api/geocode/google-reverse', async (req, res) => {
     });
   } catch (err) {
     res.json({ status: 'fallback', exactMatch: null, nearbyCandidates: [], message: err.message });
+  }
+});
+
+// 5.2 Shared Server Proxy & Cache cho TomTom API (giảm >90% spam quota khi nhiều người dùng cùng tra cứu)
+async function callTomTomWithPool(buildUrlFn) {
+  const pool = (config.API_KEY_POOLS && config.API_KEY_POOLS.tomtom) || [config.API_KEYS.TOMTOM].filter(Boolean);
+  const healthyKeys = apiQuotaGuard.getHealthyKeys('tomtom', pool);
+  if (healthyKeys.length === 0) {
+    const err = new Error('TOMTOM_QUOTA_COOLDOWN');
+    err.status = 429;
+    throw err;
+  }
+
+  let lastErr = null;
+  for (const activeKey of healthyKeys) {
+    try {
+      const response = await axios.get(buildUrlFn(activeKey), { timeout: 5000 });
+      return response.data;
+    } catch (err) {
+      lastErr = err;
+      const status = err.response?.status;
+      if (status === 403 || status === 429) {
+        apiQuotaGuard.markRateLimited('tomtom', activeKey, status, err.response?.headers?.['retry-after']);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr || new Error('TomTom API unavailable');
+}
+
+app.get('/api/geocode/tomtom-search', async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (q.length < 2) {
+    return res.json({ status: 'success', results: [], cached: false });
+  }
+  const lat = Number(req.query.lat) || 21.0285;
+  const lng = Number(req.query.lng ?? req.query.lon) || 105.8542;
+  const limit = Math.min(12, Math.max(1, parseInt(req.query.limit, 10) || 6));
+  const radius = Math.min(60000, Math.max(1000, parseInt(req.query.radius, 10) || 40000));
+  const cacheKey = `tt:search:${q.toLowerCase()}:${lat.toFixed(2)},${lng.toFixed(2)}:${limit}:${radius}`;
+
+  try {
+    const { value, cached } = await apiQuotaGuard.withDedupAndCache(cacheKey, 24 * 60 * 60 * 1000, () =>
+      callTomTomWithPool(activeKey =>
+        `https://api.tomtom.com/search/2/search/${encodeURIComponent(q)}.json?key=${activeKey}&countrySet=VN&lat=${lat}&lon=${lng}&radius=${radius}&language=vi-VN&limit=${limit}`
+      )
+    );
+    res.json({ status: 'success', cached, results: value?.results || [] });
+  } catch (err) {
+    const code = err.status === 429 ? 429 : 200;
+    res.status(code).json({ status: 'fallback', cached: false, results: [], message: err.message });
+  }
+});
+
+app.get('/api/geocode/tomtom-reverse', async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng ?? req.query.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return res.status(400).json({ status: 'error', message: 'Tọa độ không hợp lệ' });
+  }
+  const cacheKey = `tt:rev:${lat.toFixed(4)},${lng.toFixed(4)}`;
+
+  try {
+    const { value, cached } = await apiQuotaGuard.withDedupAndCache(cacheKey, 24 * 60 * 60 * 1000, () =>
+      callTomTomWithPool(activeKey =>
+        `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lng}.json?key=${activeKey}&language=vi-VN`
+      )
+    );
+    res.json({ status: 'success', cached, addresses: value?.addresses || [] });
+  } catch (err) {
+    const code = err.status === 429 ? 429 : 200;
+    res.status(code).json({ status: 'fallback', cached: false, addresses: [], message: err.message });
+  }
+});
+
+app.get('/api/geocode/tomtom-nearby', async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng ?? req.query.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return res.status(400).json({ status: 'error', message: 'Tọa độ không hợp lệ' });
+  }
+  const keyword = String(req.query.keyword || '').trim();
+  const categorySet = String(req.query.categorySet || '7315').trim();
+  const radius = Math.min(15000, Math.max(25, parseInt(req.query.radius, 10) || 2500));
+  const limit = Math.min(20, Math.max(1, parseInt(req.query.limit, 10) || 12));
+  const cacheKey = `tt:poi:${lat.toFixed(3)},${lng.toFixed(3)}:${radius}:${keyword ? 'kw:' + keyword.toLowerCase() : 'cat:' + categorySet}:${limit}`;
+
+  try {
+    const { value, cached } = await apiQuotaGuard.withDedupAndCache(cacheKey, 6 * 60 * 60 * 1000, () =>
+      callTomTomWithPool(activeKey =>
+        keyword
+          ? `https://api.tomtom.com/search/2/poiSearch/${encodeURIComponent(keyword)}.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=${limit}&countrySet=VN&language=vi-VN&key=${activeKey}`
+          : `https://api.tomtom.com/search/2/nearbySearch/.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=${limit}&categorySet=${encodeURIComponent(categorySet)}&countrySet=VN&language=vi-VN&key=${activeKey}`
+      )
+    );
+    res.json({ status: 'success', cached, results: value?.results || [] });
+  } catch (err) {
+    const code = err.status === 429 ? 429 : 200;
+    res.status(code).json({ status: 'fallback', cached: false, results: [], message: err.message });
   }
 });
 

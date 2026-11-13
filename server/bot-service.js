@@ -6,6 +6,7 @@ const EventEmitter = require('events');
 const config = require('./config');
 const historyService = require('./history-service');
 const systemLogger = require('./system-logger');
+const { apiQuotaGuard } = require('./api-quota-guard');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const PUBLIC_DATA_DIR = path.join(__dirname, '..', 'public', 'data');
@@ -468,30 +469,52 @@ class LocalUrbanBot extends EventEmitter {
     this.crawlPromise = null;
     this.portalFloodOverrides = new Map();
     this.floodMemory = new Map(); // Lưu { depth_cm, updatedMs } cho từng trạm để tính toán rút nước
+    this.lastTomTomSyncByCity = {};
     this.init();
   }
 
   init() {
     // Đọc cache cũ nếu có
+    let cacheAgeMs = Infinity;
     if (fs.existsSync(CACHE_FILE)) {
       try {
         const raw = fs.readFileSync(CACHE_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
         if (parsed && parsed.floodPoints) {
           this.cachedData = parsed;
+          if (parsed.tomtomSyncedAt && typeof parsed.tomtomSyncedAt === 'object') {
+            this.lastTomTomSyncByCity = { ...parsed.tomtomSyncedAt };
+          }
+          if (parsed.lastUpdated) {
+            const parsedTime = new Date(parsed.lastUpdated).getTime();
+            if (Number.isFinite(parsedTime)) {
+              cacheAgeMs = Math.max(0, Date.now() - parsedTime);
+            }
+          }
         }
       } catch (err) {
         console.warn('[Bot] Không thể đọc cache cũ, khởi tạo dữ liệu mặc định:', err.message);
       }
     }
 
-    // Chạy cào ngay khi khởi động
-    this.crawlAll().catch(e => console.error('[Bot] Lỗi trong lần quét đầu tiên:', e.message));
+    // Chỉ tự động cào & lập lịch nền khi chạy server thực tế (bỏ qua trong unit/API test hoặc CLI runner)
+    const isTestOrManual = process.env.NODE_ENV === 'test' ||
+      process.env.BOT_DISABLE_AUTO_INIT === '1' ||
+      process.execArgv.some(arg => arg.startsWith('--test'));
 
-    // Lên lịch tự động quét định kỳ
-    setInterval(() => {
-      this.crawlAll().catch(e => console.error('[Bot] Lỗi quét định kỳ:', e.message));
-    }, config.BOT_CONFIG.CRAWL_INTERVAL_MS).unref();
+    if (!isTestOrManual) {
+      // Nếu cache vừa được cập nhật (< CRAWL_INTERVAL_MS), bỏ qua quét ngay khi khởi động để tiết kiệm API quota
+      if (cacheAgeMs > config.BOT_CONFIG.CRAWL_INTERVAL_MS) {
+        this.crawlAll().catch(e => console.error('[Bot] Lỗi trong lần quét đầu tiên:', e.message));
+      } else {
+        console.log(`[Bot] Dùng lại cache đô thị vừa cập nhật (${Math.round(cacheAgeMs / 1000)}s trước), chưa gọi lại API.`);
+      }
+
+      // Lên lịch tự động quét định kỳ
+      setInterval(() => {
+        this.crawlAll().catch(e => console.error('[Bot] Lỗi quét định kỳ:', e.message));
+      }, config.BOT_CONFIG.CRAWL_INTERVAL_MS).unref();
+    }
   }
 
   async saveCacheFiles(dataObj) {
@@ -509,16 +532,18 @@ class LocalUrbanBot extends EventEmitter {
 
     this.crawlPromise = (async () => {
       try {
-        // 1. Quét song song tin tức VOV, cổng ngập HSDC/UDi, TomTom giao thông và thời tiết các đô thị
+        // 1. Quét song song nguồn miễn phí (VOV, HSDC/UDi, Open-Meteo) + TomTom tuần tự có TTL guard chống burst QPS
         await Promise.allSettled([
           this.crawlVOVTraffic(),
           this.crawlFloodPortals(),
-          this.fetchTomTomIncidents('hanoi'),
-          this.fetchTomTomIncidents('hcm'),
-          this.fetchTomTomIncidents('danang'),
           this.crawlWeatherStations('hanoi'),
           this.crawlWeatherStations('hcm'),
-          this.crawlWeatherStations('danang')
+          this.crawlWeatherStations('danang'),
+          (async () => {
+            for (const cityKey of ['hanoi', 'hcm', 'danang']) {
+              await this.fetchTomTomIncidents(cityKey);
+            }
+          })()
         ]);
 
         // 2. Phân tích cảnh báo KTTV sau khi đã có dữ liệu lượng mưa thực tế
@@ -905,14 +930,49 @@ class LocalUrbanBot extends EventEmitter {
     }
   }
 
-  // 3. Lấy sự cố giao thông thực tế từ TomTom Traffic API v5 bằng API Key của người dùng
+  // 3. Lấy sự cố giao thông thực tế từ TomTom Traffic API v5 (có TTL 12 phút, xoay vòng Key Pool & ngắt mạch 403/429)
   async fetchTomTomIncidents(cityKey = 'hanoi') {
     const city = config.CITIES[cityKey];
-    if (!city || !config.API_KEYS.TOMTOM) return;
+    const tomtomPool = (config.API_KEY_POOLS && config.API_KEY_POOLS.tomtom) || [config.API_KEYS.TOMTOM].filter(Boolean);
+    if (!city || tomtomPool.length === 0) return;
+
+    const ttlMs = config.BOT_CONFIG.TOMTOM_INCIDENTS_TTL_MS || 12 * 60 * 1000;
+    const lastSyncMs = this.lastTomTomSyncByCity[cityKey] || 0;
+    const existingRealItems = (this.cachedData.trafficIncidents || []).filter(
+      item => item.city === cityKey && String(item.id || '').startsWith(`tomtom-${cityKey}-`)
+    );
+
+    if (existingRealItems.length > 0 && (Date.now() - lastSyncMs) < ttlMs) {
+      return; // Bảo toàn dữ liệu TomTom còn trong TTL, tránh đốt quota mỗi 5 phút
+    }
 
     try {
-      const url = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${config.API_KEYS.TOMTOM}&bbox=${city.bbox}&fields={incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code}}}}`;
-      const response = await axios.get(url, { timeout: 8000 });
+      const healthyKeys = apiQuotaGuard.getHealthyKeys('tomtom', tomtomPool);
+      if (healthyKeys.length === 0) {
+        throw new Error('TomTom API keys temporarily on rate-limit cooldown');
+      }
+
+      let response = null;
+      let lastErr = null;
+      for (const activeKey of healthyKeys) {
+        const url = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${activeKey}&bbox=${city.bbox}&fields={incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code}}}}`;
+        try {
+          response = await axios.get(url, { timeout: 8000 });
+          break;
+        } catch (reqErr) {
+          lastErr = reqErr;
+          const status = reqErr.response?.status;
+          if (status === 403 || status === 429) {
+            apiQuotaGuard.markRateLimited('tomtom', activeKey, status, reqErr.response?.headers?.['retry-after']);
+            continue;
+          }
+          throw reqErr;
+        }
+      }
+      if (!response) throw lastErr || new Error('TomTom API unavailable');
+
+      this.lastTomTomSyncByCity[cityKey] = Date.now();
+      this.cachedData.tomtomSyncedAt = { ...this.lastTomTomSyncByCity };
       const incidents = response.data?.incidents || [];
 
       // Kiểm tra khung giờ thực tế tại Việt Nam
@@ -1048,6 +1108,13 @@ class LocalUrbanBot extends EventEmitter {
       console.log(`[Bot] ✓ TomTom API v5 (${city.name}): ${mapped.length} sự cố (Ùn tắc thực tế: ${jamCount}, Công trường/Rào chắn: ${roadworkCount})`);
     } catch (err) {
       console.warn(`[Bot] TomTom Traffic incidents API không phản hồi (${cityKey}):`, err.message);
+      // Nếu vừa có dữ liệu TomTom thật trong vòng 45 phút gần nhất, ưu tiên giữ lại thay vì ghi đè dữ liệu giả lập
+      const existingRealItems = (this.cachedData.trafficIncidents || []).filter(
+        item => item.city === cityKey && String(item.id || '').startsWith(`tomtom-${cityKey}-`)
+      );
+      if (existingRealItems.length > 0 && (Date.now() - lastSyncMs) < 45 * 60 * 1000) {
+        return;
+      }
       const vnHour = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })).getHours();
       const isNightTime = (vnHour >= 22 || vnHour < 6);
 

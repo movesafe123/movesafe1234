@@ -75,6 +75,8 @@ class AIChat {
 
     this.isPickingSpatialPoint = false;
     this._spatialPickMarker = null;
+    this._geminiKeyCooldowns = new Map();
+    this._geminiKeyIdx = 0;
 
     this.initSpeech();
     this.initCommutePresetsFromStorage();
@@ -1644,6 +1646,49 @@ class AIChat {
   // GỌI TRỰC TIẾP GEMINI CLIENT (CÂN BẰNG THÔNG MINH + NHANH)
   // =========================================================================
 
+  _getGeminiKeyHash(key) {
+    return key ? `${key.slice(0, 8)}..${key.slice(-4)}` : 'none';
+  }
+
+  _readGeminiCooldownStorage() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        return JSON.parse(localStorage.getItem('movesafe_gemini_cooldowns_v1') || '{}') || {};
+      }
+    } catch (_e) {}
+    return {};
+  }
+
+  _isGeminiKeyCoolingDown(key) {
+    if (!key) return true;
+    const now = Date.now();
+    const id = this._getGeminiKeyHash(key);
+    const memUntil = this._geminiKeyCooldowns.get(id) || 0;
+    if (now < memUntil) return true;
+    const store = this._readGeminiCooldownStorage();
+    const storedUntil = Number(store[id] || 0);
+    if (storedUntil > now) {
+      this._geminiKeyCooldowns.set(id, storedUntil);
+      return true;
+    }
+    return false;
+  }
+
+  _markGeminiKeyRateLimited(key, status) {
+    if (!key) return;
+    const id = this._getGeminiKeyHash(key);
+    const ttlMs = (status === 401 || status === 403) ? 15 * 60 * 1000 : 90 * 1000;
+    const until = Date.now() + ttlMs;
+    this._geminiKeyCooldowns.set(id, until);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const store = this._readGeminiCooldownStorage();
+        store[id] = until;
+        localStorage.setItem('movesafe_gemini_cooldowns_v1', JSON.stringify(store));
+      }
+    } catch (_e) {}
+  }
+
   async callDirectGeminiWithBalancedModel(query, currentCity, apiKey, webState, ragInfo = null) {
     const _dec = (b) => { try { return (typeof atob === 'function') ? atob(b) : Buffer.from(b, 'base64').toString(); } catch { return ''; } };
     const rawKeys = [
@@ -1651,7 +1696,10 @@ class AIChat {
       _dec('QVEuQWI4Uk42S0lDQlpLRDlvX3F2cFVDZHhiSEhZX0tzbXVESnhRVm5hSW8wN2txVk9fQVE='),
       _dec('QVEuQWI4Uk42TGJyQnNvQ0sySHA4NFFoWlFEcEZOV2hvdDVXSFR2Z3BXWUMwQ1BHeW1HQkE=')
     ].filter(k => k && k.length > 15);
-    const candidateKeys = [...new Set(rawKeys)];
+    const uniqueKeys = [...new Set(rawKeys)];
+    const pool = uniqueKeys.length > 0 ? uniqueKeys : [apiKey].filter(Boolean);
+    const rotatedPool = pool.map((_, i) => pool[(this._geminiKeyIdx + i) % pool.length]);
+    const candidateKeys = rotatedPool.filter(k => !this._isGeminiKeyCoolingDown(k));
     const cityName = currentCity === 'hanoi' ? 'Hà Nội' : (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : 'Đà Nẵng');
 
     const deadline = Date.now() + 7500;
@@ -1716,8 +1764,12 @@ QUY TẮC BẮT BUỘC (CẤU TRÚC 3 NHỊP TRỢ LÝ ĐỒNG HÀNH CO-PILOT):
 ${query}
 </USER_QUERY>`;
 
+    if (candidateKeys.length === 0) {
+      throw new Error('All client Gemini keys are in cooldown');
+    }
+
     const candidateModels = ['gemini-2.5-flash', 'gemini-3-flash-preview', 'gemini-2.5-flash-lite'];
-    for (const keyToUse of (candidateKeys.length > 0 ? candidateKeys : [apiKey])) {
+    for (const keyToUse of candidateKeys) {
       if (Date.now() >= deadline) break;
       for (const model of candidateModels) {
         if (Date.now() >= deadline) break;
@@ -1744,7 +1796,8 @@ ${query}
           clearTimeout(timeoutId);
 
           if (res.status === 429 || res.status === 401 || res.status === 403) {
-            // Key exhausted or forbidden, immediately break to try next key!
+            // Đưa key vào trạng thái nghỉ tạm thời (cooldown), chuyển ngay sang key kế tiếp
+            this._markGeminiKeyRateLimited(keyToUse, res.status);
             break;
           }
 
@@ -1753,6 +1806,7 @@ ${query}
             const parts = data.candidates?.[0]?.content?.parts || [];
             let text = parts.filter(p => !p.thought && p.text).map(p => p.text).join('\n').trim();
             if (text) {
+              this._geminiKeyIdx = (this._geminiKeyIdx + 1) % Math.max(1, pool.length);
               if (ragInfo?.safetyOverride?.mandatoryPrefix && !text.includes('115')) {
                 text = ragInfo.safetyOverride.mandatoryPrefix + text;
               }

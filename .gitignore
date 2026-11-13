@@ -34,4 +34,8 @@ generate_full_doc.js
 .github/skills/
 .vscode/
 
+# Media recordings & tool locks
+*.mp4
+skills-lock.json
+
 

@@ -2178,7 +2178,7 @@
     }
   ],
   "stats": {
-    "totalFloods": 0,
+    "totalFloods": 1,
     "criticalFloods": 0,
     "trafficJams": 20,
     "roadworks": 85,

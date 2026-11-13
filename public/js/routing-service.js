@@ -223,11 +223,13 @@ class RoutingService {
         durationMin: Math.round(route.duration / 60),
         durationSeconds: route.duration,
         polyline: route.geometry.coordinates.map(c => [c[1], c[0]]),
-        steps: route.legs ? route.legs[0].steps.map(s => ({
-          instruction: s.maneuver.type + ' ' + (s.name || ''),
-          distance: s.distance,
-          name: s.name || ''
-        })) : []
+        steps: Array.isArray(route.legs)
+          ? route.legs.flatMap(leg => (leg.steps || []).map(s => ({
+              instruction: s.maneuver.type + ' ' + (s.name || ''),
+              distance: s.distance,
+              name: s.name || ''
+            })))
+          : []
       }));
 
       // Giới hạn bộ đệm LRU tối đa 60 lộ trình chống rò rỉ RAM
@@ -606,7 +608,7 @@ class RoutingService {
     }
 
     const alleyRatio = route.distanceMeters > 0 ? (alleyDistanceMeters / route.distanceMeters) : 0;
-    const isFourWheeler = (specs.type === 'car' || specs.type === 'ecar');
+    const isFourWheeler = ['car', 'sedan', 'suv', 'ecar'].includes(specs.type);
     const hasAlleyTrap = isFourWheeler && (alleyDistanceMeters > 250 || alleyRatio > 0.15);
 
     // 2. Nhận diện khung giờ cao điểm thực tế tại đô thị Việt Nam
@@ -952,6 +954,11 @@ return {
   // Tạo các tuyến dự phòng chất lượng cao khi OSRM không phản hồi hoặc ngoại tuyến
   generateFallbackRoutes(origin, destination) {
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
+    const hasValidVia = Boolean(viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number');
+    const detourBaseDistMeters = hasValidVia
+      ? (this.getDistanceMeters(origin.lat, origin.lng, viaWaypoint.lat, viaWaypoint.lng) +
+         this.getDistanceMeters(viaWaypoint.lat, viaWaypoint.lng, destination.lat, destination.lng))
+      : directDistMeters;
     const stepsCount = Math.max(12, Math.min(30, Math.round(directDistMeters / 200)));
 
     // Tuyến 1: Trực diện trục chính
@@ -1030,6 +1037,11 @@ return {
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
 
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
+    const hasValidVia = Boolean(viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number');
+    const detourBaseDistMeters = hasValidVia
+      ? (this.getDistanceMeters(origin.lat, origin.lng, viaWaypoint.lat, viaWaypoint.lng) +
+         this.getDistanceMeters(viaWaypoint.lat, viaWaypoint.lng, destination.lat, destination.lng))
+      : directDistMeters;
 
     // Chuẩn hóa danh sách các tuyến đường giả định cấm / cần né
     const cleanAvoidRoads = (Array.isArray(avoidRoads) ? avoidRoads : (avoidRoads ? [avoidRoads] : []))
@@ -1075,7 +1087,7 @@ return {
     }
 
     // 2. Lấy tuyến trực tiếp từ OSRM (hỗ trợ chèn điểm dừng chân viaWaypoint)
-    const osrmCoords = (viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number')
+    const osrmCoords = hasValidVia
       ? [
           [origin.lng, origin.lat],
           [viaWaypoint.lng, viaWaypoint.lat],
@@ -1201,11 +1213,13 @@ return {
 
     // 4. Bộ lọc chất lượng hình học (Trùng lặp, Quay đầu, Vòng quá mức)
     let goodCandidates = this.filterDistinctRoutes(allRawCandidates);
+    if (!hasValidVia) {
+      goodCandidates = goodCandidates.filter(route =>
+        !this.detectBacktracking(route.polyline, origin.lat, origin.lng, destination.lat, destination.lng)
+      );
+    }
     goodCandidates = goodCandidates.filter(route =>
-      !this.detectBacktracking(route.polyline, origin.lat, origin.lng, destination.lat, destination.lng)
-    );
-    goodCandidates = goodCandidates.filter(route =>
-      !this.isExcessiveDetour(route, directDistMeters, cleanAvoidRoads.length > 0 ? 2.8 : 2.2)
+      !this.isExcessiveDetour(route, detourBaseDistMeters, cleanAvoidRoads.length > 0 ? 2.8 : 2.2)
     );
 
     // 5. BỘ LỌC CỐT TỬ: ĐÁNH GIÁ TÍNH KHẢ DỤNG (PASSABILITY) & QUY ĐỊNH GIAO THÔNG CHO PHƯƠNG TIỆN

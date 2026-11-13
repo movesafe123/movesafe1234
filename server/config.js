@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { parseKeyPool } = require('./api-quota-guard');
 
 // Đọc tự động file .env nếu có
 const envPath = path.join(__dirname, '..', '.env');
@@ -17,10 +18,10 @@ if (fs.existsSync(envPath)) {
 }
 
 // Cấu hình trung tâm cho hệ sinh thái MoveSafe VN
-module.exports = {
+const config = {
   PORT: process.env.PORT || 3000,
   
-  // API Keys được nạp từ biến môi trường
+  // API Keys được nạp từ biến môi trường (hỗ trợ danh sách xoay vòng *_KEYS)
   API_KEYS: {
     OPENWEATHER: process.env.OPENWEATHER_KEY || '1e050d36d170249efaf439dcdb324228',
     TOMTOM: process.env.TOMTOM_KEY || 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF',
@@ -59,7 +60,8 @@ module.exports = {
 
   // Cấu hình Bot Crawler địa phương
   BOT_CONFIG: {
-    CRAWL_INTERVAL_MS: 5 * 60 * 1000, // 5 phút quét 1 lần
+    CRAWL_INTERVAL_MS: Number(process.env.BOT_CRAWL_INTERVAL_MS) || 5 * 60 * 1000, // 5 phút quét thời tiết/VOV 1 lần
+    TOMTOM_INCIDENTS_TTL_MS: Number(process.env.TOMTOM_INCIDENTS_TTL_MS) || 12 * 60 * 1000, // 12 phút mới gọi lại TomTom Incidents (giảm >58% quota/ngày)
     TIMEOUT_MS: 8000,
     ENDPOINTS: {
       VOV_TRAFFIC: 'https://vovgiaothong.vn/tin-tuc',
@@ -69,3 +71,13 @@ module.exports = {
     }
   }
 };
+
+// Danh sách key xoay vòng tự động khi 1 key chạm hạn mức 429/403
+config.API_KEY_POOLS = {
+  tomtom: parseKeyPool(process.env.TOMTOM_KEYS, config.API_KEYS.TOMTOM),
+  openweather: parseKeyPool(process.env.OPENWEATHER_KEYS, config.API_KEYS.OPENWEATHER),
+  gemini: parseKeyPool(process.env.GEMINI_KEYS, config.API_KEYS.GEMINI, config.API_KEYS.GEMINI_BACKUP),
+  openchargemap: parseKeyPool(process.env.OPEN_CHARGE_MAP_KEYS, config.API_KEYS.OPEN_CHARGE_MAP)
+};
+
+module.exports = config;

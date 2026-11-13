@@ -45,12 +45,103 @@ class WeatherService {
     this.openWeatherKey = '';
     this.stationPresets = WEATHER_STATION_PRESETS;
     this.stationCache = {};
+    this.weatherCache = new Map();
+    this._inflightWeather = new Map();
+    this._owmCooldownUntil = 0;
+    this._weatherCacheTtlMs = 10 * 60 * 1000;
+    this._owmCooldownMs = 30 * 60 * 1000;
   }
 
   setApiKey(key) {
     if (key && key.trim()) {
       this.openWeatherKey = key.trim();
     }
+  }
+
+  isOpenWeatherCoolingDown() {
+    const now = Date.now();
+    if (now < this._owmCooldownUntil) return true;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const until = Number(localStorage.getItem('movesafe_owm_cooldown_until') || '0');
+        if (until > now) {
+          this._owmCooldownUntil = until;
+          return true;
+        }
+      }
+    } catch (_e) {}
+    return false;
+  }
+
+  _markOpenWeatherRateLimited(status) {
+    const until = Date.now() + this._owmCooldownMs;
+    this._owmCooldownUntil = until;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('movesafe_owm_cooldown_until', String(until));
+      }
+    } catch (_e) {}
+    console.warn(`[WeatherService] OpenWeatherMap ${status} - tạm nghỉ 30 phút, chuyển sang Open-Meteo miễn phí.`);
+  }
+
+  _getWeatherCacheKey(lat, lng) {
+    const rLat = Number.isFinite(Number(lat)) ? Number(lat).toFixed(2) : '0.00';
+    const rLng = Number.isFinite(Number(lng)) ? Number(lng).toFixed(2) : '0.00';
+    return `${rLat},${rLng}`;
+  }
+
+  _readWeatherCache(cacheKey) {
+    const now = Date.now();
+    const memEntry = this.weatherCache.get(cacheKey);
+    if (memEntry && now - memEntry.ts < this._weatherCacheTtlMs) {
+      return memEntry.data;
+    }
+    if (memEntry) this.weatherCache.delete(cacheKey);
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem('movesafe_weather_cache_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const item = parsed && parsed[cacheKey];
+          if (item && now - item.ts < this._weatherCacheTtlMs && item.data) {
+            this.weatherCache.set(cacheKey, item);
+            return item.data;
+          }
+        }
+      }
+    } catch (_e) {}
+    return null;
+  }
+
+  _saveWeatherCache(cacheKey, data) {
+    const now = Date.now();
+    this.weatherCache.set(cacheKey, { ts: now, data });
+    if (this.weatherCache.size > 40) {
+      const oldestKey = this.weatherCache.keys().next().value;
+      if (oldestKey !== undefined) this.weatherCache.delete(oldestKey);
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        let store = {};
+        try {
+          store = JSON.parse(localStorage.getItem('movesafe_weather_cache_v1') || '{}') || {};
+        } catch (_e) {
+          store = {};
+        }
+        const { raw: _omitRaw, ...compactData } = data || {};
+        store[cacheKey] = { ts: now, data: compactData };
+        const keys = Object.keys(store);
+        if (keys.length > 20) {
+          keys
+            .sort((a, b) => (store[a]?.ts || 0) - (store[b]?.ts || 0))
+            .slice(0, keys.length - 20)
+            .forEach((k) => delete store[k]);
+        }
+        localStorage.setItem('movesafe_weather_cache_v1', JSON.stringify(store));
+      }
+    } catch (_e) {}
   }
 
   // Trích xuất lượng mưa an toàn đa nguồn (chống nuốt mất mưa rào/dông và bù suy diễn theo mã WMO)
@@ -162,14 +253,42 @@ class WeatherService {
     });
   }
 
-  // 1. Lấy thời tiết trung tâm thành phố
+  // 1. Lấy thời tiết trung tâm thành phố (Cache 10 phút + Dedup + Circuit Breaker OWM)
   async getWeather(lat, lng, cityName = 'Hà Nội') {
-    // Thử OpenWeatherMap nếu có key
-    if (this.openWeatherKey) {
+    const cacheKey = this._getWeatherCacheKey(lat, lng);
+    const cached = this._readWeatherCache(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    if (this._inflightWeather.has(cacheKey)) {
+      return this._inflightWeather.get(cacheKey);
+    }
+
+    const task = this._fetchWeatherDirect(lat, lng, cityName)
+      .then((result) => {
+        if (result) {
+          this._saveWeatherCache(cacheKey, result);
+        }
+        return result;
+      })
+      .finally(() => {
+        this._inflightWeather.delete(cacheKey);
+      });
+
+    this._inflightWeather.set(cacheKey, task);
+    return task;
+  }
+
+  async _fetchWeatherDirect(lat, lng, cityName = 'Hà Nội') {
+    // Thử OpenWeatherMap nếu có key và chưa bị cooldown 401/403/429
+    if (this.openWeatherKey && !this.isOpenWeatherCoolingDown()) {
       try {
         const owmUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&lang=vi&appid=${this.openWeatherKey}`;
         const res = await fetch(owmUrl);
-        if (res.ok) {
+        if (res.status === 401 || res.status === 403 || res.status === 429) {
+          this._markOpenWeatherRateLimited(res.status);
+        } else if (res.ok) {
           const data = await res.json();
           let rain1h = (data.rain && data.rain['1h']) || 0;
           const weatherId = (data.weather && data.weather[0] && data.weather[0].id) || 800;

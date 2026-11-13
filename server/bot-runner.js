@@ -4,6 +4,7 @@
  * Bao gồm: VOV Giao thông, NCHMF Thời tiết, HSDC Hà Nội, UDi TP.HCM, TomTom Traffic v5 & Open-Meteo Trạm Đô Thị.
  */
 
+process.env.BOT_DISABLE_AUTO_INIT = '1';
 const botService = require('./bot-service');
 
 async function runBotTask() {

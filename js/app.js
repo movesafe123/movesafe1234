@@ -2631,7 +2631,7 @@ class GoogleMapsApp {
         }
       });
 
-      // Khi gõ phím: Debounce 280ms gọi API Geocoding
+      // Khi gõ phím: Debounce 450ms để giảm request thừa khi đang gõ liên tục
       input.addEventListener('input', () => {
         const val = input.value.trim();
         clearTimeout(this.autocompleteDebounce[type]);
@@ -2649,7 +2649,7 @@ class GoogleMapsApp {
 
         this.autocompleteDebounce[type] = setTimeout(async () => {
           await this.renderAddressSuggestions(type, val);
-        }, 280);
+        }, 450);
       });
 
       // Bắt phím điều hướng
@@ -2743,7 +2743,8 @@ class GoogleMapsApp {
       const results = await window.geocodingService.searchAddresses(query, {
         city: this.currentCity,
         center: center,
-        limit: 8
+        limit: 8,
+        isAutocomplete: true
       });
 
       if (!results || results.length === 0) {
@@ -4008,15 +4009,18 @@ class GoogleMapsApp {
     const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
     const dayName = dayNames[vnDay];
 
-    const vehicle = this.currentVehicle; // 'motorbike', 'car', 'ebike', 'ecar'
+    const vehicle = this.currentVehicle; // 'motorbike', 'scooter', 'car', 'sedan', 'suv', 'ebike', 'ecar'
     const vehicleNames = {
       motorbike: 'Xe máy',
+      scooter: 'Xe tay ga',
       car: 'Ô tô',
+      sedan: 'Ô tô Sedan',
+      suv: 'Ô tô SUV',
       ebike: 'Xe máy điện',
       ecar: 'Ô tô điện'
     };
     const vehicleName = vehicleNames[vehicle] || 'Xe máy';
-    const isTwoWheeler = (vehicle === 'motorbike' || vehicle === 'ebike');
+    const isTwoWheeler = (vehicle === 'motorbike' || vehicle === 'scooter' || vehicle === 'ebike');
 
     const routes = result.routes || [];
     const recommended = routes.find(r => r.isRecommended) || routes[0];
@@ -5001,7 +5005,7 @@ class GoogleMapsApp {
         this.currentCity = city;
         const citySelect = document.getElementById('city-select-gm');
         if (citySelect) citySelect.value = city;
-        window.mapEngine.flyToCity(city);
+        window.mapEngine.flyToCity(this.citiesConfig[city] || city);
       }
 
       if (params.get('sim') === '1') {
@@ -5444,8 +5448,11 @@ class GoogleMapsApp {
     // Định mức chi phí cơ bản (VNĐ/km) + hệ số đốt nhiên liệu khi dừng chờ kẹt xe (VNĐ/phút trễ)
     const rates = {
       motorbike: { perKm: 480, perDelayMin: 110, label: 'xăng', evAltPerKm: 95, evAltLabel: 'Xe máy điện' },
+      scooter:   { perKm: 520, perDelayMin: 120, label: 'xăng', evAltPerKm: 95, evAltLabel: 'Xe máy điện' },
       ebike:     { perKm: 95,  perDelayMin: 18,  label: 'điện', gasAltPerKm: 480, gasAltLabel: 'Xe máy xăng' },
       car:       { perKm: 1950, perDelayMin: 420, label: 'xăng', evAltPerKm: 560, evAltLabel: 'Ô tô điện' },
+      sedan:     { perKm: 1850, perDelayMin: 390, label: 'xăng', evAltPerKm: 560, evAltLabel: 'Ô tô điện' },
+      suv:       { perKm: 2350, perDelayMin: 490, label: 'xăng', evAltPerKm: 560, evAltLabel: 'Ô tô điện' },
       ecar:      { perKm: 560,  perDelayMin: 85,  label: 'điện', gasAltPerKm: 1950, gasAltLabel: 'Ô tô xăng' }
     };
     const cfg = rates[veh] || rates.motorbike;
@@ -5467,7 +5474,7 @@ class GoogleMapsApp {
     const activeFloods = this.getCurrentFloods().filter(f => f.depth_cm > 0 && f.danger_level !== 'safe');
     let shieldHtml = '';
     if ((blockedRoutes && blockedRoutes.length > 0) || (activeFloods.length > 0 && (!route.warnings || !route.warnings.some(w => w.hazardType === 'flood')))) {
-      const riskSavedText = (veh === 'car' || veh === 'ecar')
+      const riskSavedText = ['car', 'sedan', 'suv', 'ecar'].includes(veh)
         ? '15 – 40 triệu đ (Rủi ro thủy kích / ngập gầm ô tô)'
         : '150.000đ – 500.000đ (Rủi ro chết máy, thay dầu láp & bugi)';
       shieldHtml = `
@@ -6592,8 +6599,12 @@ class GoogleMapsApp {
       filterType = 'all'
     } = options;
 
-    const allEV = (window.mapEngine && window.mapEngine._evStationsData) || window.MOVE_SAFE_EV_STATIONS || [];
-    const floods = (window.mapEngine && window.mapEngine._lastFloodPoints) || window.currentFloodPoints || [];
+    const mapEV = (window.mapEngine && Array.isArray(window.mapEngine.evStations) && window.mapEngine.evStations.length > 0)
+      ? window.mapEngine.evStations
+      : ((window.mapEngine && window.mapEngine._evStationsData) || []);
+    const allEV = mapEV.length > 0 ? mapEV : (window.MOVE_SAFE_EV_STATIONS || []);
+    const floods = (typeof this.getCurrentFloods === 'function' ? this.getCurrentFloods() : []) ||
+      (window.mapEngine && window.mapEngine._lastFloodPoints) || window.currentFloodPoints || [];
 
     const enriched = [];
     for (const st of allEV) {

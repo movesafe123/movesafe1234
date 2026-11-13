@@ -4,6 +4,8 @@ const HANOI_WARDS_DATA = require('../js/hanoi-wards-streets');
 const FOOD_ENTERTAINMENT_DATA = require('../js/food-entertainment-data');
 const webEventService = require('./web-event-service');
 const systemLogger = require('./system-logger');
+const config = require('./config');
+const { apiQuotaGuard } = require('./api-quota-guard');
 
 function normalizeVi(str) {
   if (!str) return '';
@@ -969,12 +971,16 @@ class AIAssistantService {
       console.warn('[AI] Tra cứu sự kiện trực tiếp bỏ qua:', e.message);
     }
 
-    const systemGeminiKey = require('./config').API_KEYS.GEMINI || '';
-    const activeKey = (userApiKey && userApiKey.trim().length > 10) ? userApiKey.trim() : systemGeminiKey;
+    const candidatePool = [
+      ...(userApiKey && userApiKey.trim().length > 10 ? [userApiKey.trim()] : []),
+      ...(config.API_KEY_POOLS?.gemini || [config.API_KEYS?.GEMINI, config.API_KEYS?.GEMINI_BACKUP])
+    ].filter((k, idx, arr) => k && k.length > 10 && arr.indexOf(k) === idx);
+    const healthyKeys = apiQuotaGuard.getHealthyKeys('gemini', candidatePool);
+    const activeKey = healthyKeys[0] || '';
 
-    if (activeKey && activeKey.length > 10) {
+    if (activeKey) {
       try {
-        return await this.callGeminiAPI(query, mergedData, city, activeKey, context, liveEvents);
+        return await this.callGeminiAPI(query, mergedData, city, healthyKeys, context, liveEvents);
       } catch (err) {
         console.warn('[AI] Gọi Gemini API thất bại, chuyển sang Bộ não AI cục bộ giàu dữ liệu:', err.message);
       }
@@ -1016,7 +1022,10 @@ class AIAssistantService {
         delete payload.generationConfig.thinkingConfig;
         response = await axios.post(url, payload, { timeout: timeoutMs });
       } else {
-        if (status === 429 || status === 503 || status === 404) {
+        if (status === 429 || status === 403) {
+          apiQuotaGuard.markRateLimited('gemini', apiKey, status, apiErr.response?.headers?.['retry-after']);
+          this._modelCooldowns.set(model, Date.now() + 25000);
+        } else if (status === 503 || status === 404) {
           this._modelCooldowns.set(model, Date.now() + 25000);
         }
         throw apiErr;
@@ -1147,47 +1156,71 @@ QUY TẮC CẤM:
     }
 
     const enableSearch = (isAskingTrafficOnly || lower.includes('sự kiện') || lower.includes('hôm qua') || lower.includes('concert')) && (!liveEvents || liveEvents.articlesCount === 0);
+    const keyList = (Array.isArray(apiKey) ? apiKey : [apiKey]).filter(Boolean);
+    const statelessCacheKey = (!Array.isArray(context.history) || context.history.length === 0)
+      ? `ai:${city}:${query.trim().toLowerCase().slice(0, 120)}:${mergedData.activeFloods?.length || 0}`
+      : null;
+
+    if (statelessCacheKey) {
+      const cachedAi = apiQuotaGuard.getCached(statelessCacheKey);
+      if (cachedAi) return cachedAi;
+    }
 
     let result = null;
-    try {
-      result = await new Promise((resolve, reject) => {
-        let settled = false;
-        let errors = 0;
-        const primaryPair = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
+    for (const activeKey of keyList) {
+      if (apiQuotaGuard.isKeyBlocked('gemini', activeKey)) continue;
+      try {
+        result = await new Promise((resolve, reject) => {
+          let settled = false;
+          let errors = 0;
+          let hedgeTimer = null;
+          const primaryPair = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
 
-        const handleSuccess = (res) => {
-          if (!settled) {
-            settled = true;
-            resolve(res);
-          }
-        };
-        const handleError = (err) => {
-          errors++;
-          if (errors >= primaryPair.length && !settled) {
-            reject(err);
-          }
-        };
+          const handleSuccess = (res) => {
+            if (!settled) {
+              settled = true;
+              if (hedgeTimer) clearTimeout(hedgeTimer);
+              resolve(res);
+            }
+          };
+          const handleError = (err) => {
+            errors++;
+            if (!settled && (errors >= primaryPair.length || apiQuotaGuard.isKeyBlocked('gemini', activeKey))) {
+              settled = true;
+              if (hedgeTimer) clearTimeout(hedgeTimer);
+              reject(err);
+            }
+          };
 
-        this._invokeSingleGeminiModel(primaryPair[0], apiKey, contents, enableSearch, 6000)
-          .then(handleSuccess)
-          .catch(handleError);
-
-        const hedgeTimer = setTimeout(() => {
-          if (!settled) {
-            this._invokeSingleGeminiModel(primaryPair[1], apiKey, contents, false, 6500)
+          // Chỉ gửi request dự phòng song song nếu model chính chậm > 2.8s (tiết kiệm ~85% lượt gọi Gemini thừa)
+          hedgeTimer = setTimeout(() => {
+            if (settled) return;
+            if (apiQuotaGuard.isKeyBlocked('gemini', activeKey)) {
+              handleError(new Error('Gemini key cooling down'));
+              return;
+            }
+            this._invokeSingleGeminiModel(primaryPair[1], activeKey, contents, false, 6000)
               .then(handleSuccess)
               .catch(handleError);
-          }
-        }, 900);
-        if (hedgeTimer.unref) hedgeTimer.unref();
-      });
-    } catch (_primaryErr) {
-      const backupModels = ['gemini-2.5-flash-lite', 'gemini-flash-latest'];
-      for (const bModel of backupModels) {
-        try {
-          result = await this._invokeSingleGeminiModel(bModel, apiKey, contents, false, 6000);
-          if (result) break;
-        } catch (_e) {}
+          }, 2800);
+          if (hedgeTimer.unref) hedgeTimer.unref();
+
+          this._invokeSingleGeminiModel(primaryPair[0], activeKey, contents, enableSearch, 6000)
+            .then(handleSuccess)
+            .catch(handleError);
+        });
+        if (result && result.reply) break;
+      } catch (_primaryErr) {
+        if (apiQuotaGuard.isKeyBlocked('gemini', activeKey)) continue; // Xoay sang key kế tiếp nếu 429/403
+        const backupModels = ['gemini-2.5-flash-lite', 'gemini-flash-latest'];
+        for (const bModel of backupModels) {
+          if (apiQuotaGuard.isKeyBlocked('gemini', activeKey)) break;
+          try {
+            result = await this._invokeSingleGeminiModel(bModel, activeKey, contents, false, 6000);
+            if (result) break;
+          } catch (_e) {}
+        }
+        if (result && result.reply) break;
       }
     }
 
@@ -1341,7 +1374,7 @@ QUY TẮC CẤM:
           },
           {
             stepName: 'Bước 3: Đua Model Song song có Độ trễ (Staggered Hedge Race)',
-            formulaOrRule: 'gemini-2.5-flash (0ms) vs gemini-3-flash-preview (+900ms) -> Fallback Lite',
+            formulaOrRule: 'gemini-2.5-flash (0ms) vs gemini-3-flash-preview (+2800ms) -> Fallback Lite',
             detail: `Model chiến thắng phản hồi nhanh nhất: ${modelUsed} (thinkingBudget: 0).`,
             metrics: { modelUsed, googleSearchGrounding: enableSearch }
           },
@@ -1362,6 +1395,9 @@ QUY TẮC CẤM:
       });
     } catch (_logErr) {}
 
+    if (statelessCacheKey && responsePayload?.reply) {
+      apiQuotaGuard.setCached(statelessCacheKey, responsePayload, 2 * 60 * 1000);
+    }
     return responsePayload;
   }
 

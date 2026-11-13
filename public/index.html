@@ -176,7 +176,7 @@
           <span class="chip-text">Ùn tắc (0 - Thông thoáng)</span>
         </button>
 
-        <button class="gm-chip gm-chip-ai" id="chip-ai-trigger">
+        <button class="gm-chip gm-chip-ai" id="chip-ai-trigger" style="display: none !important;">
           <svg class="chip-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
           </svg>
@@ -545,7 +545,7 @@
           <span>Chống ngập</span>
         </button>
 
-        <button type="button" class="gm-place-circle-action ai-ask" id="btn-place-ask-ai" title="Hỏi Trợ lý AI phân tích toàn diện điểm này">
+        <button type="button" class="gm-place-circle-action ai-ask" id="btn-place-ask-ai" title="Hỏi Trợ lý AI phân tích toàn diện điểm này" style="display: none !important;">
           <div class="gm-place-circle-icon" style="background:#eff6ff;color:#1a73e8;border-color:#bfdbfe;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M8 10h.01"></path><path d="M12 10h.01"></path><path d="M16 10h.01"></path></svg>
           </div>
@@ -789,7 +789,7 @@
   </div>
 
   <!-- ==================== 6. TRỢ LÝ AI COPILOT DRAWER (BÊN PHẢI) ==================== -->
-  <div class="gm-ai-drawer" id="ai-chat-window">
+  <div class="gm-ai-drawer" id="ai-chat-window" style="display: none !important;">
     <div class="gm-ai-header">
       <div class="gm-ai-header-info">
         <div class="gm-ai-avatar">
@@ -1231,7 +1231,7 @@
           <span>Sao chép tọa độ GPS gửi Cứu hộ</span>
         </button>
         <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn-gm-primary" onclick="document.getElementById('modal-sos-rescue').classList.remove('open'); window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Xe tôi đang gặp mưa ngập lớn, tư vấn giúp tôi chỗ gửi xe cao ráo hoặc cách xử lý chống chết máy thủy kích ngay lúc này!'));" style="background: #2563eb; display: inline-flex; align-items: center; gap: 6px;">
+          <button type="button" class="btn-gm-primary" onclick="document.getElementById('modal-sos-rescue').classList.remove('open'); window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Xe tôi đang gặp mưa ngập lớn, tư vấn giúp tôi chỗ gửi xe cao ráo hoặc cách xử lý chống chết máy thủy kích ngay lúc này!'));" style="background: #2563eb; display: none !important; align-items: center; gap: 6px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
             <span>Hỏi AI Cứu hộ</span>
           </button>
@@ -1398,7 +1398,7 @@
       <span class="mnav-label">Trạm sạc</span>
     </button>
 
-    <button class="mobile-nav-item" id="mnav-ai" data-tab="ai">
+    <button class="mobile-nav-item" id="mnav-ai" data-tab="ai" style="display: none !important;">
       <svg class="mnav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
       </svg>

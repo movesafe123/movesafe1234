@@ -1015,22 +1015,22 @@ class MapEngine {
             Cafe / Chờ sạc
           </button>
           <button 
-            style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
-            onmouseover="this.style.background='#dbeafe'"
-            onmouseout="this.style.background='#eff6ff'"
-            onclick="window.aiChat && (window.aiChat.open(), window.aiChat.sendMessage('Tư vấn lộ trình xe điện đến trạm sạc ${safeName.replace(/'/g, "\\'")} (${safeAddress.replace(/'/g, "\\'")}), dọc đường có điểm ngập nào cần tránh không?'))">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
-            Hỏi AI
+            style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+            onmouseover="this.style.background='#d1fae5'"
+            onmouseout="this.style.background='#ecfdf5'"
+            onclick="window.appState && typeof window.appState.insertWaypointToRoute === 'function' && window.appState.insertWaypointToRoute(${st.lat}, ${st.lng}, '${safeName.replace(/'/g, "\\'")}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            + Ghé sạc
           </button>
         </div>
       </div>
     `;
   }
 
-  focusEVStation(stationIdOrName) {
+  async focusEVStation(stationIdOrName) {
     if (!this.layers.evLayer) return false;
     if (!this.map.hasLayer(this.layers.evLayer)) {
-      this.toggleEV(true);
+      await this.toggleEV(true);
     }
     const term = String(stationIdOrName || '').toLowerCase().trim();
     let foundMarker = null;

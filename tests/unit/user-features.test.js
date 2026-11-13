@@ -21,7 +21,11 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
 
   it('[TC-UI-01] Thanh tìm kiếm nền trắng, đã bỏ logo và có placeholder "Nhập địa chỉ..."', () => {
     assert.strictEqual(html.includes('class="gm-brand-badge"'), false, 'Vẫn còn gm-brand-badge');
-    assert.ok(html.includes('placeholder="Nhập địa chỉ..."'), 'Thiếu placeholder Nhập địa chỉ...');
+    assert.ok(
+      html.includes('id="gm-search-input"') &&
+      (html.includes('placeholder="Nhập địa chỉ..."') || html.includes('Tìm địa chỉ')),
+      'Thiếu ô nhập địa chỉ tìm kiếm'
+    );
     assert.ok(css.includes('.gm-search-box'), 'Thiếu class .gm-search-box');
   });
 

@@ -306,9 +306,107 @@ class GeocodingService {
       { title: 'Chợ Hàn Đà Nẵng', subtitle: '119 Trần Phú, Hải Châu 1, Hải Châu, Đà Nẵng', lat: 16.0681, lng: 108.2244, city: 'danang', category: 'Chợ truyền thống / Du lịch', type: 'landmark', radiusM: 180, aliases: ['cho han', 'cho con'] }
     ];
 
-    // Bộ nhớ đệm tìm kiếm
+    // Bộ nhớ đệm tìm kiếm (RAM + localStorage TTL 24h) & bảo vệ Quota TomTom
     this.cache = new Map();
     this.reverseCache = new Map();
+    this._inflightSearches = new Map();
+    this._inflightReverses = new Map();
+    this._tomtomCooldownUntil = 0;
+    this._CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+    this._loadPersistentCaches();
+  }
+
+  _getStorage() {
+    try {
+      return (typeof localStorage !== 'undefined') ? localStorage : null;
+    } catch {
+      return null;
+    }
+  }
+
+  _loadPersistentCaches() {
+    const store = this._getStorage();
+    if (!store) return;
+    const now = Date.now();
+    try {
+      const cd = Number(store.getItem('movesafe_tt_cooldown_until') || 0);
+      if (Number.isFinite(cd) && cd > now) {
+        this._tomtomCooldownUntil = cd;
+      }
+      const fwdRaw = store.getItem('movesafe_geo_fwd_cache_v1');
+      if (fwdRaw) {
+        const entries = JSON.parse(fwdRaw);
+        if (Array.isArray(entries)) {
+          entries.forEach(([k, v]) => {
+            if (v && v.expiresAt > now && Array.isArray(v.data)) {
+              this.cache.set(k, v.data);
+            }
+          });
+        }
+      }
+      const revRaw = store.getItem('movesafe_geo_rev_cache_v1');
+      if (revRaw) {
+        const entries = JSON.parse(revRaw);
+        if (Array.isArray(entries)) {
+          entries.forEach(([k, v]) => {
+            if (v && v.expiresAt > now && v.data) {
+              this.reverseCache.set(k, v.data);
+            }
+          });
+        }
+      }
+    } catch {}
+  }
+
+  _savePersistentEntry(storageKey, mapObj, key, data, maxEntries = 120) {
+    const store = this._getStorage();
+    if (!store) return;
+    try {
+      const raw = store.getItem(storageKey);
+      let entries = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(entries)) entries = [];
+      const now = Date.now();
+      entries = entries.filter(([k, v]) => k !== key && v && v.expiresAt > now);
+      entries.push([key, { expiresAt: now + this._CACHE_TTL_MS, data }]);
+      if (entries.length > maxEntries) {
+        entries = entries.slice(entries.length - maxEntries);
+      }
+      store.setItem(storageKey, JSON.stringify(entries));
+    } catch {}
+  }
+
+  isTomTomCoolingDown() {
+    if (Date.now() < this._tomtomCooldownUntil) return true;
+    const store = this._getStorage();
+    if (store) {
+      const stored = Number(store.getItem('movesafe_tt_cooldown_until') || 0);
+      if (Number.isFinite(stored) && Date.now() < stored) {
+        this._tomtomCooldownUntil = stored;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  markTomTomRateLimited(status = 429) {
+    const durationMs = status === 403 ? 30 * 60 * 1000 : 15 * 60 * 1000;
+    const until = Date.now() + durationMs;
+    this._tomtomCooldownUntil = Math.max(this._tomtomCooldownUntil, until);
+    const store = this._getStorage();
+    if (store) {
+      try { store.setItem('movesafe_tt_cooldown_until', String(this._tomtomCooldownUntil)); } catch {}
+    }
+    console.warn(`[Geocoding] TomTom HTTP ${status}: Tạm ngưng gọi TomTom ${Math.round(durationMs / 60000)} phút để bảo toàn quota.`);
+  }
+
+  _getTomTomKey() {
+    const store = this._getStorage();
+    const userKey = store ? store.getItem('movesafe_tomtom_key') : '';
+    if (userKey && userKey.trim()) return userKey.trim();
+    if (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey) {
+      return window.mapEngine.tomtomKey;
+    }
+    return 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
   }
 
   /**
@@ -544,23 +642,62 @@ class GeocodingService {
   }
 
   /**
-   * Tầng 2: Tìm kiếm bằng TomTom Commercial Fuzzy Search API (Sử dụng TomTom Key có sẵn của dự án)
+   * Tầng dự phòng chính xác cao: TomTom Commercial Fuzzy Search
+   * Tối ưu quota: kiểm tra Cooldown 403/429, gộp request trùng, ưu tiên Proxy Cache dùng chung trên Backend
    */
   async searchViaTomTom(query, center, limit = 6) {
-    const tomtomKey = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey)
-      ? window.mapEngine.tomtomKey
-      : 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
-    if (!tomtomKey) return [];
+    if (this.isTomTomCoolingDown()) return [];
 
-    try {
-      const encoded = encodeURIComponent(query);
-      const url = `https://api.tomtom.com/search/2/search/${encoded}.json?key=${tomtomKey}&countrySet=VN&lat=${center.lat}&lon=${center.lng}&radius=40000&language=vi-VN&limit=${limit}`;
-      const res = await fetch(url);
-      if (!res.ok) return [];
-      const data = await res.json();
-      if (!data || !Array.isArray(data.results) || data.results.length === 0) return [];
+    const dedupKey = `tt_s:${query.toLowerCase()}:${center.lat.toFixed(2)},${center.lng.toFixed(2)}:${limit}`;
+    if (this._inflightSearches.has(dedupKey)) {
+      return this._inflightSearches.get(dedupKey);
+    }
 
-      return data.results.map((r, idx) => {
+    const run = (async () => {
+      let resultsList = null;
+
+      // 1. Ưu tiên gọi Backend Shared Cache Proxy (mọi người dùng dùng chung 1 cache TomTom)
+      try {
+        const proxyPath = `/api/geocode/tomtom-search?q=${encodeURIComponent(query)}&lat=${center.lat}&lng=${center.lng}&limit=${limit}`;
+        const proxyUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+          ? window.getApiUrl(proxyPath)
+          : proxyPath;
+        const pRes = await fetch(proxyUrl, { signal: AbortSignal.timeout(2200) });
+        if (pRes.status === 429) {
+          this.markTomTomRateLimited(429);
+          return [];
+        }
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          if (pData && pData.status === 'success' && Array.isArray(pData.results)) {
+            resultsList = pData.results;
+          }
+        }
+      } catch {}
+
+      // 2. Chỉ gọi trực tiếp TomTom nếu không kết nối được backend (Static GitHub Pages mode)
+      if (resultsList === null && !this.isTomTomCoolingDown()) {
+        const tomtomKey = this._getTomTomKey();
+        if (!tomtomKey) return [];
+        try {
+          const encoded = encodeURIComponent(query);
+          const url = `https://api.tomtom.com/search/2/search/${encoded}.json?key=${tomtomKey}&countrySet=VN&lat=${center.lat}&lon=${center.lng}&radius=40000&language=vi-VN&limit=${limit}`;
+          const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+          if (res.status === 403 || res.status === 429) {
+            this.markTomTomRateLimited(res.status);
+            return [];
+          }
+          if (!res.ok) return [];
+          const data = await res.json();
+          resultsList = Array.isArray(data?.results) ? data.results : [];
+        } catch {
+          return [];
+        }
+      }
+
+      if (!Array.isArray(resultsList) || resultsList.length === 0) return [];
+
+      return resultsList.map((r, idx) => {
         const addr = r.address || {};
         const poi = r.poi || {};
         const pos = r.position || {};
@@ -593,8 +730,13 @@ class GeocodingService {
           score: rawScore - idx * 0.5
         };
       }).filter(item => Number.isFinite(item.lat) && Number.isFinite(item.lng));
-    } catch (e) {
-      return [];
+    })();
+
+    this._inflightSearches.set(dedupKey, run);
+    try {
+      return await run;
+    } finally {
+      this._inflightSearches.delete(dedupKey);
     }
   }
 
@@ -766,210 +908,338 @@ class GeocodingService {
       return this.cache.get(cacheKey).slice(0, limit);
     }
 
-    const merged = [];
-    const seenCoords = new Set();
-
-    const addCandidates = (items) => {
-      for (const item of (items || [])) {
-        if (!item || !this.isValidVietnamCoord(item.lat, item.lng)) continue;
-        const coordKey = `${item.lat.toFixed(4)},${item.lng.toFixed(4)}`;
-        const titleKey = this.removeAccents(item.title || '');
-        if (!seenCoords.has(coordKey) && !seenCoords.has(titleKey)) {
-          seenCoords.add(coordKey);
-          if (titleKey.length > 5) seenCoords.add(titleKey);
-          item._distKm = this.calcDistKm(center.lat, center.lng, item.lat, item.lng);
-          merged.push(item);
-        }
-      }
-    };
-
-    // 1. TẦNG TỨC THÌ (0ms): Tìm trong CSDL 76 phường, 299 đường lớn, trường ĐH, bệnh viện, TTTM, quán ăn & trạm sạc nội bộ
-    const localMatches = this.searchLocalIndex(normalizedQ, cityKey);
-    addCandidates(localMatches);
-
-    // Nếu đã khớp đủ kết quả độ tin cậy cao từ CSDL nội bộ (đặc biệt khi Geocode nhanh limit=1 cho lộ trình), trả về ngay lập tức (0ms)!
-    const hasExactLocalMatch = localMatches.some(m => (m.score || 0) >= 85);
-    if (merged.length >= limit && (hasExactLocalMatch || limit === 1)) {
-      if (this.cache.size > 200) this.cache.clear();
-      this.cache.set(cacheKey, merged);
-      return merged.slice(0, limit);
+    if (this._inflightSearches.has(cacheKey)) {
+      const shared = await this._inflightSearches.get(cacheKey);
+      return (shared || []).slice(0, limit);
     }
 
-    // 2. TẦNG GOOGLE MAPS STREAM SEARCH (Nếu cần tìm chi tiết số nhà/ngõ ngách chưa có trong từ điển nội bộ)
-    try {
-      const searchApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
-        ? window.getApiUrl(`/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`)
-        : `/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`;
-      const gRes = await fetch(searchApiUrl, { signal: AbortSignal.timeout(2400) });
-      if (gRes.ok) {
-        const gj = await gRes.json();
-        if (gj.status === 'success' && Array.isArray(gj.results) && gj.results.length > 0) {
-          const gItems = gj.results.map(r => ({
-            title: r.title,
-            subtitle: r.subtitle || r.fullAddress,
-            fullAddress: r.fullAddress || r.subtitle,
-            lat: r.lat,
-            lng: r.lng,
-            rating: r.rating,
-            reviewsCount: r.reviewsCount,
-            type: 'restaurant',
-            typeName: r.category || 'Địa điểm',
-            category: r.category || 'Quán ăn / Nhà hàng',
-            icon: '',
-            source: 'google',
-            score: 98
-          }));
-          addCandidates(gItems);
-        }
-      }
-    } catch {}
+    const searchPromise = (async () => {
+      const merged = [];
+      const seenCoords = new Set();
 
-    // 2. TẦNG 2 & 3: Chạy song song TomTom Commercial Search + Esri ArcGIS Geocoder + Photon Bounded
-    const fallbackQueries = this.buildFallbackQueries(normalizedQ, center.name);
-    const primaryQuery = fallbackQueries[0];
-    const bboxStr = center.bbox ? center.bbox.join(',') : '105.28,20.56,106.02,21.39';
-
-    try {
-      const [tomtomResults, arcgisResults, photonResults] = await Promise.all([
-        this.searchViaTomTom(primaryQuery, center, limit),
-        this.searchViaArcGIS(primaryQuery, center, limit),
-        (async () => {
-          try {
-            const url = `${this.photonBaseUrl}?q=${encodeURIComponent(primaryQuery)}&lat=${center.lat}&lon=${center.lng}&bbox=${bboxStr}&limit=${limit}`;
-            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!res.ok) return [];
-            const data = await res.json();
-            return (data.features || []).map(f => this.formatResultItem(f));
-          } catch {
-            return [];
+      const addCandidates = (items) => {
+        for (const item of (items || [])) {
+          if (!item || !this.isValidVietnamCoord(item.lat, item.lng)) continue;
+          const coordKey = `${item.lat.toFixed(4)},${item.lng.toFixed(4)}`;
+          const titleKey = this.removeAccents(item.title || '');
+          if (!seenCoords.has(coordKey) && !seenCoords.has(titleKey)) {
+            seenCoords.add(coordKey);
+            if (titleKey.length > 5) seenCoords.add(titleKey);
+            item._distKm = this.calcDistKm(center.lat, center.lng, item.lat, item.lng);
+            merged.push(item);
           }
-        })()
-      ]);
-
-      addCandidates(tomtomResults);
-      addCandidates(arcgisResults);
-      addCandidates(photonResults);
-    } catch (e) {
-      console.warn('[Geocoding] Parallel lookup warning:', e);
-    }
-
-    // 3. TẦNG 4 & 5: Nếu vẫn chưa có kết quả (do gõ số nhà/ngách quá sâu hoặc từ khóa đặc biệt), kích hoạt Lùi cấp địa chỉ (Smart Fallback) + Nominatim
-    if (merged.length === 0) {
-      for (let i = 1; i < fallbackQueries.length; i++) {
-        const fbQuery = fallbackQueries[i];
-        try {
-          const [ttFb, arcFb] = await Promise.all([
-            this.searchViaTomTom(fbQuery, center, 4),
-            this.searchViaArcGIS(fbQuery, center, 4)
-          ]);
-          addCandidates(ttFb);
-          addCandidates(arcFb);
-          if (merged.length > 0) break;
-        } catch {}
-      }
-    }
-
-    if (merged.length === 0) {
-      try {
-        const nomUrl = `${this.nominatimSearchUrl}?q=${encodeURIComponent(primaryQuery)}&format=json&countrycodes=vn&addressdetails=1&limit=${limit}`;
-        const nomRes = await fetch(nomUrl, {
-          headers: { 'User-Agent': 'MoveSafeVN-App/1.0 (contact: info@movesafe.vn)' }
-        });
-        if (nomRes.ok) {
-          const nomData = await nomRes.json();
-          const nomResults = (nomData || []).map(d => {
-            const addr = d.address || {};
-            const title = addr.road || addr.suburb || addr.neighbourhood || d.name || rawQ;
-            const subParts = [addr.suburb, addr.city_district || addr.county, addr.city || addr.state].filter(Boolean);
-            const subtitle = subParts.join(', ') || d.display_name;
-            return {
-              title,
-              subtitle,
-              fullAddress: d.display_name,
-              lat: parseFloat(d.lat),
-              lng: parseFloat(d.lon),
-              icon: '',
-              type: 'place',
-              typeName: 'Địa điểm'
-            };
-          });
-          addCandidates(nomResults);
         }
-      } catch (nomErr) {
-        console.warn('[Geocoding] Nominatim lookup error:', nomErr);
+      };
+
+      // 1. TẦNG TỨC THÌ (0ms, 0 API Key): Tìm trong CSDL 76 phường, 299 đường lớn, trường ĐH, bệnh viện, TTTM, quán ăn & 223 trạm sạc
+      const localMatches = this.searchLocalIndex(normalizedQ, cityKey);
+      addCandidates(localMatches);
+
+      // Ngắt sớm ở Tầng 1 khi đã có kết quả khớp chính xác nội bộ (giảm triệt để lượt gọi API ngoài)
+      const hasExactLocalMatch = localMatches.some(m => (m.score || 0) >= 85);
+      if (hasExactLocalMatch && (merged.length >= limit || limit <= 3 || (options.isAutocomplete && merged.length >= 2))) {
+        if (this.cache.size > 200) this.cache.clear();
+        this.cache.set(cacheKey, merged);
+        return merged;
       }
+
+      // 2. TẦNG GOOGLE MAPS STREAM SEARCH (Zero API Key)
+      try {
+        const searchApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+          ? window.getApiUrl(`/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`)
+          : `/api/geocode/google-search?q=${encodeURIComponent(normalizedQ)}&city=${cityKey}&lat=${center.lat}&lng=${center.lng}`;
+        const gRes = await fetch(searchApiUrl, { signal: AbortSignal.timeout(2400) });
+        if (gRes.ok) {
+          const gj = await gRes.json();
+          if (gj.status === 'success' && Array.isArray(gj.results) && gj.results.length > 0) {
+            const gItems = gj.results.map(r => ({
+              title: r.title,
+              subtitle: r.subtitle || r.fullAddress,
+              fullAddress: r.fullAddress || r.subtitle,
+              lat: r.lat,
+              lng: r.lng,
+              rating: r.rating,
+              reviewsCount: r.reviewsCount,
+              type: 'restaurant',
+              typeName: r.category || 'Địa điểm',
+              category: r.category || 'Quán ăn / Nhà hàng',
+              icon: '',
+              source: 'google',
+              score: 98
+            }));
+            addCandidates(gItems);
+          }
+        }
+      } catch {}
+
+      // 3. TẦNG MIỄN PHÍ TRƯỚC (Free-First Cascade: Esri ArcGIS + Photon Bounded - Không cần API Key)
+      const fallbackQueries = this.buildFallbackQueries(normalizedQ, center.name);
+      const primaryQuery = fallbackQueries[0];
+      const bboxStr = center.bbox ? center.bbox.join(',') : '105.28,20.56,106.02,21.39';
+
+      try {
+        const [arcgisResults, photonResults] = await Promise.all([
+          this.searchViaArcGIS(primaryQuery, center, limit),
+          (async () => {
+            try {
+              const url = `${this.photonBaseUrl}?q=${encodeURIComponent(primaryQuery)}&lat=${center.lat}&lon=${center.lng}&bbox=${bboxStr}&limit=${limit}`;
+              const res = await fetch(url, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(2800) });
+              if (!res.ok) return [];
+              const data = await res.json();
+              return (data.features || []).map(f => this.formatResultItem(f));
+            } catch {
+              return [];
+            }
+          })()
+        ]);
+
+        addCandidates(arcgisResults);
+        addCandidates(photonResults);
+      } catch (e) {
+        console.warn('[Geocoding] Parallel free lookup warning:', e);
+      }
+
+      // 4. TẦNG TOMTOM CÓ CHỌN LỌC: Chỉ gọi TomTom khi nguồn miễn phí chưa đủ kết quả tin cậy (tiết kiệm >85% quota TomTom)
+      const freeEnough = merged.length >= (options.isAutocomplete ? 2 : Math.min(limit, 1));
+      const allowTomTom = !freeEnough && (!options.isAutocomplete || normalizedQ.length >= 4);
+      if (allowTomTom) {
+        const tomtomResults = await this.searchViaTomTom(primaryQuery, center, limit);
+        addCandidates(tomtomResults);
+      }
+
+      // 5. TẦNG LÙI CẤP ĐỊA CHỈ THÔNG MINH (Thử ArcGIS miễn phí trước, chỉ gọi TomTom tối đa 1 lần ở bước lùi đầu tiên)
+      if (merged.length === 0) {
+        for (let i = 1; i < fallbackQueries.length; i++) {
+          const fbQuery = fallbackQueries[i];
+          try {
+            const arcFb = await this.searchViaArcGIS(fbQuery, center, 4);
+            addCandidates(arcFb);
+            if (merged.length > 0) break;
+          } catch {}
+        }
+        if (merged.length === 0 && fallbackQueries.length > 1 && normalizedQ.length >= 4) {
+          const ttFb = await this.searchViaTomTom(fallbackQueries[1], center, 4);
+          addCandidates(ttFb);
+        }
+      }
+
+      if (merged.length === 0) {
+        try {
+          const nomUrl = `${this.nominatimSearchUrl}?q=${encodeURIComponent(primaryQuery)}&format=json&countrycodes=vn&addressdetails=1&limit=${limit}`;
+          const nomRes = await fetch(nomUrl, {
+            headers: { 'User-Agent': 'MoveSafeVN-App/1.0 (contact: info@movesafe.vn)' },
+            signal: AbortSignal.timeout(3000)
+          });
+          if (nomRes.ok) {
+            const nomData = await nomRes.json();
+            const nomResults = (Array.isArray(nomData) ? nomData : []).map(d => {
+              const addr = d.address || {};
+              const title = addr.road || addr.suburb || addr.neighbourhood || d.name || rawQ;
+              const subParts = [addr.suburb, addr.city_district || addr.county, addr.city || addr.state].filter(Boolean);
+              const subtitle = subParts.join(', ') || d.display_name;
+              return {
+                title,
+                subtitle,
+                fullAddress: d.display_name,
+                lat: parseFloat(d.lat),
+                lng: parseFloat(d.lon),
+                icon: '',
+                type: 'place',
+                typeName: 'Địa điểm'
+              };
+            });
+            addCandidates(nomResults);
+          }
+        } catch (nomErr) {
+          console.warn('[Geocoding] Nominatim lookup error:', nomErr);
+        }
+      }
+
+      const qTokens = this.removeAccents(normalizedQ).split(/\s+/).filter(t => t.length >= 2);
+      const normQ = this.removeAccents(normalizedQ);
+      const computeRelevance = (item) => {
+        const titleNorm = this.removeAccents(item.title || '');
+        const hay = this.removeAccents(`${item.title || ''} ${item.subtitle || ''} ${(item.aliases || []).join(' ')}`);
+        let matchedTokens = 0;
+        for (const tok of qTokens) {
+          if (hay.includes(tok)) matchedTokens++;
+        }
+        const tokenRatio = qTokens.length > 0 ? (matchedTokens / qTokens.length) : 0;
+
+        // Nếu không khớp bất kỳ token nào, hạ điểm xuống 5 để triệt tiêu hoàn toàn kết quả rác (như Reference Testing...)
+        if (tokenRatio === 0) return 5;
+
+        let score = 50 + tokenRatio * 50;
+
+        if (titleNorm === normQ) {
+          score += 80;
+        } else if (titleNorm.startsWith(normQ)) {
+          score += 40;
+        } else if (titleNorm.includes(normQ)) {
+          score += 30;
+        }
+
+        if (item.source === 'builtin' || item.source === 'google') score += 25;
+        if (item.rating && item.rating >= 4.0) score += 10;
+
+        if ((item._distKm || 0) > 45) {
+          score -= 30;
+        } else if ((item._distKm || 0) < 15) {
+          score += 15;
+        }
+        return score;
+      };
+
+      merged.forEach(item => {
+        item._relevance = computeRelevance(item);
+      });
+
+      // Sắp xếp theo Điểm độ khớp địa chỉ (Relevance Score) giảm dần giống hệt Google Maps
+      merged.sort((a, b) => (b._relevance || 0) - (a._relevance || 0));
+
+      if (merged.length > 0) {
+        if (this.cache.size > 200) this.cache.clear();
+        this.cache.set(cacheKey, merged);
+        this._savePersistentEntry('movesafe_geo_fwd_cache_v1', this.cache, cacheKey, merged.slice(0, 8), 100);
+      }
+
+      return merged;
+    })();
+
+    this._inflightSearches.set(cacheKey, searchPromise);
+    try {
+      const fullList = await searchPromise;
+      return fullList.slice(0, limit);
+    } finally {
+      this._inflightSearches.delete(cacheKey);
     }
-
-    const qTokens = this.removeAccents(normalizedQ).split(/\s+/).filter(t => t.length >= 2);
-    const normQ = this.removeAccents(normalizedQ);
-    const computeRelevance = (item) => {
-      const titleNorm = this.removeAccents(item.title || '');
-      const hay = this.removeAccents(`${item.title || ''} ${item.subtitle || ''} ${(item.aliases || []).join(' ')}`);
-      let matchedTokens = 0;
-      for (const tok of qTokens) {
-        if (hay.includes(tok)) matchedTokens++;
-      }
-      const tokenRatio = qTokens.length > 0 ? (matchedTokens / qTokens.length) : 0;
-
-      // Nếu không khớp bất kỳ token nào, hạ điểm xuống 5 để triệt tiêu hoàn toàn kết quả rác (như Reference Testing...)
-      if (tokenRatio === 0) return 5;
-
-      let score = 50 + tokenRatio * 50;
-
-      if (titleNorm === normQ) {
-        score += 80;
-      } else if (titleNorm.startsWith(normQ)) {
-        score += 40;
-      } else if (titleNorm.includes(normQ)) {
-        score += 30;
-      }
-
-      if (item.source === 'builtin' || item.source === 'google') score += 25;
-      if (item.rating && item.rating >= 4.0) score += 10;
-
-      if ((item._distKm || 0) > 45) {
-        score -= 30;
-      } else if ((item._distKm || 0) < 15) {
-        score += 15;
-      }
-      return score;
-    };
-
-    merged.forEach(item => {
-      item._relevance = computeRelevance(item);
-    });
-
-    // Sắp xếp theo Điểm độ khớp địa chỉ (Relevance Score) giảm dần giống hệt Google Maps
-    merged.sort((a, b) => (b._relevance || 0) - (a._relevance || 0));
-
-    if (merged.length > 0) {
-      if (this.cache.size > 200) this.cache.clear();
-      this.cache.set(cacheKey, merged);
-    }
-
-    return merged.slice(0, limit);
   }
 
   /**
-   * Reverse Geocoding Đa tầng: Lấy tên đường/ngõ/số nhà cụ thể từ kinh độ/vĩ độ
+   * Reverse Geocoding Đa tầng (Free-First + Cache + Proxy TomTom tiết kiệm quota)
    */
   async reverseGeocode(lat, lng) {
     const cacheKey = `${lat.toFixed(4)},${lng.toFixed(4)}`;
     if (this.reverseCache.has(cacheKey)) {
       return this.reverseCache.get(cacheKey);
     }
+    if (this._inflightReverses.has(cacheKey)) {
+      return this._inflightReverses.get(cacheKey);
+    }
 
-    // 1. Thử TomTom Reverse Geocode trước (rất chi tiết số nhà & tên đường tiếng Việt)
-    const tomtomKey = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey)
-      ? window.mapEngine.tomtomKey
-      : 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
-    if (tomtomKey) {
+    const revPromise = (async () => {
+      const saveRev = (result) => {
+        if (this.reverseCache.size > 300) this.reverseCache.clear();
+        this.reverseCache.set(cacheKey, result);
+        this._savePersistentEntry('movesafe_geo_rev_cache_v1', this.reverseCache, cacheKey, result, 150);
+        return result;
+      };
+
+      // 1. Thử Esri ArcGIS Reverse Geocode TRƯỚC (Miễn phí 100%, không tốn API Key)
       try {
-        const ttUrl = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lng}.json?key=${tomtomKey}&language=vi-VN`;
-        const ttRes = await fetch(ttUrl);
-        if (ttRes.ok) {
-          const ttData = await ttRes.json();
-          const first = ttData?.addresses?.[0]?.address;
+        const arcUrl = `${this.arcgisReverseUrl}?location=${lng},${lat}&langCode=vi&f=json`;
+        const arcRes = await fetch(arcUrl, { signal: AbortSignal.timeout(2600) });
+        if (arcRes.ok) {
+          const arcData = await arcRes.json();
+          const addr = arcData?.address;
+          if (addr && (addr.Address || addr.Match_addr)) {
+            const title = addr.Address || addr.PlaceName || addr.Match_addr.split(',')[0];
+            const subtitle = [addr.Neighborhood, addr.District, addr.City].filter(Boolean).join(', ') || addr.Match_addr;
+            return saveRev({
+              title,
+              subtitle,
+              fullAddress: addr.LongLabel || addr.Match_addr || `${title}, ${subtitle}`,
+              lat,
+              lng
+            });
+          }
+        }
+      } catch {}
+
+      // 2. Thử Photon Reverse (Miễn phí 100%, OSM)
+      try {
+        const url = `${this.photonReverseUrl}?lat=${lat}&lon=${lng}`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(2600) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.features && data.features.length > 0) {
+            const item = this.formatResultItem(data.features[0]);
+            if (item.title && item.title !== 'Địa điểm trên bản đồ') {
+              return saveRev({
+                title: item.title,
+                subtitle: item.subtitle,
+                fullAddress: item.fullAddress,
+                lat,
+                lng
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[Reverse Geocoding] Photon reverse failed:', e);
+      }
+
+      // 3. Thử Nominatim Reverse (Miễn phí 100%)
+      try {
+        const nomUrl = `${this.nominatimReverseUrl}?lat=${lat}&lon=${lng}&format=json`;
+        const res = await fetch(nomUrl, {
+          headers: { 'User-Agent': 'MoveSafeVN-App/1.0' },
+          signal: AbortSignal.timeout(2600)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const addr = data.address || {};
+          const title = addr.road || addr.suburb || 'Vị trí đã chọn';
+          const subParts = [addr.suburb, addr.city_district, addr.city].filter(Boolean);
+          const subtitle = subParts.join(', ') || data.display_name;
+          if (addr.road || addr.suburb) {
+            return saveRev({
+              title,
+              subtitle,
+              fullAddress: data.display_name,
+              lat,
+              lng
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('[Reverse Geocoding] Nominatim reverse failed:', e);
+      }
+
+      // 4. Phương án dự phòng cuối: TomTom Reverse (qua Proxy Cache Backend hoặc gọi trực tiếp có Circuit Breaker)
+      if (!this.isTomTomCoolingDown()) {
+        try {
+          let addresses = null;
+          try {
+            const pUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
+              ? window.getApiUrl(`/api/geocode/tomtom-reverse?lat=${lat}&lng=${lng}`)
+              : `/api/geocode/tomtom-reverse?lat=${lat}&lng=${lng}`;
+            const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(2200) });
+            if (pRes.status === 429) {
+              this.markTomTomRateLimited(429);
+            } else if (pRes.ok) {
+              const pd = await pRes.json();
+              if (pd?.status === 'success' && Array.isArray(pd.addresses)) {
+                addresses = pd.addresses;
+              }
+            }
+          } catch {}
+
+          if (addresses === null && !this.isTomTomCoolingDown()) {
+            const tomtomKey = this._getTomTomKey();
+            if (tomtomKey) {
+              const ttUrl = `https://api.tomtom.com/search/2/reverseGeocode/${lat},${lng}.json?key=${tomtomKey}&language=vi-VN`;
+              const ttRes = await fetch(ttUrl, { signal: AbortSignal.timeout(2800) });
+              if (ttRes.status === 403 || ttRes.status === 429) {
+                this.markTomTomRateLimited(ttRes.status);
+              } else if (ttRes.ok) {
+                const ttData = await ttRes.json();
+                addresses = ttData?.addresses || [];
+              }
+            }
+          }
+
+          const first = addresses?.[0]?.address;
           if (first && (first.streetName || first.freeformAddress)) {
             let streetName = first.streetName || '';
             let freeform = first.freeformAddress || '';
@@ -981,98 +1251,32 @@ class GeocodingService {
               ? `Số ${first.streetNumber} ${streetName}`
               : (streetName || first.municipalitySubdivision || freeform);
             const subtitle = [first.municipalitySubdivision, first.municipality, first.countrySubdivision].filter(Boolean).join(', ') || freeform;
-            const result = {
+            return saveRev({
               title,
               subtitle,
               fullAddress: first.freeformAddress || `${title}, ${subtitle}`,
               lat,
               lng
-            };
-            this.reverseCache.set(cacheKey, result);
-            return result;
+            });
           }
-        }
-      } catch {}
-    }
-
-    // 2. Thử Esri ArcGIS Reverse Geocode (Miễn phí 100%, không cần key)
-    try {
-      const arcUrl = `${this.arcgisReverseUrl}?location=${lng},${lat}&langCode=vi&f=json`;
-      const arcRes = await fetch(arcUrl);
-      if (arcRes.ok) {
-        const arcData = await arcRes.json();
-        const addr = arcData?.address;
-        if (addr && (addr.Address || addr.Match_addr)) {
-          const title = addr.Address || addr.PlaceName || addr.Match_addr.split(',')[0];
-          const subtitle = [addr.Neighborhood, addr.District, addr.City].filter(Boolean).join(', ') || addr.Match_addr;
-          const result = {
-            title,
-            subtitle,
-            fullAddress: addr.LongLabel || addr.Match_addr || `${title}, ${subtitle}`,
-            lat,
-            lng
-          };
-          this.reverseCache.set(cacheKey, result);
-          return result;
-        }
+        } catch {}
       }
-    } catch {}
 
-    // 3. Dự phòng Photon & Nominatim
+      return {
+        title: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
+        subtitle: 'Vị trí trên bản đồ',
+        fullAddress: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        lat,
+        lng
+      };
+    })();
+
+    this._inflightReverses.set(cacheKey, revPromise);
     try {
-      const url = `${this.photonReverseUrl}?lat=${lat}&lon=${lng}`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.features && data.features.length > 0) {
-          const item = this.formatResultItem(data.features[0]);
-          const result = {
-            title: item.title,
-            subtitle: item.subtitle,
-            fullAddress: item.fullAddress,
-            lat,
-            lng
-          };
-          this.reverseCache.set(cacheKey, result);
-          return result;
-        }
-      }
-    } catch (e) {
-      console.warn('[Reverse Geocoding] Photon reverse failed:', e);
+      return await revPromise;
+    } finally {
+      this._inflightReverses.delete(cacheKey);
     }
-
-    try {
-      const nomUrl = `${this.nominatimReverseUrl}?lat=${lat}&lon=${lng}&format=json`;
-      const res = await fetch(nomUrl, {
-        headers: { 'User-Agent': 'MoveSafeVN-App/1.0' }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const addr = data.address || {};
-        const title = addr.road || addr.suburb || 'Vị trí đã chọn';
-        const subParts = [addr.suburb, addr.city_district, addr.city].filter(Boolean);
-        const subtitle = subParts.join(', ') || data.display_name;
-        const result = {
-          title,
-          subtitle,
-          fullAddress: data.display_name,
-          lat,
-          lng
-        };
-        this.reverseCache.set(cacheKey, result);
-        return result;
-      }
-    } catch (e) {
-      console.warn('[Reverse Geocoding] Nominatim reverse failed:', e);
-    }
-
-    return {
-      title: `Tọa độ [${lat.toFixed(4)}, ${lng.toFixed(4)}]`,
-      subtitle: 'Vị trí trên bản đồ',
-      fullAddress: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-      lat,
-      lng
-    };
   }
 
   /**
@@ -1165,7 +1369,17 @@ class GeocodingService {
    * Giải mã địa điểm thông minh: Tự động phát hiện Địa danh trọng điểm, POI lân cận (<75m), hoặc Số nhà / Tuyến đường
    */
   async reverseGeocodeSmart(lat, lng) {
-    // 0a. Thử Google Maps Stream Reverse nếu backend Node.js đang chạy
+    const smartCacheKey = `smart:${lat.toFixed(4)},${lng.toFixed(4)}`;
+    if (this.reverseCache.has(smartCacheKey)) {
+      return this.reverseCache.get(smartCacheKey);
+    }
+    const saveSmart = (obj) => {
+      this.reverseCache.set(smartCacheKey, obj);
+      this._savePersistentEntry('movesafe_geo_rev_cache_v1', this.reverseCache, smartCacheKey, obj, 150);
+      return obj;
+    };
+
+    // 0a. Thử Google Maps Stream Reverse nếu backend Node.js đang chạy (Zero API Key)
     try {
       const revApiUrl = (typeof window !== 'undefined' && typeof window.getApiUrl === 'function')
         ? window.getApiUrl(`/api/geocode/google-reverse?lat=${lat}&lng=${lng}`)
@@ -1176,7 +1390,7 @@ class GeocodingService {
         if (gj.status === 'success' && gj.exactMatch) {
           const match = gj.exactMatch;
           const plusCode = this.getPlusCode(lat, lng, match.subtitle);
-          return {
+          return saveSmart({
             isPoi: true,
             type: 'restaurant',
             category: match.category || 'Quán ăn / Nhà hàng',
@@ -1193,7 +1407,7 @@ class GeocodingService {
             price: '35.000 - 110.000 đ',
             openingHours: '08:00 - 22:30',
             nearbyCandidates: gj.nearbyCandidates || []
-          };
+          });
         }
       }
     } catch {}
@@ -1249,57 +1463,9 @@ class GeocodingService {
       };
     }
 
-    const tomtomKey = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine.tomtomKey)
-      ? window.mapEngine.tomtomKey
-      : 'dz8wjRiOa8pDrr1g9Grzk0Qnp6O6wLbF';
-
-    let addressInfo = null;
-    let nearbyPoi = null;
-
-    if (tomtomKey) {
-      try {
-        const [poiRes, revRes] = await Promise.allSettled([
-          fetch('https://api.tomtom.com/search/2/nearbySearch/.json?lat=' + lat + '&lon=' + lng + '&radius=25&limit=5&key=' + tomtomKey + '&language=vi-VN').then(r => r.json()),
-          fetch('https://api.tomtom.com/search/2/reverseGeocode/' + lat + ',' + lng + '.json?key=' + tomtomKey + '&language=vi-VN').then(r => r.json())
-        ]);
-
-        if (poiRes.status === 'fulfilled' && poiRes.value?.results?.length > 0) {
-          nearbyPoi = poiRes.value.results.find(r => r.type === 'POI' && r.dist <= 18);
-        }
-
-        if (revRes.status === 'fulfilled') {
-          const first = revRes.value?.addresses?.[0]?.address;
-          if (first && (first.streetName || first.freeformAddress)) {
-            let streetName = first.streetName || '';
-            let freeform = first.freeformAddress || '';
-            if (/ngõ\s+109\s+(phố\s+)?trung\s+liệt/i.test(streetName) || /ngõ\s+109\s+(phố\s+)?trung\s+liệt/i.test(freeform)) {
-              streetName = 'Phố Nguyễn Văn Tuyết';
-              freeform = freeform.replace(/Ngõ\s+109\s+(Phố\s+)?Trung\s+Liệt/gi, 'Phố Nguyễn Văn Tuyết');
-            }
-            const isHouse = !!first.streetNumber;
-            const title = isHouse
-              ? 'Số ' + first.streetNumber + ' ' + streetName
-              : (streetName || first.municipalitySubdivision || freeform);
-            const subtitle = [first.municipalitySubdivision, first.municipality, first.countrySubdivision].filter(Boolean).join(', ') || freeform;
-            addressInfo = {
-              title,
-              subtitle,
-              fullAddress: first.freeformAddress || (title + ', ' + subtitle),
-              isHouse,
-              streetName: first.streetName,
-              lat,
-              lng
-            };
-          }
-        }
-      } catch (err) {
-        console.warn('TomTom smart reverse error:', err);
-      }
-    }
-
-    if (!addressInfo) {
-      addressInfo = await this.reverseGeocode(lat, lng);
-    }
+    // Không bắn 2-3 request TomTom mỗi lần click bản đồ; dùng tầng Miễn phí trước (ArcGIS -> Photon -> Nominatim -> TomTom Proxy có Cache)
+    const addressInfo = await this.reverseGeocode(lat, lng);
+    const nearbyPoi = null;
 
     const fullAddr = addressInfo.fullAddress || (addressInfo.title + ', ' + addressInfo.subtitle);
     const plusCode = this.getPlusCode(lat, lng, addressInfo.subtitle || fullAddr);

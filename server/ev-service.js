@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config');
 const systemLogger = require('./system-logger');
+const { apiQuotaGuard } = require('./api-quota-guard');
 
 function normalizeNFCDeep(val) {
   if (typeof val === 'string') return val.normalize('NFC');
@@ -117,25 +118,35 @@ class EVService {
     return 'hanoi';
   }
 
-  // Gọi trực tiếp Open Charge Map API v3 với API Key
+  // Gọi trực tiếp Open Charge Map API v3 với Key Pool & Circuit Breaker
   async fetchFromOpenChargeMap() {
-    if (!this.apiKey) {
-      console.warn('[EVService] Chưa cấu hình OPEN_CHARGE_MAP_KEY.');
+    const ocmPool = (config.API_KEY_POOLS && config.API_KEY_POOLS.openchargemap) || [this.apiKey].filter(Boolean);
+    const healthyKeys = apiQuotaGuard.getHealthyKeys('openchargemap', ocmPool);
+    if (healthyKeys.length === 0) {
       return [];
     }
 
     try {
-      const url = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=VN&maxresults=500&compact=true&verbose=false&key=${this.apiKey}`;
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'MoveSafeVN/1.0',
-          'X-API-Key': this.apiKey
-        },
-        signal: AbortSignal.timeout(10000)
-      });
+      let res = null;
+      for (const activeKey of healthyKeys) {
+        const url = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=VN&maxresults=500&compact=true&verbose=false&key=${activeKey}`;
+        const attempt = await fetch(url, {
+          headers: {
+            'User-Agent': 'MoveSafeVN/1.0',
+            'X-API-Key': activeKey
+          },
+          signal: AbortSignal.timeout(10000)
+        });
+        if (attempt.status === 403 || attempt.status === 429) {
+          apiQuotaGuard.markRateLimited('openchargemap', activeKey, attempt.status, attempt.headers?.get('retry-after'));
+          continue;
+        }
+        res = attempt;
+        break;
+      }
 
-      if (!res.ok) {
-        console.warn(`[EVService] Open Charge Map API trả về mã lỗi ${res.status}`);
+      if (!res || !res.ok) {
+        if (res) console.warn(`[EVService] Open Charge Map API trả về mã lỗi ${res.status}`);
         return [];
       }
 
@@ -219,9 +230,10 @@ class EVService {
     }
   }
 
-  // Gọi TomTom Search EV API tiết kiệm quota (chỉ ~5 request cho mỗi chu kỳ cache 6 giờ)
+  // Gọi TomTom Search EV API tiết kiệm quota (chỉ ~5 request cho mỗi chu kỳ cache 6 giờ + Circuit Breaker 403/429)
   async fetchFromTomTomEV() {
-    if (!this.tomtomKey) {
+    const ttPool = (config.API_KEY_POOLS && config.API_KEY_POOLS.tomtom) || [this.tomtomKey].filter(Boolean);
+    if (ttPool.length === 0 || apiQuotaGuard.getHealthyKeys('tomtom', ttPool).length === 0) {
       return [];
     }
 
@@ -237,9 +249,11 @@ class EVService {
     const seenIds = new Set();
 
     for (const hub of hubs) {
+      const healthyKey = apiQuotaGuard.getHealthyKey('tomtom', ttPool);
+      if (!healthyKey) break; // Mọi key đang nghỉ cooldown -> dừng vòng lặp ngay
       try {
         const u = new URL(`https://api.tomtom.com/search/2/${hub.path}`);
-        u.searchParams.set('key', this.tomtomKey);
+        u.searchParams.set('key', healthyKey);
         u.searchParams.set('countrySet', 'VN');
         u.searchParams.set('lat', String(hub.lat));
         u.searchParams.set('lon', String(hub.lon));
@@ -247,6 +261,10 @@ class EVService {
         u.searchParams.set('limit', '100');
 
         const res = await fetch(u.toString(), { signal: AbortSignal.timeout(8000) });
+        if (res.status === 403 || res.status === 429) {
+          apiQuotaGuard.markRateLimited('tomtom', healthyKey, res.status, res.headers?.get('retry-after'));
+          continue;
+        }
         if (!res.ok) continue;
         const data = await res.json();
         const results = Array.isArray(data.results) ? data.results : [];
@@ -452,9 +470,14 @@ class EVService {
 // Singleton instance
 const evService = new EVService();
 
-// Tự động đồng bộ theo TTL cache (chỉ gọi API ngoài khi cache quá 6 giờ)
-evService.syncAllStations({ force: false }).catch(err => {
-  console.warn('[EVService] Lỗi chạy đồng bộ ban đầu:', err.message);
-});
+// Tự động đồng bộ theo TTL cache (chỉ gọi API ngoài khi cache quá 6 giờ; bỏ qua trong test)
+const _isTestMode = process.env.NODE_ENV === 'test' ||
+  process.env.BOT_DISABLE_AUTO_INIT === '1' ||
+  process.execArgv.some(arg => arg.startsWith('--test'));
+if (!_isTestMode) {
+  evService.syncAllStations({ force: false }).catch(err => {
+    console.warn('[EVService] Lỗi chạy đồng bộ ban đầu:', err.message);
+  });
+}
 
 module.exports = evService;

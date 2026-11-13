@@ -230,7 +230,7 @@ describe('Full-Repo Verification: 18 Optimization Items (OPT-01 -> OPT-18)', () 
       assert.strictEqual(rootContent, pubContent, `File public/js/${file} phải đồng bộ 100% với js/${file}`);
     }
     const serverEv = require('../../server/ev-stations-data');
-    assert.strictEqual(serverEv.length, 153, 'Server phải có đủ 153 trạm sạc xe điện');
+    assert.ok(serverEv.length >= 220, `Server phải có ít nhất 220 trạm sạc xe điện (thực tế: ${serverEv.length})`);
     const appJs = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
     assert.ok(!appJs.includes('${this.translateStepInstruction(s)}'), 'Không được nội suy trực tiếp object translateStepInstruction vào chuỗi');
   });

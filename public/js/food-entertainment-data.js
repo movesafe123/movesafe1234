@@ -1826,92 +1826,260 @@
     hcm: { lat: 10.7769, lng: 106.6811, name: 'TP. Hồ Chí Minh' },
     danang: { lat: 16.0544, lng: 108.2022, name: 'Đà Nẵng' }
   };
+  const _foodMemCache = new Map();
+  const _foodInflight = new Map();
+  const _FOOD_GEO_TTL_MS = 24 * 60 * 60 * 1000;
+  const _FOOD_POI_TTL_MS = 6 * 60 * 60 * 1000;
+  const _FOOD_TT_COOLDOWN_MS = 30 * 60 * 1000;
+  let _foodTtCooldownUntil = 0;
 
-  async function geocodeLocationLive(phrase, currentCity = 'hanoi') {
-    if (!phrase || phrase.trim().length < 2) return null;
-    const cityObj = CITY_CENTERS[currentCity] || CITY_CENTERS.hanoi;
+  function _getTomTomRuntimeKey() {
+    if (typeof window !== 'undefined') {
+      if (window.geocodingService && window.geocodingService.tomtomKey) {
+        return window.geocodingService.tomtomKey;
+      }
+      if (window.mapEngine && window.mapEngine.tomtomKey) {
+        return window.mapEngine.tomtomKey;
+      }
+    }
+    return TOMTOM_SEARCH_KEY;
+  }
 
-    // 1. Nếu đang chạy trên trình duyệt và có window.geocodingService, ưu tiên dùng bộ 5-Layer Geocoder
-    if (typeof window !== 'undefined' && window.geocodingService && typeof window.geocodingService.searchAddresses === 'function') {
+  function _canUseBackendProxy() {
+    if (typeof window === 'undefined' || typeof window.getApiUrl !== 'function') return false;
+    const host = (window.location && window.location.hostname) || '';
+    return host !== '' && !host.endsWith('github.io');
+  }
+
+  function _isTomTomCoolingDown() {
+    const now = Date.now();
+    if (now < _foodTtCooldownUntil) return true;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const until = Number(localStorage.getItem('movesafe_tt_cooldown_until') || '0');
+        if (until > now) {
+          _foodTtCooldownUntil = until;
+          return true;
+        }
+      }
+    } catch (_e) {}
+    return false;
+  }
+
+  function _markTomTomRateLimited(status) {
+    const until = Date.now() + _FOOD_TT_COOLDOWN_MS;
+    _foodTtCooldownUntil = until;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('movesafe_tt_cooldown_until', String(until));
+      }
+    } catch (_e) {}
+    console.warn(`[FoodData] TomTom trả mã ${status}, tạm nghỉ 30 phút để bảo vệ quota.`);
+  }
+
+  function _readFoodCache(storageKey, cacheKey, ttlMs) {
+    const now = Date.now();
+    const memKey = `${storageKey}:${cacheKey}`;
+    const memEntry = _foodMemCache.get(memKey);
+    if (memEntry && now - memEntry.ts < ttlMs) {
+      return memEntry.data;
+    }
+    if (memEntry) _foodMemCache.delete(memKey);
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const parsed = JSON.parse(localStorage.getItem(storageKey) || '{}') || {};
+        const item = parsed[cacheKey];
+        if (item && now - item.ts < ttlMs) {
+          _foodMemCache.set(memKey, item);
+          return item.data;
+        }
+      }
+    } catch (_e) {}
+    return null;
+  }
+
+  function _writeFoodCache(storageKey, cacheKey, data, maxEntries = 35) {
+    const now = Date.now();
+    const memKey = `${storageKey}:${cacheKey}`;
+    _foodMemCache.set(memKey, { ts: now, data });
+    if (_foodMemCache.size > 100) {
+      const oldest = _foodMemCache.keys().next().value;
+      if (oldest !== undefined) _foodMemCache.delete(oldest);
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        let store = {};
+        try {
+          store = JSON.parse(localStorage.getItem(storageKey) || '{}') || {};
+        } catch (_e) {
+          store = {};
+        }
+        store[cacheKey] = { ts: now, data };
+        const keys = Object.keys(store);
+        if (keys.length > maxEntries) {
+          keys
+            .sort((a, b) => (store[a]?.ts || 0) - (store[b]?.ts || 0))
+            .slice(0, keys.length - maxEntries)
+            .forEach((k) => delete store[k]);
+        }
+        localStorage.setItem(storageKey, JSON.stringify(store));
+      }
+    } catch (_e) {}
+  }
+
+  async function _fetchTomTomJson(proxyPath, directUrl, timeoutMs) {
+    const fetchWithAbort = async (url) => {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
       try {
-        const matches = await window.geocodingService.searchAddresses(phrase, {
-          city: currentCity,
-          center: cityObj,
-          limit: 1
-        });
-        if (matches && matches.length > 0 && Number.isFinite(matches[0].lat) && Number.isFinite(matches[0].lng)) {
-          return {
-            title: matches[0].title || phrase,
-            address: matches[0].subtitle || matches[0].fullAddress || cityObj.name,
-            lat: matches[0].lat,
-            lng: matches[0].lng
-          };
+        const res = await fetch(url, controller ? { signal: controller.signal } : {});
+        if (res.status === 403 || res.status === 429) {
+          _markTomTomRateLimited(res.status);
+          return null;
+        }
+        if (!res.ok) return null;
+        return await res.json();
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+
+    if (_canUseBackendProxy() && proxyPath) {
+      try {
+        const proxyData = await fetchWithAbort(window.getApiUrl(proxyPath));
+        if (proxyData && Array.isArray(proxyData.results)) {
+          return proxyData;
         }
       } catch (_e) {}
     }
 
-    // 2. Gọi trực tiếp TomTom Fuzzy Search API (hoạt động trên cả Node.js Backend & Browser)
-    if (typeof fetch === 'function') {
-      try {
-        const searchQ = phrase.toLowerCase().includes(cityObj.name.toLowerCase()) ? phrase : `${phrase}, ${cityObj.name}`;
-        const url = `https://api.tomtom.com/search/2/search/${encodeURIComponent(searchQ)}.json?lat=${cityObj.lat}&lon=${cityObj.lng}&radius=40000&limit=1&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timer = controller ? setTimeout(() => controller.abort(), 2500) : null;
-        const res = await fetch(url, controller ? { signal: controller.signal } : {});
-        if (timer) clearTimeout(timer);
-        if (res.ok) {
-          const data = await res.json();
-          const top = data?.results?.[0];
-          if (top && top.position && Number.isFinite(top.position.lat) && Number.isFinite(top.position.lon)) {
-            const rawName = top.poi?.name || top.address?.streetName || top.address?.municipalitySubdivision || phrase;
-            return {
-              title: rawName,
-              address: top.address?.freeformAddress || cityObj.name,
-              lat: top.position.lat,
-              lng: top.position.lon
-            };
-          }
-        }
-      } catch (_err) {}
+    if (_isTomTomCoolingDown() || !directUrl) return null;
+    try {
+      return await fetchWithAbort(directUrl);
+    } catch (_err) {
+      return null;
     }
-    return null;
+  }
+
+  async function geocodeLocationLive(phrase, currentCity = 'hanoi') {
+    if (!phrase || phrase.trim().length < 2) return null;
+    const cityObj = CITY_CENTERS[currentCity] || CITY_CENTERS.hanoi;
+    const cacheKey = `${currentCity}|${phrase.trim().toLowerCase()}`;
+    const cached = _readFoodCache('movesafe_food_geo_cache_v1', cacheKey, _FOOD_GEO_TTL_MS);
+    if (cached) return cached;
+
+    if (_foodInflight.has(`geo:${cacheKey}`)) {
+      return _foodInflight.get(`geo:${cacheKey}`);
+    }
+
+    const task = (async () => {
+      // 1. Ưu tiên dùng bộ Free-First Geocoder có cache sẵn của trình duyệt
+      if (typeof window !== 'undefined' && window.geocodingService && typeof window.geocodingService.searchAddresses === 'function') {
+        try {
+          const matches = await window.geocodingService.searchAddresses(phrase, {
+            city: currentCity,
+            center: cityObj,
+            limit: 1
+          });
+          if (matches && matches.length > 0 && Number.isFinite(matches[0].lat) && Number.isFinite(matches[0].lng)) {
+            const resolved = {
+              title: matches[0].title || phrase,
+              address: matches[0].subtitle || matches[0].fullAddress || cityObj.name,
+              lat: matches[0].lat,
+              lng: matches[0].lng
+            };
+            _writeFoodCache('movesafe_food_geo_cache_v1', cacheKey, resolved, 40);
+            return resolved;
+          }
+        } catch (_e) {}
+      }
+
+      // 2. Chỉ gọi Proxy / TomTom khi tầng Free không có và chưa bị cooldown
+      if (typeof fetch === 'function' && !_isTomTomCoolingDown()) {
+        const searchQ = phrase.toLowerCase().includes(cityObj.name.toLowerCase()) ? phrase : `${phrase}, ${cityObj.name}`;
+        const activeKey = _getTomTomRuntimeKey();
+        const proxyPath = `/api/geocode/tomtom-search?q=${encodeURIComponent(searchQ)}&lat=${cityObj.lat}&lng=${cityObj.lng}&radius=40000&limit=1`;
+        const directUrl = activeKey
+          ? `https://api.tomtom.com/search/2/search/${encodeURIComponent(searchQ)}.json?lat=${cityObj.lat}&lon=${cityObj.lng}&radius=40000&limit=1&countrySet=VN&language=vi-VN&key=${activeKey}`
+          : '';
+        const data = await _fetchTomTomJson(proxyPath, directUrl, 2500);
+        const top = data?.results?.[0];
+        if (top && top.position && Number.isFinite(top.position.lat) && Number.isFinite(top.position.lon)) {
+          const rawName = top.poi?.name || top.address?.streetName || top.address?.municipalitySubdivision || phrase;
+          const resolved = {
+            title: rawName,
+            address: top.address?.freeformAddress || cityObj.name,
+            lat: top.position.lat,
+            lng: top.position.lon
+          };
+          _writeFoodCache('movesafe_food_geo_cache_v1', cacheKey, resolved, 40);
+          return resolved;
+        }
+      }
+      return null;
+    })().finally(() => {
+      _foodInflight.delete(`geo:${cacheKey}`);
+    });
+
+    _foodInflight.set(`geo:${cacheKey}`, task);
+    return task;
   }
 
   /**
    * Quét trực tiếp địa điểm thực tế (Quán ăn, Cafe, Rạp phim, Giải trí) trong bán kính quanh tọa độ [lat, lng]
-   * từ TomTom Real-time POI API để phủ sóng 100% mọi con phố, ngõ ngách và huyện ngoại thành Hà Nội
+   * Có cache 6h, dedup và đi qua shared proxy server trước để tiết kiệm quota TomTom
    */
   async function fetchLiveNearbyPois(lat, lng, categoryType = 'food', specificKeyword = null, currentCity = 'hanoi') {
     if (typeof fetch !== 'function' || !Number.isFinite(lat) || !Number.isFinite(lng)) return [];
 
-    let url = '';
-    if (specificKeyword) {
-      url = `https://api.tomtom.com/search/2/poiSearch/${encodeURIComponent(specificKeyword)}.json?lat=${lat}&lon=${lng}&radius=3500&limit=12&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
-    } else {
-      let categorySet = '7315'; // Mặc định: Nhà hàng / Quán ăn
-      let radius = 2500;
-      if (categoryType === 'cafe') {
-        categorySet = '9376';
-        radius = 2500;
-      } else if (categoryType === 'cinema') {
-        categorySet = '7342';
-        radius = 5000;
-      } else if (categoryType === 'entertainment') {
-        categorySet = '9362,7373,7317,9902,7376';
-        radius = 3500;
-      }
-      url = `https://api.tomtom.com/search/2/nearbySearch/.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=15&categorySet=${categorySet}&countrySet=VN&language=vi-VN&key=${TOMTOM_SEARCH_KEY}`;
+    const normKw = specificKeyword ? String(specificKeyword).trim().toLowerCase() : '';
+    const cacheKey = `${lat.toFixed(3)},${lng.toFixed(3)}|${categoryType}|${normKw}|${currentCity}`;
+    const cached = _readFoodCache('movesafe_food_poi_cache_v1', cacheKey, _FOOD_POI_TTL_MS);
+    if (cached) return cached;
+
+    if (_foodInflight.has(`poi:${cacheKey}`)) {
+      return _foodInflight.get(`poi:${cacheKey}`);
     }
 
-    try {
-      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timer = controller ? setTimeout(() => controller.abort(), 2800) : null;
-      const res = await fetch(url, controller ? { signal: controller.signal } : {});
-      if (timer) clearTimeout(timer);
-      if (!res.ok) return [];
+    if (_isTomTomCoolingDown() && !_canUseBackendProxy()) {
+      return [];
+    }
 
-      const data = await res.json();
-      const results = Array.isArray(data?.results) ? data.results : [];
+    let categorySet = '7315'; // Mặc định: Nhà hàng / Quán ăn
+    let radius = 2500;
+    let limit = 15;
+    if (specificKeyword) {
+      radius = 3500;
+      limit = 12;
+    } else if (categoryType === 'cafe') {
+      categorySet = '9376';
+      radius = 2500;
+    } else if (categoryType === 'cinema') {
+      categorySet = '7342';
+      radius = 5000;
+    } else if (categoryType === 'entertainment') {
+      categorySet = '9362,7373,7317,9902,7376';
+      radius = 3500;
+    }
+
+    const activeKey = _getTomTomRuntimeKey();
+    const proxyPath = specificKeyword
+      ? `/api/geocode/tomtom-nearby?lat=${lat}&lng=${lng}&keyword=${encodeURIComponent(specificKeyword)}&radius=${radius}&limit=${limit}`
+      : `/api/geocode/tomtom-nearby?lat=${lat}&lng=${lng}&categorySet=${encodeURIComponent(categorySet)}&radius=${radius}&limit=${limit}`;
+    const directUrl = activeKey
+      ? (specificKeyword
+        ? `https://api.tomtom.com/search/2/poiSearch/${encodeURIComponent(specificKeyword)}.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=${limit}&countrySet=VN&language=vi-VN&key=${activeKey}`
+        : `https://api.tomtom.com/search/2/nearbySearch/.json?lat=${lat}&lon=${lng}&radius=${radius}&limit=${limit}&categorySet=${categorySet}&countrySet=VN&language=vi-VN&key=${activeKey}`)
+      : '';
+
+    const task = (async () => {
+      try {
+        const data = await _fetchTomTomJson(proxyPath, directUrl, 2800);
+        if (!data) return [];
+
+        const results = Array.isArray(data?.results) ? data.results : [];
       const liveSpots = [];
       const seenNames = new Set();
 
@@ -1988,10 +2156,19 @@
         });
       }
 
-      return liveSpots;
-    } catch (_err) {
-      return [];
-    }
+        if (liveSpots.length > 0) {
+          _writeFoodCache('movesafe_food_poi_cache_v1', cacheKey, liveSpots, 30);
+        }
+        return liveSpots;
+      } catch (_err) {
+        return [];
+      }
+    })().finally(() => {
+      _foodInflight.delete(`poi:${cacheKey}`);
+    });
+
+    _foodInflight.set(`poi:${cacheKey}`, task);
+    return task;
   }
 
   function formatGuideMessage(area, spots = [], categoryType = 'food', centerPoint = null, specificKeyword = null) {

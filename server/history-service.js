@@ -24,9 +24,21 @@ class HistoryService {
     this.historySummaryFile = path.join(HISTORY_DIR, 'history_summary.json');
     this.lastRecordTime = 0;
     this.recordIntervalMs = 15 * 60 * 1000; // Lưu 1 snapshot mỗi 15 phút
+    this._cachedHistoryData = null;
 
     // Khởi tạo hoặc nạp sẵn dữ liệu 7 ngày qua nếu chưa có
     this.ensureHistoricalData();
+  }
+
+  _getHistoryData() {
+    if (this._cachedHistoryData) return this._cachedHistoryData;
+    if (!fs.existsSync(this.historySummaryFile)) {
+      this.seedSevenDaysHistory();
+    }
+    if (!this._cachedHistoryData && fs.existsSync(this.historySummaryFile)) {
+      this._cachedHistoryData = JSON.parse(fs.readFileSync(this.historySummaryFile, 'utf-8'));
+    }
+    return this._cachedHistoryData || { snapshots: [] };
   }
 
   // Đảm bảo luôn có sẵn dữ liệu 7 ngày qua để tra cứu và vẽ biểu đồ
@@ -117,6 +129,7 @@ class HistoryService {
       snapshots: records
     };
 
+    this._cachedHistoryData = payload;
     fs.writeFileSync(this.historySummaryFile, JSON.stringify(payload, null, 2), 'utf-8');
     console.log(`[HistoryService] ✓ Đã tạo thành công ${records.length} mốc lịch sử 7 ngày qua.`);
   }
@@ -182,6 +195,7 @@ class HistoryService {
       payload.totalSnapshots = payload.snapshots.length;
       payload.updatedAt = isoNow;
 
+      this._cachedHistoryData = payload;
       await fs.promises.writeFile(this.historySummaryFile, JSON.stringify(payload, null, 2), 'utf-8');
       console.log(`[HistoryService] 💾 Đã lưu snapshot lịch sử lúc ${new Date().toLocaleTimeString()} (Tổng số mốc: ${payload.snapshots.length})`);
 
@@ -287,10 +301,7 @@ class HistoryService {
   // Lấy thống kê baseline trung bình của 7 ngày qua tại đúng khung giờ targetHour (0-23)
   getHourlyBaseline(city = 'hanoi', targetHour = 18) {
     try {
-      if (!fs.existsSync(this.historySummaryFile)) {
-        this.seedSevenDaysHistory();
-      }
-      const data = JSON.parse(fs.readFileSync(this.historySummaryFile, 'utf-8'));
+      const data = this._getHistoryData();
       const snapshots = (data.snapshots || []).filter(s => Number(s.hour) === Number(targetHour));
       if (snapshots.length === 0) {
         const isPeak = (targetHour >= 7 && targetHour <= 9) || (targetHour >= 17 && targetHour <= 19);
@@ -316,10 +327,7 @@ class HistoryService {
   // Lấy dữ liệu lịch sử theo thành phố và số ngày
   getHistory(city = 'hanoi', days = 7) {
     try {
-      if (!fs.existsSync(this.historySummaryFile)) {
-        this.seedSevenDaysHistory();
-      }
-      const data = JSON.parse(fs.readFileSync(this.historySummaryFile, 'utf-8'));
+      const data = this._getHistoryData();
       const snapshots = data.snapshots || [];
 
       // Lọc theo số ngày yêu cầu
