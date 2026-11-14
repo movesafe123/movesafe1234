@@ -315,10 +315,13 @@
 
         <!-- 3 MỨC ĐỘ TRÁNH NÉ -->
         <div class="gm-avoidance-selector" id="gm-avoidance-selector">
-          <div class="gm-avoidance-label">Chế độ lộ trình ưu tiên:</div>
+          <div class="gm-avoidance-label">
+            <span>Chế độ lộ trình ưu tiên:</span>
+            <span id="gm-avoid-context-badge" class="gm-avoid-context-badge mode-fast" title="Tự động chọn Nhanh thực tế khi khô ráo và chuyển An toàn hành lang lớn khi có mưa/ngập">Tự động • Khô ráo</span>
+          </div>
           <div class="gm-avoidance-options">
-            <label class="gm-avoidance-option gm-avoid-safe active" data-level="1" title="Hành lang đường lớn cao ráo, 100% không ngập nước và không dắt vào ngõ hẹp">
-              <input type="radio" name="avoidLevel" value="1" checked aria-label="Ưu tiên an toàn hành lang lớn">
+            <label class="gm-avoidance-option gm-avoid-safe" data-level="1" title="Hành lang đường lớn cao ráo, 100% không ngập nước và không dắt vào ngõ hẹp">
+              <input type="radio" name="avoidLevel" value="1" aria-label="Ưu tiên an toàn hành lang lớn">
               <div class="gm-avoid-radio"></div>
               <div class="gm-avoid-content">
                 <div class="gm-avoid-text">
@@ -345,8 +348,8 @@
               </div>
             </label>
 
-            <label class="gm-avoidance-option gm-avoid-fast" data-level="3" title="Tối ưu thời gian thực tế theo mô hình dòng xe TomTom & VOV (chống bão hòa nút thắt)">
-              <input type="radio" name="avoidLevel" value="3" aria-label="Ưu tiên nhanh thực tế">
+            <label class="gm-avoidance-option gm-avoid-fast active" data-level="3" title="Tối ưu thời gian thực tế theo mô hình dòng xe TomTom & VOV (chống bão hòa nút thắt)">
+              <input type="radio" name="avoidLevel" value="3" checked aria-label="Ưu tiên nhanh thực tế">
               <div class="gm-avoid-radio"></div>
               <div class="gm-avoid-content">
                 <div class="gm-avoid-text">

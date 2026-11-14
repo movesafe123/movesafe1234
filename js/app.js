@@ -361,7 +361,10 @@ class GoogleMapsApp {
     this.simulatedCity = null;
 
     this.currentVehicle = 'motorbike';
-    this.currentAvoidLevel = 1; // Mức độ tránh né mặc định: An toàn tuyệt đối
+    this.currentAvoidLevel = 3; // Mặc định thích ứng: Khô ráo -> Nhanh thực tế (Mức 3), Mưa/Ngập -> An toàn (Mức 1)
+    this.userSelectedAvoidLevel = false;
+    this.latestWeatherStations = [];
+    this.latestCityWeather = null;
     this.isDirectionsOpen = false;
     this.activeFilter = 'all';
 
@@ -696,7 +699,8 @@ class GoogleMapsApp {
       }
     }
 
-    // 2. Vẽ lại toàn bộ dữ liệu trên bản đồ
+    // 2. Đồng bộ chế độ lộ trình mặc định theo bối cảnh Giả lập / Dữ liệu thật & vẽ lại bản đồ
+    this.syncSmartDefaultAvoidLevel({ force: true });
     this.renderAllData();
 
     // 3. Nếu bảng chỉ đường đang mở, tự động tính toán lại lộ trình né ngập
@@ -785,6 +789,86 @@ class GoogleMapsApp {
     }
   }
 
+  /**
+   * Đồng bộ giá trị Mức tránh né hiện tại lên radio UI và huy hiệu ngữ cảnh.
+   */
+  setAvoidanceLevelUI(level, badgeInfo = null) {
+    const parsedLevel = parseInt(level, 10);
+    const normalizedLevel = [1, 2, 3].includes(parsedLevel) ? parsedLevel : 3;
+    this.currentAvoidLevel = normalizedLevel;
+
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('.gm-avoidance-option').forEach(opt => {
+        const lvl = parseInt(opt.getAttribute('data-level'), 10);
+        const isMatch = lvl === normalizedLevel;
+        opt.classList.toggle('active', isMatch);
+        const radio = opt.querySelector('input[type="radio"]');
+        if (radio) radio.checked = isMatch;
+      });
+
+      const badge = document.getElementById('gm-avoid-context-badge');
+      if (badge && badgeInfo) {
+        badge.textContent = badgeInfo.text;
+        badge.classList.remove('mode-fast', 'mode-safe', 'mode-manual');
+        if (badgeInfo.mode) badge.classList.add(badgeInfo.mode);
+      }
+    }
+
+    return normalizedLevel;
+  }
+
+  /**
+   * Xác định chế độ mặc định thích ứng theo Thời tiết & Tình trạng ngập thực tế.
+   * - Khô ráo & không có rốn ngập hoạt động: Mức 3 (Nhanh thực tế - Dynamic Flow).
+   * - Có điểm ngập, mưa lớn (>= 5mm/h) hoặc đang bật Giả lập: Mức 1 (An toàn hành lang lớn).
+   */
+  resolveSmartDefaultAvoidLevel() {
+    const floods = typeof this.getCurrentFloods === 'function' ? this.getCurrentFloods() : [];
+    const activeFloods = floods.filter(f => (f.depth_cm || 0) > 0 && f.danger_level !== 'safe');
+    const stations = Array.isArray(this.latestWeatherStations) ? this.latestWeatherStations : [];
+    const maxStationRain = stations.reduce((max, st) => {
+      const rainVal = Number(st?.rain1h ?? st?.rain ?? 0);
+      return Number.isFinite(rainVal) ? Math.max(max, rainVal) : max;
+    }, 0);
+    const cityRain = Number(this.latestCityWeather?.rain1h ?? this.latestCityWeather?.rain ?? 0);
+    const hasHeavyRain = Math.max(maxStationRain, Number.isFinite(cityRain) ? cityRain : 0) >= 5;
+
+    if (this.isSimulationMode) {
+      return { level: 1, text: 'Tự động • Giả lập ngập', mode: 'mode-safe' };
+    }
+    if (activeFloods.length > 0) {
+      return { level: 1, text: `Tự động • Có ${activeFloods.length} điểm ngập`, mode: 'mode-safe' };
+    }
+    if (hasHeavyRain) {
+      return { level: 1, text: 'Tự động • Mưa lớn bảo vệ xe', mode: 'mode-safe' };
+    }
+    return { level: 3, text: 'Tự động • Khô ráo', mode: 'mode-fast' };
+  }
+
+  /**
+   * Tự động cập nhật chế độ mặc định nếu người dùng chưa tự tay chọn đè.
+   * Truyền { force: true } khi bật/tắt Giả lập để reset về thích ứng tự động.
+   */
+  syncSmartDefaultAvoidLevel({ force = false } = {}) {
+    if (force) {
+      this.userSelectedAvoidLevel = false;
+    }
+
+    if (this.userSelectedAvoidLevel) {
+      this.setAvoidanceLevelUI(this.currentAvoidLevel, {
+        text: 'Tùy chỉnh thủ công',
+        mode: 'mode-manual'
+      });
+      return this.currentAvoidLevel;
+    }
+
+    const decision = this.resolveSmartDefaultAvoidLevel();
+    return this.setAvoidanceLevelUI(decision.level, {
+      text: decision.text,
+      mode: decision.mode
+    });
+  }
+
   renderAllData() {
     let cityFloods = this.liveData.floodPoints.filter(f => f.city === this.currentCity);
     let cityTraffics = this.liveData.trafficIncidents.filter(t => t.city === this.currentCity);
@@ -806,12 +890,14 @@ class GoogleMapsApp {
     window.mapEngine.renderTrafficIncidents(cityTraffics);
 
     this.updateStatsCounters();
+    this.syncSmartDefaultAvoidLevel();
   }
 
   // Cập nhật widget thời tiết trung tâm (góc dưới trái)
   async updateWeather() {
     const city = this.citiesConfig[this.currentCity];
     const w = await window.weatherService.getWeather(city.lat, city.lng, city.name);
+    this.latestCityWeather = w;
 
     const pillText = document.getElementById('weather-pill-text');
     const pillDot = document.getElementById('weather-risk-dot');
@@ -829,6 +915,7 @@ class GoogleMapsApp {
     if (pillDot) {
       pillDot.className = 'gm-risk-dot ' + (w.floodRisk.level === 'danger' ? 'risk-danger' : (w.floodRisk.level === 'warning' ? 'risk-warning' : ''));
     }
+    this.syncSmartDefaultAvoidLevel();
   }
 
   // Cập nhật và vẽ các trạm thời tiết quận huyện trực tiếp lên bản đồ
@@ -856,6 +943,8 @@ class GoogleMapsApp {
           this.updateStatsCounters();
         }
       }
+
+      this.syncSmartDefaultAvoidLevel();
 
       const streetsModal = document.getElementById('modal-hanoi-streets');
       if (streetsModal && streetsModal.classList.contains('open')) {
@@ -1488,6 +1577,7 @@ class GoogleMapsApp {
       window.mapEngine.flyToCity(city);
       this.resetCityRouteDefaults();
       this.updateCommutePlacesLabel();
+      this.syncSmartDefaultAvoidLevel();
       await this.updateWeather();
       await this.updateWeatherStations();
 
@@ -1655,17 +1745,13 @@ class GoogleMapsApp {
     // 5b. Bộ chọn 3 mức độ tránh né
     document.querySelectorAll('.gm-avoidance-option').forEach(option => {
       option.addEventListener('click', () => {
-        // Cập nhật trạng thái active của các option
-        document.querySelectorAll('.gm-avoidance-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
-        
-        // Cập nhật radio button
-        const radio = option.querySelector('input[type="radio"]');
-        if (radio) radio.checked = true;
-        
-        // Lưu mức độ tránh né
-        this.currentAvoidLevel = parseInt(option.getAttribute('data-level'));
-        
+        const lvl = parseInt(option.getAttribute('data-level'), 10);
+        this.userSelectedAvoidLevel = true;
+        this.setAvoidanceLevelUI(lvl, {
+          text: 'Tùy chỉnh thủ công',
+          mode: 'mode-manual'
+        });
+
         // Tự động tính lại đường nếu panel đang mở
         if (this.isDirectionsOpen) {
           this.calculateSmartRoute();
@@ -3695,7 +3781,7 @@ class GoogleMapsApp {
 
     const targetDest = parsedRoute ? (parsedRoute.destination || parsedRoute.dest) : null;
     if (parsedRoute && parsedRoute.origin && targetDest) {
-      await this.triggerChatRoute(parsedRoute.origin, targetDest, 1, parsedRoute.timeOffsetHours || 0, parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []);
+      await this.triggerChatRoute(parsedRoute.origin, targetDest, null, parsedRoute.timeOffsetHours || 0, parsedRoute.avoidRoad ? [parsedRoute.avoidRoad] : []);
       return;
     }
 
@@ -3831,7 +3917,7 @@ class GoogleMapsApp {
   }
 
   // Kích hoạt tìm đường tự động từ Trợ lý AI (không cần gõ tay thủ công, hỗ trợ né đường giả định)
-  async triggerChatRoute(originStr, destStr, avoidLevel = 1, timeOffsetHours = 0, avoidRoads = []) {
+  async triggerChatRoute(originStr, destStr, avoidLevel = null, timeOffsetHours = 0, avoidRoads = []) {
     this._shouldAnnounceRouteVoice = true;
     this.currentAvoidRoads = Array.isArray(avoidRoads) ? avoidRoads : (avoidRoads ? [avoidRoads] : []);
     this.toggleDirectionsPanel(true);
@@ -3850,18 +3936,15 @@ class GoogleMapsApp {
       await this.applyPredictionOffset(clampedOffset);
     }
 
-    this.currentAvoidLevel = avoidLevel;
-    // Cập nhật giao diện radio 3 mức độ tránh né
-    document.querySelectorAll('.gm-avoidance-option').forEach(o => {
-      const lvl = parseInt(o.getAttribute('data-level'));
-      if (lvl === avoidLevel) {
-        o.classList.add('active');
-        const radio = o.querySelector('input[type="radio"]');
-        if (radio) radio.checked = true;
-      } else {
-        o.classList.remove('active');
-      }
-    });
+    const hasExplicitAvoidLevel = avoidLevel !== null && avoidLevel !== undefined;
+    if (hasExplicitAvoidLevel) {
+      this.setAvoidanceLevelUI(avoidLevel, {
+        text: 'Theo đề xuất AI',
+        mode: 'mode-manual'
+      });
+    } else {
+      this.syncSmartDefaultAvoidLevel();
+    }
 
     const timeNote = timeOffsetHours > 0 ? ` (Dự báo +${timeOffsetHours}h tới)` : '';
     const avoidNote = (this.currentAvoidRoads && this.currentAvoidRoads.length > 0)
@@ -3881,7 +3964,7 @@ class GoogleMapsApp {
     if (destMatches && destMatches.length > 0) this.routeLocations.destination = destMatches[0];
     else this.routeLocations.destination = { title: destStr, fullAddress: destStr, lat: cityCenter.lat, lng: cityCenter.lng };
 
-    await this.calculateSmartRoute();
+    await this.calculateSmartRoute({ skipSmartSync: hasExplicitAvoidLevel });
   }
 
   // Áp dụng độ lệch dự báo AI tương lai (+1h, +2h, +3h) lên bản đồ & tự động tính lại lộ trình
@@ -3952,7 +4035,10 @@ class GoogleMapsApp {
   }
 
   // Tính toán lộ trình thông minh kết hợp Geocoding ngõ ngách & OSRM
-  async calculateSmartRoute() {
+  async calculateSmartRoute(options = {}) {
+    if (!options?.skipSmartSync) {
+      this.syncSmartDefaultAvoidLevel();
+    }
     const resultsContainer = document.getElementById('gm-route-results');
     const summaryContainer = document.getElementById('gm-route-summary');
     
@@ -4920,20 +5006,19 @@ class GoogleMapsApp {
     if (!selectedRoute) return;
 
     // Đồng bộ mức độ tránh né và radio button trong UI
+    const prevAvoidLevel = this.currentAvoidLevel;
     const targetAvoidLevel = (Array.isArray(selectedRoute.mergedLevels) && selectedRoute.mergedLevels.includes(this.currentAvoidLevel))
       ? this.currentAvoidLevel
       : selectedRoute.avoidLevel;
-    this.currentAvoidLevel = targetAvoidLevel;
-    document.querySelectorAll('.gm-avoidance-option').forEach(o => {
-      const lvl = parseInt(o.getAttribute('data-level'));
-      if (lvl === targetAvoidLevel) {
-        o.classList.add('active');
-        const r = o.querySelector('input[type="radio"]');
-        if (r) r.checked = true;
-      } else {
-        o.classList.remove('active');
-      }
-    });
+    if (targetAvoidLevel !== prevAvoidLevel) {
+      this.userSelectedAvoidLevel = true;
+      this.setAvoidanceLevelUI(targetAvoidLevel, {
+        text: 'Tùy chỉnh thủ công',
+        mode: 'mode-manual'
+      });
+    } else {
+      this.setAvoidanceLevelUI(targetAvoidLevel);
+    }
 
     // Cập nhật isRecommended trên tất cả các route
     routes.forEach((r, i) => {
@@ -5172,12 +5257,10 @@ class GoogleMapsApp {
 
       const avoid = parseInt(params.get('avoid'), 10);
       if (!isNaN(avoid) && [1, 2, 3].includes(avoid)) {
-        this.currentAvoidLevel = avoid;
-        document.querySelectorAll('.gm-avoidance-option').forEach(opt => {
-          const isMatch = parseInt(opt.dataset.level, 10) === avoid;
-          opt.classList.toggle('active', isMatch);
-          const radio = opt.querySelector('input[type="radio"]');
-          if (radio) radio.checked = isMatch;
+        this.userSelectedAvoidLevel = true;
+        this.setAvoidanceLevelUI(avoid, {
+          text: 'Theo liên kết chia sẻ',
+          mode: 'mode-manual'
         });
       }
 
@@ -7012,7 +7095,13 @@ class GoogleMapsApp {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  window.appState = new GoogleMapsApp();
-  window.appState.init();
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.appState = new GoogleMapsApp();
+    window.appState.init();
+  });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { GoogleMapsApp };
+}

@@ -313,4 +313,62 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
     const hnJams = (cacheJson.trafficIncidents || []).filter(i => i.city === 'hanoi' && i.isJam);
     assert.ok(hnJams.every(i => !i.id.startsWith('tomtom-hanoi-0')), 'ID sự cố TomTom phải dùng tọa độ cố định thay vì chỉ số mảng');
   });
+
+  it('[TC-UI-18] Mặc định thích ứng theo Thời tiết / Bối cảnh (Khô ráo -> Mức 3 Nhanh thực tế, Mưa/Ngập/Giả lập -> Mức 1 An toàn)', () => {
+    const htmlContent = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
+    const cssContent = fs.readFileSync(path.join(__dirname, '../../css/style.css'), 'utf8');
+
+    // 1. UI HTML & CSS: Huy hiệu ngữ cảnh và radio mặc định khô ráo (Mức 3)
+    assert.ok(htmlContent.includes('id="gm-avoid-context-badge"'), 'Thiếu huy hiệu #gm-avoid-context-badge');
+    assert.ok(htmlContent.includes('class="gm-avoidance-option gm-avoid-fast active" data-level="3"'), 'Trạng thái HTML khởi tạo phải kích hoạt Mức 3 (Nhanh thực tế)');
+    assert.ok(cssContent.includes('.gm-avoid-context-badge.mode-fast') && cssContent.includes('.gm-avoid-context-badge.mode-safe'), 'Thiếu CSS .gm-avoid-context-badge');
+
+    // 2. Logic động trong GoogleMapsApp
+    const { GoogleMapsApp } = require('../../js/app');
+    const app = new GoogleMapsApp();
+
+    // Case A: Trạng thái khởi tạo khô ráo -> Mức 3 (Nhanh thực tế)
+    assert.strictEqual(app.currentAvoidLevel, 3, 'Mặc định khởi tạo khi khô ráo phải là Mức 3');
+    let dec = app.resolveSmartDefaultAvoidLevel();
+    assert.strictEqual(dec.level, 3);
+    assert.strictEqual(dec.mode, 'mode-fast');
+
+    // Case B: Phát hiện điểm ngập đang hoạt động -> tự động chuyển Mức 1 (An toàn hành lang lớn)
+    app.liveData.floodPoints = [
+      { id: 'f1', city: 'hanoi', name: 'Ngập Nguyễn Trãi', depth_cm: 28, danger_level: 'medium' }
+    ];
+    app.syncSmartDefaultAvoidLevel();
+    assert.strictEqual(app.currentAvoidLevel, 1, 'Khi có điểm ngập thật phải tự động chuyển sang Mức 1');
+    dec = app.resolveSmartDefaultAvoidLevel();
+    assert.strictEqual(dec.mode, 'mode-safe');
+
+    // Case C: Hết ngập nhưng trạm thời tiết ghi nhận mưa lớn (>= 5mm/h) -> tự động giữ Mức 1
+    app.liveData.floodPoints = [];
+    app.latestWeatherStations = [{ name: 'Cầu Giấy', rain1h: 7.2 }];
+    app.syncSmartDefaultAvoidLevel();
+    assert.strictEqual(app.currentAvoidLevel, 1, 'Khi có mưa lớn >= 5mm/h phải tự động ưu tiên Mức 1');
+
+    // Case D: Tạnh mưa trở lại -> tự động quay về Mức 3 (Nhanh thực tế)
+    app.latestWeatherStations = [{ name: 'Cầu Giấy', rain1h: 0 }];
+    app.syncSmartDefaultAvoidLevel();
+    assert.strictEqual(app.currentAvoidLevel, 3, 'Khi thời tiết khô ráo trở lại phải chuyển về Mức 3');
+
+    // Case E: Bật Giả lập -> ép chuyển về Mức 1; Tắt Giả lập khi khô ráo -> quay lại Mức 3
+    app.isSimulationMode = true;
+    app.simulatedFloods = [{ id: 'sim1', city: 'hanoi', depth_cm: 35, danger_level: 'critical' }];
+    app.simulatedCity = 'hanoi';
+    app.syncSmartDefaultAvoidLevel({ force: true });
+    assert.strictEqual(app.currentAvoidLevel, 1, 'Bật Giả lập ngập phải tự động chuyển về Mức 1');
+
+    // Case F: Tôn trọng lựa chọn thủ công của người dùng
+    app.userSelectedAvoidLevel = true;
+    app.currentAvoidLevel = 2;
+    app.isSimulationMode = false;
+    app.syncSmartDefaultAvoidLevel();
+    assert.strictEqual(app.currentAvoidLevel, 2, 'Không được tự ý ghi đè khi người dùng đã tự chọn Mức 2');
+
+    // Reset về tự động khi force: true (như lúc bật/tắt công tắc Giả lập)
+    app.syncSmartDefaultAvoidLevel({ force: true });
+    assert.strictEqual(app.currentAvoidLevel, 3, 'Khi force=true ở trạng thái khô ráo phải khôi phục Mức 3');
+  });
 });
