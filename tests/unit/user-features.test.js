@@ -215,7 +215,7 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
   it('[TC-AI-11] Giao diện trực quan hoá độ thông minh AI: live thinking steps, spatial scan header, vehicle physics meter và verification badge', () => {
     const AIChatClass = require('../../js/ai-chat');
     const chatInstance = new AIChatClass();
-    
+
     // Test spatial scan header
     const scanHtml = chatInstance.renderSpatialScanHeaderHtml({ title: 'Đã quét hành lang 2.5km', stats: '15 trạm ngập' });
     assert.ok(scanHtml.includes('gm-spatial-scan-header'), 'Thiếu class gm-spatial-scan-header');
@@ -251,5 +251,66 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
     assert.ok(chatJs.includes('buildTimeShiftAdvisor('), 'Thiếu hàm buildTimeShiftAdvisor');
     assert.ok(chatJs.includes('buildMultiStopTimeline('), 'Thiếu hàm buildMultiStopTimeline');
     assert.ok(chatJs.includes('buildSpatialCitations('), 'Thiếu hàm buildSpatialCitations');
+  });
+
+  it('[TC-UI-16] Google Maps-style Left Slide-Out Navigation Drawer với hoạt ảnh trượt trái sang phải & chuyển Dark Mode', () => {
+    const htmlContent = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
+    const cssContent = fs.readFileSync(path.join(__dirname, '../../css/style.css'), 'utf8');
+    const appJsContent = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+
+    // 1. HTML structure: Search tối giản + Navigation Drawer bên trái
+    assert.ok(htmlContent.includes('id="btn-nav-drawer-toggle"'), 'Thiếu nút Hamburger mở drawer');
+    assert.ok(htmlContent.includes('id="gm-nav-drawer"'), 'Thiếu phần tử #gm-nav-drawer');
+    assert.ok(htmlContent.includes('id="btn-close-nav-drawer"'), 'Thiếu nút đóng drawer');
+    assert.ok(htmlContent.includes('id="gm-nav-backdrop"'), 'Thiếu lớp nền #gm-nav-backdrop');
+    assert.ok(htmlContent.includes('id="btn-quick-directions"'), 'Thiếu nút chỉ đường nhanh trên thanh tìm kiếm');
+    assert.ok(htmlContent.includes('id="chk-drawer-darkmode"'), 'Thiếu nút bật/tắt Giao diện Tối trong drawer');
+    assert.ok(htmlContent.includes('id="btn-drawer-quick-report"'), 'Thiếu nút báo cáo nhanh trong drawer');
+    assert.ok(htmlContent.includes('id="btn-drawer-shortcut-tip"'), 'Thiếu nút mẹo phím tắt trong drawer');
+    assert.ok(htmlContent.includes('class="gm-brand-move"') && htmlContent.includes('class="gm-brand-safe"'), 'Wordmark MoveSafe phải dùng 2 tông màu thương hiệu .gm-brand-move & .gm-brand-safe');
+    assert.ok(!htmlContent.includes('class="chip-forecast-badge"'), 'Không còn badge MỚI ở mục Dự báo thời tiết 15P');
+    assert.ok(!htmlContent.includes('class="gm-chips-rail"'), 'Không nên còn thanh chips nổi .gm-chips-rail cũ');
+
+    // 2. CSS animation: Trượt từ trái sang phải + reduced-motion + dark mode
+    assert.ok(cssContent.includes('.gm-nav-drawer'), 'Thiếu style .gm-nav-drawer');
+    assert.ok(cssContent.includes('.gm-nav-drawer.open'), 'Thiếu trạng thái .gm-nav-drawer.open');
+    assert.ok(cssContent.includes('translateX(-100%)'), 'Drawer mặc định phải ẩn bên trái translateX(-100%)');
+    assert.ok(cssContent.includes('translateX(0)'), 'Drawer mở phải trượt về translateX(0)');
+    assert.ok(cssContent.includes('@keyframes gmDrawerItemSlideIn'), 'Thiếu hoạt ảnh trượt mục drawer gmDrawerItemSlideIn');
+    assert.ok(cssContent.includes('prefers-reduced-motion'), 'Thiếu hỗ trợ prefers-reduced-motion cho drawer');
+    assert.ok(cssContent.includes('.gm-nav-backdrop'), 'Thiếu style .gm-nav-backdrop');
+    assert.ok(cssContent.includes('body.dark-mode .gm-nav-drawer'), 'Thiếu theme Dark Mode cho drawer');
+    assert.ok(cssContent.includes('body.dark-mode .gm-brand-wordmark .gm-brand-move'), 'Thiếu màu Dark Mode cho wordmark MoveSafe');
+
+    // 3. JS logic: Quản lý trạng thái mở/đóng, Alt+M, Esc, lưu theme
+    assert.ok(appJsContent.includes('openNavDrawer('), 'Thiếu hàm openNavDrawer');
+    assert.ok(appJsContent.includes('closeNavDrawer('), 'Thiếu hàm closeNavDrawer');
+    assert.ok(appJsContent.includes('toggleNavDrawer('), 'Thiếu hàm toggleNavDrawer');
+    assert.ok(appJsContent.includes('applyTheme('), 'Thiếu hàm applyTheme');
+    assert.ok(appJsContent.includes('bindNavDrawerEvents('), 'Thiếu hàm bindNavDrawerEvents');
+    assert.ok(appJsContent.includes('movesafe_dark_mode'), 'Thiếu lưu localStorage movesafe_dark_mode');
+    assert.ok(appJsContent.includes('e.altKey'), 'Thiếu phím tắt Alt + M mở/đóng drawer');
+  });
+
+  it('[TC-UI-17] Chuẩn hóa vị trí & lọc chính xác ghim Ùn tắc TomTom / VOV (tránh ghim sai tâm phường & ngõ nhỏ)', () => {
+    const mapEngineContent = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    const botServiceContent = fs.readFileSync(path.join(__dirname, '../../server/bot-service.js'), 'utf8');
+    const appJsContent = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+    const cacheJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/live_urban_cache.json'), 'utf8'));
+
+    // 1. map-engine.js: Luôn cập nhật icon khi tái sử dụng marker để không bị lệch nhãn Ùn tắc
+    assert.ok(mapEngineContent.includes('marker.setIcon(customIcon)'), 'Thiếu marker.setIcon(customIcon) khi cập nhật marker cũ');
+
+    // 2. bot-service.js: Trung điểm LineString, lọc ngõ/kiệt/hẻm, VOV chỉ map CORE_INTERSECTIONS_GEO và chống chồng chéo 350m
+    assert.ok(botServiceContent.includes('Math.floor(coords.length / 2)'), 'Thiếu lấy trung điểm LineString của TomTom');
+    assert.ok(botServiceContent.includes('isAlleyNoise') && botServiceContent.includes('ngõ|ngách|hẻm|kiệt'), 'Thiếu bộ lọc ngõ/ngách/hẻm/kiệt');
+    assert.ok(botServiceContent.includes('hasVerifiedIntersection'), 'VOV incidents phải xác thực qua CORE_INTERSECTIONS_GEO');
+    assert.ok(botServiceContent.includes('Math.hypot(d.lat - item.lat, d.lng - item.lng) < 0.0032'), 'Thiếu chống chồng chéo ghim cùng loại trong bán kính ~350m');
+
+    // 3. app.js & cache JSON: Vô hiệu hóa cache localStorage cũ bằng _trafficSchemaVersion === 2
+    assert.ok(appJsContent.includes('_trafficSchemaVersion !== 2'), 'Thiếu kiểm tra _trafficSchemaVersion trong fetchLiveData');
+    assert.strictEqual(cacheJson._trafficSchemaVersion, 2, 'live_urban_cache.json phải có _trafficSchemaVersion = 2');
+    const hnJams = (cacheJson.trafficIncidents || []).filter(i => i.city === 'hanoi' && i.isJam);
+    assert.ok(hnJams.every(i => !i.id.startsWith('tomtom-hanoi-0')), 'ID sự cố TomTom phải dùng tọa độ cố định thay vì chỉ số mảng');
   });
 });

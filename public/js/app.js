@@ -398,6 +398,11 @@ class GoogleMapsApp {
     const city = this.citiesConfig[this.currentCity];
     window.mapEngine.init('map-container', [city.lat, city.lng], city.zoom);
     this.bindEvents();
+    try {
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('movesafe_dark_mode') === '1') {
+        this.applyTheme(true, false);
+      }
+    } catch (_e) {}
     this.setupAddressAutocomplete();
     this.initQuickCommutePresets();
 
@@ -456,6 +461,9 @@ class GoogleMapsApp {
           const parsed = JSON.parse(cached);
           if (parsed && Array.isArray(parsed.floodPoints)) {
             parsed.floodPoints = parsed.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
+            if (parsed._trafficSchemaVersion !== 2) {
+              parsed.trafficIncidents = [];
+            }
             this.liveData = parsed;
             this.renderAllData();
             this._hasInitialRendered = true;
@@ -499,6 +507,7 @@ class GoogleMapsApp {
       if (Array.isArray(fetchedData.floodPoints)) {
         fetchedData.floodPoints = fetchedData.floodPoints.filter(f => f.name !== 'Ngã tư Tràng Tiền - Hàng Bài');
       }
+      fetchedData._trafficSchemaVersion = 2;
       this.liveData = fetchedData;
       this._hasInitialRendered = true;
       try {
@@ -1020,33 +1029,166 @@ class GoogleMapsApp {
     });
   }
 
+  /**
+   * Mở ngăn kéo điều hướng bên trái (Google Maps-style Left Slide-Out Drawer).
+   */
+  openNavDrawer() {
+    this.toggleNavDrawer(true);
+  }
+
+  /**
+   * Đóng ngăn kéo điều hướng bên trái.
+   */
+  closeNavDrawer() {
+    this.toggleNavDrawer(false);
+  }
+
+  /**
+   * Chuyển đổi trạng thái mở/đóng cho ngăn kéo điều hướng bên trái.
+   * @param {boolean} [forceState]
+   */
+  toggleNavDrawer(forceState) {
+    const drawer = document.getElementById('gm-nav-drawer');
+    const backdrop = document.getElementById('gm-nav-backdrop');
+    const toggleBtn = document.getElementById('btn-nav-drawer-toggle');
+    if (!drawer) return;
+
+    const nextOpen = forceState !== undefined ? Boolean(forceState) : !this.isNavDrawerOpen;
+    this.isNavDrawerOpen = nextOpen;
+
+    drawer.classList.toggle('open', nextOpen);
+    drawer.setAttribute('aria-hidden', nextOpen ? 'false' : 'true');
+    if (backdrop) backdrop.classList.toggle('open', nextOpen);
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
+    document.body.classList.toggle('nav-drawer-open', nextOpen);
+
+    if (nextOpen) {
+      requestAnimationFrame(() => {
+        document.getElementById('btn-close-nav-drawer')?.focus({ preventScroll: true });
+      });
+    } else if (drawer.contains(document.activeElement)) {
+      toggleBtn?.focus({ preventScroll: true });
+    }
+  }
+
+  /**
+   * Đồng bộ giao diện Sáng/Tối toàn ứng dụng và lưu tùy chọn vào localStorage.
+   * @param {boolean} isDark
+   * @param {boolean} [persist=true]
+   */
+  applyTheme(isDark, persist = true) {
+    const dark = Boolean(isDark);
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+
+    const chkDark = document.getElementById('chk-drawer-darkmode');
+    if (chkDark) {
+      chkDark.checked = dark;
+      chkDark.setAttribute('aria-checked', dark ? 'true' : 'false');
+    }
+
+    if (persist) {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('movesafe_dark_mode', dark ? '1' : '0');
+        }
+      } catch (_e) {}
+    }
+  }
+
+  /**
+   * Gắn toàn bộ sự kiện cho thanh tìm kiếm tối giản và ngăn kéo điều hướng bên trái.
+   */
+  bindNavDrawerEvents() {
+    document.getElementById('btn-nav-drawer-toggle')?.addEventListener('click', () => {
+      this.toggleNavDrawer();
+    });
+
+    document.getElementById('btn-close-nav-drawer')?.addEventListener('click', () => {
+      this.closeNavDrawer();
+    });
+
+    document.getElementById('gm-nav-backdrop')?.addEventListener('click', () => {
+      this.closeNavDrawer();
+    });
+
+    document.getElementById('btn-quick-directions')?.addEventListener('click', () => {
+      this.closeNavDrawer();
+      this.toggleDirectionsPanel(true);
+    });
+
+    document.getElementById('chk-drawer-darkmode')?.addEventListener('change', (e) => {
+      const dark = Boolean(e.target?.checked);
+      this.applyTheme(dark, true);
+      this.showToast(
+        dark ? 'Đã chuyển sang Giao diện Tối' : 'Đã chuyển sang Giao diện Sáng',
+        'info',
+        2000
+      );
+    });
+
+    document.getElementById('row-drawer-darkmode')?.addEventListener('click', (e) => {
+      if (e.target?.closest?.('.gm-drawer-switch')) return;
+      document.getElementById('chk-drawer-darkmode')?.click();
+    });
+
+    document.getElementById('btn-drawer-quick-report')?.addEventListener('click', () => {
+      this.closeNavDrawer();
+      document.getElementById('modal-report')?.classList.add('open');
+    });
+
+    document.getElementById('btn-drawer-shortcut-tip')?.addEventListener('click', () => {
+      this.closeNavDrawer();
+      this.showToast('Mẹo nhanh: Nhấn Alt + M để mở/đóng menu bên trái, hoặc Esc để đóng bảng.', 'info', 4200);
+    });
+
+    const drawerAutoCloseIds = new Set([
+      'btn-open-directions',
+      'chip-commute-comfort',
+      'chip-hanoi-streets',
+      'chip-urban-insights',
+      'chip-flood-count',
+      'chip-traffic-count',
+      'chip-sos-rescue',
+    ]);
+    document.getElementById('gm-nav-drawer')?.addEventListener('click', (e) => {
+      const targetBtn = e.target?.closest?.('.gm-chip, button');
+      if (!targetBtn) return;
+      const shouldAutoClose = drawerAutoCloseIds.has(targetBtn.id) ||
+        (window.innerWidth <= 768 && targetBtn.classList.contains('gm-chip'));
+      if (shouldAutoClose) {
+        this.closeNavDrawer();
+      }
+    });
+  }
+
   toggleDirectionsPanel(forceState) {
     const panel = document.getElementById('gm-directions-panel');
     const searchBox = document.getElementById('gm-search-box');
-    const chips = document.getElementById('gm-chips-scroll');
     const isMobile = window.innerWidth <= 768;
 
     this.isDirectionsOpen = forceState !== undefined ? forceState : !this.isDirectionsOpen;
 
     if (this.isDirectionsOpen) {
+      this.closeNavDrawer();
       this.closePlaceDetailsCard();
       panel.classList.add('open');
       panel.classList.remove('sheet-minimized');
       if (!isMobile) {
         if (searchBox) searchBox.style.display = 'none';
-        if (chips) chips.style.display = 'none';
       }
       this.setMobileActiveTab('route');
     } else {
       panel.classList.remove('open');
       panel.classList.remove('sheet-minimized');
       if (searchBox) searchBox.style.display = 'flex';
-      if (chips) chips.style.display = 'flex';
       this.setMobileActiveTab('explore');
     }
   }
 
   bindEvents() {
+    this.bindNavDrawerEvents();
+
     // 1. Nút chỉ đường
     document.getElementById('btn-open-directions')?.addEventListener('click', () => {
       this.toggleDirectionsPanel(true);
@@ -1336,7 +1478,7 @@ class GoogleMapsApp {
       this.currentCity = e.target.value;
       const hanoiStreetsChip = document.getElementById('chip-hanoi-streets');
       if (hanoiStreetsChip) {
-        hanoiStreetsChip.style.display = (this.currentCity === 'hanoi') ? 'inline-flex' : 'none';
+        hanoiStreetsChip.style.display = (this.currentCity === 'hanoi') ? 'flex' : 'none';
       }
 
       if (this.isSimulationMode) {
@@ -1971,6 +2113,10 @@ class GoogleMapsApp {
           }
           return;
         }
+        if (this.isNavDrawerOpen) {
+          this.closeNavDrawer();
+          return;
+        }
         if (window.aiChat && window.aiChat.isOpen) {
           window.aiChat.close();
           this.setMobileActiveTab('explore');
@@ -1990,6 +2136,9 @@ class GoogleMapsApp {
           this.toggleDirectionsPanel(false);
           return;
         }
+      } else if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        this.toggleNavDrawer();
       }
     });
 
@@ -5714,10 +5863,9 @@ class GoogleMapsApp {
       window.aiChat.close();
     }
 
-    // Thêm class lên body và ẩn thanh chips để chống đè giao diện trên Desktop
+    // Đóng ngăn kéo điều hướng nếu đang mở và đánh dấu place-card-open trên body
+    this.closeNavDrawer();
     document.body.classList.add('place-card-open');
-    const chipsEl = document.getElementById('gm-chips-scroll');
-    if (chipsEl) chipsEl.style.display = 'flex';
 
     const titleEl = document.getElementById('gm-place-title');
     const subtitleEl = document.getElementById('gm-place-subtitle');
@@ -6036,8 +6184,6 @@ class GoogleMapsApp {
   closeDirections() {
     this.toggleDirectionsPanel(false);
     this.clearRouteLayers();
-    const chipsEl = document.getElementById('gm-chips-scroll');
-    if (chipsEl) chipsEl.style.display = 'flex';
     const searchBox = document.getElementById('gm-search-box');
     if (searchBox) searchBox.style.display = 'flex';
   }
@@ -6049,8 +6195,6 @@ class GoogleMapsApp {
       card.style.display = 'none';
     }
     document.body.classList.remove('place-card-open');
-    const chipsEl = document.getElementById('gm-chips-scroll');
-    if (chipsEl && !this.isDirectionsOpen) chipsEl.style.display = 'flex';
   }
 
   /**

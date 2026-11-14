@@ -482,7 +482,7 @@ class LocalUrbanBot extends EventEmitter {
         const parsed = JSON.parse(raw);
         if (parsed && parsed.floodPoints) {
           this.cachedData = parsed;
-          if (parsed.tomtomSyncedAt && typeof parsed.tomtomSyncedAt === 'object') {
+          if (parsed.tomtomSyncedAt && typeof parsed.tomtomSyncedAt === 'object' && parsed._trafficSchemaVersion === 2) {
             this.lastTomTomSyncByCity = { ...parsed.tomtomSyncedAt };
           }
           if (parsed.lastUpdated) {
@@ -572,13 +572,19 @@ class LocalUrbanBot extends EventEmitter {
         const crowdFloods = activeCrowdsourced.filter(c => !c.type || c.type === 'flood');
         const crowdTraffics = activeCrowdsourced.filter(c => c.type && c.type !== 'flood');
 
-        // Gộp tin VOV có địa điểm thành sự cố trên bản đồ
+        // Gộp tin VOV có địa điểm thành sự cố trên bản đồ (chỉ map khi thuộc nút giao trọng điểm và đúng ngữ cảnh giao thông)
         const vovIncidents = [];
         (this.cachedData.vovTrafficNews || []).forEach(news => {
           if (news.detectedLocation && news.detectedLocation.lat) {
             const loc = news.detectedLocation;
             const titleLower = (news.title + ' ' + (news.summary || '')).toLowerCase();
-            const isJam = titleLower.includes('ùn') || titleLower.includes('tắc') || titleLower.includes('kẹt') || titleLower.includes('chậm') || titleLower.includes('đông') || titleLower.includes('va chạm');
+            const isRealTrafficEvent = /\b(ùn tắc|ùn ứ|kẹt xe|tắc đường|tắc nghẽn|di chuyển rất chậm|va chạm giao thông|tai nạn)\b/i.test(titleLower);
+            const hasVerifiedIntersection = CORE_INTERSECTIONS_GEO.some(
+              s => Math.abs(s.lat - loc.lat) < 0.0001 && Math.abs(s.lng - loc.lng) < 0.0001
+            );
+            if (!isRealTrafficEvent || !hasVerifiedIntersection) return;
+
+            const isJam = /\b(ùn tắc|ùn ứ|kẹt xe|tắc đường|tắc nghẽn|di chuyển rất chậm)\b/i.test(titleLower);
             vovIncidents.push({
               id: 'vov-inc-' + news.id,
               city: loc.city || 'hanoi',
@@ -609,7 +615,8 @@ class LocalUrbanBot extends EventEmitter {
         const actualJams = this.cachedData.trafficIncidents.filter(t => t.isJam === true);
         const roadworks = this.cachedData.trafficIncidents.filter(t => t.type === 'roadwork' || t.type === 'road_closure');
 
-        // Cập nhật thống kê
+        // Cập nhật thống kê & phiên bản schema sự cố giao thông
+        this.cachedData._trafficSchemaVersion = 2;
         this.cachedData.lastUpdated = new Date().toISOString();
         this.cachedData.floodPoints = allFloodPoints;
         this.cachedData.stats = {
@@ -771,23 +778,31 @@ class LocalUrbanBot extends EventEmitter {
         const container = $(el).closest('div, article');
         const summary = container.find('p, .sapo, .desc, .lead').first().text().trim() || title;
 
-        // Trích xuất địa điểm ùn tắc bằng bộ từ điển có xét ngữ cảnh thành phố
+        // Trích xuất địa điểm ùn tắc: chỉ gắn tọa độ nút giao trọng điểm khi đúng tin giao thông đô thị
         let detectedStreet = null;
         const fullText = (title + ' ' + summary).toLowerCase();
+        const isHanoiContext = fullText.includes('hà nội');
         const isHcmContext = fullText.includes('tp.hcm') || fullText.includes('tp hcm') || fullText.includes('hồ chí minh') || fullText.includes('sài gòn') || fullText.includes('thủ đức');
         const isDanangContext = fullText.includes('đà nẵng') || fullText.includes('hải châu') || fullText.includes('sơn trà') || fullText.includes('liên chiểu');
-        const preferredCity = isHcmContext ? 'hcm' : (isDanangContext ? 'danang' : null);
+        const hasOtherProvince = /\b(thanh hóa|gia lai|nghệ an|hà tĩnh|quảng bình|quảng trị|bình định|phú yên|khánh hòa|đắk lắk|đắk nông|kon tum|lâm đồng|lào cai|yên bái|sơn la|điện biên|lai châu|hà giang|cao bằng|bắc kạn|lạng sơn|tuyên quang|thái nguyên|phú thọ|quảng ninh|hải phòng|nam định|thái bình|ninh bình|hà nam|hưng yên|hải dương|bắc ninh|bắc giang|vĩnh phúc|cần thơ|an giang|kiên giang|cà mau|bạc liêu|sóc trăng|trà vinh|vĩnh long|bến tre|tiền giang|long an|đồng tháp|bình dương|đồng nai|bà rịa|vũng tàu|bình phước|tây ninh)\b/i.test(fullText);
+        const hasTrafficIncidentContext = /\b(ùn tắc|ùn ứ|kẹt xe|tắc đường|tắc nghẽn|di chuyển rất chậm|va chạm giao thông|tai nạn liên hoàn|cấm đường|phân luồng)\b/i.test(fullText);
 
-        const candidates = preferredCity
-          ? STREET_GEO_DICTIONARY.filter(s => s.city === preferredCity)
-          : STREET_GEO_DICTIONARY;
+        if (hasTrafficIncidentContext && (!hasOtherProvince || isHanoiContext || isHcmContext || isDanangContext)) {
+          const preferredCity = isHcmContext ? 'hcm' : (isDanangContext ? 'danang' : (isHanoiContext ? 'hanoi' : null));
+          const candidates = preferredCity
+            ? CORE_INTERSECTIONS_GEO.filter(s => s.city === preferredCity)
+            : CORE_INTERSECTIONS_GEO;
 
-        for (const street of candidates) {
-          const cleanName = street.name.toLowerCase().replace(/\([^)]*\)/g, '').trim();
-          const parts = cleanName.split(' - ').map(k => k.replace(/^(đường|phố|nút giao|vòng xoay)\s+/i, '').trim()).filter(k => k.length >= 5);
-          if ((cleanName.length >= 5 && fullText.includes(cleanName)) || parts.some(k => fullText.includes(k))) {
-            detectedStreet = street;
-            break;
+          for (const street of candidates) {
+            const cleanName = street.name.toLowerCase().replace(/\([^)]*\)/g, '').trim();
+            const parts = cleanName
+              .split(' - ')
+              .map(k => k.replace(/^(đường|phố|nút giao|vòng xoay|cầu)\s+/i, '').trim())
+              .filter(k => k.length >= 6);
+            if ((cleanName.length >= 6 && fullText.includes(cleanName)) || parts.some(k => fullText.includes(k))) {
+              detectedStreet = street;
+              break;
+            }
           }
         }
 
@@ -955,7 +970,7 @@ class LocalUrbanBot extends EventEmitter {
       let response = null;
       let lastErr = null;
       for (const activeKey of healthyKeys) {
-        const url = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${activeKey}&bbox=${city.bbox}&fields={incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code}}}}`;
+        const url = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${activeKey}&bbox=${city.bbox}&fields={incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,delay,length,from,to,roadNumbers,events{description,code}}}}`;
         try {
           response = await axios.get(url, { timeout: 8000 });
           break;
@@ -978,7 +993,19 @@ class LocalUrbanBot extends EventEmitter {
       // Kiểm tra khung giờ thực tế tại Việt Nam
       const vnHour = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })).getHours();
       const isNightTime = (vnHour >= 22 || vnHour < 6); // 22h đêm - 6h sáng: đường rất vắng
-      const isPeakHour = (vnHour >= 7 && vnHour <= 9) || (vnHour >= 17 && vnHour <= 19); // Giờ cao điểm
+
+      // Lấy tọa độ đại diện chuẩn xác (Point hoặc trung điểm của LineString)
+      const getRepCoords = (inc) => {
+        const geom = inc?.geometry;
+        if (geom?.type === 'Point' && Array.isArray(geom.coordinates)) {
+          return geom.coordinates;
+        }
+        if (geom?.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 0) {
+          const coords = geom.coordinates;
+          return coords[Math.floor(coords.length / 2)];
+        }
+        return [city.lng, city.lat];
+      };
 
       // Ưu tiên các sự cố kẹt xe có độ trễ lớn và nằm gần khu vực nội thành
       const sortedIncidents = [...incidents].sort((a, b) => {
@@ -986,27 +1013,45 @@ class LocalUrbanBot extends EventEmitter {
         const delayB = b.properties?.magnitudeOfDelay || 0;
         if (delayB !== delayA) return delayB - delayA;
 
-        const cA = a.geometry?.type === 'Point' ? a.geometry.coordinates : a.geometry?.coordinates?.[0] || [0, 0];
-        const cB = b.geometry?.type === 'Point' ? b.geometry.coordinates : b.geometry?.coordinates?.[0] || [0, 0];
+        const cA = getRepCoords(a);
+        const cB = getRepCoords(b);
         const distA = Math.hypot(cA[1] - city.lat, cA[0] - city.lng);
         const distB = Math.hypot(cB[1] - city.lat, cB[0] - city.lng);
         return distA - distB;
       });
 
-      const mapped = sortedIncidents.slice(0, 45).map((inc, idx) => {
+      const mappedRaw = sortedIncidents.slice(0, 80).map((inc) => {
         const rawDesc = inc.properties?.events?.[0]?.description || '';
         const iconCategory = inc.properties?.iconCategory;
         const delayLevel = inc.properties?.magnitudeOfDelay || 0;
+        const rawDelaySec = Number(inc.properties?.delay) || 0;
+        const lengthMeters = Number(inc.properties?.length) || 0;
+        const fromRoad = String(inc.properties?.from || '').trim();
+        const toRoad = String(inc.properties?.to || '').trim();
+        const roadNums = Array.isArray(inc.properties?.roadNumbers)
+          ? inc.properties.roadNumbers.filter(Boolean).join(', ')
+          : '';
+        const routeLabel = (fromRoad && toRoad && fromRoad !== toRoad)
+          ? `${fromRoad} → ${toRoad}`
+          : (fromRoad || toRoad || roadNums || `Khu vực ${city.name}`);
 
         let lat = city.lat;
         let lng = city.lng;
-        if (inc.geometry?.type === 'Point') {
+        if (inc.geometry?.type === 'Point' && Array.isArray(inc.geometry.coordinates)) {
           lng = inc.geometry.coordinates[0];
           lat = inc.geometry.coordinates[1];
         } else if (inc.geometry?.type === 'LineString' && inc.geometry.coordinates.length > 0) {
-          lng = inc.geometry.coordinates[0][0];
-          lat = inc.geometry.coordinates[0][1];
+          const coords = inc.geometry.coordinates;
+          const midIdx = Math.floor(coords.length / 2);
+          lng = coords[midIdx][0];
+          lat = coords[midIdx][1];
         }
+
+        const alleyRegex = /^(ngõ|ngách|hẻm|kiệt)\s/i;
+        const fromIsAlley = alleyRegex.test(fromRoad);
+        const toIsAlley = alleyRegex.test(toRoad);
+        const isAlleyNoise = (fromIsAlley && (!toRoad || toIsAlley))
+          || ((fromIsAlley || toIsAlley) && (rawDelaySec < 360 || lengthMeters < 450));
 
         let type = 'hazard';
         let categoryName = 'Cảnh báo đường bộ';
@@ -1023,9 +1068,9 @@ class LocalUrbanBot extends EventEmitter {
           icon = '';
           isJam = false;
           speedKmh = isNightTime ? 40 : 25;
-          delaySec = 90;
+          delaySec = rawDelaySec > 0 ? rawDelaySec : 90;
           viDesc = isNightTime
-            ? `Công trường thi công / Rào chắn sửa đường ban đêm - Đi chậm quan sát`
+            ? `Công trường thi công / Rào chắn sửa đường ban đêm`
             : `Đoạn đường đang thi công, thu hẹp làn xe`;
         } else if (iconCategory === 8 || rawDesc.toLowerCase().includes('closed')) {
           type = 'road_closure';
@@ -1033,7 +1078,7 @@ class LocalUrbanBot extends EventEmitter {
           icon = '';
           isJam = false;
           speedKmh = 0;
-          delaySec = 600;
+          delaySec = rawDelaySec > 0 ? rawDelaySec : 600;
           viDesc = `Đoạn đường tạm đóng phân luồng phục vụ thi công hạ tầng`;
         } else if (iconCategory === 1 || rawDesc.toLowerCase().includes('accident')) {
           type = 'accident';
@@ -1041,9 +1086,16 @@ class LocalUrbanBot extends EventEmitter {
           icon = '';
           isJam = false;
           speedKmh = 20;
-          delaySec = 300;
-          viDesc = `Sự cố va chạm nhẹ trên đường, phương tiện đang xử lý`;
+          delaySec = rawDelaySec > 0 ? rawDelaySec : 300;
+          viDesc = `Sự cố va chạm trên đường, phương tiện đang xử lý`;
         } else if (iconCategory === 6 || iconCategory === 7 || rawDesc.toLowerCase().includes('traffic') || rawDesc.toLowerCase().includes('jam')) {
+          const hasMetrics = rawDelaySec > 0 || lengthMeters > 0;
+          const qualifiesAsJam = !isNightTime && !isAlleyNoise && (
+            !hasMetrics
+              ? delayLevel >= 3
+              : (rawDelaySec >= 180 && lengthMeters >= 200 && (delayLevel >= 3 || rawDelaySec >= 240 || lengthMeters >= 350))
+          );
+
           if (isNightTime) {
             type = 'slow_traffic';
             categoryName = 'Phương tiện giảm tốc';
@@ -1051,22 +1103,24 @@ class LocalUrbanBot extends EventEmitter {
             isJam = false;
             speedKmh = 35;
             delaySec = 0;
-            viDesc = `Phương tiện giảm tốc qua nút giao / biển báo ban đêm (Đường đêm thông thoáng)`;
-          } else if (isPeakHour || delayLevel >= 2) {
+            viDesc = `Phương tiện giảm tốc qua nút giao / biển báo ban đêm`;
+          } else if (qualifiesAsJam) {
             type = 'traffic_jam';
             categoryName = delayLevel >= 3 ? 'Kẹt xe nghiêm trọng' : 'Ùn ứ phương tiện';
             icon = '';
             isJam = true;
             speedKmh = delayLevel >= 3 ? 5 : 12;
-            delaySec = delayLevel >= 3 ? 900 : 450;
-            viDesc = delayLevel >= 3 ? `Ùn tắc kéo dài, các phương tiện di chuyển rất chậm` : `Lưu lượng xe đông, di chuyển chậm`;
+            delaySec = rawDelaySec > 0 ? rawDelaySec : (delayLevel >= 3 ? 900 : 450);
+            viDesc = delayLevel >= 3
+              ? `Ùn tắc kéo dài, các phương tiện di chuyển rất chậm`
+              : `Lưu lượng xe đông, di chuyển chậm`;
           } else {
             type = 'slow_traffic';
             categoryName = 'Phương tiện di chuyển chậm';
             icon = '';
             isJam = false;
             speedKmh = 25;
-            delaySec = 60;
+            delaySec = rawDelaySec > 0 ? rawDelaySec : 60;
             viDesc = `Lưu lượng xe vừa phải, di chuyển ổn định`;
           }
         } else {
@@ -1080,22 +1134,36 @@ class LocalUrbanBot extends EventEmitter {
         }
 
         return {
-          id: `tomtom-${cityKey}-${idx}`,
+          id: `tomtom-${cityKey}-${type}-${lat.toFixed(4)}-${lng.toFixed(4)}`,
           city: cityKey,
           lat,
           lng,
           type,
           categoryName,
+          roadName: routeLabel,
           icon,
           isJam,
-          description: `${icon} ${viDesc} - Khu vực ${city.name}`,
+          description: `${viDesc} (${routeLabel})`,
           rawDescription: rawDesc,
           delaySeconds: delaySec,
+          lengthMeters,
           speedKmh,
           source: 'TomTom Live Traffic API v5 (Vệ tinh)',
           updated_at: new Date().toISOString()
         };
       });
+
+      // Chống chồng chéo nhiều ghim cùng loại trong bán kính ~350m (0.0032 độ)
+      const mapped = [];
+      for (const item of mappedRaw) {
+        const hasNearbySameType = mapped.some(
+          d => d.type === item.type && Math.hypot(d.lat - item.lat, d.lng - item.lng) < 0.0032
+        );
+        if (!hasNearbySameType) {
+          mapped.push(item);
+          if (mapped.length >= 45) break;
+        }
+      }
 
       // Gộp vào trafficIncidents (giữ lại các báo cáo cộng đồng hoặc thành phố khác)
       this.cachedData.trafficIncidents = [

@@ -20,7 +20,7 @@ if (fs.existsSync(envPath)) {
 // Cấu hình trung tâm cho hệ sinh thái MoveSafe VN
 const config = {
   PORT: process.env.PORT || 3000,
-  
+
   // API Keys được nạp từ biến môi trường (hỗ trợ danh sách xoay vòng *_KEYS)
   API_KEYS: {
     OPENWEATHER: process.env.OPENWEATHER_KEY || '1e050d36d170249efaf439dcdb324228',

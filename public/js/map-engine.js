@@ -697,18 +697,19 @@ class MapEngine {
         </div>
       `;
 
+      const customIcon = L.divIcon({
+        className: 'gm-traffic-pin-container',
+        html: `<div class="gm-traffic-pin" style="background: ${pinBg};">${pinText}</div>`,
+        iconSize: [64, 24],
+        iconAnchor: [32, 12]
+      });
+
       if (this._trafficMarkerMap.has(incId)) {
         const marker = this._trafficMarkerMap.get(incId);
+        marker.setIcon(customIcon);
         marker.setPopupContent(popupHtml);
         marker.setLatLng([inc.lat, inc.lng]);
       } else {
-        const customIcon = L.divIcon({
-          className: 'gm-traffic-pin-container',
-          html: `<div class="gm-traffic-pin" style="background: ${pinBg};">${pinText}</div>`,
-          iconSize: [64, 24],
-          iconAnchor: [32, 12]
-        });
-
         const marker = L.marker([inc.lat, inc.lng], { icon: customIcon });
         marker.bindPopup(popupHtml);
         this.layers.trafficMarkers.addLayer(marker);

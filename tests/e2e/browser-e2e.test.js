@@ -170,4 +170,103 @@ describe('Module TC-E2E: End-to-End User Experience & Browser Automation', { tim
     assert.ok(aiDrawerCheck.btnFound && aiDrawerCheck.drawerFound, 'AI Copilot drawer must be integrated into UI');
     assert.strictEqual(aiDrawerCheck.hasAiChatInstance, true, 'window.aiChat instance must be active');
   });
+
+  // TC-E2E-006: Ngăn kéo điều hướng trượt trái sang phải (Google Maps-style Left Slide-Out Drawer)
+  it('[TC-E2E-006] Navigation drawer slides smoothly left-to-right, toggles dark mode, and responds to Esc / Alt+M', async () => {
+    const initial = await page.evaluate(() => {
+      const drawer = document.getElementById('gm-nav-drawer');
+      const toggleBtn = document.getElementById('btn-nav-drawer-toggle');
+      const searchBox = document.getElementById('gm-search-box');
+      const quickRouteBtn = document.getElementById('btn-quick-directions');
+      const toolsChildren = Array.from(document.querySelectorAll('.gm-top-right-tools > *'));
+      if (!drawer || !toggleBtn || !searchBox) return { missing: true };
+      const searchRect = searchBox.getBoundingClientRect();
+      const toolsMinLeft = toolsChildren.length > 0
+        ? Math.min(...toolsChildren.map(el => Math.round(el.getBoundingClientRect().left)))
+        : 9999;
+      return {
+        missing: false,
+        initiallyOpen: drawer.classList.contains('open'),
+        ariaHidden: drawer.getAttribute('aria-hidden'),
+        ariaExpanded: toggleBtn.getAttribute('aria-expanded'),
+        drawerLeft: Math.round(drawer.getBoundingClientRect().left),
+        drawerZIndex: Number(getComputedStyle(drawer).zIndex || 0),
+        searchBoxHeight: Math.round(searchRect.height),
+        searchBoxRight: Math.round(searchRect.right),
+        toolsMinLeft,
+        hasQuickRouteBtn: !!quickRouteBtn
+      };
+    });
+
+    assert.strictEqual(initial.missing, false, 'Drawer and search toggle elements must exist in DOM');
+    assert.strictEqual(initial.initiallyOpen, false, 'Drawer should start closed on initial load');
+    assert.strictEqual(initial.ariaHidden, 'true', 'Closed drawer should carry aria-hidden="true"');
+    assert.strictEqual(initial.ariaExpanded, 'false', 'Hamburger button should carry aria-expanded="false" initially');
+    assert.ok(initial.drawerLeft < -100, `Closed drawer should sit off-screen to the left (got ${initial.drawerLeft}px)`);
+    assert.ok(initial.drawerZIndex > 2100, `Drawer z-index must exceed mobile-bottom-nav (got ${initial.drawerZIndex})`);
+    assert.ok(initial.searchBoxHeight <= 60, `Minimal search box should stay compact (got ${initial.searchBoxHeight}px)`);
+    assert.ok(
+      initial.toolsMinLeft >= initial.searchBoxRight + 8,
+      `Top-right tools (${initial.toolsMinLeft}px) must not overlap search box right edge (${initial.searchBoxRight}px)`
+    );
+    assert.strictEqual(initial.hasQuickRouteBtn, true, 'Desktop search bar should include quick directions shortcut');
+
+    // Mở drawer qua nút Hamburger
+    await page.click('#btn-nav-drawer-toggle');
+    await page.waitForFunction(() => {
+      const d = document.getElementById('gm-nav-drawer');
+      return d && d.classList.contains('open') && Math.round(d.getBoundingClientRect().left) === 0;
+    }, { timeout: 4000 });
+
+    const opened = await page.evaluate(() => {
+      const drawer = document.getElementById('gm-nav-drawer');
+      const backdrop = document.getElementById('gm-nav-backdrop');
+      const items = Array.from(document.querySelectorAll('#gm-chips-scroll .gm-chip:not([id="chip-ai-trigger"])'));
+      const rect = drawer.getBoundingClientRect();
+      return {
+        ariaHidden: drawer.getAttribute('aria-hidden'),
+        backdropOpen: !!(backdrop && backdrop.classList.contains('open')),
+        rectLeft: Math.round(rect.left),
+        rectHeight: Math.round(rect.height),
+        rectWidth: Math.round(rect.width),
+        itemCount: items.length,
+        hasTramSacExact: items.some(el => el.querySelector('.chip-text')?.textContent?.trim() === 'Trạm Sạc')
+      };
+    });
+
+    assert.strictEqual(opened.ariaHidden, 'false', 'Opened drawer must expose aria-hidden="false"');
+    assert.strictEqual(opened.backdropOpen, true, 'Backdrop scrim should activate when drawer opens');
+    assert.strictEqual(opened.rectLeft, 0, 'Opened drawer must align flush with viewport left edge');
+    assert.ok(opened.rectWidth >= 280 && opened.rectWidth <= 360, `Drawer width should stay compact (got ${opened.rectWidth}px)`);
+    assert.ok(opened.rectHeight >= 800, `Drawer should span full viewport height (got ${opened.rectHeight}px)`);
+    assert.strictEqual(opened.itemCount, 10, 'All 10 drawer navigation/layer items must exist in #gm-chips-scroll');
+    assert.strictEqual(opened.hasTramSacExact, true, 'EV item must preserve exact 2-word label "Trạm Sạc"');
+
+    // Chuyển Dark Mode và kiểm tra lưu localStorage
+    await page.click('#row-drawer-darkmode');
+    await page.waitForFunction(() => document.body.classList.contains('dark-mode'), { timeout: 2000 });
+    const darkStored = await page.evaluate(() => localStorage.getItem('movesafe_dark_mode'));
+    assert.strictEqual(darkStored, '1', 'Dark mode toggle must persist movesafe_dark_mode=1');
+
+    // Khôi phục lại Light Mode
+    await page.click('#row-drawer-darkmode');
+    await page.waitForFunction(() => !document.body.classList.contains('dark-mode'), { timeout: 2000 });
+
+    // Nhấn phím Escape để đóng drawer
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.getElementById('gm-nav-drawer')?.classList.contains('open'), { timeout: 3000 });
+
+    // Mở lại bằng phím tắt Alt + M và kiểm tra click "Chỉ đường" tự đóng drawer
+    await page.keyboard.down('Alt');
+    await page.keyboard.press('KeyM');
+    await page.keyboard.up('Alt');
+    await page.waitForFunction(() => document.getElementById('gm-nav-drawer')?.classList.contains('open'), { timeout: 3000 });
+
+    await page.click('#btn-open-directions');
+    await page.waitForFunction(() => {
+      const d = document.getElementById('gm-nav-drawer');
+      const dir = document.getElementById('gm-directions-panel');
+      return d && !d.classList.contains('open') && dir && dir.classList.contains('open');
+    }, { timeout: 3000 });
+  });
 });
