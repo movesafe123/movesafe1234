@@ -247,4 +247,153 @@ describe('Module TC-NAV: Routing Engine & Smart Flood Avoidance', () => {
     assert.strictEqual(mergedCard.label, 'Nhanh thực tế + An toàn hành lang lớn');
     assert.strictEqual(mergedCard.shortLabel, 'Nhanh + An toàn');
   });
+
+  // TC-NAV-010: Ngập cảnh báo (cautionFloods) phải cộng độ trễ cho Nhanh thực tế & Chế độ An toàn phải chọn tuyến khô ráo
+  it('[TC-NAV-010] evaluatePassableRoute adds flood delay and Mode 1 prefers 0cm dry route over caution flood', () => {
+    const specs = router.vehicleSpecs.motorbike; // safeDepth = 10, maxPassableDepth = 20
+    const cautionFloods = [
+      { id: 'f-caution', name: 'Ngập cận ngưỡng 16cm', lat: 21.01, lng: 105.81, depth_cm: 16, danger_level: 'medium', radius: 120 }
+    ];
+
+    const wetRouteRaw = {
+      distanceKm: '4.0',
+      distanceMeters: 4000,
+      durationSeconds: 480, // 8 phút nền
+      polyline: [[21.00, 105.80], [21.01, 105.81], [21.02, 105.82]],
+      steps: [{ name: 'Đường Xã Đàn', distance: 4000, instruction: 'depart ' }]
+    };
+
+    const dryRouteRaw = {
+      distanceKm: '4.6',
+      distanceMeters: 4600,
+      durationSeconds: 540, // 9 phút nền
+      polyline: [[21.00, 105.80], [21.03, 105.85], [21.02, 105.82]],
+      steps: [{ name: 'Đại lộ Võ Văn Kiệt', distance: 4600, instruction: 'depart ' }]
+    };
+
+    const wetEval = router.evaluatePassableRoute(wetRouteRaw, cautionFloods, [], [], specs);
+    const dryEval = router.evaluatePassableRoute(dryRouteRaw, cautionFloods, [], [], specs);
+
+    assert.strictEqual(wetEval.cautionFloodCount, 1);
+    assert.ok(wetEval.floodDelayMin >= 2, `Đi qua ngập 16cm phải cộng độ trễ >= 2 phút (nhận ${wetEval.floodDelayMin}p)`);
+    assert.strictEqual(dryEval.cautionFloodCount, 0);
+    assert.strictEqual(dryEval.floodDelayMin, 0);
+    assert.ok(dryEval.rpi > wetEval.rpi, 'Tuyến khô ráo phải có RPI cao hơn tuyến ngập cảnh báo');
+
+    const res = router.buildThreePassableModes([wetEval, dryEval], 1, specs, []);
+    const safeCard = res.routes.find(r => Array.isArray(r.mergedLevels) && r.mergedLevels.includes(1));
+    assert.ok(safeCard, 'Phải trả về tuyến cho Chế độ 1 (An toàn hành lang lớn)');
+    assert.strictEqual(safeCard.cautionFloodCount, 0, 'Chế độ 1 phải chọn tuyến 0cm ngập khô ráo');
+    assert.ok(safeCard.label.includes('An toàn'), 'Thẻ chế độ 1 phải mang nhãn An toàn');
+  });
+
+  // TC-NAV-011: Khi tuyến Nhanh nhất cũng là tuyến An toàn nhất, Chế độ 1 KHÔNG được hạ cấp sang tuyến kém an toàn hơn
+  it('[TC-NAV-011] Mode 1 merges with Mode 3 instead of downgrading to a less safe route', () => {
+    const specs = router.vehicleSpecs.car;
+    const bestOverall = {
+      distanceKm: '6.0',
+      distanceMeters: 6000,
+      durationMin: 12,
+      realAvgSpeedKmh: 30,
+      rpi: 96,
+      ecoScore: 86,
+      jamPercent: 0,
+      freeFlowPercent: 100,
+      moderatePercent: 0,
+      severePercent: 0,
+      severeCount: 0,
+      cautionFloodCount: 0,
+      safeFloodCount: 0,
+      alleyRatio: 0,
+      majorRatio: 85,
+      hasAlleyTrap: false,
+      matchedFloods: [],
+      matchedTraffics: [],
+      warnings: [],
+      bottleneckWarnings: [],
+      congestionScore: 0,
+      polyline: [[21.0, 105.7], [21.02, 105.75], [21.04, 105.80]]
+    };
+
+    // Tuyến phụ chậm hơn, dính kẹt cứng severeCount = 1 và RPI thấp (72%)
+    const worseAlternative = {
+      ...bestOverall,
+      distanceKm: '6.8',
+      distanceMeters: 6800,
+      durationMin: 14,
+      rpi: 72,
+      ecoScore: 76,
+      jamPercent: 25,
+      freeFlowPercent: 75,
+      moderatePercent: 10,
+      severePercent: 15,
+      severeCount: 1,
+      congestionScore: 80,
+      polyline: [[21.0, 105.7], [21.05, 105.78], [21.04, 105.80]]
+    };
+
+    const res = router.buildThreePassableModes([bestOverall, worseAlternative], 1, specs, []);
+    const safeCard = res.routes.find(r => r.mergedLevels.includes(1));
+    assert.ok(safeCard, 'Phải có thẻ gộp chứa mức 1');
+    assert.strictEqual(safeCard.rpi, 96, 'Chế độ 1 phải giữ tuyến an toàn RPI 96%, không bị hạ xuống RPI 72%');
+    assert.ok(safeCard.mergedLevels.includes(3), 'Tuyến tốt nhất toàn diện phải gộp Nhanh thực tế + An toàn hành lang lớn');
+  });
+
+  // TC-NAV-012: Chế độ 2 (Trục chính êm ái) trừ điểm ngõ nhỏ/nhiều cua và từ chối đi vòng quá xa (> 1.35x)
+  it('[TC-NAV-012] Mode 2 penalizes high turn/alley routes and rejects excessive detours', () => {
+    const specs = router.vehicleSpecs.motorbike;
+    const zigZagRouteRaw = {
+      distanceKm: '3.0',
+      distanceMeters: 3000,
+      durationSeconds: 600,
+      polyline: [[21.00, 105.80], [21.01, 105.81], [21.02, 105.82]],
+      steps: Array.from({ length: 12 }, (_, idx) => ({
+        name: idx % 2 === 0 ? 'Ngõ 120 Trường Chinh' : 'Ngách 45 Thái Hà',
+        distance: 250,
+        instruction: 'turn right'
+      }))
+    };
+
+    const smoothMajorRaw = {
+      distanceKm: '3.4',
+      distanceMeters: 3400,
+      durationSeconds: 600,
+      polyline: [[21.00, 105.80], [21.03, 105.84], [21.02, 105.82]],
+      steps: [
+        { name: 'Đại lộ Nguyễn Trãi', distance: 1700, instruction: 'depart ' },
+        { name: 'Đường Lê Văn Lương', distance: 1700, instruction: 'continue ' }
+      ]
+    };
+
+    const zigZagEval = router.evaluatePassableRoute(zigZagRouteRaw, [], [], [], specs);
+    const smoothEval = router.evaluatePassableRoute(smoothMajorRaw, [], [], [], specs);
+
+    assert.ok(smoothEval.ecoScore > zigZagEval.ecoScore, `Trục chính lớn (${smoothEval.ecoScore}) phải có ecoScore cao hơn lộ trình ngõ ngoằn ngoèo (${zigZagEval.ecoScore})`);
+
+    // Tuyến đi vòng quá xa (35 phút vs nhanh nhất 12 phút > 1.35x) dù ecoScore = 99 cũng không được chọn cho Chế độ 2
+    const fastRoute = { ...smoothEval, durationMin: 12, ecoScore: 84, majorRatio: 60, rpi: 94 };
+    const midSmoothRoute = {
+      ...smoothEval,
+      distanceMeters: 4200,
+      durationMin: 14,
+      ecoScore: 95,
+      majorRatio: 90,
+      rpi: 92,
+      polyline: [[21.00, 105.80], [21.04, 105.85], [21.02, 105.82]]
+    };
+    const absurdDetour = {
+      ...smoothEval,
+      distanceMeters: 9500,
+      durationMin: 35,
+      ecoScore: 99,
+      majorRatio: 100,
+      rpi: 94,
+      polyline: [[21.00, 105.80], [21.08, 105.90], [21.02, 105.82]]
+    };
+
+    const res = router.buildThreePassableModes([fastRoute, midSmoothRoute, absurdDetour], 2, specs, []);
+    const balancedCard = res.routes.find(r => r.mergedLevels.includes(2));
+    assert.ok(balancedCard, 'Phải chọn được tuyến cho Chế độ 2');
+    assert.strictEqual(balancedCard.durationMin, 14, 'Chế độ 2 phải chọn tuyến 14 phút hợp lý thay vì tuyến đi vòng 35 phút');
+  });
 });

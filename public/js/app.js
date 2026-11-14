@@ -5605,16 +5605,19 @@ class GoogleMapsApp {
       ecar:      { perKm: 560,  perDelayMin: 85,  label: 'điện', gasAltPerKm: 1950, gasAltLabel: 'Ô tô xăng' }
     };
     const cfg = rates[veh] || rates.motorbike;
-    const totalCost = Math.max(100, Math.round((distKm * cfg.perKm + delayMin * cfg.perDelayMin) / 100) * 100);
+    const ecoScore = typeof route.ecoScore === 'number' ? route.ecoScore : 82;
+    const ecoFactor = Math.max(0.90, Math.min(1.12, 1 + (80 - ecoScore) * 0.0035));
+    const floodDragVnd = (route.cautionFloodCount || 0) * 350 + (route.safeFloodCount || 0) * 120;
+    const totalCost = Math.max(100, Math.round((distKm * cfg.perKm * ecoFactor + delayMin * cfg.perDelayMin + floodDragVnd) / 100) * 100);
     const fmt = (n) => n.toLocaleString('vi-VN') + 'đ';
 
     let compareBadge = '';
     if (cfg.evAltPerKm) {
-      const evCost = Math.max(100, Math.round((distKm * cfg.evAltPerKm + delayMin * 25) / 100) * 100);
+      const evCost = Math.max(100, Math.round((distKm * cfg.evAltPerKm * ecoFactor + delayMin * 25 + floodDragVnd * 0.3) / 100) * 100);
       const savePct = Math.round((1 - evCost / totalCost) * 100);
       compareBadge = `<span class="gm-econ-ev-compare" title="So sánh chi phí chuyển đổi xanh">Đi ${cfg.evAltLabel}: ~${fmt(evCost)} (Tiết kiệm ${savePct}%)</span>`;
     } else if (cfg.gasAltPerKm) {
-      const gasCost = Math.round((distKm * cfg.gasAltPerKm + delayMin * 150) / 100) * 100;
+      const gasCost = Math.round((distKm * cfg.gasAltPerKm * ecoFactor + delayMin * 150 + floodDragVnd) / 100) * 100;
       const savedVnd = Math.max(100, gasCost - totalCost);
       compareBadge = `<span class="gm-econ-ev-compare">Rẻ hơn ${cfg.gasAltLabel} ~${fmt(savedVnd)}</span>`;
     }

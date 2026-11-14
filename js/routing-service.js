@@ -485,31 +485,40 @@ class RoutingService {
    * 4. Điểm êm ái & Tiết kiệm năng lượng (Eco-Smooth Score)
    */
   evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs) {
-    const polyline = route.polyline;
+    const polyline = Array.isArray(route.polyline) ? route.polyline : [];
     const totalPoints = polyline.length;
     let affectedPoints = 0;
     let cumulativeMeters = 0;
+    let measuredMeters = 0;
+    let severeMeters = 0;
+    let moderateMeters = 0;
 
     const matchedFloods = [];
     const matchedTraffics = [];
-    const allShallowFloods = [...cautionFloods, ...safeFloods];
+    const allShallowFloods = [...(cautionFloods || []), ...(safeFloods || [])];
     const degLimit = 0.0035; // ~380m
 
     for (let i = 0; i < totalPoints; i++) {
       const pt = polyline[i];
       const pLat = pt[0];
       const pLng = pt[1];
+      const nextPt = (i + 1 < totalPoints) ? polyline[i + 1] : null;
+      const segDist = nextPt ? this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]) : 0;
       if (i > 0) {
         cumulativeMeters += this.getDistanceMeters(polyline[i - 1][0], polyline[i - 1][1], pLat, pLng);
       }
-      const nextPt = (i + 1 < totalPoints) ? polyline[i + 1] : null;
+      if (nextPt) {
+        measuredMeters += segDist;
+      }
+
       const minLat = nextPt ? Math.min(pLat, nextPt[0]) : pLat;
       const maxLat = nextPt ? Math.max(pLat, nextPt[0]) : pLat;
       const minLng = nextPt ? Math.min(pLng, nextPt[1]) : pLng;
       const maxLng = nextPt ? Math.max(pLng, nextPt[1]) : pLng;
       let isPointCongested = false;
+      let segWorstJam = 0; // 0: thoáng, 1: đông chậm, 2: kẹt nặng
 
-      // Kẹt xe / sự cố
+      // Kẹt xe / sự cố (quét đủ toàn bộ incident trong BBox)
       for (let j = 0; j < trafficIncidents.length; j++) {
         const inc = trafficIncidents[j];
         if (inc.lat < minLat - degLimit || inc.lat > maxLat + degLimit || inc.lng < minLng - degLimit || inc.lng > maxLng + degLimit) continue;
@@ -519,11 +528,12 @@ class RoutingService {
         if (dist <= 250) {
           if (inc.isJam) {
             isPointCongested = true;
+            const isSevereJam = (typeof inc.speedKmh === 'number' && inc.speedKmh < 12) || (Number(inc.delaySeconds) >= 600);
+            segWorstJam = Math.max(segWorstJam, isSevereJam ? 2 : 1);
           }
           if (!matchedTraffics.some(t => t.id === inc.id)) {
             let segProgressMeters = 0;
-            if (nextPt) {
-              const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+            if (nextPt && segDist > 0) {
               const dLatSeg = nextPt[0] - pLat;
               const dLngSeg = nextPt[1] - pLng;
               const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
@@ -542,11 +552,18 @@ class RoutingService {
               etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
             });
           }
-          break;
         }
       }
 
-      // Ngập nhẹ / nước nông
+      if (nextPt && segWorstJam > 0) {
+        if (segWorstJam === 2) {
+          severeMeters += segDist;
+        } else {
+          moderateMeters += segDist;
+        }
+      }
+
+      // Ngập nhẹ / ngập cảnh báo (quét đủ toàn bộ điểm ngập trong BBox)
       for (let k = 0; k < allShallowFloods.length; k++) {
         const fl = allShallowFloods[k];
         if (fl.lat < minLat - degLimit || fl.lat > maxLat + degLimit || fl.lng < minLng - degLimit || fl.lng > maxLng + degLimit) continue;
@@ -556,8 +573,7 @@ class RoutingService {
         if (dist <= (fl.radius || specs.corridorBuffer)) {
           if (!matchedFloods.some(f => f.id === fl.id)) {
             let segProgressMeters = 0;
-            if (nextPt) {
-              const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
+            if (nextPt && segDist > 0) {
               const dLatSeg = nextPt[0] - pLat;
               const dLngSeg = nextPt[1] - pLng;
               const segLenSq = (dLatSeg * dLatSeg) + (dLngSeg * dLngSeg);
@@ -571,32 +587,47 @@ class RoutingService {
               ...fl,
               hazardType: 'flood',
               distanceToRoute: Math.round(dist),
-              isSafeShallow: (fl.depth_cm <= specs.safeDepth),
+              isSafeShallow: (Number(fl.depth_cm) <= specs.safeDepth),
               cumulativeMeters: Math.round(hazardAtMeters),
               atKm: Number((hazardAtMeters / 1000).toFixed(1)),
               etaMinutes: Math.max(1, Math.round((hazardAtMeters / 1000) / 22 * 60))
             });
           }
-          break;
         }
       }
 
       if (isPointCongested) affectedPoints++;
     }
 
-    const jamPercent = totalPoints > 0 ? Math.round((affectedPoints / totalPoints) * 100) : 0;
-    const severeCount = matchedTraffics.filter(t => t.isJam && (t.speedKmh < 12 || t.delaySeconds >= 600)).length;
-    const moderateCount = matchedTraffics.filter(t => t.isJam && (!t.speedKmh || (t.speedKmh >= 12 && t.speedKmh < 25))).length;
+    const totalRouteMeters = (Number(route.distanceMeters) > 0) ? Number(route.distanceMeters) : measuredMeters;
+    const severePercent = totalRouteMeters > 0
+      ? Math.min(100, Math.round((severeMeters / totalRouteMeters) * 100))
+      : 0;
+    const moderatePercent = totalRouteMeters > 0
+      ? Math.min(100 - severePercent, Math.round((moderateMeters / totalRouteMeters) * 100))
+      : (totalPoints > 0 ? Math.round((affectedPoints / totalPoints) * 100) : 0);
+    const jamPercent = Math.min(100, Math.max(0, severePercent + moderatePercent));
+    const freeFlowPercent = Math.max(0, 100 - jamPercent);
 
-    // 1. Phân tích bẫy ngõ hẹp và phân cấp trục đường đô thị
+    const severeCount = matchedTraffics.filter(t => t.isJam && ((typeof t.speedKmh === 'number' && t.speedKmh < 12) || Number(t.delaySeconds) >= 600)).length;
+    const moderateCount = matchedTraffics.filter(t => t.isJam && ((typeof t.speedKmh !== 'number' && Number(t.delaySeconds) < 600) || (t.speedKmh >= 12 && t.speedKmh < 25))).length;
+
+    const cautionFloodCount = matchedFloods.filter(f => !f.isSafeShallow).length;
+    const safeFloodCount = matchedFloods.filter(f => f.isSafeShallow).length;
+    const maxFloodDepthCm = matchedFloods.reduce((mx, f) => Math.max(mx, Number(f.depth_cm) || 0), 0);
+
+    // 1. Phân tích bẫy ngõ hẹp, tỷ lệ trục chính & mật độ khúc cua (turnsPerKm)
     let alleyDistanceMeters = 0;
     let majorDistanceMeters = 0;
+    let turnsCount = 0;
     const alleyKeywords = ['ngõ', 'ngách', 'hẻm', 'kiệt', 'đường bê tông', 'đường đê', 'lối đi', 'đường mòn'];
     const majorKeywords = ['đường', 'phố', 'đại lộ', 'quốc lộ', 'vành đai', 'cầu', 'hầm', 'trục'];
+    const turnKeywords = ['turn', 'roundabout', 'fork', 'end of road', 'merge', 'ramp', 'rotary'];
 
     if (route.steps && route.steps.length > 0) {
-      route.steps.forEach(s => {
+      route.steps.forEach((s, idx) => {
         const name = (s.name || '').toLowerCase();
+        const instr = (s.instruction || '').toLowerCase();
         const dist = s.distance || 0;
         if (alleyKeywords.some(kw => name.includes(kw))) {
           alleyDistanceMeters += dist;
@@ -604,41 +635,45 @@ class RoutingService {
         if (majorKeywords.some(kw => name.includes(kw))) {
           majorDistanceMeters += dist;
         }
+        if (idx > 0 && idx < route.steps.length - 1 && (turnKeywords.some(kw => instr.includes(kw)) || route.steps.length > 3)) {
+          turnsCount++;
+        }
       });
     }
 
-    const alleyRatio = route.distanceMeters > 0 ? (alleyDistanceMeters / route.distanceMeters) : 0;
+    const effectiveDistMeters = totalRouteMeters > 0 ? totalRouteMeters : 1000;
+    const alleyRatio = alleyDistanceMeters / effectiveDistMeters;
+    const majorRatio = Math.min(1, majorDistanceMeters / effectiveDistMeters);
     const isFourWheeler = ['car', 'sedan', 'suv', 'ecar'].includes(specs.type);
     const hasAlleyTrap = isFourWheeler && (alleyDistanceMeters > 250 || alleyRatio > 0.15);
+
+    const distanceKmNum = parseFloat(route.distanceKm) || (effectiveDistMeters / 1000);
+    const turnsPerKm = distanceKmNum > 0 ? (turnsCount / distanceKmNum) : 0;
 
     // 2. Nhận diện khung giờ cao điểm thực tế tại đô thị Việt Nam
     const now = new Date();
     const currentHour = now.getHours() + now.getMinutes() / 60;
     const isPeakHour = (currentHour >= 7.0 && currentHour <= 8.75) || (currentHour >= 16.75 && currentHour <= 19.25);
 
-    // 3. Mô hình BPR (Bureau of Public Roads) phi tuyến tính tính toán thời gian trễ thực tế
-    const baseDurationMin = Math.max(1, Math.round(route.durationSeconds / 60));
+    // 3. Mô hình BPR + Độ trễ giảm tốc lội nước (áp dụng speedFactor chỉ lên thời gian chạy thoáng)
+    const baseDurationMin = Math.max(1, Math.round((route.durationSeconds || (route.durationMin * 60) || 300) / 60));
+    const freeFlowDurationMin = Math.max(2, Math.round(baseDurationMin / specs.speedFactor));
     let totalBprDelayMin = 0;
     const bottleneckWarnings = [];
 
     matchedTraffics.forEach(t => {
       if (t.isJam || t.type === 'accident' || t.type === 'roadwork' || t.type === 'road_closure') {
         const speed = t.speedKmh || 14;
-        // Tỷ lệ bão hòa dòng xe V/C: Vận tốc càng thấp -> V/C càng tiệm cận hoặc vượt 1.0
         const vcRatio = speed < 10 ? 1.1 : (speed < 18 ? 0.9 : 0.7);
-
-        // Công thức BPR: độ trễ tăng phi tuyến theo lũy thừa 4 khi đường bão hòa
-        let bprDelay = Math.round(4 * 0.15 * Math.pow(vcRatio, 4) * 8); // Dao động ~5 - 15 phút
+        let bprDelay = Math.round(4 * 0.15 * Math.pow(vcRatio, 4) * 8);
         if (t.delaySeconds && t.delaySeconds > 0) {
           bprDelay = Math.max(bprDelay, Math.round(t.delaySeconds / 60));
         }
         if (isPeakHour) {
-          bprDelay = Math.round(bprDelay * 1.35); // Nhân hệ số 1.35 trong giờ tan tầm
+          bprDelay = Math.round(bprDelay * 1.35);
         }
-
         totalBprDelayMin += Math.min(bprDelay, 25);
 
-        // Ghi nhận nút thắt cổ chai cảnh báo cho người lái
         if (speed < 12 || bprDelay >= 8) {
           const bName = t.roadName || t.description || t.categoryName || 'Nút giao trọng điểm';
           if (!bottleneckWarnings.includes(bName)) {
@@ -648,51 +683,69 @@ class RoutingService {
       }
     });
 
-    // Nếu là giờ cao điểm mà đi qua ngõ ngách, cộng thêm độ trễ do dồn lưu lượng vào ngõ hẹp
     if (isPeakHour && alleyRatio > 0.1) {
       totalBprDelayMin += Math.round(alleyDistanceMeters / 80);
     }
 
-    let realDurationMin = baseDurationMin + totalBprDelayMin;
-    realDurationMin = Math.max(3, Math.round(realDurationMin / specs.speedFactor));
+    const floodDelayMin = matchedFloods.reduce((acc, f) => {
+      if (f.isSafeShallow) return acc + 1;
+      const ratio = Math.min(1, (Number(f.depth_cm) || specs.safeDepth) / Math.max(1, specs.maxPassableDepth));
+      return acc + Math.max(2, Math.round(ratio * 4));
+    }, 0);
 
-    // Vận tốc dòng xe trung bình thực tế:
-    const distanceKmNum = parseFloat(route.distanceKm) || (route.distanceMeters / 1000);
+    const realDurationMin = Math.max(3, freeFlowDurationMin + totalBprDelayMin + floodDelayMin);
     const realAvgSpeedKmh = Math.max(6, Math.min(65, Math.round(distanceKmNum / (realDurationMin / 60))));
 
-    // 4. Chỉ số Độ tin cậy Lộ trình (Route Predictability Index - RPI %):
-    // Đo lường xác suất đến đúng giờ, không gặp biến động ngoài dự kiến
-    let rpi = 100 - (jamPercent * 0.4 + severeCount * 12 + moderateCount * 4 + matchedFloods.length * 15 + (hasAlleyTrap ? 20 : 0));
-    if (isPeakHour && severeCount > 0) rpi -= 10;
+    // 4. Chỉ số Độ tin cậy Lộ trình (Route Predictability Index - RPI %)
+    let rpi = 100 - (
+      jamPercent * 0.35 +
+      severeCount * 14 +
+      moderateCount * 5 +
+      cautionFloodCount * 22 +
+      safeFloodCount * 8 +
+      (hasAlleyTrap ? 20 : Math.round(alleyRatio * 12))
+    );
+    if (isPeakHour && (severeCount > 0 || cautionFloodCount > 0)) rpi -= 8;
     rpi = Math.max(35, Math.min(98, Math.round(rpi)));
 
-    // 5. Điểm êm ái & Tiết kiệm năng lượng (Eco-Smooth Score / 100):
-    // Đo lường mức độ duy trì vận tốc đều đặn, ít nhịp phanh dừng giật cục
-    let ecoScore = Math.max(40, Math.min(99, Math.round(
-      96 - (jamPercent * 0.45) - (severeCount * 12) - (hasAlleyTrap ? 18 : 0) + (majorDistanceMeters > route.distanceMeters * 0.65 ? 6 : 0)
+    // 5. Điểm êm ái & Tiết kiệm năng lượng (Eco-Smooth Score / 100)
+    const turnPenalty = Math.min(14, Math.round(turnsPerKm * 1.8));
+    const alleyPenalty = hasAlleyTrap ? 18 : Math.min(12, Math.round(alleyRatio * 20));
+    const floodDragPenalty = cautionFloodCount * 10 + safeFloodCount * 4;
+    const majorBonus = majorRatio >= 0.65 ? 6 : (majorRatio >= 0.45 ? 3 : 0);
+    const ecoScore = Math.max(40, Math.min(99, Math.round(
+      95 - (jamPercent * 0.4) - (severeCount * 11) - turnPenalty - alleyPenalty - floodDragPenalty + majorBonus
     )));
 
-    // Điểm bất lợi tổng hợp (cho thuật toán sắp xếp)
-    const congestionScore = (severeCount * 50) + (moderateCount * 20) + (matchedFloods.length * 25) + (jamPercent * 1.5) + (hasAlleyTrap ? 80 : 0);
+    // Điểm bất lợi tổng hợp
+    const congestionScore = (severeCount * 50) + (moderateCount * 20) + (cautionFloodCount * 45) + (safeFloodCount * 15) + (jamPercent * 1.5) + (hasAlleyTrap ? 80 : 0);
 
     return {
       ...route,
       durationMin: realDurationMin,
       baseDurationMin,
-      delayMin: Math.max(0, realDurationMin - baseDurationMin),
+      delayMin: Math.max(0, realDurationMin - freeFlowDurationMin),
+      floodDelayMin,
       realAvgSpeedKmh,
       rpi,
       ecoScore,
+      turnsPerKm: Number(turnsPerKm.toFixed(1)),
+      majorRatio: Math.round(majorRatio * 100),
       alleyDistanceMeters,
       alleyRatio: Math.round(alleyRatio * 100),
       hasAlleyTrap,
+      cautionFloodCount,
+      safeFloodCount,
+      maxFloodDepthCm,
       bottleneckWarnings,
       isPeakHour,
       matchedFloods,
       matchedTraffics,
       warnings: [...matchedFloods, ...matchedTraffics],
-      jamPercent: Math.min(100, Math.max(0, jamPercent)),
-      freeFlowPercent: Math.max(0, 100 - jamPercent),
+      jamPercent,
+      freeFlowPercent,
+      moderatePercent,
+      severePercent,
       severeCount,
       moderateCount,
       congestionScore
@@ -711,10 +764,35 @@ class RoutingService {
       throw new Error(`Không có tuyến đường khả dụng cho ${specs.name}`);
     }
 
-    // 1. Tuyến 1: Nhanh thực tế (Dynamic Flow)
-    // Sắp xếp theo realDurationMin (thời gian thực tế đã tính BPR delay và vận tốc dòng xe)
-    const sortedByFastest = [...passableCandidates].sort((a, b) => {
+    // Chuẩn hóa chỉ số mặc định phòng trường hợp mock test truyền thiếu field
+    const normalizedCandidates = passableCandidates.map(r => {
+      const floods = Array.isArray(r.matchedFloods) ? r.matchedFloods : [];
+      const cautionCnt = (typeof r.cautionFloodCount === 'number')
+        ? r.cautionFloodCount
+        : floods.filter(f => !f.isSafeShallow && Number(f.depth_cm) > (specs.safeDepth || 10)).length;
+      const safeCnt = (typeof r.safeFloodCount === 'number')
+        ? r.safeFloodCount
+        : Math.max(0, floods.length - cautionCnt);
+      return {
+        ...r,
+        cautionFloodCount: cautionCnt,
+        safeFloodCount: safeCnt,
+        alleyRatio: r.alleyRatio ?? 0,
+        majorRatio: r.majorRatio ?? 0,
+        severeCount: r.severeCount ?? 0,
+        rpi: r.rpi ?? 90,
+        ecoScore: r.ecoScore ?? 85,
+        congestionScore: r.congestionScore ?? 0,
+        moderatePercent: r.moderatePercent ?? (r.jamPercent || 0),
+        severePercent: r.severePercent ?? 0
+      };
+    });
+
+    // 1. Tuyến 1 (Mức 3): Nhanh thực tế (Dynamic Flow)
+    // Sắp xếp theo thời gian thực tế -> tránh ngập cảnh báo -> ít kẹt nặng -> quãng đường
+    const sortedByFastest = [...normalizedCandidates].sort((a, b) => {
       if (a.durationMin !== b.durationMin) return a.durationMin - b.durationMin;
+      if (a.cautionFloodCount !== b.cautionFloodCount) return a.cautionFloodCount - b.cautionFloodCount;
       if (a.severeCount !== b.severeCount) return a.severeCount - b.severeCount;
       return a.distanceMeters - b.distanceMeters;
     });
@@ -736,50 +814,72 @@ class RoutingService {
       return false;
     };
 
-    // 2. Tuyến 2: An toàn hành lang lớn (Resilient Corridor)
-    // Ưu tiên: 0 ngập, CẤM BẪY NGÕ HẸP, cốt nền cao, RPI cao nhất
-    const sortedBySafety = [...passableCandidates].sort((a, b) => {
-      // Ưu tiên 1: Không dính bẫy ngõ hẹp
+    // 2. Tuyến 2 (Mức 1): An toàn hành lang lớn (Resilient Corridor)
+    // Ưu tiên: CẤM BẪY NGÕ HẸP -> 0 ngập cảnh báo -> 0 nước nông -> ít kẹt cứng -> RPI cao -> hành lang lớn
+    const sortedBySafety = [...normalizedCandidates].sort((a, b) => {
       const trapDiff = (a.hasAlleyTrap ? 1 : 0) - (b.hasAlleyTrap ? 1 : 0);
       if (trapDiff !== 0) return trapDiff;
 
-      // Ưu tiên 2: Ít điểm ngập nước nhất (ưu tiên tuyệt đối 0 điểm ngập)
+      const cautionDiff = a.cautionFloodCount - b.cautionFloodCount;
+      if (cautionDiff !== 0) return cautionDiff;
+
+      const safeFloodDiff = a.safeFloodCount - b.safeFloodCount;
+      if (safeFloodDiff !== 0) return safeFloodDiff;
+
       const floodDiff = a.matchedFloods.length - b.matchedFloods.length;
       if (floodDiff !== 0) return floodDiff;
 
-      // Ưu tiên 3: Tỷ lệ ngõ ngách thấp nhất (đi đường phân phối lớn)
+      if (a.severeCount !== b.severeCount) return a.severeCount - b.severeCount;
+
+      if (Math.abs(a.rpi - b.rpi) >= 4) return b.rpi - a.rpi;
+
       const alleyDiff = a.alleyRatio - b.alleyRatio;
       if (Math.abs(alleyDiff) > 10) return alleyDiff;
 
-      // Ưu tiên 4: Độ tin cậy thời gian (RPI) cao hơn
-      if (a.rpi !== b.rpi) return b.rpi - a.rpi;
-
       return a.durationMin - b.durationMin;
     });
-    // Nếu có ứng viên khác fastestRoute mà độ an toàn tương đương, ưu tiên chọn để tạo sự khác biệt thực tế
+
+    // Chỉ chọn tuyến khác fastestRoute làm An toàn khi tuyến đó an toàn tương đương hoặc tốt hơn bestSafe (không hạ RPI / tăng ngõ hẹp)
+    const bestSafe = sortedBySafety[0];
     let safeRoute = sortedBySafety.find(r => !isSameRoute(r, fastestRoute) &&
-      (r.hasAlleyTrap === sortedBySafety[0].hasAlleyTrap) &&
-      (r.matchedFloods.length === sortedBySafety[0].matchedFloods.length) &&
-      (r.durationMin <= sortedBySafety[0].durationMin * 1.25)
+      Boolean(r.hasAlleyTrap) === Boolean(bestSafe.hasAlleyTrap) &&
+      r.cautionFloodCount === bestSafe.cautionFloodCount &&
+      r.matchedFloods.length === bestSafe.matchedFloods.length &&
+      r.severeCount <= bestSafe.severeCount &&
+      r.rpi >= bestSafe.rpi &&
+      r.alleyRatio <= bestSafe.alleyRatio &&
+      r.durationMin <= bestSafe.durationMin * 1.25
     );
     if (!safeRoute) {
-      safeRoute = sortedBySafety[0];
+      safeRoute = bestSafe;
     }
 
-    // 3. Tuyến 3: Trục chính êm ái (Major Road & Eco-Smooth)
-    // Ưu tiên: Điểm êm ái EcoScore cao nhất, dòng xe đều đặn, ít khúc cua gấp, tiết kiệm nhiên liệu/pin
-    const sortedByBalanced = [...passableCandidates].sort((a, b) => {
-      // Ưu tiên 1: EcoScore cao hơn
-      if (a.ecoScore !== b.ecoScore) return b.ecoScore - a.ecoScore;
+    // 3. Tuyến 3 (Mức 2): Trục chính êm ái (Major Road & Eco-Smooth)
+    // Hàm mục tiêu kết hợp: EcoScore + Tỷ lệ trục chính - Phạt thời gian chậm - Phạt ngập & kẹt
+    const minDur = fastestRoute.durationMin || 1;
+    const getBalancedUtility = (r) =>
+      r.ecoScore * 1.6 +
+      r.majorRatio * 0.25 -
+      Math.max(0, r.durationMin - minDur) * 2.5 -
+      r.cautionFloodCount * 18 -
+      r.matchedFloods.length * 8 -
+      r.congestionScore * 0.25 -
+      r.alleyRatio * 0.35;
 
-      // Ưu tiên 2: Cân bằng thời gian & độ an toàn
-      const scoreA = a.durationMin * 1.8 + a.matchedFloods.length * 12 + a.congestionScore * 0.3;
-      const scoreB = b.durationMin * 1.8 + b.matchedFloods.length * 12 + b.congestionScore * 0.3;
-      return scoreA - scoreB;
-    });
-    let balancedRoute = sortedByBalanced.find(r => !isSameRoute(r, fastestRoute) && !isSameRoute(r, safeRoute));
+    const maxBalancedDur = Math.max(minDur * 1.35, minDur + 5);
+    const sortedByBalanced = [...normalizedCandidates].sort((a, b) => getBalancedUtility(b) - getBalancedUtility(a));
+    let balancedRoute = sortedByBalanced.find(r =>
+      !isSameRoute(r, fastestRoute) &&
+      !isSameRoute(r, safeRoute) &&
+      r.durationMin <= maxBalancedDur &&
+      r.cautionFloodCount <= safeRoute.cautionFloodCount + 1 &&
+      !r.hasAlleyTrap
+    );
     if (!balancedRoute) {
-      balancedRoute = sortedByBalanced.find(r => !isSameRoute(r, safeRoute)) || sortedByBalanced[0];
+      balancedRoute = sortedByBalanced.find(r =>
+        !isSameRoute(r, safeRoute) &&
+        r.durationMin <= maxBalancedDur
+      ) || sortedByBalanced[0];
     }
 
     const safeJam = safeRoute.jamPercent;
@@ -800,15 +900,17 @@ class RoutingService {
       label: 'An toàn hành lang lớn',
       shortLabel: 'An toàn',
       sublabel: `${safeFloodText} • Tránh bẫy ngõ hẹp • Tin cậy ${safeRoute.rpi}%`,
-      tagText: `Tin cậy ${safeRoute.rpi}% • 0% Ngập lụt`,
+      tagText: safeRoute.matchedFloods.length === 0
+        ? `Tin cậy ${safeRoute.rpi}% • 0% Ngập lụt`
+        : `Tin cậy ${safeRoute.rpi}% • Nước nông < ${specs.safeDepth}cm`,
       tagClass: 'gm-tag-safe',
       trafficDesc: safeRoute.matchedFloods.length === 0
         ? 'Tuyến hành lang lớn cao ráo, cốt nền chuẩn, không dắt vào ngõ hẹp, độ tin cậy thời gian cao nhất'
         : 'Đi vòng qua các trục đường lớn cao ráo, chỉ dính nước nông nhẹ không ảnh hưởng máy',
       jamPercent: safeJam,
       freeFlowPercent: safeFree,
-      moderatePercent: safeJam,
-      severePercent: 0,
+      moderatePercent: safeRoute.moderatePercent,
+      severePercent: safeRoute.severePercent,
       isRecommended: (activeAvoidLevel === 1),
       color: '#1e8e3e',
       avoidLevel: 1,
@@ -826,8 +928,8 @@ class RoutingService {
       trafficDesc: 'Ưu tiên các trục đường thẳng lớn, ít nhịp phanh dừng giật cục, tối ưu năng lượng pin & xăng',
       jamPercent: balJam,
       freeFlowPercent: balFree,
-      moderatePercent: balJam,
-      severePercent: 0,
+      moderatePercent: balancedRoute.moderatePercent,
+      severePercent: balancedRoute.severePercent,
       isRecommended: (activeAvoidLevel === 2),
       color: '#f9ab00',
       avoidLevel: 2,
@@ -850,8 +952,8 @@ class RoutingService {
       trafficDesc: `${bottleneckDesc} (Mô hình BPR TomTom + VOV)`,
       jamPercent: fastJam,
       freeFlowPercent: fastFree,
-      moderatePercent: Math.round(fastJam * 0.6),
-      severePercent: Math.round(fastJam * 0.4),
+      moderatePercent: fastestRoute.moderatePercent,
+      severePercent: fastestRoute.severePercent,
       isRecommended: (activeAvoidLevel === 3),
       color: '#1a73e8',
       avoidLevel: 3,
@@ -952,33 +1054,49 @@ return {
   }
 
   // Tạo các tuyến dự phòng chất lượng cao khi OSRM không phản hồi hoặc ngoại tuyến
-  generateFallbackRoutes(origin, destination) {
+  generateFallbackRoutes(origin, destination, viaWaypoint = null) {
     const directDistMeters = this.getDistanceMeters(origin.lat, origin.lng, destination.lat, destination.lng);
     const hasValidVia = Boolean(viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number');
     const detourBaseDistMeters = hasValidVia
       ? (this.getDistanceMeters(origin.lat, origin.lng, viaWaypoint.lat, viaWaypoint.lng) +
          this.getDistanceMeters(viaWaypoint.lat, viaWaypoint.lng, destination.lat, destination.lng))
       : directDistMeters;
-    const stepsCount = Math.max(12, Math.min(30, Math.round(directDistMeters / 200)));
+    const stepsCount = Math.max(12, Math.min(30, Math.round(detourBaseDistMeters / 200)));
 
-    // Tuyến 1: Trực diện trục chính
+    // Tuyến 1: Trực diện trục chính (tôn trọng viaWaypoint nếu có)
     const directPolyline = [];
     for (let i = 0; i <= stepsCount; i++) {
       const ratio = i / stepsCount;
-      const lat = origin.lat + (destination.lat - origin.lat) * ratio;
-      const lng = origin.lng + (destination.lng - origin.lng) * ratio;
-      directPolyline.push([lat, lng]);
+      if (hasValidVia) {
+        if (ratio <= 0.5) {
+          const u = ratio * 2;
+          directPolyline.push([
+            origin.lat + (viaWaypoint.lat - origin.lat) * u,
+            origin.lng + (viaWaypoint.lng - origin.lng) * u
+          ]);
+        } else {
+          const u = (ratio - 0.5) * 2;
+          directPolyline.push([
+            viaWaypoint.lat + (destination.lat - viaWaypoint.lat) * u,
+            viaWaypoint.lng + (destination.lng - viaWaypoint.lng) * u
+          ]);
+        }
+      } else {
+        const lat = origin.lat + (destination.lat - origin.lat) * ratio;
+        const lng = origin.lng + (destination.lng - origin.lng) * ratio;
+        directPolyline.push([lat, lng]);
+      }
     }
-    const directDurationMin = Math.max(4, Math.round((directDistMeters / 1000) / 25 * 60));
+    const directDurationMin = Math.max(4, Math.round((detourBaseDistMeters / 1000) / 25 * 60));
     const directRoute = {
-      distanceKm: (directDistMeters / 1000).toFixed(1),
-      distanceMeters: directDistMeters,
+      distanceKm: (detourBaseDistMeters / 1000).toFixed(1),
+      distanceMeters: Math.round(detourBaseDistMeters),
       durationMin: directDurationMin,
       durationSeconds: directDurationMin * 60,
       polyline: directPolyline,
       steps: [
-        { instruction: 'Khởi hành từ ' + (origin.title || 'điểm xuất phát'), distance: Math.round(directDistMeters * 0.5), name: 'Trục đường chính' },
-        { instruction: 'Đến đích ' + (destination.title || 'điểm đến'), distance: Math.round(directDistMeters * 0.5), name: 'Đích đến' }
+        { instruction: 'Khởi hành từ ' + (origin.title || 'điểm xuất phát'), distance: Math.round(detourBaseDistMeters * 0.5), name: 'Trục đường chính' },
+        { instruction: 'Đến đích ' + (destination.title || 'điểm đến'), distance: Math.round(detourBaseDistMeters * 0.5), name: 'Đích đến' }
       ]
     };
 
@@ -997,7 +1115,7 @@ return {
       const lng = (1 - t) * (1 - t) * origin.lng + 2 * (1 - t) * t * (midLng + pLng) + t * t * destination.lng;
       detourPolyline.push([lat, lng]);
     }
-    const detourDistMeters = Math.round(directDistMeters * 1.15);
+    const detourDistMeters = Math.round(detourBaseDistMeters * 1.15);
     const detourDurationMin = Math.max(5, Math.round((detourDistMeters / 1000) / 26 * 60));
     const detourRoute = {
       distanceKm: (detourDistMeters / 1000).toFixed(1),
@@ -1099,8 +1217,10 @@ return {
         ];
     const directRoutes = await this.fetchOsrmRoute(osrmCoords).catch(() => []);
 
-    // Kiểm tra sơ bộ các tuyến trực tiếp xem có tuyến nào đi được an toàn không
+    // Kiểm tra sơ bộ các tuyến trực tiếp xem có tuyến nào đi được an toàn & sạch hoàn toàn không
     let directPassableCount = 0;
+    let directCleanCount = 0;
+    const directMatchedSevereHazards = [];
     directRoutes.forEach(r => {
       const p = this.checkRoutePassability(r.polyline, blockedFloods, blockedTraffics, specs.corridorBuffer);
       const v = this.checkVehicleRoadRestrictions(r, vehicleType);
@@ -1111,13 +1231,34 @@ return {
           return cleanAvoidRoads.some(ar => sName.includes(ar));
         });
       }
-      if (p.isPassable && v.allowed && !hitsAvoid) directPassableCount++;
+      if (p.isPassable && v.allowed && !hitsAvoid) {
+        directPassableCount++;
+        const evalPreview = this.evaluatePassableRoute(r, cautionFloods, safeFloods, trafficIncidents, specs);
+        const severeOnDirect = (evalPreview.matchedTraffics || []).filter(t => t.isJam && Number(t.delaySeconds) >= 450);
+        if (evalPreview.matchedFloods.length === 0 && severeOnDirect.length === 0) {
+          directCleanCount++;
+        } else {
+          evalPreview.matchedFloods.forEach(fl => {
+            if (!directMatchedSevereHazards.some(h => h.id === fl.id)) directMatchedSevereHazards.push(fl);
+          });
+          severeOnDirect.forEach(tr => {
+            if (!directMatchedSevereHazards.some(h => h.id === tr.id)) directMatchedSevereHazards.push(tr);
+          });
+        }
+      }
     });
 
     const allRawCandidates = [...directRoutes];
 
-    // 3. Chỉ sinh các tuyến vòng (Bypass Detours) khi chưa đủ tuyến an toàn hoặc có chướng ngại vật / đường cần né
+    // 3. Sinh các tuyến vòng (Bypass Detours) khi thiếu tuyến khả dụng hoặc toàn bộ tuyến thẳng dính ngập nhẹ/kẹt nặng
     const hazardsForDetours = [...blockedFloods, ...cautionFloods];
+    if (directCleanCount === 0 && directMatchedSevereHazards.length > 0) {
+      directMatchedSevereHazards.slice(0, 3).forEach(h => {
+        if (!hazardsForDetours.some(ex => ex.id === h.id)) {
+          hazardsForDetours.push(h);
+        }
+      });
+    }
 
     // Nếu có đường cần né giả định, tìm tọa độ đại diện của tuyến đường đó và bổ sung chướng ngại vật để sinh đường vòng
     if (cleanAvoidRoads.length > 0) {
@@ -1165,7 +1306,7 @@ return {
       });
     }
 
-    if (directPassableCount < 2 && hazardsForDetours.length > 0) {
+    if ((directPassableCount < 2 || directCleanCount < 1) && hazardsForDetours.length > 0) {
       const customOffsets = cleanAvoidRoads.length > 0 ? [1800, 2600, 3400] : null;
       const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs, customOffsets);
 
@@ -1207,7 +1348,7 @@ return {
 
     if (allRawCandidates.length === 0) {
       console.warn('[RoutingService] OSRM không phản hồi, tự động kích hoạt bộ định tuyến dự phòng ngoại tuyến.');
-      const fallbackRoutes = this.generateFallbackRoutes(origin, destination);
+      const fallbackRoutes = this.generateFallbackRoutes(origin, destination, viaWaypoint);
       allRawCandidates.push(...fallbackRoutes);
     }
 
