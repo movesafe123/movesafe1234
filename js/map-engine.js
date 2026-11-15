@@ -934,6 +934,48 @@ class MapEngine {
     }
   }
 
+  estimateEVPortAvailability(st) {
+    const total = Math.max(1, Number(st?.totalPoints || st?.capacity || 2));
+    if (st && st.isOperational === false) {
+      return { available: 0, total, isSimulated: true, label: 'Đang bảo trì' };
+    }
+    const hour = new Date().getHours();
+    let occupancyRatio = 0.38;
+    if ((hour >= 11 && hour <= 13) || (hour >= 17 && hour <= 21)) {
+      occupancyRatio = 0.65;
+    } else if (hour >= 22 || hour <= 6) {
+      occupancyRatio = 0.18;
+    }
+    const idStr = String(st?.id || st?.name || 'ev');
+    let hash = 0;
+    for (let i = 0; i < idStr.length; i++) {
+      hash = ((hash << 5) - hash) + idStr.charCodeAt(i);
+      hash |= 0;
+    }
+    const jitter = ((Math.abs(hash) % 5) - 2) * 0.06;
+    const finalOcc = Math.max(0.05, Math.min(0.88, occupancyRatio + jitter));
+    const available = Math.max(1, Math.min(total, Math.round(total * (1 - finalOcc))));
+    return {
+      available,
+      total,
+      isSimulated: true,
+      label: `Trống ~${available}/${total} trụ (Mô phỏng theo giờ)`
+    };
+  }
+
+  resolveEVSourceLabel(st) {
+    if (Array.isArray(st?.verifiedSources) && st.verifiedSources.length > 0) {
+      return st.verifiedSources.slice(0, 2).join(' + ');
+    }
+    const id = String(st?.id || '');
+    const src = String(st?.source || '');
+    if (id.startsWith('evcs-') || /EVCS\.VN/i.test(src)) return 'EVCS.VN';
+    if (id.startsWith('tt-') || /TomTom/i.test(src)) return 'TomTom EV';
+    if (id.startsWith('osm-') || /OpenStreetMap|Overpass/i.test(src)) return 'OpenStreetMap';
+    if (id.startsWith('ocm-') || /Open Charge Map/i.test(src)) return 'OpenChargeMap';
+    return 'MoveSafe VN';
+  }
+
   generateEVPopupHtml(st) {
     const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
     const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
@@ -941,6 +983,8 @@ class MapEngine {
     const safeName = String(st.name || 'Trạm sạc xe điện').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeAddress = String(st.address || st.town || 'Việt Nam').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeOperator = String(st.operator || st.provider || 'Hệ thống đối tác').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const sourceLabel = this.resolveEVSourceLabel(st);
+    const portAvail = this.estimateEVPortAvailability(st);
     const statusText = st.isOperational !== false ? 'Đang hoạt động 24/7' : 'Đang bảo trì';
     const statusColor = st.isOperational !== false ? '#10b981' : '#f59e0b';
     
@@ -992,7 +1036,10 @@ class MapEngine {
           <div><strong>Đơn vị:</strong> ${safeOperator}</div>
           <div><strong>Công suất:</strong> ${st.maxPowerKw || (isFast ? 60 : 22)} kW</div>
           <div><strong>Quy mô:</strong> ${st.totalPoints || st.capacity || 2} trụ sạc</div>
-          <div><strong>Nguồn:</strong> ${st.source ? 'OpenChargeMap' : 'MoveSafe VN'}</div>
+          <div><strong>Nguồn:</strong> ${sourceLabel}</div>
+          <div style="grid-column: 1 / -1; padding-top: 4px; border-top: 1px dashed #cbd5e1; color: ${st.isOperational !== false ? '#047857' : '#b45309'};">
+            <strong>Khả dụng ước tính:</strong> Trống ~${portAvail.available}/${portAvail.total} trụ <span style="color: #64748b; font-weight: 500;">(Mô phỏng theo giờ)</span>
+          </div>
         </div>
 
         ${connectorsHtml}

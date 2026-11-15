@@ -371,4 +371,88 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
     app.syncSmartDefaultAvoidLevel({ force: true });
     assert.strictEqual(app.currentAvoidLevel, 3, 'Khi force=true ở trạng thái khô ráo phải khôi phục Mức 3');
   });
+
+  it('[TC-UI-19] Tích hợp Overpass OSM, gom cụm trụ trùng <= 60m, khử trùng lặp đa tầng & ưu tiên nguồn', () => {
+    const evService = require('../../server/ev-service');
+    const mapEngineContent = fs.readFileSync(path.join(__dirname, '../../js/map-engine.js'), 'utf8');
+    const appJsContent = fs.readFileSync(path.join(__dirname, '../../js/app.js'), 'utf8');
+
+    // 1. UI hiển thị nguồn thật + ước tính trụ khả dụng gắn nhãn mô phỏng minh bạch
+    assert.ok(mapEngineContent.includes('estimateEVPortAvailability('), 'Thiếu hàm estimateEVPortAvailability trong map-engine.js');
+    assert.ok(mapEngineContent.includes('resolveEVSourceLabel('), 'Thiếu hàm resolveEVSourceLabel trong map-engine.js');
+    assert.ok(mapEngineContent.includes('Mô phỏng theo giờ'), 'Popup trạm sạc phải gắn nhãn minh bạch (Mô phỏng theo giờ)');
+    assert.ok(appJsContent.includes('Mô phỏng)'), 'Thẻ EV finder phải gắn nhãn minh bạch (Mô phỏng)');
+
+    // 2. Gom cụm nội bộ OSM <= 60m cùng hãng
+    const clustered = evService.clusterOverpassStations([
+      { id: 'osm-node-1', name: 'Trụ 1 VinFast Smart City', operator: 'VinFast', lat: 20.9942, lng: 105.7482, maxPowerKw: 60, _rawPoints: 2 },
+      { id: 'osm-node-2', name: 'Trụ 2 Smart City', operator: 'VinFast', lat: 20.99435, lng: 105.7483, maxPowerKw: 150, _rawPoints: 2 },
+      { id: 'osm-node-3', name: 'Tủ đổi pin Selex Mỹ Đình', operator: 'Selex Motors', lat: 21.0285, lng: 105.7785, maxPowerKw: 11, _rawPoints: 4, supportsEscooter: true, vehicleTypes: ['ebike'] }
+    ]);
+    assert.strictEqual(clustered.length, 2, 'Hai trụ OSM cùng bãi <= 60m phải gom thành 1, khác khu phải tách riêng');
+    const mergedSmartCity = clustered.find(s => s.operator === 'VinFast');
+    assert.strictEqual(mergedSmartCity.totalPoints, 4, 'Gom cụm phải cộng dồn số cổng sạc');
+    assert.strictEqual(mergedSmartCity.maxPowerKw, 150, 'Gom cụm phải giữ công suất cao nhất');
+
+    // 3. Khử trùng lặp đa tầng: Cùng trạm lệch tọa độ 65m cùng hãng + trùng tên -> GỘP; Khác hãng hoặc khác tên đường -> TÁCH
+    const evcsBase = {
+      id: 'evcs-xm-mtdt',
+      name: 'Trạm sạc VinFast - Công ty Môi trường Đô thị Xuân Mai',
+      operator: 'VinFast',
+      address: 'Quốc lộ 6, Thị trấn Xuân Mai, Chương Mỹ, Hà Nội',
+      lat: 20.8920,
+      lng: 105.5735,
+      totalPoints: 6,
+      source: 'EVCS.VN / VinFast V-GREEN'
+    };
+    const osmShiftedSame = {
+      id: 'osm-node-991',
+      name: 'VinFast Chợ Xuân Mai',
+      operator: 'VinFast',
+      address: 'Quốc lộ 6, Xuân Mai',
+      lat: 20.8925, // lệch ~60m
+      lng: 105.5737,
+      totalPoints: 4,
+      source: 'OpenStreetMap (Overpass API)'
+    };
+    assert.strictEqual(evService.shouldMergeStations(evcsBase, osmShiftedSame), true, 'Cùng trạm VinFast Xuân Mai lệch ~60m phải được gộp');
+
+    const osmDiffBrandNearby = {
+      id: 'osm-node-992',
+      name: 'Tủ đổi pin Selex Xuân Mai',
+      operator: 'Selex Motors',
+      address: 'Quốc lộ 6, Xuân Mai',
+      lat: 20.8922, // cách 25m nhưng khác hẳn hãng & loại xe
+      lng: 105.5736,
+      supportsEscooter: true,
+      vehicleTypes: ['ebike'],
+      source: 'OpenStreetMap (Overpass API)'
+    };
+    assert.strictEqual(evService.shouldMergeStations(evcsBase, osmDiffBrandNearby), false, 'Khác hẳn hãng và khác loại xe (ô tô vs xe máy) không được gộp nhầm');
+
+    const ttDifferentStreet = {
+      id: 'tt-993',
+      name: 'Trạm sạc Hồ Gươm Phố Huế',
+      operator: 'OpenStreetMap EV',
+      address: '120 Phố Huế, Hai Bà Trưng',
+      lat: 21.0150,
+      lng: 105.8510
+    };
+    const osmDifferentStreet100m = {
+      id: 'osm-994',
+      name: 'Trạm sạc Bách Khoa Đại Cồ Việt',
+      operator: 'OpenStreetMap EV',
+      address: '1 Đại Cồ Việt, Hai Bà Trưng',
+      lat: 21.0159, // ~100m nhưng khác hẳn tên địa danh
+      lng: 105.8512
+    };
+    assert.strictEqual(evService.shouldMergeStations(ttDifferentStreet, osmDifferentStreet100m), false, 'Cách ~100m nhưng khác tên đường/địa danh hoàn toàn phải giữ thành 2 trạm riêng');
+
+    // 4. Quy tắc ưu tiên nguồn: Không cho OSM (prio 1) ghi đè tọa độ gốc của EVCS.VN (prio 4)
+    const enriched = evService.enrichExistingStation({ ...evcsBase }, osmShiftedSame, 'osmId');
+    assert.strictEqual(enriched.lat, 20.8920, 'Phải giữ nguyên vĩ độ chuẩn của EVCS.VN');
+    assert.strictEqual(enriched.lng, 105.5735, 'Phải giữ nguyên kinh độ chuẩn của EVCS.VN');
+    assert.strictEqual(enriched.osmId, 'osm-node-991', 'Phải gắn thêm osmId làm giàu dữ liệu');
+    assert.ok(Array.isArray(enriched.verifiedSources) && enriched.verifiedSources.includes('EVCS.VN') && enriched.verifiedSources.includes('OpenStreetMap'));
+  });
 });

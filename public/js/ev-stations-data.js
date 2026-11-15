@@ -1,5 +1,5 @@
 /**
- * MoveSafe VN - Dữ liệu Mạng lưới Trạm sạc Xe điện & e-Scooter Toàn quốc (223 trạm)
+ * MoveSafe VN - Dữ liệu Mạng lưới Trạm sạc Xe điện & e-Scooter Toàn quốc (228 trạm)
  * Tự động đồng bộ từ Nguồn Sự Thật Duy Nhất: data/ev_stations_cache.json
  */
 (function() {
@@ -1914,7 +1914,14 @@
     ],
     "accessComments": "Tầng hầm B2 & B3 tháp Landmark 81",
     "tomtomId": "tt-jPbGLf24RYcdo475sqbhfQ",
-    "lastUpdated": "2026-11-14T00:11:07.989Z"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "MoveSafe VN",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ev-hcm-dongkhoi",
@@ -1951,7 +1958,14 @@
     ],
     "accessComments": "Tầng hầm B3 sảnh thương mại",
     "tomtomId": "tt-leJkaNT00SLa6QGnxDwu6A",
-    "lastUpdated": "2026-11-14T00:11:07.989Z"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "MoveSafe VN",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ev-hcm-bitexco",
@@ -3012,7 +3026,14 @@
     ],
     "accessComments": "Cây xăng Petrolimex trục Nguyễn Văn Linh - Cầu Rồng",
     "ocmId": "ocm-274579",
-    "lastUpdated": "2023-10-09T02:47:00Z"
+    "lastUpdated": "2023-10-09T02:47:00Z",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "MoveSafe VN",
+      "OpenChargeMap"
+    ]
   },
   {
     "id": "ev-dn-pvoil-ngoquyen",
@@ -3994,8 +4015,16 @@
     ],
     "accessComments": "Tầng hầm B1 TTTM Vincom Plaza",
     "ocmId": "ocm-267276",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-wqBsh1l2qn4Ihc_mP58U4A"
+    "lastUpdated": "2023-07-04T03:26:00Z",
+    "tomtomId": "tt-wqBsh1l2qn4Ihc_mP58U4A",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "MoveSafe VN",
+      "TomTom EV",
+      "OpenChargeMap"
+    ]
   },
   {
     "id": "ev-hcm-sunwahpearl",
@@ -4424,17 +4453,17 @@
   {
     "id": "ocm-494307",
     "name": "86 Chế Lan Viên, Tây Thạnh, TP.HCM, Việt Nam",
-    "operator": "EVOne",
-    "address": "30 Đường D11",
+    "operator": "TomTom EV Network",
+    "address": "Đường D11 30, Quận Tân Phú, Ho Chi Minh City, 72009",
     "town": "Tay Thanh",
     "city": "hcm",
-    "lat": 10.812103354121845,
-    "lng": 106.62878881061545,
+    "lat": 10.812103,
+    "lng": 106.62879,
     "isOperational": true,
     "statusText": "Đang hoạt động",
     "maxPowerKw": 120,
     "isFastCharge": true,
-    "totalPoints": 1,
+    "totalPoints": 4,
     "connectors": [
       {
         "type": "Cổng sạc chuẩn",
@@ -4444,24 +4473,31 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
+    "lastUpdated": "2026-06-21T03:35:00Z",
     "ocmId": "ocm-494307",
-    "tomtomId": "tt-iy8DwsYtu0aQAYeTXLfWsA"
+    "tomtomId": "tt-iy8DwsYtu0aQAYeTXLfWsA",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "OpenChargeMap",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ocm-492405",
     "name": "Hàm Nghi",
-    "operator": "EVOne",
-    "address": "Hàm Nghi",
+    "operator": "TomTom EV Network",
+    "address": "Đường Hàm Nghi, Quận 1, Ho Chi Minh City, 71010",
     "town": "",
     "city": "hcm",
-    "lat": 10.771267228263671,
-    "lng": 106.7002503659336,
+    "lat": 10.771267,
+    "lng": 106.70025,
     "isOperational": true,
     "statusText": "Đang hoạt động",
-    "maxPowerKw": 22,
-    "isFastCharge": false,
-    "totalPoints": 1,
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
     "connectors": [
       {
         "type": "Cổng sạc chuẩn",
@@ -4471,24 +4507,31 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
+    "lastUpdated": "2026-06-07T02:52:00Z",
     "ocmId": "ocm-492405",
-    "tomtomId": "tt-ofTHq-5BVQUhw0iR86Sb2w"
+    "tomtomId": "tt-ofTHq-5BVQUhw0iR86Sb2w",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "OpenChargeMap",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ocm-461673",
     "name": "Charging Station A",
-    "operator": "EVOne",
-    "address": "20 D7, Khu đô thị mới, Bình Nguyên, Bình Dương, Việt Nam",
+    "operator": "TomTom EV Network",
+    "address": "Đường N8 87, Bình Thắng, Dĩ An, Ho Chi Minh City, 75309",
     "town": "Bien Hoa City",
     "city": "hcm",
-    "lat": 10.891655483102014,
-    "lng": 106.8047775168684,
+    "lat": 10.891656,
+    "lng": 106.804779,
     "isOperational": true,
     "statusText": "Đang hoạt động",
-    "maxPowerKw": 22,
-    "isFastCharge": false,
-    "totalPoints": 1,
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
     "connectors": [
       {
         "type": "Cổng sạc chuẩn",
@@ -4498,19 +4541,26 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
+    "lastUpdated": "2025-10-03T05:39:00Z",
     "ocmId": "ocm-461673",
-    "tomtomId": "tt-ekxbdDyG_nYHDx8MfvBy0w"
+    "tomtomId": "tt-ekxbdDyG_nYHDx8MfvBy0w",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "OpenChargeMap",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ocm-461659",
     "name": "Charging Station",
-    "operator": "EVOne",
-    "address": "Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh, Việt Nam",
+    "operator": "TomTom EV Network",
+    "address": "Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh, Việt Nam, Long Thạnh Mỹ, Thủ Đức, Ho Chi Minh City, 71216",
     "town": "",
     "city": "hcm",
-    "lat": 10.841320778974648,
-    "lng": 106.80753715366711,
+    "lat": 10.841321,
+    "lng": 106.807538,
     "isOperational": true,
     "statusText": "Đang hoạt động",
     "maxPowerKw": 500,
@@ -4525,24 +4575,31 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
+    "lastUpdated": "2025-10-02T09:54:00Z",
     "ocmId": "ocm-461659",
-    "tomtomId": "tt-EDXHVNPW2XLhAEAOeau-8A"
+    "tomtomId": "tt-EDXHVNPW2XLhAEAOeau-8A",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "OpenChargeMap",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ocm-208970",
     "name": "Trường Cao Đẳng Lý Tự Trọng",
-    "operator": "EVOne",
-    "address": "Hoàng Văn Thụ",
+    "operator": "TomTom EV Network",
+    "address": "Đường Hoàng Văn Thụ, Tân Bình, Quận Tân Bình, Ho Chi Minh City, 72106",
     "town": "Tân Bình",
     "city": "hcm",
-    "lat": 10.797634648670268,
-    "lng": 106.65591013732762,
+    "lat": 10.797636,
+    "lng": 106.655911,
     "isOperational": true,
     "statusText": "Đang hoạt động",
-    "maxPowerKw": 22,
-    "isFastCharge": false,
-    "totalPoints": 1,
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 4,
     "connectors": [
       {
         "type": "Cổng sạc chuẩn",
@@ -4552,9 +4609,16 @@
       }
     ],
     "source": "Open Charge Map API (Live)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
+    "lastUpdated": "2022-10-25T03:24:00Z",
     "ocmId": "ocm-208969",
-    "tomtomId": "tt-QxmpfytGzKxDk07Xra21cw"
+    "tomtomId": "tt-QxmpfytGzKxDk07Xra21cw",
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "verifiedSources": [
+      "OpenChargeMap",
+      "TomTom EV"
+    ]
   },
   {
     "id": "ev-hn-xuanmai-01",
@@ -5576,8 +5640,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-0th4I_UuA9r-9WOcRBOq9w"
+    "lastUpdated": "2026-11-15T07:30:58.997Z",
+    "tomtomId": "tt-0th4I_UuA9r-9WOcRBOq9w",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-9UkZuPUAoMWcxeFe67avGw",
@@ -5606,8 +5673,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-9UkZuPUAoMWcxeFe67avGw"
+    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "tomtomId": "tt-9UkZuPUAoMWcxeFe67avGw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-4p-IxsNwM2ap-oS4OS083A",
@@ -5636,8 +5706,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-4p-IxsNwM2ap-oS4OS083A"
+    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "tomtomId": "tt-4p-IxsNwM2ap-oS4OS083A",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-F0gl74ZSr_QqMOyQZM6G_Q",
@@ -5666,8 +5739,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-F0gl74ZSr_QqMOyQZM6G_Q"
+    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "tomtomId": "tt-F0gl74ZSr_QqMOyQZM6G_Q",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-HLMIDzqt2T2CRVyh9o2sKA",
@@ -5696,8 +5772,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-HLMIDzqt2T2CRVyh9o2sKA"
+    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "tomtomId": "tt-HLMIDzqt2T2CRVyh9o2sKA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-UbZLmaIRXwjQReKp4oXSnQ",
@@ -5726,8 +5805,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.107Z",
-    "tomtomId": "tt-UbZLmaIRXwjQReKp4oXSnQ"
+    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "tomtomId": "tt-UbZLmaIRXwjQReKp4oXSnQ",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-pOGjJBZbuaLG1SKJepECiA",
@@ -5756,8 +5838,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.417Z",
-    "tomtomId": "tt-pOGjJBZbuaLG1SKJepECiA"
+    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "tomtomId": "tt-pOGjJBZbuaLG1SKJepECiA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-K07tVtLCfnUP-mlADOAh2w",
@@ -5786,8 +5871,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.417Z",
-    "tomtomId": "tt-K07tVtLCfnUP-mlADOAh2w"
+    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "tomtomId": "tt-K07tVtLCfnUP-mlADOAh2w",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-hip-rk-YgCfHDtyI-USNUQ",
@@ -5817,8 +5905,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.417Z",
-    "tomtomId": "tt-hip-rk-YgCfHDtyI-USNUQ"
+    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "tomtomId": "tt-hip-rk-YgCfHDtyI-USNUQ",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-UFjLvn6elJuY_C3Upqrwcw",
@@ -5847,8 +5938,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-UFjLvn6elJuY_C3Upqrwcw"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-UFjLvn6elJuY_C3Upqrwcw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-CkKPdz77IA2dpybmZoYUPQ",
@@ -5877,8 +5971,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-CkKPdz77IA2dpybmZoYUPQ"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-CkKPdz77IA2dpybmZoYUPQ",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-oTA2xQ352FNRAd67MGXL3w",
@@ -5907,8 +6004,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-oTA2xQ352FNRAd67MGXL3w"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-oTA2xQ352FNRAd67MGXL3w",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-BqCCzrBBvFUnXBocJ5pDBg",
@@ -5937,8 +6037,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-BqCCzrBBvFUnXBocJ5pDBg"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-BqCCzrBBvFUnXBocJ5pDBg",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-6spALtx4x5FWlukQBrIXCg",
@@ -5967,8 +6070,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-6spALtx4x5FWlukQBrIXCg"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-6spALtx4x5FWlukQBrIXCg",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-kiNgQNinA41PqX2rtw0i0A",
@@ -5997,8 +6103,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-kiNgQNinA41PqX2rtw0i0A"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-kiNgQNinA41PqX2rtw0i0A",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt--0eKiX313LxbTcampar-gA",
@@ -6027,8 +6136,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt--0eKiX313LxbTcampar-gA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt--0eKiX313LxbTcampar-gA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-dY_AO0jLLl3_Td_HsBbnuA",
@@ -6057,8 +6169,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-dY_AO0jLLl3_Td_HsBbnuA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-dY_AO0jLLl3_Td_HsBbnuA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-S-WTiP065GRRMnI9qlOPWA",
@@ -6087,8 +6202,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-S-WTiP065GRRMnI9qlOPWA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-S-WTiP065GRRMnI9qlOPWA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-H18BTSLHqFkNI0pC-lioqw",
@@ -6117,8 +6235,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-H18BTSLHqFkNI0pC-lioqw"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-H18BTSLHqFkNI0pC-lioqw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-Y9qLGB1NArEv__Acaa8c1g",
@@ -6147,8 +6268,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-Y9qLGB1NArEv__Acaa8c1g"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-tbzuoWM52s7OUNWS22__FA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-aWbgnd3d5NYd7hoyNqJ8UA",
@@ -6177,8 +6301,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-aWbgnd3d5NYd7hoyNqJ8UA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-aWbgnd3d5NYd7hoyNqJ8UA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-lWqjIoLkyI4akg1fN9i91A",
@@ -6207,8 +6334,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-lWqjIoLkyI4akg1fN9i91A"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-lWqjIoLkyI4akg1fN9i91A",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-9XXAKTCUeY9eepoa8BzSEA",
@@ -6238,8 +6368,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-9XXAKTCUeY9eepoa8BzSEA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-9XXAKTCUeY9eepoa8BzSEA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-GqTdCtHz43UJieesyMFOcQ",
@@ -6268,8 +6401,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-GqTdCtHz43UJieesyMFOcQ"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-GqTdCtHz43UJieesyMFOcQ",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-Mlpehg9MHJgMjyS7IXivWg",
@@ -6298,8 +6434,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-Mlpehg9MHJgMjyS7IXivWg"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-Mlpehg9MHJgMjyS7IXivWg",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-BQHDvYQp9tvf2mN3Tizh2Q",
@@ -6328,8 +6467,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-BQHDvYQp9tvf2mN3Tizh2Q"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-BQHDvYQp9tvf2mN3Tizh2Q",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-ynGpndZyNJhEU4scE6lpxA",
@@ -6358,8 +6500,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-ynGpndZyNJhEU4scE6lpxA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-ynGpndZyNJhEU4scE6lpxA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-NB9R2qHG274J5M22xgKgkg",
@@ -6388,8 +6533,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.989Z",
-    "tomtomId": "tt-NB9R2qHG274J5M22xgKgkg"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-NB9R2qHG274J5M22xgKgkg",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-aYzEK-D-GuIvbYwPDQHkvw",
@@ -6418,8 +6566,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-aYzEK-D-GuIvbYwPDQHkvw"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-aYzEK-D-GuIvbYwPDQHkvw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-fCkwb-dCauzZsIHgElSo8g",
@@ -6448,8 +6599,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-fCkwb-dCauzZsIHgElSo8g"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-fCkwb-dCauzZsIHgElSo8g",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-GHF8CZVrsqH71OHE8OOZ1w",
@@ -6478,8 +6632,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-GHF8CZVrsqH71OHE8OOZ1w"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-GHF8CZVrsqH71OHE8OOZ1w",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt--OKqbYQe1LTFdHi7g3wWgA",
@@ -6508,8 +6665,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt--OKqbYQe1LTFdHi7g3wWgA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt--OKqbYQe1LTFdHi7g3wWgA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-XEe79pMgFtEHLFeYdZDiSA",
@@ -6538,8 +6698,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-XEe79pMgFtEHLFeYdZDiSA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-XEe79pMgFtEHLFeYdZDiSA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-1VoI9eb6LGngCItwG76m2Q",
@@ -6568,8 +6731,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-1VoI9eb6LGngCItwG76m2Q"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-1VoI9eb6LGngCItwG76m2Q",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-IVZLT5GfwVPXnJRvHlwmtw",
@@ -6598,8 +6764,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-IVZLT5GfwVPXnJRvHlwmtw"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-IVZLT5GfwVPXnJRvHlwmtw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-axa_pI8fsFJn6Zohrzn0xQ",
@@ -6628,8 +6797,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-axa_pI8fsFJn6Zohrzn0xQ"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-axa_pI8fsFJn6Zohrzn0xQ",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-wvl1n9xTZxpakvnz_igjog",
@@ -6658,8 +6830,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-wvl1n9xTZxpakvnz_igjog"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-wvl1n9xTZxpakvnz_igjog",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-I2KB34yRaJDws7cJpCTZhA",
@@ -6688,8 +6863,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt-I2KB34yRaJDws7cJpCTZhA"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt-I2KB34yRaJDws7cJpCTZhA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt--vWr0_cpzJEqwmtPqnmRUg",
@@ -6718,8 +6896,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:07.990Z",
-    "tomtomId": "tt--vWr0_cpzJEqwmtPqnmRUg"
+    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "tomtomId": "tt--vWr0_cpzJEqwmtPqnmRUg",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-AoKDQGX6Xp3v45MI0nOnQA",
@@ -6748,8 +6929,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:08.198Z",
-    "tomtomId": "tt-AoKDQGX6Xp3v45MI0nOnQA"
+    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "tomtomId": "tt-AoKDQGX6Xp3v45MI0nOnQA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-rjEE6xJY653fMZTqXHmicw",
@@ -6778,8 +6962,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:08.198Z",
-    "tomtomId": "tt-rjEE6xJY653fMZTqXHmicw"
+    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "tomtomId": "tt-rjEE6xJY653fMZTqXHmicw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-evWyIqUrozA98Me8a8EBkA",
@@ -6808,8 +6995,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:08.198Z",
-    "tomtomId": "tt-evWyIqUrozA98Me8a8EBkA"
+    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "tomtomId": "tt-evWyIqUrozA98Me8a8EBkA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-wq9yKXzTRU1NUfUYPFxQqw",
@@ -6838,8 +7028,11 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:08.198Z",
-    "tomtomId": "tt-wq9yKXzTRU1NUfUYPFxQqw"
+    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "tomtomId": "tt-wq9yKXzTRU1NUfUYPFxQqw",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
   },
   {
     "id": "tt-YLKHOtD_RZP9WOPX0qoeYA",
@@ -6868,8 +7061,178 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-14T00:11:08.198Z",
-    "tomtomId": "tt-YLKHOtD_RZP9WOPX0qoeYA"
+    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "tomtomId": "tt-YLKHOtD_RZP9WOPX0qoeYA",
+    "verifiedSources": [
+      "TomTom EV"
+    ]
+  },
+  {
+    "id": "osm-way-1368995955",
+    "osmId": "osm-way-1368995955",
+    "name": "Trạm sạc Vinfast (Phường Phúc Lợi, Thành phố Hà Nội)",
+    "operator": "VinFast",
+    "address": "Phường Phúc Lợi, Thành phố Hà Nội",
+    "city": "hanoi",
+    "lat": 21.0477084,
+    "lng": 105.9032624,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 2,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 1
+      }
+    ],
+    "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
+    "source": "OpenStreetMap (Overpass/Nominatim)",
+    "lastUpdated": "2026-11-15T07:31:11.634Z",
+    "verifiedSources": [
+      "OpenStreetMap"
+    ]
+  },
+  {
+    "id": "osm-way-1568003148",
+    "osmId": "osm-way-1568003148",
+    "name": "Trạm sạc VinFast (Âu Lạc 1, Tây Mỗ)",
+    "operator": "VinFast",
+    "address": "Âu Lạc 1, Tây Mỗ, Phường Tây Mỗ, Thành phố Hà Nội",
+    "city": "hanoi",
+    "lat": 21.008609,
+    "lng": 105.7412087,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 2,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 1
+      }
+    ],
+    "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
+    "source": "OpenStreetMap (Overpass/Nominatim)",
+    "lastUpdated": "2026-11-15T07:31:11.634Z",
+    "verifiedSources": [
+      "OpenStreetMap"
+    ]
+  },
+  {
+    "id": "osm-way-1464995859",
+    "osmId": "osm-way-1464995859",
+    "name": "Trạm sạc Vinfast (Lê Ngung, Phường Tân Tạo)",
+    "operator": "VinFast",
+    "address": "Lê Ngung, Phường Tân Tạo, Thành phố Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.7460413,
+    "lng": 106.582685,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 2,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 1
+      }
+    ],
+    "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
+    "source": "OpenStreetMap (Overpass/Nominatim)",
+    "lastUpdated": "2026-11-15T07:31:12.838Z",
+    "verifiedSources": [
+      "OpenStreetMap"
+    ]
+  },
+  {
+    "id": "osm-node-9587618739",
+    "osmId": "osm-node-9587618739",
+    "name": "Trạm sạc VinFast (Đường Tô Ký, Phường Trung Mỹ Tây)",
+    "operator": "VinFast",
+    "address": "Đường Tô Ký, Phường Trung Mỹ Tây, Thành phố Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8695365,
+    "lng": 106.6157273,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 60,
+    "isFastCharge": true,
+    "totalPoints": 2,
+    "vehicleTypes": [
+      "ecar"
+    ],
+    "supportsEscooter": false,
+    "connectors": [
+      {
+        "type": "CCS (Type 2)",
+        "powerKw": 60,
+        "current": "DC",
+        "quantity": 1
+      }
+    ],
+    "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
+    "source": "OpenStreetMap (Overpass/Nominatim)",
+    "lastUpdated": "2026-11-15T07:31:12.839Z",
+    "verifiedSources": [
+      "OpenStreetMap"
+    ]
+  },
+  {
+    "id": "osm-way-1481306334",
+    "osmId": "osm-way-1481306334",
+    "name": "Trạm Sạc VinFast (Thạnh Xuân 33, Phường Thới An)",
+    "operator": "VinFast",
+    "address": "Thạnh Xuân 33, Phường Thới An, Thành phố Hồ Chí Minh",
+    "city": "hcm",
+    "lat": 10.8829959,
+    "lng": 106.6740934,
+    "isOperational": true,
+    "statusText": "Đang hoạt động 24/7",
+    "maxPowerKw": 11,
+    "isFastCharge": false,
+    "totalPoints": 2,
+    "vehicleTypes": [
+      "ebike",
+      "ecar"
+    ],
+    "supportsEscooter": true,
+    "connectors": [
+      {
+        "type": "e-Scooter / Type 2",
+        "powerKw": 11,
+        "current": "AC",
+        "quantity": 1
+      }
+    ],
+    "openingHours": "24/7",
+    "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
+    "source": "OpenStreetMap (Overpass/Nominatim)",
+    "lastUpdated": "2026-11-15T07:31:10.498Z",
+    "verifiedSources": [
+      "OpenStreetMap"
+    ]
   }
 ];
   if (typeof window !== 'undefined') {

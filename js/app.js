@@ -7021,6 +7021,10 @@ class GoogleMapsApp {
       const typeTag = st._isEscooter && st._isEcar
         ? '<span class="ev-tag">Ô tô EV + e-Scooter</span>'
         : (st._isEscooter ? '<span class="ev-tag">Xe máy điện / Đổi pin</span>' : '<span class="ev-tag">Ô tô điện EV</span>');
+      const availInfo = (window.mapEngine && typeof window.mapEngine.estimateEVPortAvailability === 'function')
+        ? window.mapEngine.estimateEVPortAvailability(st)
+        : { available: Math.max(1, Math.floor((st.totalPoints || 2) / 2)), total: Math.max(1, st.totalPoints || 2) };
+      const availTag = `<span class="ev-tag">Trống ~${availInfo.available}/${availInfo.total} trụ (Mô phỏng)</span>`;
       const safeName = String(st.name || '').replace(/'/g, "\\'");
 
       return `
@@ -7033,6 +7037,7 @@ class GoogleMapsApp {
           <div class="ev-card-tags">
             <span class="ev-tag power">${st.maxPowerKw || 60} kW • ${st.operator || 'EV'}</span>
             ${typeTag}
+            ${availTag}
             ${floodBadge}
           </div>
           <div class="ev-card-actions">
