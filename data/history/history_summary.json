@@ -1,69 +1,10 @@
 {
   "description": "Lịch sử quan trắc lưu thông & ngập lụt đô thị 7 ngày gần nhất",
   "retentionDays": 7,
-  "totalSnapshots": 30,
+  "totalSnapshots": 29,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-17T10:31:44.808Z",
+  "updatedAt": "2026-11-17T19:41:44.950Z",
   "snapshots": [
-    {
-      "timestamp": "2026-11-10T10:52:58.319Z",
-      "date": "2026-11-10",
-      "hour": 17,
-      "hanoi": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 4.6,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 5,
-        "congestionIndex": 5,
-        "maxRainMm": 5,
-        "activeFloodSpots": [
-          {
-            "id": "dn-02",
-            "name": "Đường Mẹ Suốt (Liên Chiểu)",
-            "depth_cm": 13,
-            "danger_level": "medium"
-          },
-          {
-            "id": "dn-04",
-            "name": "Đường Tôn Đức Thắng (Trước Bến xe Trung tâm Đà Nẵng)",
-            "depth_cm": 11,
-            "danger_level": "medium"
-          }
-        ]
-      }
-    },
-    {
-      "timestamp": "2026-11-10T18:31:24.620Z",
-      "date": "2026-11-11",
-      "hour": 1,
-      "hanoi": {
-        "avgSpeedKmh": 39,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 37,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 40,
-        "congestionIndex": 1,
-        "maxRainMm": 0.2,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-11-10T23:56:48.229Z",
       "date": "2026-11-11",
@@ -895,6 +836,29 @@
       "danang": {
         "avgSpeedKmh": 16,
         "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-11-17T19:41:44.950Z",
+      "date": "2026-11-18",
+      "hour": 2,
+      "hanoi": {
+        "avgSpeedKmh": 40,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 38,
+        "congestionIndex": 1,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 38,
+        "congestionIndex": 1,
         "maxRainMm": 0,
         "activeFloodSpots": []
       }
