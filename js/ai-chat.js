@@ -1279,7 +1279,7 @@ class AIChat {
           if (typeof window !== 'undefined' && window.moveSafeLogger) {
             window.moveSafeLogger.log({
               category: 'ai',
-              title: `AI Copilot & Spatial RAG (${r.modelUsed || 'Server Gemini'})`,
+              title: `Trợ lý AI Gemini & Spatial RAG (${r.modelUsed || 'Server Gemini'})`,
               source: 'js/ai-chat.js :: sendMessage() -> Server',
               durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
               status: verified.verification?.type === 'warning' ? 'warning' : 'success',
@@ -1388,7 +1388,7 @@ class AIChat {
         if (typeof window !== 'undefined' && window.moveSafeLogger) {
           window.moveSafeLogger.log({
             category: 'ai',
-            title: 'AI Copilot & Spatial RAG (Client Direct Gemini)',
+            title: 'Trợ lý AI Gemini & Spatial RAG (Client Direct Gemini)',
             source: 'js/ai-chat.js :: sendMessage() -> Client Fallback',
             durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
             status: verified.verification?.type === 'warning' ? 'warning' : 'success',
@@ -1454,7 +1454,7 @@ class AIChat {
     if (typeof window !== 'undefined' && window.moveSafeLogger) {
       window.moveSafeLogger.log({
         category: 'ai',
-        title: 'AI Copilot & Spatial RAG (Local Smart Engine)',
+        title: 'Trợ lý AI Gemini & Spatial RAG (Local Smart Engine)',
         source: 'js/ai-chat.js :: sendMessage() -> Offline Engine',
         durationMs: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - _aiStartMs,
         status: 'info',
