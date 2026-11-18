@@ -303,6 +303,15 @@ class RoutingService {
     return false;
   }
 
+  isSameHazard(a, b) {
+    if (!a || !b) return false;
+    if (a === b) return true;
+    if (a.id !== undefined && b.id !== undefined && a.id !== null && b.id !== null) {
+      return String(a.id) === String(b.id);
+    }
+    return a.lat === b.lat && a.lng === b.lng && (a.name || a.description || '') === (b.name || b.description || '');
+  }
+
   /**
    * Phân loại chướng ngại vật theo đặc tính kỹ thuật của phương tiện
    */
@@ -367,7 +376,7 @@ class RoutingService {
           ? this.getPointToSegmentDistanceMeters(f.lat, f.lng, pLat, pLng, nextPt[0], nextPt[1])
           : this.getDistanceMeters(pLat, pLng, f.lat, f.lng);
         const radius = f.radius || corridorBuffer;
-        if (d <= radius && !blockedBy.some(b => b.id === f.id)) {
+        if (d <= radius && !blockedBy.some(b => this.isSameHazard(b, f))) {
           let segProgressMeters = 0;
           if (nextPt) {
             const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
@@ -399,7 +408,7 @@ class RoutingService {
         const d = nextPt
           ? this.getPointToSegmentDistanceMeters(t.lat, t.lng, pLat, pLng, nextPt[0], nextPt[1])
           : this.getDistanceMeters(pLat, pLng, t.lat, t.lng);
-        if (d <= 150 && !blockedBy.some(b => b.id === t.id)) {
+        if (d <= 150 && !blockedBy.some(b => this.isSameHazard(b, t))) {
           let segProgressMeters = 0;
           if (nextPt) {
             const segDist = this.getDistanceMeters(pLat, pLng, nextPt[0], nextPt[1]);
@@ -428,6 +437,39 @@ class RoutingService {
       isPassable: blockedBy.length === 0,
       blockedBy
     };
+  }
+
+  buildDetourOsrmCoords(origin, destination, wp, viaWaypoint = null) {
+    const hasValidVia = Boolean(viaWaypoint && typeof viaWaypoint.lat === 'number' && typeof viaWaypoint.lng === 'number');
+    if (!hasValidVia) {
+      return [
+        [origin.lng, origin.lat],
+        [wp.lng, wp.lat],
+        [destination.lng, destination.lat]
+      ];
+    }
+    const leg1Detour =
+      this.getDistanceMeters(origin.lat, origin.lng, wp.lat, wp.lng) +
+      this.getDistanceMeters(wp.lat, wp.lng, viaWaypoint.lat, viaWaypoint.lng) -
+      this.getDistanceMeters(origin.lat, origin.lng, viaWaypoint.lat, viaWaypoint.lng);
+    const leg2Detour =
+      this.getDistanceMeters(viaWaypoint.lat, viaWaypoint.lng, wp.lat, wp.lng) +
+      this.getDistanceMeters(wp.lat, wp.lng, destination.lat, destination.lng) -
+      this.getDistanceMeters(viaWaypoint.lat, viaWaypoint.lng, destination.lat, destination.lng);
+    if (leg1Detour <= leg2Detour) {
+      return [
+        [origin.lng, origin.lat],
+        [wp.lng, wp.lat],
+        [viaWaypoint.lng, viaWaypoint.lat],
+        [destination.lng, destination.lat]
+      ];
+    }
+    return [
+      [origin.lng, origin.lat],
+      [viaWaypoint.lng, viaWaypoint.lat],
+      [wp.lng, wp.lat],
+      [destination.lng, destination.lat]
+    ];
   }
 
   /**
@@ -484,7 +526,7 @@ class RoutingService {
    * 3. Chỉ số ổn định lộ trình (Route Predictability Index - RPI)
    * 4. Điểm êm ái & Tiết kiệm năng lượng (Eco-Smooth Score)
    */
-  evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs) {
+  evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs, timeOffsetHours = null) {
     const polyline = Array.isArray(route.polyline) ? route.polyline : [];
     const totalPoints = polyline.length;
     let affectedPoints = 0;
@@ -531,7 +573,7 @@ class RoutingService {
             const isSevereJam = (typeof inc.speedKmh === 'number' && inc.speedKmh < 12) || (Number(inc.delaySeconds) >= 600);
             segWorstJam = Math.max(segWorstJam, isSevereJam ? 2 : 1);
           }
-          if (!matchedTraffics.some(t => t.id === inc.id)) {
+          if (!matchedTraffics.some(t => this.isSameHazard(t, inc))) {
             let segProgressMeters = 0;
             if (nextPt && segDist > 0) {
               const dLatSeg = nextPt[0] - pLat;
@@ -571,7 +613,7 @@ class RoutingService {
           ? this.getPointToSegmentDistanceMeters(fl.lat, fl.lng, pLat, pLng, nextPt[0], nextPt[1])
           : this.getDistanceMeters(pLat, pLng, fl.lat, fl.lng);
         if (dist <= (fl.radius || specs.corridorBuffer)) {
-          if (!matchedFloods.some(f => f.id === fl.id)) {
+          if (!matchedFloods.some(f => this.isSameHazard(f, fl))) {
             let segProgressMeters = 0;
             if (nextPt && segDist > 0) {
               const dLatSeg = nextPt[0] - pLat;
@@ -650,9 +692,12 @@ class RoutingService {
     const distanceKmNum = parseFloat(route.distanceKm) || (effectiveDistMeters / 1000);
     const turnsPerKm = distanceKmNum > 0 ? (turnsCount / distanceKmNum) : 0;
 
-    // 2. Nhận diện khung giờ cao điểm thực tế tại đô thị Việt Nam
+    // 2. Nhận diện khung giờ cao điểm thực tế tại đô thị Việt Nam (cộng thêm độ lệch dự báo tương lai nếu có)
+    const offsetHrs = (timeOffsetHours !== null && timeOffsetHours !== undefined)
+      ? (Number(timeOffsetHours) || 0)
+      : ((typeof window !== 'undefined' && window.appState) ? (Number(window.appState.currentPredictionOffset) || 0) : 0);
     const now = new Date();
-    const currentHour = now.getHours() + now.getMinutes() / 60;
+    const currentHour = (now.getHours() + now.getMinutes() / 60 + offsetHrs) % 24;
     const isPeakHour = (currentHour >= 7.0 && currentHour <= 8.75) || (currentHour >= 16.75 && currentHour <= 19.25);
 
     // 3. Mô hình BPR + Độ trễ giảm tốc lội nước (áp dụng speedFactor chỉ lên thời gian chạy thoáng)
@@ -1149,7 +1194,7 @@ return {
    * Tìm kiếm lộ trình xét Đặc tính Kỹ thuật & Nguy cơ của Phương tiện
    * Hỗ trợ cấm đường / né đường giả định (avoidRoads) theo yêu cầu tự nhiên của người dùng
    */
-  async calculateMultiRoutes({ origin, destination, viaWaypoint = null, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [] }) {
+  async calculateMultiRoutes({ origin, destination, viaWaypoint = null, floodPoints = [], trafficIncidents = [], vehicleType = 'motorbike', avoidLevel = 1, avoidRoads = [], timeOffsetHours = null }) {
     const _routeStartMs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const { specs, blockedFloods, cautionFloods, safeFloods, blockedTraffics } =
       this.classifyHazards(floodPoints, trafficIncidents, vehicleType);
@@ -1233,16 +1278,16 @@ return {
       }
       if (p.isPassable && v.allowed && !hitsAvoid) {
         directPassableCount++;
-        const evalPreview = this.evaluatePassableRoute(r, cautionFloods, safeFloods, trafficIncidents, specs);
+        const evalPreview = this.evaluatePassableRoute(r, cautionFloods, safeFloods, trafficIncidents, specs, timeOffsetHours);
         const severeOnDirect = (evalPreview.matchedTraffics || []).filter(t => t.isJam && Number(t.delaySeconds) >= 450);
         if (evalPreview.matchedFloods.length === 0 && severeOnDirect.length === 0) {
           directCleanCount++;
         } else {
           evalPreview.matchedFloods.forEach(fl => {
-            if (!directMatchedSevereHazards.some(h => h.id === fl.id)) directMatchedSevereHazards.push(fl);
+            if (!directMatchedSevereHazards.some(h => this.isSameHazard(h, fl))) directMatchedSevereHazards.push(fl);
           });
           severeOnDirect.forEach(tr => {
-            if (!directMatchedSevereHazards.some(h => h.id === tr.id)) directMatchedSevereHazards.push(tr);
+            if (!directMatchedSevereHazards.some(h => this.isSameHazard(h, tr))) directMatchedSevereHazards.push(tr);
           });
         }
       }
@@ -1254,7 +1299,7 @@ return {
     const hazardsForDetours = [...blockedFloods, ...cautionFloods];
     if (directCleanCount === 0 && directMatchedSevereHazards.length > 0) {
       directMatchedSevereHazards.slice(0, 3).forEach(h => {
-        if (!hazardsForDetours.some(ex => ex.id === h.id)) {
+        if (!hazardsForDetours.some(ex => this.isSameHazard(ex, h))) {
           hazardsForDetours.push(h);
         }
       });
@@ -1310,14 +1355,10 @@ return {
       const customOffsets = cleanAvoidRoads.length > 0 ? [1800, 2600, 3400] : null;
       const detourWaypoints = this.generateDetourWaypoints(origin, destination, hazardsForDetours, specs, customOffsets);
 
-      // Pha 1: Thử 4 waypoint ưu tiên cao nhất trước để tránh lỗi Rate-Limit 429 từ OSRM
+      // Pha 1: Thử 4 waypoint ưu tiên cao nhất trước để tránh lỗi Rate-Limit 429 từ OSRM (giữ viaWaypoint nếu có)
       const tier1Waypoints = detourWaypoints.slice(0, 4);
       const tier1Results = await Promise.all(tier1Waypoints.map(wp =>
-        this.fetchOsrmRoute([
-          [origin.lng, origin.lat],
-          [wp.lng, wp.lat],
-          [destination.lng, destination.lat]
-        ]).catch(() => [])
+        this.fetchOsrmRoute(this.buildDetourOsrmCoords(origin, destination, wp, viaWaypoint)).catch(() => [])
       ));
       let foundPassableDetour = 0;
       tier1Results.forEach(res => {
@@ -1334,11 +1375,7 @@ return {
       if (directPassableCount + foundPassableDetour < 2 && detourWaypoints.length > 4) {
         const tier2Waypoints = detourWaypoints.slice(4, 8);
         const tier2Results = await Promise.all(tier2Waypoints.map(wp =>
-          this.fetchOsrmRoute([
-            [origin.lng, origin.lat],
-            [wp.lng, wp.lat],
-            [destination.lng, destination.lat]
-          ]).catch(() => [])
+          this.fetchOsrmRoute(this.buildDetourOsrmCoords(origin, destination, wp, viaWaypoint)).catch(() => [])
         ));
         tier2Results.forEach(res => {
           if (res && res.length > 0) allRawCandidates.push(res[0]);
@@ -1458,7 +1495,7 @@ return {
 
     // 7. Đánh giá chi tiết lưu thông & nước nông trên các tuyến ĐI ĐƯỢC
     const analyzedPassableRoutes = passableCandidates.map(route =>
-      this.evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs)
+      this.evaluatePassableRoute(route, cautionFloods, safeFloods, trafficIncidents, specs, timeOffsetHours)
     );
 
     // 8. Xây dựng 3 chế độ từ các tuyến ĐI ĐƯỢC

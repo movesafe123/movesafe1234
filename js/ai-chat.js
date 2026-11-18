@@ -7,13 +7,23 @@
 const VEHICLE_PHYSICS_SPECS = {
   motorbike: {
     type: 'motorbike',
-    name: 'Xe máy xăng / Xe tay ga',
+    name: 'Xe máy xăng',
     safeDepthCm: 10,
     maxPassableDepthCm: 20,
     criticalDepthCm: 25,
-    intakePart: 'Ống xả và lọc gió nồi xe ga',
-    damageRisk: 'Nước tràn ống xả, tắt máy, nước vào lốc máy & bộ côn',
+    intakePart: 'Ống xả và bugi động cơ',
+    damageRisk: 'Nước tràn ống xả, tắt máy, nước vào lốc máy',
     riskCostRangeVnd: '300.000đ – 2.500.000đ'
+  },
+  scooter: {
+    type: 'scooter',
+    name: 'Xe tay ga',
+    safeDepthCm: 10,
+    maxPassableDepthCm: 18,
+    criticalDepthCm: 22,
+    intakePart: 'Hốc gió nồi CVT & ống xả thấp',
+    damageRisk: 'Ngập bộ nồi CVT, nước vào dầu láp & chết máy',
+    riskCostRangeVnd: '500.000đ – 3.500.000đ'
   },
   ebike: {
     type: 'ebike',
@@ -27,13 +37,33 @@ const VEHICLE_PHYSICS_SPECS = {
   },
   car: {
     type: 'car',
-    name: 'Ô tô xăng (Sedan / Hatchback)',
+    name: 'Ô tô xăng',
     safeDepthCm: 15,
     maxPassableDepthCm: 25,
     criticalDepthCm: 30,
     intakePart: 'Họng hút gió động cơ (Air intake)',
     damageRisk: 'THỦY KÍCH phá hủy tay biên, cong xúp-páp, vỡ lốc máy',
     riskCostRangeVnd: '25.000.000đ – 80.000.000đ'
+  },
+  sedan: {
+    type: 'sedan',
+    name: 'Ô tô Sedan gầm thấp',
+    safeDepthCm: 12,
+    maxPassableDepthCm: 22,
+    criticalDepthCm: 28,
+    intakePart: 'Cổ hút gió thấp dưới ba-đờ-sốc trước',
+    damageRisk: 'THỦY KÍCH cực cao khi sóng nước dâng qua cản trước',
+    riskCostRangeVnd: '30.000.000đ – 90.000.000đ'
+  },
+  suv: {
+    type: 'suv',
+    name: 'Ô tô SUV / Bán tải gầm cao',
+    safeDepthCm: 20,
+    maxPassableDepthCm: 35,
+    criticalDepthCm: 42,
+    intakePart: 'Hệ thống cảm biến gầm, hộp số vi sai & cổ hút cao',
+    damageRisk: 'Mất bám đường hoặc hỏng cảm biến cầu khi ngập sâu > 35cm',
+    riskCostRangeVnd: '15.000.000đ – 50.000.000đ'
   },
   ecar: {
     type: 'ecar',
@@ -242,7 +272,7 @@ class AIChat {
     }
 
     if (this.sessionMemory.lastVehicle && this.sessionMemory.lastVehicle !== 'motorbike') {
-      const vMap = { car: 'Ô tô', ebike: 'Xe máy điện', ecar: 'Ô tô điện' };
+      const vMap = { scooter: 'Xe tay ga', car: 'Ô tô', sedan: 'Ô tô Sedan', suv: 'Ô tô SUV', ebike: 'Xe máy điện', ecar: 'Ô tô điện' };
       parts.push(vMap[this.sessionMemory.lastVehicle] || this.sessionMemory.lastVehicle);
     }
 
@@ -573,7 +603,7 @@ class AIChat {
           </div>
         </div>
         <div class="gm-timeshift-actions">
-          <button type="button" class="btn-ts-act" onclick="window.appState && window.appState.applyPredictionOffset(1)">
+          <button type="button" class="btn-ts-act" onclick="(async()=>{ const s=document.getElementById('traffic-prediction-slider'); const lbl=document.getElementById('prediction-time-label'); if(s) s.value='1'; if(lbl) lbl.textContent='+1 Giờ tới'; if(window.appState){ await window.appState.applyPredictionOffset(1); if(window.appState.isDirectionsOpen) await window.appState.calculateSmartRoute(); } })()">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span>Bật bản đồ mốc +1h</span>
           </button>
@@ -999,7 +1029,7 @@ class AIChat {
       this.sessionMemory.lastOrigin = orig;
       this.sessionMemory.lastDestination = dest;
       this.updateMemoryBarUI();
-      await app.triggerChatRoute(orig, dest, 1, 0, []);
+      await app.triggerChatRoute(orig, dest, null, 0, []);
       executedResults.preActionSummary = `Đã tự động vạch chặng nối tiếp: ${orig} -> ${dest}.`;
       return { query: `Tìm đường nối tiếp từ ${orig} sang ${dest}`, executedResults };
     }
@@ -1126,11 +1156,23 @@ class AIChat {
       this.sessionMemory.lastOrigin = parsed.origin;
       this.sessionMemory.lastDestination = parsed.destination;
       if (parsed.requestedVehicle) this.sessionMemory.lastVehicle = parsed.requestedVehicle;
-      if (parsed.avoidRoad) this.sessionMemory.lastAvoidRoads = [parsed.avoidRoad];
+      const avoidList = (Array.isArray(parsed.avoidRoads) && parsed.avoidRoads.length > 0)
+        ? parsed.avoidRoads
+        : (parsed.avoidRoad ? [parsed.avoidRoad] : []);
+      this.sessionMemory.lastAvoidRoads = avoidList;
+      if (parsed.requestedAvoidLevel !== null && parsed.requestedAvoidLevel !== undefined) {
+        this.sessionMemory.lastAvoidLevel = parsed.requestedAvoidLevel;
+      }
       this.updateMemoryBarUI();
 
       // Kích hoạt tính toán trước để lấy kết quả thật và đánh dấu đã vẽ để không bị gọi lặp lần 2
-      await app.triggerChatRoute(parsed.origin, parsed.destination, 1, parsed.timeOffsetHours || 0, parsed.avoidRoad ? [parsed.avoidRoad] : []);
+      await app.triggerChatRoute(
+        parsed.origin,
+        parsed.destination,
+        parsed.requestedAvoidLevel ?? null,
+        parsed.timeOffsetHours || 0,
+        avoidList
+      );
       this._preActionRouteExecuted = true;
       executedResults.preActionSummary = `Đã tính toán lộ trình: ${parsed.origin} -> ${parsed.destination}`;
     }
@@ -1522,12 +1564,14 @@ class AIChat {
       const seen = new Set();
 
       if (isEvQ && typeof window !== 'undefined' && Array.isArray(window.mapEngine?._evStationsData)) {
-        window.mapEngine._evStationsData.forEach(st => {
+        const cityEv = window.mapEngine._evStationsData.filter(st => !st?.city || st.city === currentCity);
+        const evList = cityEv.length > 0 ? cityEv : window.mapEngine._evStationsData;
+        evList.forEach(st => {
           if (st && st.lat && st.lng && !seen.has(st.name)) {
             seen.add(st.name);
             pool.push({
               name: st.name,
-              address: st.address || 'Hà Nội',
+              address: st.address || (currentCity === 'hcm' ? 'TP. Hồ Chí Minh' : (currentCity === 'danang' ? 'Đà Nẵng' : 'Hà Nội')),
               lat: st.lat,
               lng: st.lng,
               category: 'ev',
@@ -1837,7 +1881,9 @@ ${query}
       if (act.type === 'AUTO_ROUTE' && act.origin && act.destination) {
         if (this._preActionRouteExecuted) return;
         const avoidList = act.avoidRoads || [];
-        app.triggerChatRoute(act.origin, act.destination, act.avoidLevel || 1, act.timeOffsetHours || 0, avoidList);
+        app.triggerChatRoute(act.origin, act.destination, act.avoidLevel ?? null, act.timeOffsetHours || 0, avoidList);
+      } else if (act.type === 'OPEN_DIRECTIONS') {
+        if (typeof app.toggleDirectionsPanel === 'function') app.toggleDirectionsPanel(true);
       } else if (act.type === 'FOCUS_POINT' && act.lat && act.lng) {
         mapEng.map?.flyTo([act.lat, act.lng], 16);
       } else if (act.type === 'SHOW_FLOOD_LAYER') {
@@ -1883,7 +1929,11 @@ ${query}
       } else if (act.type === 'OPEN_URBAN_INSIGHTS') {
         if (typeof app.openUrbanInsightsModal === 'function') app.openUrbanInsightsModal();
       } else if (act.type === 'OPEN_REPORT_MODAL') {
-        if (typeof app.openCrowdsourceModal === 'function') app.openCrowdsourceModal();
+        if (typeof app.openCrowdsourceModal === 'function') {
+          app.openCrowdsourceModal();
+        } else {
+          document.getElementById('modal-report')?.classList.add('open');
+        }
       }
     };
 
@@ -2097,18 +2147,16 @@ ${query}
   computeQuantitativeTradeoff(webState = {}, query = '', ragInfo = {}, multiIntent = null) {
     const mIntent = multiIntent || (this.analyzeMultiIntentProfile ? this.analyzeMultiIntentProfile(query) : {});
     const vKey = mIntent.requestedVehicle || webState.currentVehicle || 'motorbike';
-    const spec = VEHICLE_PHYSICS_SPECS[vKey] || VEHICLE_PHYSICS_SPECS.motorbike;
     const subType = mIntent.vehicleSubType;
-    const vehicleDisplayName = subType === 'scooter' ? 'Xe tay ga'
-      : (subType === 'sedan' ? 'Ô tô sedan gầm thấp'
-      : (subType === 'suv' ? 'Ô tô SUV gầm cao' : spec.name));
+    const spec = VEHICLE_PHYSICS_SPECS[subType || vKey] || VEHICLE_PHYSICS_SPECS[vKey] || VEHICLE_PHYSICS_SPECS.motorbike;
+    const vehicleDisplayName = spec.name;
 
     const allActiveFloods = Array.isArray(webState.visibleFloods) ? webState.visibleFloods.filter(f => (f.depth_cm || 0) > 0) : [];
     const isCityWide = /(?:toàn\s+thành\s+phố|toàn\s+đô\s+thị|tình\s+hình\s+chung|những\s+điểm\s+nào\s+ngập|các\s+điểm\s+ngập)/i.test(query || '');
     let scopedFloods = allActiveFloods;
 
     if (!isCityWide && allActiveFloods.length > 0) {
-      const qNorm = (typeof window.geocodingService !== 'undefined' && window.geocodingService.normalizeVietnameseQuery)
+      const qNorm = (typeof window !== 'undefined' && window.geocodingService && window.geocodingService.normalizeVietnameseQuery)
         ? window.geocodingService.normalizeVietnameseQuery(query || '')
         : (query || '').toLowerCase();
       const qTokens = qNorm.split(/\s+/).filter(w => w.length >= 3 && !['duong', 'pho', 'quan', 'phuong', 'hien', 'tai', 'nhu', 'the', 'nao', 'khong', 'dang', 'ngap'].includes(w));
@@ -2131,8 +2179,8 @@ ${query}
       }
     }
 
-    const safeLimit = subType === 'scooter' ? 15 : spec.safeDepthCm;
-    const maxPassable = subType === 'scooter' ? 18 : spec.maxPassableDepthCm;
+    const safeLimit = spec.safeDepthCm;
+    const maxPassable = spec.maxPassableDepthCm;
     const isSafe = maxFloodCm <= safeLimit;
     const isCritical = maxFloodCm > maxPassable;
 
@@ -2549,6 +2597,7 @@ ${query}
     const hasFloods = Boolean(app && app.liveData && app.liveData.floodPoints && app.liveData.floodPoints.some(f => f.depth_cm > 0));
     const isSimulation = Boolean(app && app.isSimulationMode);
 
+    const currentCity = (app && app.currentCity) || 'hanoi';
     let chips = [];
     if (hasRoute) {
       chips = [
@@ -2558,17 +2607,35 @@ ${query}
         { text: 'Nếu đổi sang Ô tô thì mất bao lâu?', query: 'Nếu lộ trình này đổi sang đi Ô tô thì hết bao nhiêu phút và có dính ngập không?' }
       ];
     } else if (hasFloods || isSimulation) {
+      const routeSample = currentCity === 'hcm'
+        ? { text: 'Bến Thành đi Thảo Điền né ngập', query: 'Từ Chợ Bến Thành về Thảo Điền đi đường nào thông thoáng né hết điểm ngập?' }
+        : (currentCity === 'danang'
+          ? { text: 'Cầu Rồng đi Mỹ Khê né ngập', query: 'Từ Cầu Rồng ra Biển Mỹ Khê đi đường nào thông thoáng né hết điểm ngập?' }
+          : { text: 'Từ Bách Khoa đi Cầu Giấy né ngập', query: 'Từ Đại học Bách Khoa về Cầu Giấy đi đường nào thông thoáng né hết điểm ngập?' });
       chips = [
         { text: 'Top điểm đang ngập sâu nhất', query: 'Hiện tại toàn thành phố những điểm nào đang ngập sâu nhất và độ sâu bao nhiêu cm?' },
-        { text: 'Từ Bách Khoa đi Cầu Giấy né ngập', query: 'Từ Đại học Bách Khoa về Cầu Giấy đi đường nào thông thoáng né hết điểm ngập?' },
+        routeSample,
         { text: 'Bãi gửi xe & trú mưa cao ráo', query: 'Gợi ý các bãi gửi xe cao ráo và điểm trú mưa an toàn tránh thủy kích gần đây' },
         { text: 'Dự báo thời tiết & mưa 15P', query: 'Dự báo thời tiết và diễn biến mưa ngập trong 15 phút tới thế nào?' }
       ];
     } else {
+      const cityDefaults = currentCity === 'hcm'
+        ? [
+            { text: 'Bến Thành đi Sân bay TSN', query: 'Từ Chợ Bến Thành ra Sân bay Tân Sơn Nhất đi đường nào thông thoáng?' },
+            { text: 'Ăn chơi Quận 1', query: 'Quanh Quận 1 có quán ăn hay chỗ vui chơi nào nổi tiếng không?' }
+          ]
+        : (currentCity === 'danang'
+          ? [
+              { text: 'Hải Châu đi Biển Mỹ Khê', query: 'Từ Trung tâm Hải Châu ra Bãi biển Mỹ Khê đi đường nào thông thoáng?' },
+              { text: 'Ăn chơi Đà Nẵng', query: 'Quanh Hải Châu có quán ăn hay chỗ vui chơi nào nổi tiếng không?' }
+            ]
+          : [
+              { text: 'Cầu Giấy đi Mỹ Đình', query: 'Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?' },
+              { text: 'Ăn chơi Mỹ Đình', query: 'Quanh Mỹ Đình có quán ăn hay chỗ vui chơi nào nổi tiếng không?' }
+            ]);
       chips = [
         { text: 'Tình hình hiện tại', query: 'Tình hình ngập úng và kẹt xe hiện tại thế nào?' },
-        { text: 'Cầu Giấy đi Mỹ Đình', query: 'Từ Cầu Giấy ra Bến xe Mỹ Đình đi đường nào thông thoáng?' },
-        { text: 'Ăn chơi Mỹ Đình', query: 'Quanh Mỹ Đình có quán ăn hay chỗ vui chơi nào nổi tiếng không?' },
+        ...cityDefaults,
         { text: 'Dự báo thời tiết', query: 'Dự báo thời tiết và nguy cơ ngập hôm nay?' }
       ];
     }
@@ -2627,6 +2694,11 @@ ${query}
     else if (/(?:đi\s+ô\s*tô|bằng\s+ô\s*tô|xe\s+ô\s*tô|xe\s+hơi|4\s+bánh)/i.test(lower)) requestedVehicle = 'car';
     else if (/(?:đi\s+xe\s*máy|bằng\s+xe\s*máy|2\s+bánh|xe\s+gắn\s+máy)/i.test(lower)) requestedVehicle = 'motorbike';
 
+    let requestedAvoidLevel = null;
+    if (/(?:chế\s*độ\s*an\s*toàn|tuyến\s*an\s*toàn|an\s*toàn\s*nhất|an\s*toàn\s*tuyệt\s*đối)/i.test(lower)) requestedAvoidLevel = 1;
+    else if (/(?:chế\s*độ\s*cân\s*bằng|tuyến\s*cân\s*bằng|êm\s*ái|trục\s*chính\s*êm\s*ái)/i.test(lower)) requestedAvoidLevel = 2;
+    else if (/(?:chế\s*độ\s*nhanh|tuyến\s*nhanh\s*nhất|nhanh\s*thực\s*tế|đi\s*nhanh\s*nhất)/i.test(lower)) requestedAvoidLevel = 3;
+
     let hasPitstopIntent = false;
     let pitstopKeyword = null;
     const pitstopMatch = query.match(/(?:tiện\s*đường|ghé|dừng)\s*(?:vào|qua|ở)?\s*(tìm\s*quán\s*cafe|quán\s*cafe|cafe|quán\s*ăn|ăn\s*tối|trạm\s*sạc|cây\s*xăng|chỗ\s*trú\s*mưa|uống\s*nước|[a-zA-Z0-9\s\u00C0-\u1EF9]+)?/i);
@@ -2641,7 +2713,7 @@ ${query}
       let rawDest = matchA[1].replace(/^(?:tôi|mình|bạn)\s+/i, '').trim();
       let rawOrig = matchA[2].replace(/\s+(?:ra|vào|đến|theo|qua|đường|thế nào).*$/i, '').trim();
       if (rawDest.length >= 2 && rawOrig.length >= 2 && !rawDest.match(/^(?:đường|đường nào)$/i)) {
-        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
+        return { origin: rawOrig, destination: rawDest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, requestedAvoidLevel, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
       }
     }
 
@@ -2661,7 +2733,7 @@ ${query}
         .trim();
 
       if (orig.length >= 2 && dest.length >= 2 && !dest.match(/^(?:đường|đường nào)$/i)) {
-        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
+        return { origin: orig, destination: dest, timeOffsetHours, avoidRoad, avoidRoads, requestedVehicle, requestedAvoidLevel, isRouteIntent: true, hasPitstopIntent, pitstopKeyword };
       }
     }
 
@@ -2837,7 +2909,8 @@ ${query}
     // 4. Phân loại Trạm Sạc Xe Điện / Đổi Pin
     if (/(?:trạm\s*sạc|sạc\s*xe|sạc\s*điện|sạc\s*pin|xe\s*điện|vinfast|đổi\s*pin|\bsạc(?!h)\b)/i.test(q) && !/(?:sạch\s*sẽ|ăn\s*sạch)/i.test(q)) {
       const evStations = (typeof window !== 'undefined' && window.mapEngine && window.mapEngine._evStationsData) || [];
-      const top3Ev = evStations.slice(0, 3);
+      const cityEv = evStations.filter(st => !st?.city || st.city === currentCity);
+      const top3Ev = (cityEv.length > 0 ? cityEv : evStations).slice(0, 3);
       let text = `**Hệ thống Trạm sạc Xe điện & Đổi pin tại ${cityName}:**\n\n`;
       if (top3Ev.length > 0) {
         top3Ev.forEach((st, idx) => {

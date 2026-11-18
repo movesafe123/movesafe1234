@@ -455,4 +455,82 @@ describe('Module TC-UI & TC-AI: User Features & AI Co-Pilot', () => {
     assert.strictEqual(enriched.osmId, 'osm-node-991', 'Phải gắn thêm osmId làm giàu dữ liệu');
     assert.ok(Array.isArray(enriched.verifiedSources) && enriched.verifiedSources.includes('EVCS.VN') && enriched.verifiedSources.includes('OpenStreetMap'));
   });
+
+  it('[TC-UI-20] Khôi phục Chatbox Gemini & vá 13 lỗi logic (dự báo cục bộ, viaWaypoint vòng, 7 xe AI, VOV tránh tắc, lọc EV)', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
+
+    // 1. Chatbox Gemini & các nút mở AI không còn bị ẩn cứng
+    for (const id of ['ai-chat-window', 'chip-ai-trigger', 'btn-place-ask-ai', 'mnav-ai']) {
+      const re = new RegExp(`id="${id}"[^>]*display:\\s*none\\s*!important`, 'i');
+      assert.strictEqual(re.test(html), false, `${id} không được gắn display: none !important`);
+    }
+
+    // 2. Dự báo tương lai nội suy mưa cục bộ 3 trạm gần nhất (tránh mưa ngoại thành làm ngập nội đô)
+    process.env.BOT_DISABLE_AUTO_INIT = '1';
+    const botService = require('../../server/bot-service');
+    const prevWeather = botService.cachedData.weatherStations;
+    const prevFloods = botService.cachedData.floodPoints;
+    try {
+      botService.cachedData.floodPoints = [];
+      botService.cachedData.weatherStations = {
+        hanoi: [
+          { name: 'Ba Vì Ngoại thành', lat: 21.1500, lng: 105.3800, forecastRain: [35, 35, 35] },
+          { name: 'Trạm Hoàn Kiếm 1', lat: 21.0285, lng: 105.8542, forecastRain: [0, 0, 0] },
+          { name: 'Trạm Đống Đa 2', lat: 21.0110, lng: 105.8250, forecastRain: [0, 0, 0] },
+          { name: 'Trạm Thanh Xuân 3', lat: 20.9960, lng: 105.8050, forecastRain: [0, 0, 0] },
+          { name: 'Trạm Hai Bà Trưng 4', lat: 21.0080, lng: 105.8510, forecastRain: [0, 0, 0] }
+        ]
+      };
+      const pred = botService.getFuturePredictions('hanoi', 1);
+      assert.strictEqual(pred.floodPoints.length, 0, 'Mưa tại trạm Ba Vì cách xa >40km không được bật ngập đồng loạt cho nội đô (0mm)');
+    } finally {
+      botService.cachedData.weatherStations = prevWeather;
+      botService.cachedData.floodPoints = prevFloods;
+    }
+
+    // 3. RoutingService: isSameHazard không gộp nhầm khi thiếu id, và buildDetourOsrmCoords giữ viaWaypoint
+    const RoutingService = require('../../js/routing-service');
+    const router = new RoutingService();
+    assert.strictEqual(
+      router.isSameHazard({ lat: 21.01, lng: 105.82, name: 'A' }, { lat: 21.02, lng: 105.83, name: 'B' }),
+      false,
+      'Hai điểm ngập thiếu id tại tọa độ khác nhau không được coi là trùng'
+    );
+    const detourCoords = router.buildDetourOsrmCoords(
+      { lat: 21.00, lng: 105.80 },
+      { lat: 21.04, lng: 105.85 },
+      { lat: 21.01, lng: 105.83 },
+      { lat: 21.03, lng: 105.82 }
+    );
+    assert.strictEqual(detourCoords.length, 4, 'Đường vòng khi có điểm ghé qua (viaWaypoint) phải truyền đủ 4 tọa độ');
+
+    // 4. AIChat: nhận diện đủ 7 xe (suv 35cm, sedan 22cm) & mặc định requestedAvoidLevel = null
+    const AIChat = require('../../js/ai-chat');
+    const aiChat = new AIChat();
+    const suvTradeoff = aiChat.computeQuantitativeTradeoff({
+      currentVehicle: 'suv',
+      visibleFloods: [{ name: 'Ngã tư thử nghiệm', depth_cm: 28 }]
+    }, 'Đường này có ngập không?');
+    assert.strictEqual(suvTradeoff.maxPassable, 35, 'SUV gầm cao phải có ngưỡng tối đa 35cm');
+    assert.strictEqual(suvTradeoff.isCritical, false, '28cm chưa vượt ngưỡng nguy hiểm của SUV 35cm');
+
+    const parsedRoute = aiChat.parseRouteQuery('Từ Bách Khoa về Cầu Giấy, né Thái Hà và Nguyễn Trãi');
+    assert.strictEqual(parsedRoute.requestedAvoidLevel, null, 'Không ép avoidLevel=1 khi câu hỏi không chỉ định chế độ');
+    assert.deepStrictEqual(parsedRoute.avoidRoads, ['Thái Hà', 'Nguyễn Trãi']);
+
+    // 5. EV filter tách riêng tủ đổi pin xe máy điện 11kW khỏi Ô tô điện & nút VOV avoidHotspotFromVov
+    const { GoogleMapsApp } = require('../../js/app');
+    const app = new GoogleMapsApp();
+    global.window = global.window || {};
+    global.window.MOVE_SAFE_EV_STATIONS = [
+      { id: 'selex-1', name: 'Tủ đổi pin Selex 11kW', operator: 'Selex Motors', lat: 21.0285, lng: 105.8542, maxPowerKw: 11, supportsEscooter: true, vehicleTypes: ['ebike'] },
+      { id: 'vf-1', name: 'Trạm sạc VinFast VF', operator: 'VinFast', lat: 21.0290, lng: 105.8545, maxPowerKw: 60, vehicleTypes: ['ecar'] }
+    ];
+    const ecarOnly = app.rankEVStationsAround(21.0285, 105.8542, { filterType: 'ecar', radiusKm: 5 });
+    assert.strictEqual(ecarOnly.some(s => s.id === 'selex-1'), false, 'Tủ đổi pin xe máy Selex không được lọt vào bộ lọc Ô tô điện');
+    assert.strictEqual(ecarOnly.some(s => s.id === 'vf-1'), true, 'Trạm sạc ô tô VinFast phải nằm trong bộ lọc Ô tô điện');
+    assert.strictEqual(typeof app.avoidHotspotFromVov, 'function', 'Phải có hàm avoidHotspotFromVov xử lý tránh điểm ùn tắc VOV');
+  });
 });

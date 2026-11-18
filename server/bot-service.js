@@ -1586,19 +1586,52 @@ class LocalUrbanBot extends EventEmitter {
     // Lấy baseline lịch sử của khung giờ mục tiêu từ HistoryService
     const baseline = historyService.getHourlyBaseline(cityKey, vnHour);
 
-    // 1. Dự báo ngập
+    // 1. Dự báo ngập (Nội suy mưa cục bộ 3 trạm gần nhất & tích lũy/tiêu thoát tuần tự từng giờ)
     const predictedFloods = [];
     const currentCityFloods = (this.cachedData.floodPoints || []).filter(f => f.city === cityKey && f.depth_cm > 0);
 
-    if (maxForecastRain >= 10 || currentCityFloods.length > 0) {
-      const candidateStations = LOCAL_FLOOD_STATIONS.filter(s => s.city === cityKey);
-      candidateStations.forEach(st => {
-        const currMemory = this.floodMemory.get(st.id) || { depth_cm: 0 };
-        const rainBoost = maxForecastRain >= 25 ? 1.2 : (maxForecastRain >= 10 ? 0.8 : 0);
-        const projectedRainDepth = Math.round(st.depth_cm * rainBoost);
-        const residualDepth = Math.max(0, currMemory.depth_cm - (12 * offsetHours));
-        const finalDepth = Math.max(projectedRainDepth, residualDepth);
+    if (maxForecastRain >= 4 || currentCityFloods.length > 0) {
+      const candidateStations = [...LOCAL_FLOOD_STATIONS.filter(s => s.city === cityKey)];
+      currentCityFloods.forEach(cf => {
+        if (!candidateStations.some(s => s.id === cf.id)) {
+          candidateStations.push(cf);
+        }
+      });
 
+      const geoStations = stations.filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
+
+      candidateStations.forEach(st => {
+        const activeMatch = currentCityFloods.find(f => f.id === st.id);
+        const currMemory = this.floodMemory.get(st.id) || { depth_cm: 0 };
+        const baseDepth = st.base_depth_cm || st.depth_cm || activeMatch?.depth_cm || 30;
+        let depth = Math.max(currMemory.depth_cm || 0, activeMatch?.depth_cm || 0);
+
+        const nearestThree = (geoStations.length > 0 && Number.isFinite(st.lat) && Number.isFinite(st.lng))
+          ? [...geoStations]
+              .sort((a, b) => Math.hypot(a.lat - st.lat, a.lng - st.lng) - Math.hypot(b.lat - st.lat, b.lng - st.lng))
+              .slice(0, 3)
+          : [];
+
+        for (let step = 1; step <= offsetHours; step++) {
+          let localStepRain = 0;
+          if (nearestThree.length > 0) {
+            const withForecast = nearestThree.filter(s => Array.isArray(s.forecastRain));
+            if (withForecast.length > 0) {
+              localStepRain = withForecast.reduce((mx, s) => Math.max(mx, Number(s.forecastRain[step - 1]) || 0), 0);
+            } else {
+              localStepRain = maxForecastRain;
+            }
+          } else {
+            localStepRain = maxForecastRain;
+          }
+
+          const rainBoost = localStepRain >= 25 ? 1.2 : (localStepRain >= 10 ? 0.8 : (localStepRain >= 4 ? 0.45 : 0));
+          const stepProjected = Math.round(baseDepth * rainBoost);
+          const stepResidual = Math.max(0, depth - 12);
+          depth = Math.max(stepProjected, stepResidual);
+        }
+
+        const finalDepth = depth;
         if (finalDepth >= 10) {
           const locName = st.name || 'Điểm ngập';
           predictedFloods.push({
