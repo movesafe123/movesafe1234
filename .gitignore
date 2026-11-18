@@ -13,6 +13,7 @@ Thumbs.db
 *.temp
 *.zip
 *.docx
+*.pptx
 docx_text.txt
 public/screenshots/
 preview_page_*.png
@@ -29,10 +30,13 @@ scratch/
 convert.js
 generate_full_doc.js
 
-# Local agent skills junctions
+# Local agent skills junctions & editor folders
 .agents/
 .github/skills/
 .vscode/
+.cursor/
+.cursorrules
+.kilo/
 
 # Media recordings & tool locks
 *.mp4
