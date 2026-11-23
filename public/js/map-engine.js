@@ -856,7 +856,9 @@ class MapEngine {
               
               const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
               const isSuperFast = st.maxPowerKw && st.maxPowerKw >= 120;
-              const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
+              const isSwap = st.stationKind === 'battery_swap' || st.supportsBatterySwap === true ||
+                (st.name && /selex|đổi pin|trạm tđp/i.test(st.name)) ||
+                (st.operator && st.operator.toLowerCase().includes('selex'));
               const pinClass = isSwap ? 'ev-swap' : (isSuperFast ? 'ev-super-fast' : (isFast ? 'ev-fast' : 'ev-standard'));
 
               let primaryLabel = 'Trạm sạc';
@@ -865,7 +867,7 @@ class MapEngine {
 
               if (isSwap) {
                 primaryLabel = 'Đổi pin';
-                subLabel = 'Selex';
+                subLabel = (st.operator || 'e-Scooter').split(/[\s(/]/)[0];
                 iconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 21h5v-5"></path></svg>`;
               } else {
                 primaryLabel = isSuperFast ? 'Siêu sạc' : 'Trạm sạc';
@@ -978,7 +980,9 @@ class MapEngine {
 
   generateEVPopupHtml(st) {
     const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
-    const isSwap = (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
+    const isSwap = st.stationKind === 'battery_swap' || st.supportsBatterySwap === true ||
+      (st.name && /selex|đổi pin|trạm tđp/i.test(st.name)) ||
+      (st.operator && st.operator.toLowerCase().includes('selex'));
     
     const safeName = String(st.name || 'Trạm sạc xe điện').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeAddress = String(st.address || st.town || 'Việt Nam').replace(/</g, '&lt;').replace(/>/g, '&gt;');
