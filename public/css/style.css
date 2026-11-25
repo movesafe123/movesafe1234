@@ -678,6 +678,162 @@ body {
   }
 }
 
+/* Menu xổ con khi chạm/hover mục Trạm Sạc */
+.gm-ev-menu-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.gm-ev-parent {
+  justify-content: space-between;
+}
+
+.gm-ev-chevron {
+  flex-shrink: 0;
+  opacity: 0.65;
+  transition: transform 0.2s ease, opacity 0.15s ease;
+}
+
+.gm-ev-menu-group:hover .gm-ev-chevron,
+.gm-ev-menu-group:focus-within .gm-ev-chevron,
+.gm-ev-menu-group.is-open .gm-ev-chevron {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.gm-ev-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(26, 115, 232, 0.04);
+  border-left: 2px solid rgba(26, 115, 232, 0.35);
+  margin-left: 28px;
+  transition: max-height 0.22s ease, opacity 0.18s ease, padding 0.2s ease;
+}
+
+.gm-ev-menu-group:hover .gm-ev-submenu,
+.gm-ev-menu-group:focus-within .gm-ev-submenu,
+.gm-ev-menu-group.is-open .gm-ev-submenu {
+  max-height: 112px;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 4px 0;
+}
+
+.gm-ev-subitem {
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 18px 6px 14px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c4043;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.14s ease, color 0.14s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gm-ev-subitem .chip-icon {
+  color: #5f6368;
+  flex-shrink: 0;
+}
+
+.gm-ev-subitem .chip-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (hover: hover) {
+  .gm-ev-subitem:hover {
+    background: #f1f3f4;
+    color: #202124;
+  }
+  body.dark-mode .gm-ev-subitem:hover,
+  [data-theme="dark"] .gm-ev-subitem:hover {
+    background: #303134;
+    color: #ffffff;
+  }
+}
+
+body.dark-mode .gm-ev-subitem,
+[data-theme="dark"] .gm-ev-subitem {
+  color: #e8eaed;
+}
+
+body.dark-mode .gm-ev-subitem .chip-icon,
+[data-theme="dark"] .gm-ev-subitem .chip-icon {
+  color: #9aa0a6;
+}
+
+.gm-ev-sub-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gm-ev-subitem.active {
+  background: rgba(26, 115, 232, 0.12);
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.gm-ev-subitem.active .chip-icon {
+  color: #1a73e8;
+}
+
+.gm-ev-subitem.active .gm-ev-sub-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
+}
+
+body.dark-mode .gm-ev-submenu,
+[data-theme="dark"] .gm-ev-submenu {
+  background: rgba(138, 180, 248, 0.06);
+  border-left-color: rgba(138, 180, 248, 0.4);
+}
+
+body.dark-mode .gm-ev-sub-dot,
+[data-theme="dark"] .gm-ev-sub-dot {
+  background: #4b5563;
+}
+
+body.dark-mode .gm-ev-subitem.active,
+[data-theme="dark"] .gm-ev-subitem.active {
+  background: rgba(138, 180, 248, 0.16);
+  color: #8ab4f8;
+}
+
+body.dark-mode .gm-ev-subitem.active .chip-icon,
+[data-theme="dark"] .gm-ev-subitem.active .chip-icon {
+  color: #8ab4f8;
+}
+
+body.dark-mode .gm-ev-subitem.active .gm-ev-sub-dot,
+[data-theme="dark"] .gm-ev-subitem.active .gm-ev-sub-dot {
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.22);
+}
+
 .gm-chip.active {
   background: #e8f0fe;
   color: #1967d2;
@@ -7419,6 +7575,7 @@ body.dark-mode .gm-corridor-xray-box .xray-desc,
   padding: 13px 15px;
   background: linear-gradient(135deg, #0f172a, #1e293b);
   color: #ffffff;
+  flex-shrink: 0;
 }
 
 .ev-finder-title-wrap {
@@ -7457,23 +7614,22 @@ body.dark-mode .gm-corridor-xray-box .xray-desc,
 
 .ev-finder-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 10px 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
+  flex-shrink: 0;
 }
-.ev-finder-filters::-webkit-scrollbar { display: none; }
 
 .ev-filter-pill {
   padding: 6px 11px;
-  min-height: 34px;
+  min-height: 32px;
   border-radius: 999px;
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #334155;
-  font-size: 11.8px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -7487,16 +7643,18 @@ body.dark-mode .gm-corridor-xray-box .xray-desc,
 }
 
 .ev-finder-benchmark-strip {
-  padding: 7px 12px;
+  padding: 8px 12px;
   background: #ecfdf5;
   border-bottom: 1px solid #a7f3d0;
   color: #065f46;
   font-size: 11.2px;
-  line-height: 1.4;
+  line-height: 1.45;
+  flex-shrink: 0;
 }
 
 .ev-finder-list {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: 10px 12px 14px;
   display: flex;
@@ -7781,6 +7939,33 @@ body.dark-mode .gm-ev-finder-drawer,
   border-color: #334155;
 }
 
+body.dark-mode .ev-finder-filters,
+[data-theme="dark"] .ev-finder-filters {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .ev-filter-pill,
+[data-theme="dark"] .ev-filter-pill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .ev-filter-pill.active,
+[data-theme="dark"] .ev-filter-pill.active {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+}
+
+body.dark-mode .ev-finder-benchmark-strip,
+[data-theme="dark"] .ev-finder-benchmark-strip {
+  background: rgba(6, 78, 59, 0.45);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
+}
+
 body.dark-mode .ev-station-card,
 [data-theme="dark"] .ev-station-card {
   background: #1e293b;
@@ -7795,4 +7980,149 @@ body.dark-mode .ev-card-name,
 body.dark-mode .ev-card-addr,
 [data-theme="dark"] .ev-card-addr {
   color: #94a3b8;
+}
+
+/* Modal: Yêu cầu bật vị trí (GPS) cho Trạm sạc theo vị trí */
+#modal-ev-location-required {
+  z-index: 2300;
+}
+
+.modal-ev-loc-card {
+  max-width: 440px;
+  border: 1px solid #e2e8f0;
+}
+
+.modal-ev-loc-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #dbeafe;
+}
+
+.modal-ev-loc-header .modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-ev-loc-header .modal-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.ev-loc-req-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #1a73e8;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(26, 115, 232, 0.28);
+}
+
+.modal-ev-loc-body {
+  padding: 18px 20px;
+  gap: 12px;
+}
+
+.ev-loc-req-alert {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.ev-loc-req-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.ev-loc-req-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.ev-loc-step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.modal-ev-loc-footer {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-ev-loc-footer .btn-gm-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.dark-mode .modal-ev-loc-card,
+[data-theme="dark"] .modal-ev-loc-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-ev-loc-header,
+[data-theme="dark"] .modal-ev-loc-header {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .modal-ev-loc-header .modal-title,
+[data-theme="dark"] .modal-ev-loc-header .modal-title {
+  color: #f8fafc;
+}
+
+body.dark-mode .modal-ev-loc-header .modal-subtitle,
+[data-theme="dark"] .modal-ev-loc-header .modal-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .ev-loc-req-alert,
+[data-theme="dark"] .ev-loc-req-alert {
+  background: rgba(234, 88, 12, 0.14);
+  border-color: rgba(251, 146, 60, 0.35);
+  color: #fdba74;
+}
+
+body.dark-mode .ev-loc-req-step,
+[data-theme="dark"] .ev-loc-req-step {
+  color: #cbd5e1;
+}
+
+body.dark-mode .ev-loc-step-num,
+[data-theme="dark"] .ev-loc-step-num {
+  background: rgba(59, 130, 246, 0.22);
+  color: #93c5fd;
+}
+
+body.dark-mode .modal-ev-loc-footer,
+[data-theme="dark"] .modal-ev-loc-footer {
+  background: #0f172a;
+  border-color: #334155;
 }

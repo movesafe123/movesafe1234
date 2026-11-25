@@ -25,7 +25,10 @@ app.use(express.json({ limit: '512kb' }));
 const rootDir = path.join(__dirname, '..');
 const staticOptions = {
   dotfiles: 'deny',
-  maxAge: '1h'
+  maxAge: 0,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-cache');
+  }
 };
 
 app.use('/css', express.static(path.join(rootDir, 'css'), staticOptions));
@@ -50,6 +53,7 @@ app.get('/manifest.json', (req, res) => {
 
 // Phục vụ trang chủ
 app.get(['/', '/index.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache');
   res.sendFile(path.join(rootDir, 'index.html'));
 });
 

@@ -24,6 +24,8 @@ class MapEngine {
     this.trafficVisible = true;
     this.floodVisible = true;
     this.evVisible = false; // Mặc định tắt, chỉ bật khi chọn xe điện hoặc bấm chip trạm sạc
+    this.evDisplayMode = 'default'; // 'default' | 'nearby' | 'all'
+    this._evNearbyFilter = null;
     this._loadedEvCity = null;
   }
 
@@ -107,9 +109,12 @@ class MapEngine {
       this.map.removeLayer(this.layers.weatherMarkers);
     }
 
-    // 2. Với trạm sạc xe điện (EV): Kéo bản đồ ra xa (Zoom < 13) thì ẨN HOÀN TOÀN để tránh che lấp bản đồ
+    // 2. Với trạm sạc xe điện (EV):
+    // - Ở chế độ mặc định: Zoom < 13 tạm ẩn để thoáng bản đồ
+    // - Ở chế độ 'all' hoặc 'nearby': luôn giữ hiển thị theo ý định người dùng
     if (this.layers.evLayer) {
-      if (currentZoom < 13) {
+      const keepVisibleOut = this.evDisplayMode === 'all' || this.evDisplayMode === 'nearby';
+      if (currentZoom < 13 && !keepVisibleOut) {
         if (this.map.hasLayer(this.layers.evLayer)) {
           this.map.removeLayer(this.layers.evLayer);
         }
@@ -146,23 +151,73 @@ class MapEngine {
     }
   }
 
-  // Điều tiết hiển thị trạm sạc xe điện theo mức Zoom:
-  // Zoom 13: Chỉ hiện các trạm siêu sạc (>= 120kW) và đổi pin để không bị chen chúc
-  // Zoom >= 14: Hiện toàn bộ các trạm sạc
+  setEVDisplayMode(mode = 'default', nearbyAnchor = null) {
+    this.evDisplayMode = mode === 'nearby' || mode === 'all' ? mode : 'default';
+    if (this.evDisplayMode === 'nearby' && nearbyAnchor && Number.isFinite(nearbyAnchor.lat) && Number.isFinite(nearbyAnchor.lng)) {
+      this._evNearbyFilter = {
+        lat: Number(nearbyAnchor.lat),
+        lng: Number(nearbyAnchor.lng),
+        radiusKm: Number(nearbyAnchor.radiusKm) > 0 ? Number(nearbyAnchor.radiusKm) : 2.5,
+        maxMarkers: Number(nearbyAnchor.maxMarkers) > 0 ? Number(nearbyAnchor.maxMarkers) : 20
+      };
+    } else if (this.evDisplayMode !== 'nearby') {
+      this._evNearbyFilter = null;
+    }
+    if (this.map && this.evVisible) {
+      this.updateEVMarkersByZoom(Math.round(this.map.getZoom()));
+    }
+  }
+
+  _calcEvDistKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // Điều tiết hiển thị trạm sạc xe điện theo mức Zoom & Chế độ hiển thị ('default' | 'nearby' | 'all')
   updateEVMarkersByZoom(currentZoom) {
     if (!this.layers.evLayer) return;
-    if (!this.evVisible || currentZoom < 13) {
+    const keepVisibleOut = this.evDisplayMode === 'all' || this.evDisplayMode === 'nearby';
+    if (!this.evVisible || (currentZoom < 13 && !keepVisibleOut)) {
       if (this.map && this.map.hasLayer(this.layers.evLayer)) {
         this.map.removeLayer(this.layers.evLayer);
       }
       return;
     }
+
+    if (this.evDisplayMode === 'nearby' && this._evNearbyFilter) {
+      const { lat, lng, radiusKm, maxMarkers } = this._evNearbyFilter;
+      const ranked = [];
+      this.layers.evLayer.eachLayer(marker => {
+        const st = marker._evStation;
+        if (!st) return;
+        const dKm = this._calcEvDistKm(lat, lng, st.lat, st.lng);
+        ranked.push({ marker, dKm });
+      });
+      ranked.sort((a, b) => a.dKm - b.dKm);
+      const inRadius = ranked.filter(r => r.dKm <= radiusKm);
+      const picked = inRadius.length >= 5
+        ? inRadius.slice(0, maxMarkers)
+        : ranked.filter(r => r.dKm <= Math.max(radiusKm, 6)).slice(0, Math.min(15, maxMarkers));
+      const allowedSet = new Set(picked.map(r => r.marker));
+      for (const { marker } of ranked) {
+        const el = marker.getElement();
+        if (el) el.style.display = allowedSet.has(marker) ? 'inline-flex' : 'none';
+      }
+      return;
+    }
+
     this.layers.evLayer.eachLayer(marker => {
       const st = marker._evStation;
       const el = marker.getElement();
       if (!el || !st) return;
 
-      if (currentZoom === 13) {
+      if (this.evDisplayMode === 'all') {
+        el.style.display = 'inline-flex';
+      } else if (currentZoom === 13) {
         const role = this.resolveEVStationRole(st);
         const isSuperOrSwap = (st.maxPowerKw && st.maxPowerKw >= 120) || role.isSwapOnly || (st.operator && st.operator.toLowerCase().includes('selex'));
         el.style.display = isSuperOrSwap ? 'inline-flex' : 'none';
@@ -932,8 +987,8 @@ class MapEngine {
         }
       }
 
-      // Chỉ hiển thị lên bản đồ nếu mức zoom >= 13
-      if (currentZoom >= 13) {
+      const keepVisibleOut = this.evDisplayMode === 'all' || this.evDisplayMode === 'nearby';
+      if (currentZoom >= 13 || keepVisibleOut) {
         if (!this.map.hasLayer(this.layers.evLayer)) {
           this.layers.evLayer.addTo(this.map);
         }
@@ -944,6 +999,8 @@ class MapEngine {
         }
       }
     } else {
+      this.evDisplayMode = 'default';
+      this._evNearbyFilter = null;
       if (this.map.hasLayer(this.layers.evLayer)) {
         this.map.removeLayer(this.layers.evLayer);
       }
