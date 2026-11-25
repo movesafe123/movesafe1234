@@ -2078,12 +2078,14 @@
   </nav>
 
   <!-- ==================== 7f. MODAL: YÊU CẦU BẬT VỊ TRÍ (GPS) CHO TRẠM SẠC THEO VỊ TRÍ ==================== -->
-  <div class="modal-overlay" id="modal-ev-location-required" role="dialog" aria-modal="true" aria-labelledby="ev-loc-req-title">
+  <div class="modal-overlay" id="modal-ev-location-required" role="dialog" aria-modal="true"
+    aria-labelledby="ev-loc-req-title">
     <div class="modal-card modal-ev-loc-card">
       <div class="modal-header modal-ev-loc-header">
         <div class="modal-title-group">
           <div class="ev-loc-req-badge" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
@@ -2093,23 +2095,30 @@
             <p class="modal-subtitle">Tính năng "Trạm sạc theo vị trí" chỉ hiển thị khi đã bật định vị</p>
           </div>
         </div>
-        <button type="button" class="btn-modal-close" id="btn-ev-loc-req-x" title="Đóng" aria-label="Đóng bảng yêu cầu bật vị trí">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" class="btn-modal-close" id="btn-ev-loc-req-x" title="Đóng"
+          aria-label="Đóng bảng yêu cầu bật vị trí">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 
       <div class="modal-body modal-ev-loc-body">
         <div class="ev-loc-req-alert" id="ev-loc-req-message">
-          Vị trí trên thiết bị hoặc quyền truy cập vị trí của trình duyệt đang tắt. Vui lòng bật vị trí để xem các trạm sạc &amp; tủ đổi pin gần bạn.
+          Vị trí trên thiết bị hoặc quyền truy cập vị trí của trình duyệt đang tắt. Vui lòng bật vị trí để xem các trạm
+          sạc &amp; tủ đổi pin gần bạn.
         </div>
         <div class="ev-loc-req-steps">
           <div class="ev-loc-req-step">
             <span class="ev-loc-step-num">1</span>
-            <span>Bấm biểu tượng <strong>khóa / cài đặt trang web</strong> cạnh thanh địa chỉ trình duyệt và chuyển mục <strong>Vị trí (Location)</strong> sang <strong>Cho phép (Allow)</strong>.</span>
+            <span>Bấm biểu tượng <strong>khóa / cài đặt trang web</strong> cạnh thanh địa chỉ trình duyệt và chuyển mục
+              <strong>Vị trí (Location)</strong> sang <strong>Cho phép (Allow)</strong>.</span>
           </div>
           <div class="ev-loc-req-step">
             <span class="ev-loc-step-num">2</span>
-            <span>Kiểm tra dịch vụ <strong>Location / GPS</strong> trên máy tính hoặc điện thoại đang được bật, sau đó nhấn <strong>Thử bật lại</strong>.</span>
+            <span>Kiểm tra dịch vụ <strong>Location / GPS</strong> trên máy tính hoặc điện thoại đang được bật, sau đó
+              nhấn <strong>Thử bật lại</strong>.</span>
           </div>
         </div>
       </div>
@@ -2117,7 +2126,14 @@
       <div class="modal-footer modal-ev-loc-footer">
         <button type="button" class="btn-gm-cancel" id="btn-ev-loc-req-close">Đóng</button>
         <button type="button" class="btn-gm-primary" id="btn-ev-loc-req-retry">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3"></path>
+            <path d="M12 19v3"></path>
+            <path d="M2 12h3"></path>
+            <path d="M19 12h3"></path>
+          </svg>
           <span>Đã mở vị trí — Thử bật lại</span>
         </button>
       </div>
@@ -2142,11 +2158,11 @@
   <script src="js/geocoding-service.js?v=4.0"></script>
   <script src="js/weather-service.js?v=4.0"></script>
   <script src="js/routing-service.js?v=4.0"></script>
-  <script src="js/map-engine.js?v=4.1"></script>
+  <script src="js/map-engine.js?v=4.3"></script>
   <script src="js/crowdsource.js?v=4.0"></script>
   <script src="js/food-entertainment-data.js?v=4.0"></script>
   <script src="js/ai-chat.js?v=4.0"></script>
-  <script src="js/app.js?v=4.1"></script>
+  <script src="js/app.js?v=4.3"></script>
 
 </body>
 

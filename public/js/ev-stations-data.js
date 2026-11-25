@@ -1,5 +1,5 @@
 /**
- * MoveSafe VN - Dữ liệu Mạng lưới Trạm sạc Xe điện & e-Scooter Toàn quốc (1353 trạm)
+ * MoveSafe VN - Dữ liệu Mạng lưới Trạm sạc Xe điện & e-Scooter Toàn quốc (1352 trạm)
  * Tự động đồng bộ từ Nguồn Sự Thật Duy Nhất: data/ev_stations_cache.json
  */
 (function() {
@@ -2157,7 +2157,7 @@
     ],
     "accessComments": "Tầng hầm B2 & B3 tháp Landmark 81",
     "tomtomId": "tt-jPbGLf24RYcdo475sqbhfQ",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "vehicleTypes": [
       "ecar"
     ],
@@ -2204,7 +2204,7 @@
     ],
     "accessComments": "Tầng hầm B3 sảnh thương mại",
     "tomtomId": "tt-leJkaNT00SLa6QGnxDwu6A",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "vehicleTypes": [
       "ecar"
     ],
@@ -5766,10 +5766,14 @@
     ],
     "accessComments": "Khu vực Bưu điện Thường Tín mặt QL1A",
     "source": "MoveSafe & VinFast Network Verified",
-    "lastUpdated": "2026-11-13T15:30:17.811Z",
+    "lastUpdated": "2026-11-25T19:04:20.458Z",
     "stationKind": "charging",
     "stationKindLabel": "Trạm sạc xe điện",
-    "supportsBatterySwap": false
+    "supportsBatterySwap": false,
+    "verifiedSources": [
+      "MoveSafe VN",
+      "EVCS.VN"
+    ]
   },
   {
     "id": "ev-hn-hadong-16",
@@ -5928,7 +5932,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:58.997Z",
+    "lastUpdated": "2026-11-25T18:16:26.974Z",
     "tomtomId": "tt-0th4I_UuA9r-9WOcRBOq9w",
     "verifiedSources": [
       "TomTom EV"
@@ -5964,7 +5968,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "lastUpdated": "2026-11-25T18:16:26.974Z",
     "tomtomId": "tt-9UkZuPUAoMWcxeFe67avGw",
     "verifiedSources": [
       "TomTom EV"
@@ -6000,7 +6004,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:58.999Z",
+    "lastUpdated": "2026-11-25T18:16:26.974Z",
     "tomtomId": "tt-4p-IxsNwM2ap-oS4OS083A",
     "verifiedSources": [
       "TomTom EV"
@@ -6075,7 +6079,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "lastUpdated": "2026-11-25T18:16:27.268Z",
     "tomtomId": "tt-pOGjJBZbuaLG1SKJepECiA",
     "verifiedSources": [
       "TomTom EV"
@@ -6111,7 +6115,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "lastUpdated": "2026-11-25T18:16:27.269Z",
     "tomtomId": "tt-K07tVtLCfnUP-mlADOAh2w",
     "verifiedSources": [
       "TomTom EV"
@@ -6147,7 +6151,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Hà Nội VinFast EV)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.269Z",
+    "lastUpdated": "2026-11-25T18:16:27.269Z",
     "tomtomId": "tt-hip-rk-YgCfHDtyI-USNUQ",
     "verifiedSources": [
       "TomTom EV"
@@ -6183,7 +6187,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-UFjLvn6elJuY_C3Upqrwcw",
     "verifiedSources": [
       "TomTom EV"
@@ -6219,7 +6223,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-CkKPdz77IA2dpybmZoYUPQ",
     "verifiedSources": [
       "TomTom EV"
@@ -6255,7 +6259,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-oTA2xQ352FNRAd67MGXL3w",
     "verifiedSources": [
       "TomTom EV"
@@ -6291,7 +6295,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-BqCCzrBBvFUnXBocJ5pDBg",
     "verifiedSources": [
       "TomTom EV"
@@ -6327,7 +6331,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-6spALtx4x5FWlukQBrIXCg",
     "verifiedSources": [
       "TomTom EV"
@@ -6363,7 +6367,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-kiNgQNinA41PqX2rtw0i0A",
     "verifiedSources": [
       "TomTom EV"
@@ -6399,7 +6403,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt--0eKiX313LxbTcampar-gA",
     "verifiedSources": [
       "TomTom EV"
@@ -6435,7 +6439,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-dY_AO0jLLl3_Td_HsBbnuA",
     "verifiedSources": [
       "TomTom EV"
@@ -6471,7 +6475,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-S-WTiP065GRRMnI9qlOPWA",
     "verifiedSources": [
       "TomTom EV"
@@ -6507,7 +6511,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-H18BTSLHqFkNI0pC-lioqw",
     "verifiedSources": [
       "TomTom EV"
@@ -6543,7 +6547,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.831Z",
     "tomtomId": "tt-tbzuoWM52s7OUNWS22__FA",
     "verifiedSources": [
       "TomTom EV"
@@ -6579,7 +6583,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-aWbgnd3d5NYd7hoyNqJ8UA",
     "verifiedSources": [
       "TomTom EV"
@@ -6615,7 +6619,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-lWqjIoLkyI4akg1fN9i91A",
     "verifiedSources": [
       "TomTom EV"
@@ -6652,7 +6656,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-9XXAKTCUeY9eepoa8BzSEA",
     "verifiedSources": [
       "TomTom EV"
@@ -6688,7 +6692,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-GqTdCtHz43UJieesyMFOcQ",
     "verifiedSources": [
       "TomTom EV"
@@ -6724,7 +6728,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-Mlpehg9MHJgMjyS7IXivWg",
     "verifiedSources": [
       "TomTom EV"
@@ -6760,7 +6764,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-BQHDvYQp9tvf2mN3Tizh2Q",
     "verifiedSources": [
       "TomTom EV"
@@ -6796,7 +6800,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-ynGpndZyNJhEU4scE6lpxA",
     "verifiedSources": [
       "TomTom EV"
@@ -6832,7 +6836,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-NB9R2qHG274J5M22xgKgkg",
     "verifiedSources": [
       "TomTom EV"
@@ -6868,7 +6872,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-aYzEK-D-GuIvbYwPDQHkvw",
     "verifiedSources": [
       "TomTom EV"
@@ -6904,7 +6908,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-fCkwb-dCauzZsIHgElSo8g",
     "verifiedSources": [
       "TomTom EV"
@@ -6940,7 +6944,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-GHF8CZVrsqH71OHE8OOZ1w",
     "verifiedSources": [
       "TomTom EV"
@@ -6976,7 +6980,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt--OKqbYQe1LTFdHi7g3wWgA",
     "verifiedSources": [
       "TomTom EV"
@@ -7012,7 +7016,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-XEe79pMgFtEHLFeYdZDiSA",
     "verifiedSources": [
       "TomTom EV"
@@ -7048,7 +7052,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-1VoI9eb6LGngCItwG76m2Q",
     "verifiedSources": [
       "TomTom EV"
@@ -7084,7 +7088,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-IVZLT5GfwVPXnJRvHlwmtw",
     "verifiedSources": [
       "TomTom EV"
@@ -7120,7 +7124,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (TP.HCM EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.733Z",
+    "lastUpdated": "2026-11-25T18:16:27.832Z",
     "tomtomId": "tt-axa_pI8fsFJn6Zohrzn0xQ",
     "verifiedSources": [
       "TomTom EV"
@@ -7264,7 +7268,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "lastUpdated": "2026-11-25T18:16:28.056Z",
     "tomtomId": "tt-AoKDQGX6Xp3v45MI0nOnQA",
     "verifiedSources": [
       "TomTom EV"
@@ -7300,7 +7304,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "lastUpdated": "2026-11-25T18:16:28.056Z",
     "tomtomId": "tt-rjEE6xJY653fMZTqXHmicw",
     "verifiedSources": [
       "TomTom EV"
@@ -7336,7 +7340,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "lastUpdated": "2026-11-25T18:16:28.056Z",
     "tomtomId": "tt-evWyIqUrozA98Me8a8EBkA",
     "verifiedSources": [
       "TomTom EV"
@@ -7372,7 +7376,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "lastUpdated": "2026-11-25T18:16:28.056Z",
     "tomtomId": "tt-wq9yKXzTRU1NUfUYPFxQqw",
     "verifiedSources": [
       "TomTom EV"
@@ -7408,7 +7412,7 @@
     ],
     "accessComments": "Đồng bộ tự động từ TomTom EV Search (Đà Nẵng EV Category)",
     "source": "TomTom EV Search API (Cached)",
-    "lastUpdated": "2026-11-15T07:30:59.941Z",
+    "lastUpdated": "2026-11-25T18:16:28.056Z",
     "tomtomId": "tt-YLKHOtD_RZP9WOPX0qoeYA",
     "verifiedSources": [
       "TomTom EV"
@@ -7428,7 +7432,7 @@
     "lng": 105.903282,
     "isOperational": true,
     "statusText": "Đang hoạt động 24/7",
-    "maxPowerKw": 20,
+    "maxPowerKw": 60,
     "isFastCharge": false,
     "totalPoints": 3,
     "vehicleTypes": [
@@ -7468,7 +7472,7 @@
     "lng": 105.742035,
     "isOperational": true,
     "statusText": "Đang hoạt động 24/7",
-    "maxPowerKw": 30,
+    "maxPowerKw": 60,
     "isFastCharge": false,
     "totalPoints": 4,
     "vehicleTypes": [
@@ -7523,7 +7527,7 @@
     ],
     "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
     "source": "OpenStreetMap (Overpass/Nominatim)",
-    "lastUpdated": "2026-11-15T07:31:12.838Z",
+    "lastUpdated": "2026-11-25T18:16:42.174Z",
     "verifiedSources": [
       "OpenStreetMap"
     ],
@@ -7559,7 +7563,7 @@
     ],
     "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
     "source": "OpenStreetMap (Overpass/Nominatim)",
-    "lastUpdated": "2026-11-15T07:31:12.839Z",
+    "lastUpdated": "2026-11-25T18:16:42.174Z",
     "verifiedSources": [
       "OpenStreetMap"
     ],
@@ -7597,7 +7601,7 @@
     "openingHours": "24/7",
     "accessComments": "Đồng bộ từ OpenStreetMap theo giấy phép mở ODbL",
     "source": "OpenStreetMap (Overpass/Nominatim)",
-    "lastUpdated": "2026-11-15T07:31:10.498Z",
+    "lastUpdated": "2026-11-25T18:16:38.777Z",
     "verifiedSources": [
       "OpenStreetMap"
     ],
@@ -7711,6 +7715,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7749,6 +7755,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7787,6 +7795,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7825,6 +7835,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7863,6 +7875,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7901,6 +7915,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7939,6 +7955,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined+roadside",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -7977,6 +7995,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "partner-street-paired",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8015,6 +8035,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8053,6 +8075,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8067,8 +8091,8 @@
     "district": "Ba Vì",
     "address": "Siêu thị Lan Chi Ba Vì, quốc lộ 32, xã Vật Lại",
     "city": "hanoi",
-    "lat": 21.2060602,
-    "lng": 105.4158321,
+    "lat": 21.206153,
+    "lng": 105.41595,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -8089,8 +8113,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:12.735Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8129,6 +8155,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8167,6 +8195,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8205,6 +8235,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8256,6 +8288,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8307,6 +8341,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8351,6 +8387,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8389,6 +8427,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "IN_WATER",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8427,6 +8467,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8465,6 +8507,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8510,6 +8554,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8554,6 +8600,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8605,6 +8653,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8655,6 +8705,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8693,6 +8745,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8731,6 +8785,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8769,6 +8825,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8826,6 +8884,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8877,6 +8937,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8915,6 +8977,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8953,6 +9017,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -8991,6 +9057,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9029,6 +9097,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "pluscode-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9067,6 +9137,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9105,6 +9177,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9143,6 +9217,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9181,6 +9257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9219,6 +9297,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9257,6 +9337,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9295,6 +9377,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9333,6 +9417,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9371,6 +9457,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9409,6 +9497,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9447,6 +9537,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9485,6 +9577,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9523,6 +9617,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9561,6 +9657,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9599,6 +9697,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9613,8 +9713,8 @@
     "district": "Chương Mỹ",
     "address": "Số 1, Tổ 3, TDP Tân Bình, Thị Trấn Xuân Mai",
     "city": "hanoi",
-    "lat": 20.8972,
-    "lng": 105.577904,
+    "lat": 20.906342,
+    "lng": 105.578071,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -9635,8 +9735,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:12.954Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9675,6 +9777,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9713,6 +9817,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9751,6 +9857,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9789,6 +9897,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9827,6 +9937,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9865,6 +9977,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9903,6 +10017,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9941,6 +10057,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -9979,6 +10097,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10017,6 +10137,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10055,6 +10177,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10093,6 +10217,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10131,6 +10257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10169,6 +10297,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10214,6 +10344,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10252,6 +10384,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10309,6 +10443,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10323,8 +10459,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Phúc Lâm-Hạ Dục, Xã Hồng Phong, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.84138,
-    "lng": 105.698293,
+    "lat": 20.809772,
+    "lng": 105.704707,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -10358,8 +10494,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/2 cổng✧ 60kW trống 8/8 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:13.172Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10374,8 +10512,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Hồ Chí Minh, Thị Trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.8963822,
-    "lng": 105.58009,
+    "lat": 20.901096,
+    "lng": 105.579516,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -10415,8 +10553,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 8/14 cổng✧ 60kW trống 6/6 cổng✧ 7kW trống 6/10 cổng✧ 3.5kW trống 6/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:13.383Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10462,6 +10602,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10513,6 +10655,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10551,6 +10695,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10602,6 +10748,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10647,6 +10795,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10692,6 +10842,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10736,6 +10888,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10750,8 +10904,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Hồ Chí Minh, Thị Trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.905719,
-    "lng": 105.578238,
+    "lat": 20.901096,
+    "lng": 105.579516,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -10778,8 +10932,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 6/8 cổng✧ 60kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:13.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10831,6 +10987,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10875,6 +11033,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10889,8 +11049,8 @@
     "district": "Chương Mỹ",
     "address": "6 AH13, Xã Tiên Phương, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.924444,
-    "lng": 105.69812,
+    "lat": 20.92308,
+    "lng": 105.703645,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -10924,8 +11084,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 9/10 cổng✧ 60kW trống 2/2 cổng✧ 3.5kW trống 12/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:13.852Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -10977,6 +11139,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11021,6 +11185,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11065,6 +11231,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11115,6 +11283,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11153,6 +11323,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11191,6 +11363,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11254,6 +11428,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11299,6 +11475,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11337,6 +11515,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11375,6 +11555,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11413,6 +11595,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11451,6 +11635,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11489,6 +11675,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11527,6 +11715,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11565,6 +11755,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11603,6 +11795,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11641,6 +11835,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11679,6 +11875,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11717,6 +11915,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11755,6 +11955,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11793,6 +11995,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11831,6 +12035,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11869,6 +12075,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11907,6 +12115,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11945,6 +12155,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -11989,6 +12201,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12027,6 +12241,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12071,6 +12287,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12122,6 +12340,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL,SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12166,6 +12386,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12210,6 +12432,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12255,6 +12479,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12300,6 +12526,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12345,6 +12573,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12390,6 +12620,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12428,6 +12660,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12466,6 +12700,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12504,6 +12740,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12542,6 +12780,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12580,6 +12820,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12618,6 +12860,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12656,6 +12900,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12694,6 +12940,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12732,6 +12980,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12770,6 +13020,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12784,8 +13036,8 @@
     "district": "Đông Anh",
     "address": "Nhà văn hóa Phúc Lộc, xã Đông Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.1332178,
-    "lng": 105.8463539,
+    "lat": 21.141921,
+    "lng": 105.85087,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -12806,8 +13058,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 20/20 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:14.068Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12846,6 +13100,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12884,6 +13140,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12922,6 +13180,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12960,6 +13220,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -12998,6 +13260,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13036,6 +13300,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13074,6 +13340,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13112,6 +13380,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13126,8 +13396,8 @@
     "district": "Sóc Sơn",
     "address": "Số 118 Khu Miếu Thờ, Xã Sóc Sơn, Thành Phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.260408,
-    "lng": 105.850822,
+    "lat": 21.257904,
+    "lng": 105.849768,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -13148,8 +13418,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:14.274Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13194,6 +13466,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13245,6 +13519,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13283,6 +13559,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13327,6 +13605,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13365,6 +13645,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13416,6 +13698,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13460,6 +13744,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13505,6 +13791,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13550,6 +13838,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13595,6 +13885,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13633,6 +13925,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13678,6 +13972,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13722,6 +14018,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13766,6 +14064,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13816,6 +14116,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13861,6 +14163,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13906,6 +14210,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13951,6 +14257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -13989,6 +14297,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14003,8 +14313,8 @@
     "district": "Đông Anh",
     "address": "Ban Chỉ huy phòng thủ khu vực 4 - Gia Lâm, xã Đông Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.154347,
-    "lng": 105.850688,
+    "lat": 21.141245,
+    "lng": 105.84685,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -14025,8 +14335,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 20/20 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:14.478Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14065,6 +14377,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14103,6 +14417,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14141,6 +14457,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14179,6 +14497,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14217,6 +14537,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14255,6 +14577,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14269,8 +14593,8 @@
     "district": "Long Biên",
     "address": "Phố Nông Vụ (Gần Tủ điện Ngã Tư) , Phường Phúc Lợi, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0381407,
-    "lng": 105.9311988,
+    "lat": 21.043017,
+    "lng": 105.925852,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -14291,8 +14615,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 6/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:14.683Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14331,6 +14657,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14369,6 +14697,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14407,6 +14737,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14445,6 +14777,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14483,6 +14817,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14521,6 +14857,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14559,6 +14897,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "photon-osm",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14597,6 +14937,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14635,6 +14977,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14673,6 +15017,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14687,8 +15033,8 @@
     "district": "Gia Lâm",
     "address": "69 ngõ 291 Ngô Xuân Quảng,Gia Lâm, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0101,
-    "lng": 105.9391,
+    "lat": 21.019141,
+    "lng": 105.937358,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -14709,8 +15055,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 2/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:14.894Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14749,6 +15097,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14787,6 +15137,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "photon-osm",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14825,6 +15177,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "photon-osm",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14863,6 +15217,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14901,6 +15257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14939,6 +15297,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -14953,8 +15313,8 @@
     "district": "Gia Lâm",
     "address": "Hầm Ruby 01-05., Vinhomes Ocean Park, xã Đa Tốn",
     "city": "hanoi",
-    "lat": 21.000715,
-    "lng": 105.944069,
+    "lat": 20.985766,
+    "lng": 105.931272,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -14975,8 +15335,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:15.102Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15015,6 +15377,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15053,6 +15417,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15091,6 +15457,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15136,6 +15504,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15180,6 +15550,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15218,6 +15590,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15268,6 +15642,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15312,6 +15688,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15350,6 +15728,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15388,6 +15768,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15402,8 +15784,8 @@
     "district": "Gia Lâm",
     "address": "Đường Hải Đăng, Xã Đa Tốn, Huyện Gia Lâm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.996099,
-    "lng": 105.9384,
+    "lat": 21.014447,
+    "lng": 105.945997,
     "isOperational": true,
     "statusText": "Mở 24/7 • Riêng tư • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -15430,8 +15812,10 @@
     ],
     "accessComments": "Mở 24/7 • Riêng tư • Miễn phí đỗ xe (✧ 30kW trống 2/2 cổng✧ 11kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:15.308Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15476,6 +15860,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15520,6 +15906,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15570,6 +15958,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15614,6 +16004,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15658,6 +16050,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15702,6 +16096,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15716,8 +16112,8 @@
     "district": "Gia Lâm",
     "address": "Đường Hải Đăng, Xã Đa Tốn, Huyện Gia Lâm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9946,
-    "lng": 105.941902,
+    "lat": 21.014447,
+    "lng": 105.945997,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 60,
@@ -15744,8 +16140,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 60kW trống 4/6 cổng✧ 11kW trống 2/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:15.513Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15790,6 +16188,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15834,6 +16234,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15878,6 +16280,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15922,6 +16326,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15960,6 +16366,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -15998,6 +16406,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16036,6 +16446,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16074,6 +16486,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16112,6 +16526,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16150,6 +16566,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16188,6 +16606,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16226,6 +16646,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16264,6 +16686,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL,SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16302,6 +16726,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16340,6 +16766,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16354,8 +16782,8 @@
     "district": "Hoài Đức",
     "address": "Ô số 3 Lỗ số 1, Cụm CN Lai xá, Xã Kim Chung",
     "city": "hanoi",
-    "lat": 21.060041,
-    "lng": 105.727699,
+    "lat": 21.069772,
+    "lng": 105.708457,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -16376,8 +16804,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:15.723Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16416,6 +16846,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16454,6 +16886,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16492,6 +16926,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16530,6 +16966,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-nominatim-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16574,6 +17012,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16588,8 +17028,8 @@
     "district": "Hoài Đức",
     "address": "Đại Lộ Thăng Long, Xã An Khánh, Huyện Hoài Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.007481,
-    "lng": 105.702085,
+    "lat": 21.00185,
+    "lng": 105.717244,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -16623,8 +17063,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 4/4 cổng✧ 11kW trống 2/2 cổng✧ 3.5kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:15.933Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16676,6 +17118,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16721,6 +17165,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16759,6 +17205,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16809,6 +17257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16853,6 +17303,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16897,6 +17349,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16935,6 +17389,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -16979,6 +17435,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17029,6 +17487,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17073,6 +17533,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17111,6 +17573,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17149,6 +17613,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17187,6 +17653,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17225,6 +17693,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17263,6 +17733,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17301,6 +17773,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17339,6 +17813,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17377,6 +17853,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17415,6 +17893,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17453,6 +17933,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17491,6 +17973,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17529,6 +18013,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17567,6 +18053,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17605,6 +18093,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17643,6 +18133,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined+roadside",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17681,6 +18173,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17719,6 +18213,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17757,6 +18253,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17795,6 +18293,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17846,6 +18346,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17884,6 +18386,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17922,6 +18426,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -17973,6 +18479,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18024,6 +18532,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18062,6 +18572,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18100,6 +18612,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18150,6 +18664,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18194,6 +18710,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18238,6 +18756,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18282,6 +18802,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18326,6 +18848,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18364,6 +18888,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18408,6 +18934,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18452,6 +18980,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18466,8 +18996,8 @@
     "district": "Mê Linh",
     "address": "Đường Võ Văn Kiệt, Thị Trấn Quang Minh, Huyện Mê Linh, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.187067,
-    "lng": 105.782494,
+    "lat": 21.186732,
+    "lng": 105.782831,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -18494,8 +19024,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 7/8 cổng✧ 7kW trống 4/8 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:16.149Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18540,6 +19072,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18584,6 +19118,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18628,6 +19164,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18672,6 +19210,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18710,6 +19250,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18748,6 +19290,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18786,6 +19330,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18824,6 +19370,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18862,6 +19410,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18900,6 +19450,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18938,6 +19490,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -18976,6 +19530,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19021,6 +19577,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19059,6 +19617,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19103,6 +19663,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19147,6 +19709,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19161,8 +19725,8 @@
     "district": "Mỹ Đức",
     "address": "Đường Xóm Thượng Dài, Xã Phù Lưu Tế, Huyện Mỹ Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.692438,
-    "lng": 105.742172,
+    "lat": 20.695167,
+    "lng": 105.738554,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -19190,8 +19754,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 3/4 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:16.351Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19237,6 +19803,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19281,6 +19849,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19319,6 +19889,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19357,6 +19929,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19395,6 +19969,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19433,6 +20009,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19471,6 +20049,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19509,6 +20089,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19547,6 +20129,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19585,6 +20169,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19623,6 +20209,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19661,6 +20249,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19699,6 +20289,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19713,8 +20305,8 @@
     "district": "Phú Xuyên",
     "address": "Vinfast CSM Phú Xuyên, Số 229 Tiểu Khu Mỹ Lâm, Xã Phú Xuyên, Thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 20.733944,
-    "lng": 105.9130779,
+    "lat": 20.735211,
+    "lng": 105.912833,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -19735,8 +20327,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:16.556Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19775,6 +20369,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19813,6 +20409,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19864,6 +20462,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19915,6 +20515,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -19965,6 +20567,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20010,6 +20614,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20055,6 +20661,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20100,6 +20708,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20144,6 +20754,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20189,6 +20801,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20227,6 +20841,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20265,6 +20881,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20303,6 +20921,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20341,6 +20961,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20379,6 +21001,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20417,6 +21041,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20461,6 +21087,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20505,6 +21133,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20543,6 +21173,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20581,6 +21213,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20625,6 +21259,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20663,6 +21299,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20708,6 +21346,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20746,6 +21386,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20784,6 +21426,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20798,8 +21442,8 @@
     "district": "Quốc Oai",
     "address": "Kilomet 4, đường 81, xã Sài Sơn",
     "city": "hanoi",
-    "lat": 21.015404,
-    "lng": 105.649391,
+    "lat": 21.016848,
+    "lng": 105.648179,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -20820,8 +21464,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 31/31 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:16.761Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20860,6 +21506,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20898,6 +21546,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20936,6 +21586,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -20974,6 +21626,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21012,6 +21666,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21050,6 +21706,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21088,6 +21746,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21126,6 +21786,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21164,6 +21826,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21178,8 +21842,8 @@
     "district": "Quốc Oai",
     "address": "Cầu Giếng Ngang, Xã Cộng Hòa, Huyện Quốc Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.981217,
-    "lng": 105.678822,
+    "lat": 20.993507,
+    "lng": 105.644671,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 80,
@@ -21206,8 +21870,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 80kW trống 2/6 cổng✧ 20kW trống 2/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:16.966Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21265,6 +21931,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21309,6 +21977,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21353,6 +22023,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21397,6 +22069,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21442,6 +22116,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21499,6 +22175,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21544,6 +22222,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21588,6 +22268,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21632,6 +22314,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21670,6 +22354,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21721,6 +22407,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21765,6 +22453,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21809,6 +22499,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21866,6 +22558,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21916,6 +22610,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -21930,8 +22626,8 @@
     "district": "Quốc Oai",
     "address": "Đường 421B, Xã Sài Sơn, Huyện Quốc Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.018774,
-    "lng": 105.644249,
+    "lat": 21.017322,
+    "lng": 105.647225,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -21965,8 +22661,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 7/10 cổng✧ 60kW trống 1/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:17.171Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22011,6 +22709,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22049,6 +22749,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22093,6 +22795,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22138,6 +22842,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22176,6 +22882,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22214,6 +22922,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22252,6 +22962,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22290,6 +23002,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22328,6 +23042,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22366,6 +23082,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22404,6 +23122,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-approx",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22442,6 +23162,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22480,6 +23202,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22518,6 +23242,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22556,6 +23282,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22594,6 +23322,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22632,6 +23362,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22670,6 +23402,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22708,6 +23442,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22746,6 +23482,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22784,6 +23522,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22822,6 +23562,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22860,6 +23602,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22898,6 +23642,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22936,6 +23682,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -22974,6 +23722,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23012,6 +23762,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23050,6 +23802,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23088,6 +23842,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23126,6 +23882,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23164,6 +23922,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23202,6 +23962,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23240,6 +24002,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23278,6 +24042,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23316,6 +24082,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23354,6 +24122,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23392,6 +24162,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23430,6 +24202,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23468,6 +24242,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23506,6 +24282,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23544,6 +24322,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23582,6 +24362,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23620,6 +24402,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23658,6 +24442,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23702,6 +24488,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23747,6 +24535,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23761,8 +24551,8 @@
     "district": "Sóc Sơn",
     "address": "Cầu Vượt Sân Bay, Xã Phú Cường, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.212084,
-    "lng": 105.78482,
+    "lat": 21.214142,
+    "lng": 105.801626,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -23795,8 +24585,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/4 cổng✧ 60kW trống 1/2 cổng✧ 7kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:17.381Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23860,6 +24652,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23904,6 +24698,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23949,6 +24745,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -23994,6 +24792,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24038,6 +24838,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24076,6 +24878,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24120,6 +24924,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24165,6 +24971,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24216,6 +25024,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24267,6 +25077,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24311,6 +25123,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24355,6 +25169,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24405,6 +25221,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24450,6 +25268,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24488,6 +25308,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24532,6 +25354,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24570,6 +25394,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24608,6 +25434,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24658,6 +25486,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24709,6 +25539,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24772,6 +25604,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24810,6 +25644,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24848,6 +25684,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24893,6 +25731,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24937,6 +25777,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -24982,6 +25824,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25020,6 +25864,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25065,6 +25911,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25079,8 +25927,8 @@
     "district": "Hoài Đức",
     "address": "KĐT Lê Trọng Tấn - Geleximco, An Khánh, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0054,
-    "lng": 105.73176,
+    "lat": 21.004485,
+    "lng": 105.731986,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -25101,8 +25949,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 31/31 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:17.590Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25117,8 +25967,8 @@
     "district": "Sơn Tây",
     "address": "Kilomet 2+100, đường tránh Quốc lộ 32, thôn Thủ Trung, xã Thanh Mỹ",
     "city": "hanoi",
-    "lat": 21.130953,
-    "lng": 105.485001,
+    "lat": 21.1381,
+    "lng": 105.50112,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -25139,8 +25989,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:17.791Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25179,6 +26031,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25217,6 +26071,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25255,6 +26111,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25293,6 +26151,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25331,6 +26191,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25369,6 +26231,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25407,6 +26271,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25445,6 +26311,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25483,6 +26351,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25521,6 +26391,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25559,6 +26431,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25597,6 +26471,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25611,8 +26487,8 @@
     "district": "Sơn Tây",
     "address": "Thanh Mỹ, Thành Phố Hà Nội, P. Tùng Thiện",
     "city": "hanoi",
-    "lat": 21.128076,
-    "lng": 105.4804,
+    "lat": 21.113129,
+    "lng": 105.494708,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -25633,8 +26509,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:17.996Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25673,6 +26551,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25711,6 +26591,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25749,6 +26631,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25787,6 +26671,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25838,6 +26724,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25895,6 +26783,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25939,6 +26829,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -25953,8 +26845,8 @@
     "district": "Sơn Tây",
     "address": "10 Ngách 9 Ngõ 17, Xã Thanh Mỹ, Thị Xã Sơn Tây, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.130953,
-    "lng": 105.485001,
+    "lat": 21.140914,
+    "lng": 105.502339,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 150,
@@ -25981,8 +26873,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 150kW trống 2/2 cổng✧ 60kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:18.198Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26027,6 +26921,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26077,6 +26973,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26121,6 +27019,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26166,6 +27066,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26211,6 +27113,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26249,6 +27153,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26263,8 +27169,8 @@
     "district": "Sơn Tây",
     "address": "304 Phố Chùa Thông, Phường Trung Hưng, Thị Xã Sơn Tây, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.124876,
-    "lng": 105.503754,
+    "lat": 21.133789,
+    "lng": 105.503976,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -26292,8 +27198,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 1/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:18.401Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26351,6 +27259,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26396,6 +27306,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26440,6 +27352,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26478,6 +27392,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26516,6 +27432,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26554,6 +27472,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26592,6 +27512,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26630,6 +27552,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26668,6 +27592,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26706,6 +27632,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26744,6 +27672,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26782,6 +27712,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26820,6 +27752,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26858,6 +27792,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26896,6 +27832,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26934,6 +27872,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -26972,6 +27912,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27010,6 +27952,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27048,6 +27992,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27086,6 +28032,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27124,6 +28072,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27162,6 +28112,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27200,6 +28152,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27238,6 +28192,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27276,6 +28232,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27314,6 +28272,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27352,6 +28312,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27390,6 +28352,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27428,6 +28392,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27466,6 +28432,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27504,6 +28472,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27542,6 +28512,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27580,6 +28552,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27618,6 +28592,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27656,6 +28632,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27694,6 +28672,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27732,6 +28712,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27746,8 +28728,8 @@
     "district": "Thạch Thất",
     "address": "Lô số 3 Cụm công nghiệp Bình Phú, Xã Quang Trung, Huyện Thạch Thất, Thành phố Hà Nội,",
     "city": "hanoi",
-    "lat": 21.018499,
-    "lng": 105.611641,
+    "lat": 21.024142,
+    "lng": 105.60683,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -27768,8 +28750,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 3/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:18.610Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27808,6 +28792,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27846,6 +28832,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27884,6 +28872,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27922,6 +28912,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27936,8 +28928,8 @@
     "district": "Thạch Thất",
     "address": "78 - 80 Thôn Bùng, Tây Phương",
     "city": "hanoi",
-    "lat": 21.031947,
-    "lng": 105.603845,
+    "lat": 21.012185,
+    "lng": 105.619764,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -27958,8 +28950,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:18.818Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -27998,6 +28992,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28036,6 +29032,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28074,6 +29072,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28118,6 +29118,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28156,6 +29158,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28200,6 +29204,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28244,6 +29250,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28294,6 +29302,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28338,6 +29348,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28376,6 +29388,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28414,6 +29428,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28458,6 +29474,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28502,6 +29520,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28546,6 +29566,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28584,6 +29606,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28622,6 +29646,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28636,8 +29662,8 @@
     "district": "Thạch Thất",
     "address": "Tỉnh Lộ 419 Liên Quan, Xã Phú Kim, Huyện Thạch Thất, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.0624309,
-    "lng": 105.5781642,
+    "lat": 21.062401,
+    "lng": 105.577664,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -28665,8 +29691,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps-refined",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:19.022Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28705,6 +29733,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28743,6 +29773,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28788,6 +29820,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28826,6 +29860,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28864,6 +29900,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28909,6 +29947,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28947,6 +29987,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -28992,6 +30034,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29037,6 +30081,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29075,6 +30121,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29113,6 +30161,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29151,6 +30201,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29189,6 +30241,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29227,6 +30281,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29265,6 +30321,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29303,6 +30361,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29341,6 +30401,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29379,6 +30441,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29417,6 +30481,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29455,6 +30521,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29493,6 +30561,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29531,6 +30601,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29569,6 +30641,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29607,6 +30681,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29645,6 +30721,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29683,6 +30761,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29721,6 +30801,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29772,6 +30854,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29786,8 +30870,8 @@
     "district": "Thanh Oai",
     "address": "Xã Cự Khê, Huyện Thanh Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.920547,
-    "lng": 105.787594,
+    "lat": 20.928983,
+    "lng": 105.787988,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -29815,8 +30899,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 3/3 cổng✧ 3.5kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:19.228Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29862,6 +30948,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29907,6 +30995,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29945,6 +31035,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -29995,6 +31087,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30045,6 +31139,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30083,6 +31179,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30121,6 +31219,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30159,6 +31259,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30204,6 +31306,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30242,6 +31346,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30280,6 +31386,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30318,6 +31426,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30356,6 +31466,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30394,6 +31506,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30432,6 +31546,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30470,6 +31586,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30508,6 +31626,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30546,6 +31666,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30584,6 +31706,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30622,6 +31746,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-nominatim-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30660,6 +31786,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30698,6 +31826,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30736,6 +31866,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30774,6 +31906,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30812,6 +31946,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30850,6 +31986,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30888,6 +32026,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30932,6 +32072,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -30976,6 +32118,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31027,6 +32171,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31065,6 +32211,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31109,6 +32257,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31123,8 +32273,8 @@
     "district": "Thanh Trì",
     "address": "4NV1 Đường TT7, Xã Tân Triều, Huyện Thanh Trì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.968115,
-    "lng": 105.792679,
+    "lat": 20.968044,
+    "lng": 105.792692,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -31152,8 +32302,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 3/3 cổng✧ 3.5kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:19.440Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31168,8 +32320,8 @@
     "district": "Thanh Trì",
     "address": "KM12 Đường Ngọc Hồi, Xã Tứ Hiệp, Huyện Thanh Trì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9337,
-    "lng": 105.8469,
+    "lat": 20.924312,
+    "lng": 105.841103,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -31196,8 +32348,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/4 cổng✧ 60kW trống 0/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:19.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31243,6 +32397,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31287,6 +32443,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31325,6 +32483,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31369,6 +32529,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31383,8 +32545,8 @@
     "district": "Thanh Trì",
     "address": "158 Đường Phan Trọng Tuệ, Xã Thanh Liệt, Huyện Thanh Trì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9541,
-    "lng": 105.814697,
+    "lat": 20.955496,
+    "lng": 105.813353,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -31418,8 +32580,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 10/12 cổng✧ 60kW trống 1/4 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:19.846Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31458,6 +32622,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31496,6 +32662,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31534,6 +32702,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31572,6 +32742,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31610,6 +32782,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31648,6 +32822,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31686,6 +32862,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31724,6 +32902,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31762,6 +32942,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31776,8 +32958,8 @@
     "district": "Thường Tín",
     "address": "207 Quán Gánh, Văn Binh, Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.89013,
-    "lng": 105.85747,
+    "lat": 20.870035,
+    "lng": 105.862918,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -31798,8 +32980,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:20.051Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31838,6 +33022,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31876,6 +33062,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31914,6 +33102,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31952,6 +33142,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -31990,6 +33182,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32028,6 +33222,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32042,8 +33238,8 @@
     "district": "Thường Tín",
     "address": "Số 95, Phố Quán Gánh, Xã Thường Tín, TP Hà Nội",
     "city": "hanoi",
-    "lat": 20.886487,
-    "lng": 105.866871,
+    "lat": 20.870035,
+    "lng": 105.862918,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -32064,8 +33260,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 15/15 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:20.256Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32111,6 +33309,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32149,50 +33349,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
-    "verifiedSources": [
-      "EVCS.VN"
-    ]
-  },
-  {
-    "id": "evcs-chg-c366c5baf0",
-    "name": "VinFast - Nhượng quyền Luxury - Công ty Phương Đông",
-    "operator": "VinFast (V-GREEN / EVCS.VN)",
-    "stationKind": "charging",
-    "stationKindLabel": "Trạm sạc xe điện",
-    "area": "Ngoại thành",
-    "district": "Thường Tín",
-    "address": "Quốc Lộ 1A, Xã Văn Bình, Huyện Thường Tín, Hà Nội, Việt Nam",
-    "city": "hanoi",
-    "lat": 20.89013,
-    "lng": 105.85747,
-    "isOperational": true,
-    "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
-    "maxPowerKw": 120,
-    "isFastCharge": true,
-    "totalPoints": 6,
-    "vehicleTypes": [
-      "ecar"
-    ],
-    "supportsEscooter": false,
-    "supportsBatterySwap": false,
-    "connectors": [
-      {
-        "type": "CCS2 DC 120kW",
-        "powerKw": 120,
-        "current": "DC",
-        "quantity": 4
-      },
-      {
-        "type": "CCS2 DC 60kW",
-        "powerKw": 60,
-        "current": "DC",
-        "quantity": 6
-      }
-    ],
-    "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/4 cổng✧ 60kW trống 2/6 cổng)",
-    "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32244,6 +33402,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32288,6 +33448,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32338,6 +33500,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32382,6 +33546,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32427,6 +33593,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32465,6 +33633,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32479,8 +33649,8 @@
     "district": "Thường Tín",
     "address": "Quốc Lộ 1A, Xã Nguyễn Trãi, Huyện Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.894257,
-    "lng": 105.855942,
+    "lat": 20.896072,
+    "lng": 105.850561,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -32508,8 +33678,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:20.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32548,6 +33720,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32586,6 +33760,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32624,6 +33800,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32662,6 +33840,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32700,6 +33880,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32738,6 +33920,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32776,6 +33960,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32814,6 +34000,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32828,8 +34016,8 @@
     "district": "Ứng Hòa",
     "address": "Bến xe Trung tâm thương mại Thị trấn Vân Đình, Ứng Hòa, Hà Nội",
     "city": "hanoi",
-    "lat": 20.7346,
-    "lng": 105.769543,
+    "lat": 20.726755,
+    "lng": 105.776526,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -32850,8 +34038,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 10/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:20.872Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32890,6 +34080,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32928,6 +34120,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -32966,6 +34160,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33004,6 +34200,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33042,6 +34240,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33080,6 +34280,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33118,6 +34320,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33156,6 +34360,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33207,6 +34413,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33251,6 +34459,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33296,6 +34506,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33346,6 +34558,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33384,6 +34598,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33422,6 +34638,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33460,6 +34678,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33498,6 +34718,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33536,6 +34758,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33587,6 +34811,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33625,6 +34851,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33676,6 +34904,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33727,6 +34957,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33765,6 +34997,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33803,6 +35037,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33841,6 +35077,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33879,6 +35117,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33917,6 +35157,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33955,6 +35197,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -33993,6 +35237,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34031,6 +35277,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34069,6 +35317,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34107,6 +35357,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34145,6 +35397,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34183,6 +35437,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34221,6 +35477,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34259,6 +35517,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34297,6 +35557,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34311,8 +35573,8 @@
     "district": "Ba Đình",
     "address": "343 Đội Cấn, Phường Ngọc Hà, Hà Nội",
     "city": "hanoi",
-    "lat": 21.03604,
-    "lng": 105.8171,
+    "lat": 21.035954,
+    "lng": 105.817209,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -34333,8 +35595,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:21.087Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34373,6 +35637,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34411,6 +35677,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34425,8 +35693,8 @@
     "district": "Ba Đình",
     "address": "Bến xe Kim Mã, Giảng Võ, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0322,
-    "lng": 105.82923,
+    "lat": 21.032031,
+    "lng": 105.829378,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -34447,8 +35715,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:21.292Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34487,6 +35757,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34525,6 +35797,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34563,6 +35837,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34601,6 +35877,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34639,6 +35917,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34677,6 +35957,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34715,6 +35997,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34753,6 +36037,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34767,8 +36053,8 @@
     "district": "Ba Đình",
     "address": "THPT PHẠM HỒNG THÁI - Số 01, Phố Nguyễn Văn Ngọc, phường Giảng Võ, thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.0336751,
-    "lng": 105.8118693,
+    "lat": 21.028957,
+    "lng": 105.812918,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -34789,8 +36075,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:21.501Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34829,6 +36117,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34867,6 +36157,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34881,8 +36173,8 @@
     "district": "Ba Đình",
     "address": "Quận Ba Đình",
     "city": "hanoi",
-    "lat": 21.026932,
-    "lng": 105.814186,
+    "lat": 21.035586,
+    "lng": 105.831153,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -34903,8 +36195,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:21.710Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34919,8 +36213,8 @@
     "district": "Ba Đình",
     "address": "Cột M6, hầm B3, Vincom Center Metropolis, số 29, đường Liễu Giai, phường Ngọc Khánh",
     "city": "hanoi",
-    "lat": 21.03126,
-    "lng": 105.814598,
+    "lat": 21.021677,
+    "lng": 105.815352,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -34941,8 +36235,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:21.914Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -34981,6 +36277,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35019,6 +36317,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35057,6 +36357,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35095,6 +36397,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35109,8 +36413,8 @@
     "district": "Ba Đình",
     "address": "Hầm B4, Vinhomes Metropolis, số 29 Liễu Giai, phường Ngọc Khánh",
     "city": "hanoi",
-    "lat": 21.0319,
-    "lng": 105.8141,
+    "lat": 21.03191,
+    "lng": 105.814003,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -35131,8 +36435,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:22.122Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35171,6 +36477,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35209,6 +36517,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35253,6 +36563,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35298,6 +36610,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35342,6 +36656,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35380,6 +36696,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35425,6 +36743,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35470,6 +36790,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35515,6 +36837,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35553,6 +36877,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35591,6 +36917,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35629,6 +36957,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35667,6 +36997,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35705,6 +37037,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35743,6 +37077,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35781,6 +37117,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35819,6 +37157,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35857,6 +37197,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35895,6 +37237,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35933,6 +37277,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -35971,6 +37317,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36009,6 +37357,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36047,6 +37397,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36085,6 +37437,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36123,6 +37477,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36161,6 +37517,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36199,6 +37557,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36244,6 +37604,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36282,6 +37644,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36333,6 +37697,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36378,6 +37744,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36416,6 +37784,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36461,6 +37831,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36506,6 +37878,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36551,6 +37925,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36589,6 +37965,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36627,6 +38005,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36665,6 +38045,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36703,6 +38085,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36741,6 +38125,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36779,6 +38165,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36793,8 +38181,8 @@
     "district": "Cầu Giấy",
     "address": "3 Cầu Giấy, Phường Láng, Hà Nội",
     "city": "hanoi",
-    "lat": 21.02901,
-    "lng": 105.803,
+    "lat": 21.027719,
+    "lng": 105.802696,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -36815,8 +38203,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:22.345Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36831,8 +38221,8 @@
     "district": "Cầu Giấy",
     "address": "Số 112B Chùa Láng, Phường Láng, Hà Nội",
     "city": "hanoi",
-    "lat": 21.02326,
-    "lng": 105.8024,
+    "lat": 21.038386,
+    "lng": 105.805348,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -36853,8 +38243,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:22.556Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36893,6 +38285,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36931,6 +38325,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -36969,6 +38365,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37007,6 +38405,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37045,6 +38445,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37083,6 +38485,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37121,6 +38525,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37159,6 +38565,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37197,6 +38605,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37235,6 +38645,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37273,6 +38685,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37311,6 +38725,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37325,8 +38741,8 @@
     "district": "Ba Đình",
     "address": "306B Kim Mã, Giảng Võ, Hà Nội",
     "city": "hanoi",
-    "lat": 21.02897,
-    "lng": 105.8044,
+    "lat": 21.030364,
+    "lng": 105.81666,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -37347,8 +38763,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:22.783Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37387,6 +38805,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37425,6 +38845,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37463,6 +38885,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37501,6 +38925,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37539,6 +38965,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37554,7 +38982,7 @@
     "address": "Vinhomes Skylake, ô đất E1.3, khu đô thị mới Cầu Giấy, phường Mỹ Đình",
     "city": "hanoi",
     "lat": 21.019812,
-    "lng": 105.781761,
+    "lng": 105.771222,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -37575,8 +39003,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:22.989Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37615,6 +39045,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.635Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37629,8 +39061,8 @@
     "district": "Cầu Giấy",
     "address": "5 Phố Trần Vỹ, Phường Mai Dịch, Quận Cầu Giấy, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.041836,
-    "lng": 105.772644,
+    "lat": 21.042003,
+    "lng": 105.772165,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -37658,8 +39090,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 29/46 cổng✧ 3.5kW trống 18/26 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:23.192Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37698,6 +39132,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37742,6 +39178,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37780,6 +39218,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37824,6 +39264,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37862,6 +39304,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37900,6 +39344,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37938,6 +39384,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -37976,6 +39424,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38014,6 +39464,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38058,6 +39510,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38115,6 +39569,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38172,6 +39628,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38217,6 +39675,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38255,6 +39715,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38300,6 +39762,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38338,6 +39802,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38376,6 +39842,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38414,6 +39882,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38452,6 +39922,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38490,6 +39962,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38528,6 +40002,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38566,6 +40042,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38604,6 +40082,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38642,6 +40122,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38656,8 +40138,8 @@
     "district": "Ba Đình",
     "address": "Showroom VinFast Minh Khánh - Số 140 Giảng Võ, tầng 1 - CA4, phường Giảng Võ, thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.027229,
-    "lng": 105.8241,
+    "lat": 21.027427,
+    "lng": 105.823971,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -38678,8 +40160,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:23.423Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38718,6 +40202,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38756,6 +40242,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38794,6 +40282,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38832,6 +40322,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38870,6 +40362,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38884,8 +40378,8 @@
     "district": "Đống Đa",
     "address": "THPT KIM LIÊN - Số 1 ngõ 4C phố Đặng Văn Ngữ phường Kim Liên, thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.011091,
-    "lng": 105.831625,
+    "lat": 21.003457,
+    "lng": 105.82145,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -38906,8 +40400,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 2/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:23.770Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38946,6 +40442,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -38984,6 +40482,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39022,6 +40522,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39060,6 +40562,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39098,6 +40602,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39136,6 +40642,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39181,6 +40689,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39232,6 +40742,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39282,6 +40794,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39320,6 +40834,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39358,6 +40874,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "partner-street-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39396,6 +40914,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39434,6 +40954,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39472,6 +40994,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39510,6 +41034,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39548,6 +41074,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39586,6 +41114,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39624,6 +41154,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39662,6 +41194,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39700,6 +41234,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39738,6 +41274,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39776,6 +41314,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39814,6 +41354,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39852,6 +41394,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39890,6 +41434,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39928,6 +41474,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39966,6 +41514,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -39980,8 +41530,8 @@
     "district": "Hà Đông",
     "address": "Số 01 Nguyễn Trãi, Hà Đông, Hà Nội",
     "city": "hanoi",
-    "lat": 20.9725,
-    "lng": 105.7797,
+    "lat": 20.971419,
+    "lng": 105.778794,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -40002,8 +41552,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:23.981Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40042,6 +41594,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40092,6 +41646,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40130,6 +41686,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40168,6 +41726,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40213,6 +41773,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40258,6 +41820,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40303,6 +41867,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40348,6 +41914,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40392,6 +41960,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40437,6 +42007,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40475,6 +42047,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40513,6 +42087,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.645Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40558,6 +42134,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40602,6 +42180,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40647,6 +42227,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40685,6 +42267,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40730,6 +42314,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40775,6 +42361,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40813,6 +42401,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40851,6 +42441,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40889,6 +42481,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40927,6 +42521,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -40965,6 +42561,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41003,6 +42601,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41041,6 +42641,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41079,6 +42681,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41117,6 +42721,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41155,6 +42761,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41193,6 +42801,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41231,6 +42841,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41269,6 +42881,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41307,6 +42921,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41345,6 +42961,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41383,6 +43001,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41421,6 +43041,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41459,6 +43081,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41497,6 +43121,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41535,6 +43161,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41573,6 +43201,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41611,6 +43241,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41649,6 +43281,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41687,6 +43321,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41725,6 +43361,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41763,6 +43401,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41801,6 +43441,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41839,6 +43481,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41877,6 +43521,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41891,8 +43537,8 @@
     "district": "Hai Bà Trưng",
     "address": "Hầm B2, Vincom Center Bà Triệu, số 191, đường Bà Triệu",
     "city": "hanoi",
-    "lat": 21.0115,
-    "lng": 105.8496,
+    "lat": 21.031015,
+    "lng": 105.835408,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -41913,8 +43559,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/9 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:24.207Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41959,6 +43607,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -41997,6 +43647,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42035,6 +43687,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42073,6 +43727,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42118,6 +43774,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42169,6 +43827,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42214,6 +43874,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42259,6 +43921,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42297,6 +43961,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42335,6 +44001,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42373,6 +44041,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42411,6 +44081,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42449,6 +44121,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42487,6 +44161,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42525,6 +44201,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42563,6 +44241,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42601,6 +44281,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42639,6 +44321,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42677,6 +44361,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42715,6 +44401,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42753,6 +44441,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42791,6 +44481,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42829,6 +44521,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42867,6 +44561,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42918,6 +44614,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -42962,6 +44660,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43000,6 +44700,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43044,6 +44746,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43088,6 +44792,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43126,6 +44832,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43164,6 +44872,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43202,6 +44912,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43240,6 +44952,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43284,6 +44998,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43329,6 +45045,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43367,6 +45085,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43405,6 +45125,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43443,6 +45165,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43481,6 +45205,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43519,6 +45245,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43557,6 +45285,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43595,6 +45325,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43633,6 +45365,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43671,6 +45405,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43709,6 +45445,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43747,6 +45485,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43785,6 +45525,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43823,6 +45565,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43861,6 +45605,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43899,6 +45645,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43937,6 +45685,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -43975,6 +45725,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44013,6 +45765,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44051,6 +45805,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44089,6 +45845,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44127,6 +45885,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44165,6 +45925,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44203,6 +45965,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44241,6 +46005,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44279,6 +46045,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44317,6 +46085,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44355,6 +46125,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44393,6 +46165,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44431,6 +46205,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44475,6 +46251,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44513,6 +46291,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44558,6 +46338,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44609,6 +46391,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44654,6 +46438,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44692,6 +46478,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44743,6 +46531,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44787,6 +46577,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44838,6 +46630,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44876,6 +46670,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44914,6 +46710,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44958,6 +46756,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -44996,6 +46796,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45040,6 +46842,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45085,6 +46889,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45130,6 +46936,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45168,6 +46976,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45206,6 +47016,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45244,6 +47056,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45282,6 +47096,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.653Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45320,6 +47136,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45358,6 +47176,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45396,6 +47216,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45434,6 +47256,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45472,6 +47296,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45510,6 +47336,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45548,6 +47376,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45586,6 +47416,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45624,6 +47456,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45662,6 +47496,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45700,6 +47536,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45738,6 +47576,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45776,6 +47616,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45814,6 +47656,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45852,6 +47696,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45890,6 +47736,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45928,6 +47776,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -45942,8 +47792,8 @@
     "district": "Long Biên",
     "address": "Số 1A, Đường Nguyễn Văn Linh, Phường Sài Đồng",
     "city": "hanoi",
-    "lat": 21.053122,
-    "lng": 105.889023,
+    "lat": 21.05479,
+    "lng": 105.889539,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -45964,8 +47814,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:24.425Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46004,6 +47856,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46042,6 +47896,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46080,6 +47936,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46094,8 +47952,8 @@
     "district": "Long Biên",
     "address": "777, Ngo Gia Tu Rd, Duc Giang Ward, Viet Hung Ward, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0694,
-    "lng": 105.9014,
+    "lat": 21.059959,
+    "lng": 105.896478,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -46116,8 +47974,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/14 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:24.626Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46156,6 +48016,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46194,6 +48056,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46232,6 +48096,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46270,6 +48136,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46308,6 +48176,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46346,6 +48216,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46384,6 +48256,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46422,6 +48296,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46460,6 +48336,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46498,6 +48376,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46536,6 +48416,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46574,6 +48456,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46612,6 +48496,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46650,6 +48536,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46688,6 +48576,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46726,6 +48616,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46740,8 +48632,8 @@
     "district": "Long Biên",
     "address": "Sân Golf nước, The Harmony, khu đô thị sinh thái Vinhomes Riverside, Quận Long Biên, Thành phố Trung ương Hà Nội",
     "city": "hanoi",
-    "lat": 21.048626,
-    "lng": 105.908791,
+    "lat": 21.031151,
+    "lng": 105.886138,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -46762,8 +48654,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:24.839Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46802,6 +48696,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46840,6 +48736,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46854,8 +48752,8 @@
     "district": "Long Biên",
     "address": "Nhà xe ngoài trời, trường Mầm non Vinschool Harmony 1, Vinhomes Riverside 2, đường Chu Huy Mân",
     "city": "hanoi",
-    "lat": 21.043726,
-    "lng": 105.907883,
+    "lat": 21.036748,
+    "lng": 105.910317,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -46876,8 +48774,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:25.045Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46916,6 +48816,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46954,6 +48856,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -46992,6 +48896,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47030,6 +48936,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47075,6 +48983,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47132,6 +49042,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47183,6 +49095,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47234,6 +49148,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47284,6 +49200,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47328,6 +49246,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47366,6 +49286,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47410,6 +49332,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47424,8 +49348,8 @@
     "district": "Long Biên",
     "address": "Hẻm 720 Nguyễn Văn Cừ, Phường Gia Thụy, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.053122,
-    "lng": 105.889023,
+    "lat": 21.055934,
+    "lng": 105.907527,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -47446,8 +49370,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:25.258Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47499,6 +49425,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47537,6 +49465,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47575,6 +49505,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47619,6 +49551,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47633,8 +49567,8 @@
     "district": "Long Biên",
     "address": "200 Đường Nguyễn Sơn, Phường Bồ Đề, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.0445,
-    "lng": 105.881783,
+    "lat": 21.043994,
+    "lng": 105.882086,
     "isOperational": true,
     "statusText": "Mở 24/7 • Riêng tư • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -47661,8 +49595,10 @@
     ],
     "accessComments": "Mở 24/7 • Riêng tư • Gửi xe tính phí (✧ 20kW trống 2/2 cổng✧ 11kW trống 4/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:25.468Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47708,6 +49644,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47753,6 +49691,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47797,6 +49737,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47835,6 +49777,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47904,6 +49848,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47942,6 +49888,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -47987,6 +49935,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48025,6 +49975,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48039,8 +49991,8 @@
     "district": "Long Biên",
     "address": "80 Đường Nguyễn Văn Cừ, Phường Ngọc Lâm, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.041,
-    "lng": 105.868599,
+    "lat": 21.038063,
+    "lng": 105.86765,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 22,
@@ -48061,8 +50013,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 22kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:25.680Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48108,6 +50062,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48146,6 +50102,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48209,6 +50167,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48247,6 +50207,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48291,6 +50253,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "partner-street-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48329,6 +50293,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48373,6 +50339,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48387,8 +50355,8 @@
     "district": "Long Biên",
     "address": "1N9 Đường Huỳnh Văn Nghệ, Phường Phúc Đồng, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.043726,
-    "lng": 105.907883,
+    "lat": 21.038692,
+    "lng": 105.899089,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -48416,8 +50384,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:25.892Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48463,6 +50433,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48508,6 +50480,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48546,6 +50520,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48584,6 +50560,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48622,6 +50600,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48660,6 +50640,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48698,6 +50680,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48712,8 +50696,8 @@
     "district": "Nam Từ Liêm",
     "address": "Hầm B2 chung cư Dreamland Bonanza, 23 phố Duy Tân",
     "city": "hanoi",
-    "lat": 21.0312,
-    "lng": 105.780792,
+    "lat": 21.018209,
+    "lng": 105.789221,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -48734,8 +50718,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:26.096Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48774,6 +50760,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48812,6 +50800,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48850,6 +50840,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48888,6 +50880,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48902,8 +50896,8 @@
     "district": "Nam Từ Liêm",
     "address": "Trung tâm đăng kiểm xe cơ giới Số 29-03S Mỹ Đình , P.Mễ Trì",
     "city": "hanoi",
-    "lat": 21.01501,
-    "lng": 105.7703,
+    "lat": 21.014754,
+    "lng": 105.770546,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -48924,8 +50918,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:26.304Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -48964,6 +50960,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49002,6 +51000,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49040,6 +51040,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49078,6 +51080,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49116,6 +51120,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49154,6 +51160,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49192,6 +51200,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49206,8 +51216,8 @@
     "district": "Nam Từ Liêm",
     "address": "Số 1, Đại lộ Thăng Long",
     "city": "hanoi",
-    "lat": 21.003458,
-    "lng": 105.782883,
+    "lat": 21.006473,
+    "lng": 105.787036,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -49228,8 +51238,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:26.523Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49268,6 +51280,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49306,6 +51320,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49344,6 +51360,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49382,6 +51400,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49396,8 +51416,8 @@
     "district": "Nam Từ Liêm",
     "address": "Vinhomes Smart City",
     "city": "hanoi",
-    "lat": 21.007519,
-    "lng": 105.738263,
+    "lat": 21.006761,
+    "lng": 105.738503,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -49418,8 +51438,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/25 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:26.725Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49458,6 +51480,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49496,6 +51520,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49534,6 +51560,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49572,6 +51600,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49610,6 +51640,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49648,6 +51680,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49686,6 +51720,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49724,6 +51760,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49738,8 +51776,8 @@
     "district": "Nam Từ Liêm",
     "address": "Vinhomes Smart City",
     "city": "hanoi",
-    "lat": 21.009777,
-    "lng": 105.73598,
+    "lat": 21.008748,
+    "lng": 105.739061,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -49760,8 +51798,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 16/28 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom",
-    "lastUpdated": "2026-11-23T08:13:01.672Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:26.929Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49800,6 +51840,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49838,6 +51880,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49876,6 +51920,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49914,6 +51960,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49952,6 +52000,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -49990,6 +52040,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50028,6 +52080,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50042,8 +52096,8 @@
     "district": "Nam Từ Liêm",
     "address": "Hầm nhà xe SF1, tòa S1.01, Vinhomes Smart City, phường Tây Mỗ",
     "city": "hanoi",
-    "lat": 20.9998356,
-    "lng": 105.7480899,
+    "lat": 21.00905,
+    "lng": 105.738169,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -50064,8 +52118,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 13/13 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps-refined",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:27.132Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50080,8 +52136,8 @@
     "district": "Nam Từ Liêm",
     "address": "Nhà xe nổi F2 phân khu S1/S2, Vinhomes Smart City, phường Tây Mỗ",
     "city": "hanoi",
-    "lat": 21.0037309,
-    "lng": 105.7406274,
+    "lat": 20.99874,
+    "lng": 105.743053,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -50102,8 +52158,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps-refined",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:27.334Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50142,6 +52200,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50180,6 +52240,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50218,6 +52280,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50256,6 +52320,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50294,6 +52360,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50332,6 +52400,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50370,6 +52440,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50414,6 +52486,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50452,6 +52526,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50503,6 +52579,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50541,6 +52619,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50585,6 +52665,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50636,6 +52718,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50680,6 +52764,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50725,6 +52811,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50776,6 +52864,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50814,6 +52904,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50828,8 +52920,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9998356,
-    "lng": 105.7480899,
+    "lat": 21.001897,
+    "lng": 105.75121,
     "isOperational": true,
     "statusText": "Mở Th 2-CN 07h - 19h • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 180,
@@ -50850,8 +52942,10 @@
     ],
     "accessComments": "Mở Th 2-CN 07h - 19h • Công cộng • Miễn phí đỗ xe (✧ 180kW trống 29/50 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:27.543Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50890,6 +52984,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50928,6 +53024,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -50973,6 +53071,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51018,6 +53118,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51075,6 +53177,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51120,6 +53224,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51170,6 +53276,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51227,6 +53335,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51278,6 +53388,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51322,6 +53434,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51336,8 +53450,8 @@
     "district": "Nam Từ Liêm",
     "address": "35B Đường Hồ Mễ Trì, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.000521,
-    "lng": 105.791313,
+    "lat": 21.010348,
+    "lng": 105.778819,
     "isOperational": true,
     "statusText": "Mở Th 2-CN 06h - 20h • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -51377,8 +53491,10 @@
     ],
     "accessComments": "Mở Th 2-CN 06h - 20h • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 18/22 cổng✧ 20kW trống 10/10 cổng✧ 11kW trống 7/15 cổng✧ 3.5kW trống 10/11 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:27.764Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51430,6 +53546,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51487,6 +53605,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51532,6 +53652,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51577,6 +53699,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51622,6 +53746,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51636,8 +53762,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9998356,
-    "lng": 105.7480899,
+    "lat": 21.001897,
+    "lng": 105.75121,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -51671,8 +53797,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 10/10 cổng✧ 11kW trống 7/48 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:27.973Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51724,6 +53852,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51775,6 +53905,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51813,6 +53945,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51827,8 +53961,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.01158,
-    "lng": 105.785431,
+    "lat": 21.014067,
+    "lng": 105.781744,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 30,
@@ -51855,8 +53989,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 30kW trống 2/2 cổng✧ 11kW trống 3/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:28.181Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51908,6 +54044,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51922,8 +54060,8 @@
     "district": "Nam Từ Liêm",
     "address": "S16, Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9998356,
-    "lng": 105.7480899,
+    "lat": 20.978767,
+    "lng": 105.741247,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -51951,8 +54089,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 2/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:28.384Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -51991,6 +54131,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52029,6 +54171,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52067,6 +54211,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52105,6 +54251,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52143,6 +54291,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52181,6 +54331,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52219,6 +54371,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52233,8 +54387,8 @@
     "district": "Tây Hồ",
     "address": "19B Ngõ 275 Âu Cơ, Quảng An",
     "city": "hanoi",
-    "lat": 21.070761,
-    "lng": 105.82476,
+    "lat": 21.067902,
+    "lng": 105.82728,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -52255,8 +54409,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:28.590Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52295,6 +54451,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52333,6 +54491,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52371,6 +54531,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52409,6 +54571,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52447,6 +54611,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52485,6 +54651,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52523,6 +54691,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52561,6 +54731,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52599,6 +54771,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "arcgis-house-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52637,6 +54811,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52675,6 +54851,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52713,6 +54891,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52757,6 +54937,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52808,6 +54990,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52858,6 +55042,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52872,8 +55058,8 @@
     "district": "Tây Hồ",
     "address": "21B Hẻm 275 Âu Cơ, Phường Quảng An, Quận Tây Hồ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.070761,
-    "lng": 105.82476,
+    "lat": 21.065644,
+    "lng": 105.824782,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -52894,8 +55080,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:28.795Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52934,6 +55122,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -52978,6 +55168,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53023,6 +55215,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53068,6 +55262,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53106,6 +55302,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53144,6 +55342,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53182,6 +55382,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53220,6 +55422,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53234,8 +55438,8 @@
     "district": "Thanh Xuân",
     "address": "233B Nguyễn Trãi, Khương Đình, Hà Nội",
     "city": "hanoi",
-    "lat": 20.9952848,
-    "lng": 105.8098217,
+    "lat": 20.997829,
+    "lng": 105.813155,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -53256,8 +55460,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "coordSource": "osm-poi-verified",
+    "lastUpdated": "2026-11-25T19:04:29.006Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53296,6 +55502,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53334,6 +55542,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53372,6 +55582,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.666Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53410,6 +55622,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53448,6 +55662,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53486,6 +55702,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53524,6 +55742,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53562,6 +55782,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]
@@ -53613,6 +55835,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
+    "geoQuality": "verified",
+    "geoIssue": "",
     "verifiedSources": [
       "EVCS.VN"
     ]

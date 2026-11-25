@@ -7050,8 +7050,14 @@ class GoogleMapsApp {
       });
     }
 
-    enriched.sort((a, b) => a._distKm - b._distKm || b._score - a._score);
-    return enriched.slice(0, limit);
+    const trusted = enriched.filter(s => s.geoQuality !== 'needs_review');
+    const finalPool = trusted.length >= 5 ? trusted : enriched;
+    finalPool.sort((a, b) => {
+      const qa = a.geoQuality === 'needs_review' ? 1 : 0;
+      const qb = b.geoQuality === 'needs_review' ? 1 : 0;
+      return qa - qb || a._distKm - b._distKm || b._score - a._score;
+    });
+    return finalPool.slice(0, limit);
   }
 
   async executeEVContextualSearch(rawQuery, preParsedIntent = null) {

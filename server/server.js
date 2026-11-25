@@ -63,6 +63,90 @@ app.get(['/system-log', '/pipeline-log', '/pipeline-log.html'], (req, res) => {
   res.sendFile(path.join(rootDir, 'pipeline-log.html'));
 });
 
+function isLocalhostRequest(req) {
+  const remoteIp = String(req.socket?.remoteAddress || req.ip || '').trim();
+  const host = String(req.hostname || '').toLowerCase();
+  const loopbackIps = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
+  return loopbackIps.has(remoteIp) || host === 'localhost' || host === '127.0.0.1';
+}
+
+// Công cụ nội bộ kiểm định & kéo-thả ghim trạm EVCS.VN trên ảnh vệ tinh (chỉ nhận từ localhost)
+app.get(['/ev-pin-editor', '/ev-pin-editor.html'], (req, res) => {
+  if (!isLocalhostRequest(req)) {
+    return res.status(403).send('Forbidden: localhost only');
+  }
+  res.setHeader('Cache-Control', 'no-cache');
+  res.sendFile(path.join(rootDir, 'ev-pin-editor.html'));
+});
+
+app.get('/api/dev/evcs-flagged', (req, res) => {
+  if (!isLocalhostRequest(req)) {
+    return res.status(403).json({ error: 'Forbidden: localhost only' });
+  }
+  try {
+    const fs = require('fs');
+    const evcsPath = path.join(rootDir, 'data', 'evcs_hanoi_stations.json');
+    const stations = JSON.parse(fs.readFileSync(evcsPath, 'utf8'));
+    const counts = { needs_review: 0, approx: 0, verified: 0 };
+    for (const s of stations) {
+      const q = s.geoQuality || 'verified';
+      counts[q] = (counts[q] || 0) + 1;
+    }
+    res.setHeader('Cache-Control', 'no-cache');
+    return res.json({ total: stations.length, counts, stations });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/dev/evcs-pin', (req, res) => {
+  if (!isLocalhostRequest(req)) {
+    return res.status(403).json({ error: 'Forbidden: localhost only' });
+  }
+  try {
+    const fs = require('fs');
+    const { id, lat, lng } = req.body || {};
+    if (typeof id !== 'string' || !id.startsWith('evcs-')) {
+      return res.status(400).json({ error: 'Chỉ cho phép chỉnh tọa độ các trạm evcs-* mới thêm gần nhất.' });
+    }
+    const numLat = Number(lat);
+    const numLng = Number(lng);
+    if (!Number.isFinite(numLat) || numLat < 8 || numLat > 24 || !Number.isFinite(numLng) || numLng < 102 || numLng > 110) {
+      return res.status(400).json({ error: 'Tọa độ lat/lng nằm ngoài phạm vi hợp lệ tại Việt Nam.' });
+    }
+
+    const evcsPath = path.join(rootDir, 'data', 'evcs_hanoi_stations.json');
+    const stations = JSON.parse(fs.readFileSync(evcsPath, 'utf8'));
+    const idx = stations.findIndex(s => s.id === id);
+    if (idx < 0) {
+      return res.status(404).json({ error: `Không tìm thấy trạm ${id}` });
+    }
+
+    stations[idx].lat = Number(numLat.toFixed(6));
+    stations[idx].lng = Number(numLng.toFixed(6));
+    stations[idx].geoQuality = 'verified';
+    stations[idx].geoIssue = '';
+    stations[idx].coordSource = 'manual-satellite-verified';
+    stations[idx].lastUpdated = new Date().toISOString();
+
+    fs.writeFileSync(evcsPath, (JSON.stringify(stations, null, 2) + '\n').normalize('NFC'), 'utf8');
+
+    const { rebuildEvcsOutputs } = require(path.join(rootDir, 'scripts', 'rebuild-evcs-outputs'));
+    rebuildEvcsOutputs({ syncPublic: true });
+    evService.loadFromCache();
+
+    const counts = { needs_review: 0, approx: 0, verified: 0 };
+    for (const s of stations) {
+      const q = s.geoQuality || 'verified';
+      counts[q] = (counts[q] || 0) + 1;
+    }
+
+    return res.json({ status: 'ok', station: stations[idx], counts });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // Rate Limiter trong bộ nhớ kèm cơ chế tự động dọn dẹp chống rò rỉ RAM (Zero dependency)
 const rateLimitMap = new Map();
 const RATE_LIMIT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;

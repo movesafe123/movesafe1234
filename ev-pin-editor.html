@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoveSafe VN — Công cụ Kiểm định & Chỉnh Ghim Vệ Tinh (EVCS.VN)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg-app: #0b1220;
+      --bg-panel: #111827;
+      --bg-card: #1e293b;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --blue: #2563eb;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --font: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-app);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      height: 54px;
+      padding: 0 18px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .stat-pill.review { color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.14); }
+    .stat-pill.approx { color: #fcd34d; border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.14); }
+    .stat-pill.verified { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.14); }
+    .workspace {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 410px 1fr;
+    }
+    .sidebar {
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .controls {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex-shrink: 0;
+    }
+    .search-box {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }
+    .search-box:focus { border-color: var(--blue); }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-sub);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #ffffff;
+    }
+    .station-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .station-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .station-item:hover { border-color: #60a5fa; }
+    .station-item.selected {
+      border-color: #3b82f6;
+      background: #172554;
+    }
+    .st-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .st-name { font-size: 13px; font-weight: 700; line-height: 1.35; }
+    .st-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .st-badge.needs_review { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .st-badge.approx { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .st-badge.verified { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .st-addr { font-size: 11.8px; color: var(--text-sub); line-height: 1.4; margin-bottom: 6px; }
+    .st-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 11px;
+    }
+    .issue-tag {
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+    .coord-tag {
+      background: #0f172a;
+      color: #cbd5e1;
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .map-pane {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    #editor-map {
+      flex: 1;
+      width: 100%;
+    }
+    .map-toolbar {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 800;
+      display: flex;
+      gap: 8px;
+    }
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.92);
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    .tool-btn.active { background: var(--blue); border-color: var(--blue); }
+    .action-dock {
+      background: #0f172a;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .selected-summary {
+      min-width: 240px;
+      flex: 1;
+    }
+    .selected-summary h4 { font-size: 14px; margin-bottom: 3px; }
+    .selected-summary p { font-size: 12px; color: var(--text-sub); }
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--blue); border-color: var(--blue); }
+    .btn-success { background: #059669; border-color: #059669; }
+    .toast {
+      position: fixed;
+      bottom: 84px;
+      right: 20px;
+      z-index: 2000;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: 1px solid var(--blue);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </span>
+      <span>MoveSafe VN — Trình Chỉnh Ghim Vệ Tinh (1.141 trạm EVCS.VN)</span>
+    </div>
+    <div class="stats-bar" id="stats-bar">
+      <span class="stat-pill review" id="stat-review">Cần kiểm định: --</span>
+      <span class="stat-pill approx" id="stat-approx">Ước lượng: --</span>
+      <span class="stat-pill verified" id="stat-verified">Đã chuẩn hóa: --</span>
+      <a class="stat-pill" href="/" style="color:#93c5fd;text-decoration:none;">Về bản đồ chính</a>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar">
+      <div class="controls">
+        <input type="text" class="search-box" id="search-input" placeholder="Tìm theo tên trạm, địa chỉ, quận/huyện...">
+        <div class="pill-row" id="status-filters">
+          <button type="button" class="filter-btn active" data-status="needs_review">Cần kiểm định</button>
+          <button type="button" class="filter-btn" data-status="approx">Ước lượng</button>
+          <button type="button" class="filter-btn" data-status="verified">Đã chuẩn</button>
+          <button type="button" class="filter-btn" data-status="all">Tất cả (1.141)</button>
+        </div>
+        <div class="pill-row" id="issue-filters">
+          <button type="button" class="filter-btn active" data-issue="ALL">Mọi lỗi</button>
+          <button type="button" class="filter-btn" data-issue="INSIDE_PITCH">Sân bóng</button>
+          <button type="button" class="filter-btn" data-issue="IN_WATER">Mặt nước</button>
+          <button type="button" class="filter-btn" data-issue="SHARED_CENTROID">Trùng tọa độ</button>
+          <button type="button" class="filter-btn" data-issue="DEEP_RESIDENTIAL">Nhà dân sâu</button>
+          <button type="button" class="filter-btn" data-issue="COMMUNE_LEVEL">Cấp xã</button>
+        </div>
+      </div>
+      <div class="station-list" id="station-list"></div>
+    </aside>
+
+    <section class="map-pane">
+      <div class="map-toolbar">
+        <button type="button" class="tool-btn active" id="btn-layer-sat">Vệ tinh Google</button>
+        <button type="button" class="tool-btn" id="btn-layer-street">Bản đồ đường</button>
+      </div>
+      <div id="editor-map"></div>
+      <div class="action-dock">
+        <div class="selected-summary">
+          <h4 id="sel-name">Chọn một trạm ở danh sách bên trái để chỉnh vị trí</h4>
+          <p id="sel-coords">Kéo ghim xanh hoặc bấm trực tiếp lên ảnh vệ tinh để đặt lại vị trí chuẩn.</p>
+        </div>
+        <div class="action-buttons">
+          <a class="btn" id="btn-open-gmaps" href="#" target="_blank" rel="noopener noreferrer">Mở Google Maps</a>
+          <button type="button" class="btn" id="btn-next-station">Trạm tiếp theo</button>
+          <button type="button" class="btn btn-success" id="btn-confirm-existing" disabled>Vị trí hiện tại đã đúng</button>
+          <button type="button" class="btn btn-primary" id="btn-save-pin" disabled>Lưu vị trí mới</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="editor-toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function () {
+      const ISSUE_LABELS = {
+        INSIDE_PITCH: 'Sân bóng',
+        IN_WATER: 'Mặt nước',
+        SHARED_CENTROID: 'Trùng tọa độ',
+        DEEP_RESIDENTIAL: 'Nhà dân sâu',
+        COMMUNE_LEVEL: 'Cấp xã',
+        LOW_PRECISION: 'Ít số lẻ'
+      };
+
+      const state = {
+        stations: [],
+        filtered: [],
+        selectedId: null,
+        statusFilter: 'needs_review',
+        issueFilter: 'ALL',
+        search: '',
+        draftLat: null,
+        draftLng: null
+      };
+
+      const map = L.map('editor-map', { zoomControl: true, maxZoom: 20 }).setView([21.0285, 105.8542], 13);
+      const satLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&hl=vi&scale=2&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 20,
+        attribution: 'Google Satellite'
+      }).addTo(map);
+      const streetLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&hl=vi&scale=2&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 20,
+        attribution: 'Google Maps'
+      });
+
+      const originalPin = L.circleMarker([21.0285, 105.8542], {
+        radius: 7,
+        color: '#f59e0b',
+        weight: 2,
+        fillColor: '#f59e0b',
+        fillOpacity: 0.45
+      });
+
+      const activePin = L.marker([21.0285, 105.8542], { draggable: true });
+
+      function calcMeters(aLat, aLng, bLat, bLng) {
+        const R = 6371000;
+        const dLat = (bLat - aLat) * Math.PI / 180;
+        const dLng = (bLng - aLng) * Math.PI / 180;
+        const x = Math.sin(dLat / 2) ** 2 + Math.cos(aLat * Math.PI / 180) * Math.cos(bLat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+        return Math.round(R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)));
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('editor-toast');
+        el.textContent = msg;
+        el.style.display = 'block';
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => { el.style.display = 'none'; }, 3000);
+      }
+
+      function updateSelectedSummary() {
+        const st = state.stations.find(s => s.id === state.selectedId);
+        const nameEl = document.getElementById('sel-name');
+        const coordsEl = document.getElementById('sel-coords');
+        const btnSave = document.getElementById('btn-save-pin');
+        const btnConfirm = document.getElementById('btn-confirm-existing');
+        const btnGmaps = document.getElementById('btn-open-gmaps');
+        if (!st) {
+          nameEl.textContent = 'Chọn một trạm ở danh sách bên trái để chỉnh vị trí';
+          coordsEl.textContent = 'Kéo ghim hoặc bấm trực tiếp lên ảnh vệ tinh.';
+          btnSave.disabled = true;
+          btnConfirm.disabled = true;
+          return;
+        }
+        const delta = calcMeters(st.lat, st.lng, state.draftLat, state.draftLng);
+        nameEl.textContent = `${st.name} (${st.stationKindLabel || st.stationKind})`;
+        coordsEl.textContent = `${st.address} | Gốc: ${st.lat.toFixed(6)}, ${st.lng.toFixed(6)} -> Mới: ${state.draftLat.toFixed(6)}, ${state.draftLng.toFixed(6)} (lệch ${delta}m)`;
+        btnSave.disabled = false;
+        btnConfirm.disabled = false;
+        const q = encodeURIComponent(`${st.name} ${st.address || 'Hà Nội'}`);
+        btnGmaps.href = `https://www.google.com/maps/search/?api=1&query=${q}`;
+      }
+
+      function selectStation(id) {
+        const st = state.stations.find(s => s.id === id);
+        if (!st) return;
+        state.selectedId = id;
+        state.draftLat = st.lat;
+        state.draftLng = st.lng;
+        if (!map.hasLayer(originalPin)) originalPin.addTo(map);
+        if (!map.hasLayer(activePin)) activePin.addTo(map);
+        originalPin.setLatLng([st.lat, st.lng]);
+        activePin.setLatLng([st.lat, st.lng]);
+        map.flyTo([st.lat, st.lng], 19, { duration: 0.45 });
+        updateSelectedSummary();
+        renderList();
+      }
+
+      activePin.on('dragend', () => {
+        const pos = activePin.getLatLng();
+        state.draftLat = Number(pos.lat.toFixed(6));
+        state.draftLng = Number(pos.lng.toFixed(6));
+        updateSelectedSummary();
+      });
+
+      map.on('click', (e) => {
+        if (!state.selectedId) return;
+        state.draftLat = Number(e.latlng.lat.toFixed(6));
+        state.draftLng = Number(e.latlng.lng.toFixed(6));
+        activePin.setLatLng([state.draftLat, state.draftLng]);
+        updateSelectedSummary();
+      });
+
+      function applyFilters() {
+        const q = state.search.trim().toLowerCase();
+        state.filtered = state.stations.filter(s => {
+          if (state.statusFilter !== 'all' && s.geoQuality !== state.statusFilter) return false;
+          if (state.issueFilter !== 'ALL') {
+            const raw = String(s.geoIssue || '');
+            if (!raw.includes(state.issueFilter)) return false;
+          }
+          if (q) {
+            const hay = `${s.name || ''} ${s.address || ''} ${s.district || ''} ${s.id || ''}`.toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          return true;
+        });
+        renderList();
+      }
+
+      function renderList() {
+        const listEl = document.getElementById('station-list');
+        if (!state.filtered.length) {
+          listEl.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:13px;">Không có trạm nào khớp bộ lọc hiện tại.</div>';
+          return;
+        }
+        listEl.innerHTML = state.filtered.slice(0, 250).map(s => {
+          const issues = String(s.geoIssue || '').split(',').filter(Boolean).map(code => {
+            return `<span class="issue-tag">${ISSUE_LABELS[code] || code}</span>`;
+          }).join('');
+          const qualityText = s.geoQuality === 'verified' ? 'Đã chuẩn' : (s.geoQuality === 'approx' ? 'Ước lượng' : 'Cần kiểm định');
+          return `
+            <div class="station-item ${s.id === state.selectedId ? 'selected' : ''}" data-id="${s.id}">
+              <div class="st-head">
+                <div class="st-name">${s.name}</div>
+                <span class="st-badge ${s.geoQuality}">${qualityText}</span>
+              </div>
+              <div class="st-addr">${s.address || s.district || ''}</div>
+              <div class="st-meta">
+                ${issues}
+                <span class="coord-tag">${Number(s.lat).toFixed(5)}, ${Number(s.lng).toFixed(5)}</span>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      function renderStats(counts) {
+        document.getElementById('stat-review').textContent = `Cần kiểm định: ${counts.needs_review || 0}`;
+        document.getElementById('stat-approx').textContent = `Ước lượng: ${counts.approx || 0}`;
+        document.getElementById('stat-verified').textContent = `Đã chuẩn hóa: ${counts.verified || 0}`;
+      }
+
+      async function loadData(preserveSelection = false) {
+        const res = await fetch('/api/dev/evcs-flagged');
+        const data = await res.json();
+        state.stations = Array.isArray(data.stations) ? data.stations : [];
+        renderStats(data.counts || {});
+        applyFilters();
+        if (!preserveSelection && state.filtered.length > 0) {
+          selectStation(state.filtered[0].id);
+        } else if (preserveSelection && state.selectedId) {
+          updateSelectedSummary();
+        }
+      }
+
+      async function savePin(lat, lng) {
+        if (!state.selectedId) return;
+        const currentId = state.selectedId;
+        const currentIdx = state.filtered.findIndex(s => s.id === currentId);
+        const nextCandidate = state.filtered[currentIdx + 1] || state.filtered[0];
+        const res = await fetch('/api/dev/evcs-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: currentId, lat, lng })
+        });
+        const payload = await res.json();
+        if (!res.ok) {
+          showToast(payload.error || 'Lỗi lưu tọa độ');
+          return;
+        }
+        showToast(`Đã lưu vị trí chuẩn cho trạm ${payload.station.name}`);
+        await loadData(true);
+        if (nextCandidate && nextCandidate.id !== currentId && state.filtered.some(s => s.id === nextCandidate.id)) {
+          selectStation(nextCandidate.id);
+        } else if (state.filtered.length > 0) {
+          selectStation(state.filtered[0].id);
+        }
+      }
+
+      document.getElementById('station-list').addEventListener('click', (e) => {
+        const item = e.target.closest('.station-item');
+        if (item) selectStation(item.dataset.id);
+      });
+
+      document.getElementById('search-input').addEventListener('input', (e) => {
+        state.search = e.target.value || '';
+        applyFilters();
+      });
+
+      document.getElementById('status-filters').addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        state.statusFilter = btn.dataset.status;
+        document.querySelectorAll('#status-filters .filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+        applyFilters();
+      });
+
+      document.getElementById('issue-filters').addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        state.issueFilter = btn.dataset.issue;
+        document.querySelectorAll('#issue-filters .filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+        applyFilters();
+      });
+
+      document.getElementById('btn-layer-sat').addEventListener('click', () => {
+        if (!map.hasLayer(satLayer)) satLayer.addTo(map);
+        if (map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
+        document.getElementById('btn-layer-sat').classList.add('active');
+        document.getElementById('btn-layer-street').classList.remove('active');
+      });
+
+      document.getElementById('btn-layer-street').addEventListener('click', () => {
+        if (!map.hasLayer(streetLayer)) streetLayer.addTo(map);
+        if (map.hasLayer(satLayer)) map.removeLayer(satLayer);
+        document.getElementById('btn-layer-street').classList.add('active');
+        document.getElementById('btn-layer-sat').classList.remove('active');
+      });
+
+      document.getElementById('btn-save-pin').addEventListener('click', () => {
+        if (Number.isFinite(state.draftLat) && Number.isFinite(state.draftLng)) {
+          savePin(state.draftLat, state.draftLng);
+        }
+      });
+
+      document.getElementById('btn-confirm-existing').addEventListener('click', () => {
+        const st = state.stations.find(s => s.id === state.selectedId);
+        if (st) savePin(st.lat, st.lng);
+      });
+
+      document.getElementById('btn-next-station').addEventListener('click', () => {
+        if (!state.filtered.length) return;
+        const idx = state.filtered.findIndex(s => s.id === state.selectedId);
+        const next = state.filtered[(idx + 1) % state.filtered.length];
+        selectStation(next.id);
+      });
+
+      loadData().catch(err => showToast('Không thể tải dữ liệu: ' + err.message));
+    })();
+  </script>
+</body>
+</html>

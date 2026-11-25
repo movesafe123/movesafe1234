@@ -190,20 +190,22 @@ class MapEngine {
 
     if (this.evDisplayMode === 'nearby' && this._evNearbyFilter) {
       const { lat, lng, radiusKm, maxMarkers } = this._evNearbyFilter;
-      const ranked = [];
+      const allRanked = [];
       this.layers.evLayer.eachLayer(marker => {
         const st = marker._evStation;
         if (!st) return;
         const dKm = this._calcEvDistKm(lat, lng, st.lat, st.lng);
-        ranked.push({ marker, dKm });
+        allRanked.push({ marker, st, dKm });
       });
-      ranked.sort((a, b) => a.dKm - b.dKm);
-      const inRadius = ranked.filter(r => r.dKm <= radiusKm);
+      allRanked.sort((a, b) => a.dKm - b.dKm);
+      const trusted = allRanked.filter(r => r.st.geoQuality !== 'needs_review');
+      const pool = trusted.filter(r => r.dKm <= Math.max(radiusKm, 6)).length >= 5 ? trusted : allRanked;
+      const inRadius = pool.filter(r => r.dKm <= radiusKm);
       const picked = inRadius.length >= 5
         ? inRadius.slice(0, maxMarkers)
-        : ranked.filter(r => r.dKm <= Math.max(radiusKm, 6)).slice(0, Math.min(15, maxMarkers));
+        : pool.filter(r => r.dKm <= Math.max(radiusKm, 6)).slice(0, Math.min(15, maxMarkers));
       const allowedSet = new Set(picked.map(r => r.marker));
-      for (const { marker } of ranked) {
+      for (const { marker } of allRanked) {
         const el = marker.getElement();
         if (el) el.style.display = allowedSet.has(marker) ? 'inline-flex' : 'none';
       }
@@ -217,6 +219,8 @@ class MapEngine {
 
       if (this.evDisplayMode === 'all') {
         el.style.display = 'inline-flex';
+      } else if (String(st.id || '').startsWith('evcs-') && st.geoQuality === 'needs_review') {
+        el.style.display = 'none';
       } else if (currentZoom === 13) {
         const role = this.resolveEVStationRole(st);
         const isSuperOrSwap = (st.maxPowerKw && st.maxPowerKw >= 120) || role.isSwapOnly || (st.operator && st.operator.toLowerCase().includes('selex'));
@@ -1108,6 +1112,13 @@ class MapEngine {
     const badgeColor = isSwap ? '#b45309' : (isFast ? '#1d4ed8' : '#047857');
     const badgeBorder = isSwap ? '#fde68a' : (isFast ? '#bfdbfe' : '#bbf7d0');
 
+    const geoNoticeHtml = (st.geoQuality === 'approx' || st.geoQuality === 'needs_review')
+      ? `<div style="margin-bottom: 8px; padding: 6px 8px; border-radius: 6px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 11px; display: flex; align-items: flex-start; gap: 6px; line-height: 1.35;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>${st.geoQuality === 'needs_review' ? `Vị trí đang kiểm định (${String(st.geoIssue || 'cần xác thực thực địa').replace(/</g, '&lt;')})` : 'Vị trí ước lượng theo khu vực'}</span>
+        </div>`
+      : '';
+
     return `
       <div style="font-family: var(--font-family); min-width: 280px; max-width: 320px; line-height: 1.4;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
@@ -1139,6 +1150,7 @@ class MapEngine {
           </div>
         </div>
 
+        ${geoNoticeHtml}
         ${connectorsHtml}
 
         <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;">
