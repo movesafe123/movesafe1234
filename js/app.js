@@ -6903,22 +6903,31 @@ class GoogleMapsApp {
       const distKm = this._calcDistanceKm(lat, lng, st.lat, st.lng);
       if (distKm > radiusKm) continue;
 
+      const isPureSwap = st.stationKind === 'battery_swap' || (
+        st.stationKind !== 'charging' &&
+        (st.maxPowerKw || 0) <= 15 &&
+        !(Array.isArray(st.connectors) && st.connectors.some(c => /ccs|type\s*2|chademo/i.test(String(c?.type || '')))) &&
+        (st.supportsBatterySwap === true || /selex|tủ đổi pin|trạm đổi pin|trạm tđp/i.test(`${st.name} ${st.operator}`))
+      );
       const isEscooter = Boolean(
+        isPureSwap ||
         st.supportsEscooter ||
+        st.supportsBatterySwap ||
         (Array.isArray(st.vehicleTypes) && st.vehicleTypes.some(v => v === 'ebike' || v === 'escooter')) ||
-        /selex|e-scooter|xe máy điện|đổi pin/i.test(`${st.name} ${st.operator} ${st.connectors}`)
+        /selex|e-scooter|xe máy điện|đổi pin/i.test(`${st.name} ${st.operator} ${JSON.stringify(st.connectors || '')}`)
       );
       const hasExplicitTypes = Array.isArray(st.vehicleTypes) && st.vehicleTypes.length > 0;
-      const isPureEscooterOnly = isEscooter && (
+      const isPureEscooterOnly = isPureSwap || (isEscooter && (
         (hasExplicitTypes && !st.vehicleTypes.includes('ecar')) ||
         (!hasExplicitTypes && (st.maxPowerKw || 0) <= 15 && /selex|e-scooter|xe máy điện|đổi pin/i.test(`${st.name} ${st.operator}`))
-      );
+      ));
       const isEcar = !isPureEscooterOnly && (
+        st.stationKind === 'charging' ||
         !hasExplicitTypes ||
         st.vehicleTypes.includes('ecar') ||
-        (st.maxPowerKw || 0) >= 22
+        (st.maxPowerKw || 0) >= 20
       );
-      const isFast = (st.maxPowerKw || 0) >= 60 || Boolean(st.isFastCharge);
+      const isFast = !isPureSwap && ((st.maxPowerKw || 0) >= 60 || Boolean(st.isFastCharge));
 
       if (filterType === 'ecar' && !isEcar) continue;
       if (filterType === 'escooter' && !isEscooter) continue;
@@ -7084,9 +7093,11 @@ class GoogleMapsApp {
       const floodBadge = st._floodDanger
         ? `<span class="ev-tag warn">Cần lưu ý ngập (${st._floodDepthCm}cm)</span>`
         : `<span class="ev-tag safe">An toàn ngập 250m</span>`;
-      const typeTag = st._isEscooter && st._isEcar
-        ? '<span class="ev-tag">Ô tô EV + e-Scooter</span>'
-        : (st._isEscooter ? '<span class="ev-tag">Xe máy điện / Đổi pin</span>' : '<span class="ev-tag">Ô tô điện EV</span>');
+      const typeTag = st.stationKind === 'battery_swap'
+        ? '<span class="ev-tag">Tủ đổi pin xe máy điện</span>'
+        : (st._isEscooter && st._isEcar
+          ? (st.supportsBatterySwap ? '<span class="ev-tag">Ô tô EV + Đổi pin</span>' : '<span class="ev-tag">Ô tô EV + e-Scooter</span>')
+          : (st._isEscooter ? '<span class="ev-tag">Xe máy điện / Đổi pin</span>' : '<span class="ev-tag">Ô tô điện EV</span>'));
       const availInfo = (window.mapEngine && typeof window.mapEngine.estimateEVPortAvailability === 'function')
         ? window.mapEngine.estimateEVPortAvailability(st)
         : { available: Math.max(1, Math.floor((st.totalPoints || 2) / 2)), total: Math.max(1, st.totalPoints || 2) };

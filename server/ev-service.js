@@ -96,6 +96,8 @@ function computeTextSimilarity(stationA, stationB) {
 
 function isEscooterOnlyStation(st) {
   if (!st) return false;
+  if (st.stationKind === 'battery_swap') return true;
+  if (st.stationKind === 'charging') return false;
   const vTypes = Array.isArray(st.vehicleTypes) ? st.vehicleTypes : [];
   if (vTypes.includes('ecar')) return false;
   if (vTypes.includes('ebike') && !vTypes.includes('ecar')) return true;
@@ -104,6 +106,16 @@ function isEscooterOnlyStation(st) {
     return true;
   }
   return false;
+}
+
+function resolveStationKind(st) {
+  if (!st) return 'charging';
+  if (st.stationKind === 'battery_swap') return 'battery_swap';
+  if (st.stationKind === 'charging') return 'charging';
+  const hasCarConnector = Array.isArray(st.connectors) && st.connectors.some(c => /ccs|type\s*2|chademo/i.test(String(c?.type || '')));
+  if ((st.maxPowerKw || 0) >= 20 || hasCarConnector) return 'charging';
+  if (st.supportsBatterySwap === true || isEscooterOnlyStation(st)) return 'battery_swap';
+  return 'charging';
 }
 
 function getSourcePriority(st) {
@@ -394,20 +406,25 @@ class EVService {
           }
 
           seenIds.add(item.id);
-          const isEscooter = /đổi pin|xe máy điện|escooter|selex|eboost/i.test(`${poiName} ${addrText}`);
+          const cityKey = this.detectSupportedCity(lat, lng, addrText);
+          if (!cityKey) continue;
+          const isSwapOnly = /tủ đổi pin|trạm đổi pin|đổi pin xe máy|trạm tđp/i.test(poiName) && !/trạm sạc|ô tô|ccs/i.test(poiName);
+          const isEscooter = isSwapOnly || /đổi pin|xe máy điện|escooter|selex|eboost/i.test(`${poiName} ${addrText}`);
           let operator = 'TomTom EV Network';
           if (/vinfast/i.test(poiName)) operator = 'VinFast';
           else if (/ev one/i.test(poiName)) operator = 'EV ONE';
           else if (/porsche/i.test(poiName)) operator = 'Porsche';
           else if (/selex/i.test(poiName)) operator = 'Selex Motors';
 
-          const maxKw = isEscooter ? 11 : 60;
+          const maxKw = isSwapOnly ? 3.5 : (isEscooter ? 11 : 60);
           collected.push(normalizeNFCDeep({
             id: `tt-${item.id}`,
             name: poiName,
             operator: operator,
+            stationKind: isSwapOnly ? 'battery_swap' : 'charging',
+            stationKindLabel: isSwapOnly ? 'Trạm đổi pin' : 'Trạm sạc xe điện',
             address: addrText,
-            city: this.inferCity(lat, lng),
+            city: cityKey,
             lat: lat,
             lng: lng,
             isOperational: true,
@@ -415,10 +432,11 @@ class EVService {
             maxPowerKw: maxKw,
             isFastCharge: maxKw >= 50,
             totalPoints: 4,
-            vehicleTypes: isEscooter ? ['ebike', 'ecar'] : ['ecar'],
+            vehicleTypes: isSwapOnly ? ['ebike'] : (isEscooter ? ['ebike', 'ecar'] : ['ecar']),
             supportsEscooter: isEscooter,
+            supportsBatterySwap: isSwapOnly,
             connectors: [
-              { type: isEscooter ? 'e-Scooter / Đổi pin' : 'CCS2 DC / Type 2', powerKw: maxKw, current: maxKw >= 50 ? 'DC' : 'AC', quantity: 4 }
+              { type: isSwapOnly ? 'Tủ đổi pin (e-Scooter)' : (isEscooter ? 'e-Scooter / Type 2' : 'CCS2 DC / Type 2'), powerKw: maxKw, current: maxKw >= 50 ? 'DC' : 'AC', quantity: 4 }
             ],
             accessComments: `Đồng bộ tự động từ TomTom EV Search (${hub.label})`,
             source: 'TomTom EV Search API (Cached)',
@@ -471,6 +489,11 @@ class EVService {
     const distinctNamedOps = opA !== 'generic' && opB !== 'generic' && opA !== opB;
     const onlyScooterA = isEscooterOnlyStation(existing);
     const onlyScooterB = isEscooterOnlyStation(incoming);
+    const kindA = resolveStationKind(existing);
+    const kindB = resolveStationKind(incoming);
+
+    // Không bao giờ gộp Trạm sạc với Trạm đổi pin thành một
+    if (kindA !== kindB) return false;
 
     if (distM < 40) {
       if (distinctNamedOps && (onlyScooterA !== onlyScooterB || distM >= 15)) {

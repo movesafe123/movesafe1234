@@ -163,8 +163,9 @@ class MapEngine {
       if (!el || !st) return;
 
       if (currentZoom === 13) {
-        const isSuper = (st.maxPowerKw && st.maxPowerKw >= 120) || (st.name && st.name.toLowerCase().includes('selex')) || (st.operator && st.operator.toLowerCase().includes('selex'));
-        el.style.display = isSuper ? 'inline-flex' : 'none';
+        const role = this.resolveEVStationRole(st);
+        const isSuperOrSwap = (st.maxPowerKw && st.maxPowerKw >= 120) || role.isSwapOnly || (st.operator && st.operator.toLowerCase().includes('selex'));
+        el.style.display = isSuperOrSwap ? 'inline-flex' : 'none';
       } else {
         el.style.display = 'inline-flex';
       }
@@ -851,14 +852,14 @@ class MapEngine {
           if (Array.isArray(stations)) {
             this._evStationsData = stations;
 
+            const coordSlotCount = new Map();
             stations.forEach(st => {
               if (typeof st.lat !== 'number' || typeof st.lng !== 'number') return;
-              
-              const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
-              const isSuperFast = st.maxPowerKw && st.maxPowerKw >= 120;
-              const isSwap = st.stationKind === 'battery_swap' || st.supportsBatterySwap === true ||
-                (st.name && /selex|đổi pin|trạm tđp/i.test(st.name)) ||
-                (st.operator && st.operator.toLowerCase().includes('selex'));
+
+              const role = this.resolveEVStationRole(st);
+              const isFast = role.isFast;
+              const isSuperFast = role.isSuperFast;
+              const isSwap = role.isSwapOnly;
               const pinClass = isSwap ? 'ev-swap' : (isSuperFast ? 'ev-super-fast' : (isFast ? 'ev-fast' : 'ev-standard'));
 
               let primaryLabel = 'Trạm sạc';
@@ -872,6 +873,7 @@ class MapEngine {
               } else {
                 primaryLabel = isSuperFast ? 'Siêu sạc' : 'Trạm sạc';
                 subLabel = st.maxPowerKw ? `${st.maxPowerKw}kW` : (isFast ? 'DC Fast' : '22kW');
+                if (role.hasSwapAlso) subLabel += ' + Pin';
                 iconSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
               }
 
@@ -899,7 +901,19 @@ class MapEngine {
                 popupAnchor: [0, -32]
               });
 
-              const marker = L.marker([st.lat, st.lng], { icon: icon });
+              // Tách nhẹ theo phương ngang (~3.5m) nếu Trạm sạc & Tủ đổi pin dùng chung 1 tọa độ, tránh đẩy lệch vào nhà dân
+              const ck = `${st.lat.toFixed(5)},${st.lng.toFixed(5)}`;
+              const slot = coordSlotCount.get(ck) || 0;
+              coordSlotCount.set(ck, slot + 1);
+              let displayLat = st.lat;
+              let displayLng = st.lng;
+              if (slot > 0) {
+                const dir = slot % 2 === 1 ? 1 : -1;
+                const step = Math.ceil(slot / 2);
+                displayLng += dir * step * 0.000035;
+              }
+
+              const marker = L.marker([displayLat, displayLng], { icon: icon });
               marker.bindPopup(() => this.generateEVPopupHtml(st), {
                 maxWidth: 340,
                 autoPanPadding: [20, 20]
@@ -978,11 +992,29 @@ class MapEngine {
     return 'MoveSafe VN';
   }
 
+  resolveEVStationRole(st) {
+    const conns = Array.isArray(st?.connectors) ? st.connectors : [];
+    const hasCarConn = conns.some(c => /ccs|type\s*2|chademo/i.test(String(c?.type || '')));
+    const isChargingExplicit = st?.stationKind === 'charging';
+    const isSwapExplicit = st?.stationKind === 'battery_swap';
+    const isFast = Boolean(st?.isFastCharge || (st?.maxPowerKw && st.maxPowerKw >= 50));
+    const isSuperFast = Boolean(st?.maxPowerKw && st.maxPowerKw >= 120);
+    const hasChargingHardware = isChargingExplicit || (st?.maxPowerKw && st.maxPowerKw >= 20) || hasCarConn;
+    const mentionsSwap = Boolean(
+      isSwapExplicit ||
+      st?.supportsBatterySwap === true ||
+      (st?.name && /selex|đổi pin|trạm tđp|tủ đổi/i.test(st.name)) ||
+      (st?.operator && st.operator.toLowerCase().includes('selex'))
+    );
+    const isSwapOnly = isSwapExplicit || (!hasChargingHardware && mentionsSwap);
+    const hasSwapAlso = !isSwapOnly && mentionsSwap;
+    return { isSwapOnly, hasSwapAlso, isFast, isSuperFast };
+  }
+
   generateEVPopupHtml(st) {
-    const isFast = st.isFastCharge || (st.maxPowerKw && st.maxPowerKw >= 50);
-    const isSwap = st.stationKind === 'battery_swap' || st.supportsBatterySwap === true ||
-      (st.name && /selex|đổi pin|trạm tđp/i.test(st.name)) ||
-      (st.operator && st.operator.toLowerCase().includes('selex'));
+    const role = this.resolveEVStationRole(st);
+    const isFast = role.isFast;
+    const isSwap = role.isSwapOnly;
     
     const safeName = String(st.name || 'Trạm sạc xe điện').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeAddress = String(st.address || st.town || 'Việt Nam').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1010,7 +1042,11 @@ class MapEngine {
       `;
     }
 
-    const typeBadge = isSwap ? 'Đổi pin xe máy điện' : (isFast ? 'DC Supercharge' : 'AC Tiêu chuẩn');
+    const typeBadge = isSwap
+      ? 'Đổi pin xe máy điện'
+      : (role.hasSwapAlso
+        ? `${isFast ? 'DC Supercharge' : 'Trạm sạc'} + Đổi pin`
+        : (isFast ? 'DC Supercharge' : 'AC Tiêu chuẩn'));
     const badgeBg = isSwap ? '#fef3c7' : (isFast ? '#eff6ff' : '#f0fdf4');
     const badgeColor = isSwap ? '#b45309' : (isFast ? '#1d4ed8' : '#047857');
     const badgeBorder = isSwap ? '#fde68a' : (isFast ? '#bfdbfe' : '#bbf7d0');
