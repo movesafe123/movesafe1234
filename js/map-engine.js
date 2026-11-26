@@ -219,7 +219,7 @@ class MapEngine {
 
       if (this.evDisplayMode === 'all') {
         el.style.display = 'inline-flex';
-      } else if (String(st.id || '').startsWith('evcs-') && st.geoQuality === 'needs_review') {
+      } else if (st.geoQuality === 'needs_review') {
         el.style.display = 'none';
       } else if (currentZoom === 13) {
         const role = this.resolveEVStationRole(st);

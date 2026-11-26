@@ -309,10 +309,11 @@
         </div>
         <div class="pill-row" id="issue-filters">
           <button type="button" class="filter-btn active" data-issue="ALL">Mọi lỗi</button>
-          <button type="button" class="filter-btn" data-issue="INSIDE_PITCH">Sân bóng</button>
-          <button type="button" class="filter-btn" data-issue="IN_WATER">Mặt nước</button>
+          <button type="button" class="filter-btn" data-issue="WRONG_DISTRICT">Sai quận</button>
+          <button type="button" class="filter-btn" data-issue="STREET_MISMATCH">Lệch phố</button>
           <button type="button" class="filter-btn" data-issue="SHARED_CENTROID">Trùng tọa độ</button>
           <button type="button" class="filter-btn" data-issue="DEEP_RESIDENTIAL">Nhà dân sâu</button>
+          <button type="button" class="filter-btn" data-issue="IN_WATER">Mặt nước</button>
           <button type="button" class="filter-btn" data-issue="COMMUNE_LEVEL">Cấp xã</button>
         </div>
       </div>
@@ -346,6 +347,8 @@
   <script>
     (function () {
       const ISSUE_LABELS = {
+        WRONG_DISTRICT: 'Sai quận',
+        STREET_MISMATCH: 'Lệch phố',
         INSIDE_PITCH: 'Sân bóng',
         IN_WATER: 'Mặt nước',
         SHARED_CENTROID: 'Trùng tọa độ',

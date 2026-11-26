@@ -268,8 +268,8 @@
     "district": "Ba Vì",
     "address": "Huyện Ba Vì, Hà Nội",
     "city": "hanoi",
-    "lat": 21.2151122,
-    "lng": 105.404875,
+    "lat": 21.0713032,
+    "lng": 105.3541013,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -290,10 +290,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "partner-street-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL"
   },
   {
     "id": "evcs-swap-b95895023b",
@@ -402,7 +402,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:12.735Z",
+    "lastUpdated": "2026-11-23T08:13:01.669Z",
     "geoQuality": "needs_review",
     "geoIssue": "DEEP_RESIDENTIAL"
   },
@@ -564,8 +564,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-4f674a9aa4",
@@ -614,8 +614,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-0b467a4afe",
@@ -744,8 +744,8 @@
     "district": "Ba Vì",
     "address": "ĐT.411B, Xã Vạn Thắng, Huyện Ba Vì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.241907,
-    "lng": 105.387272,
+    "lat": 21.0660371,
+    "lng": 105.348246,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -766,10 +766,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 4/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL"
   },
   {
     "id": "evcs-chg-c560ff63c1",
@@ -991,8 +991,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-6034918f76",
@@ -1467,8 +1467,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-07b0a9c932",
@@ -1578,8 +1578,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT"
   },
   {
     "id": "evcs-swap-3457a5347f",
@@ -1887,8 +1887,8 @@
     "district": "Chương Mỹ",
     "address": "Số 1, Tổ 3, TDP Tân Bình, Thị Trấn Xuân Mai",
     "city": "hanoi",
-    "lat": 20.906342,
-    "lng": 105.578071,
+    "lat": 20.8972,
+    "lng": 105.577904,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -1909,10 +1909,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:12.954Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION"
   },
   {
     "id": "evcs-swap-0f2b5964c1",
@@ -2097,7 +2097,7 @@
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-46ad5307e8",
@@ -2579,8 +2579,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Phúc Lâm-Hạ Dục, Xã Hồng Phong, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.809772,
-    "lng": 105.704707,
+    "lat": 20.9200319,
+    "lng": 105.6984202,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -2614,10 +2614,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/2 cổng✧ 60kW trống 8/8 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:13.172Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-app-restored",
+    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-60642cbfe6",
@@ -2629,8 +2629,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Hồ Chí Minh, Thị Trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.901096,
-    "lng": 105.579516,
+    "lat": 20.8963822,
+    "lng": 105.58009,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -2670,8 +2670,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 8/14 cổng✧ 60kW trống 6/6 cổng✧ 7kW trống 6/10 cổng✧ 3.5kW trống 6/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:13.383Z",
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.661Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -2984,8 +2984,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-e2738c91df",
@@ -2997,8 +2997,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Hồ Chí Minh, Thị Trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.901096,
-    "lng": 105.579516,
+    "lat": 20.885415,
+    "lng": 105.57728,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -3025,10 +3025,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 6/8 cổng✧ 60kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:13.649Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:16:11.862Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-b42c5d4011",
@@ -3040,8 +3040,8 @@
     "district": "Chương Mỹ",
     "address": "Đường Hồ Chí Minh, Xã Tân Tiến, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.905719,
-    "lng": 105.578238,
+    "lat": 20.885415,
+    "lng": 105.57728,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -3075,10 +3075,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 1/2 cổng✧ 60kW trống 4/4 cổng✧ 3.5kW trống 0/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:16:12.072Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-667cc83859",
@@ -3133,8 +3133,8 @@
     "district": "Chương Mỹ",
     "address": "6 AH13, Xã Tiên Phương, Huyện Chương Mỹ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.92308,
-    "lng": 105.703645,
+    "lat": 20.923892,
+    "lng": 105.699037,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -3168,10 +3168,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 9/10 cổng✧ 60kW trống 2/2 cổng✧ 3.5kW trống 12/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:13.852Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:41.519Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-0cf819d656",
@@ -3220,8 +3220,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-4cceb2404f",
@@ -3429,8 +3429,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-002aac9db3",
@@ -3609,8 +3609,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-305a4b42ee",
@@ -3622,8 +3622,8 @@
     "district": "Đan Phượng",
     "address": "Xã Hiệp Thuận",
     "city": "hanoi",
-    "lat": 21.086502,
-    "lng": 105.638458,
+    "lat": 21.0830577,
+    "lng": 105.6726443,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -3644,7 +3644,7 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 8/9 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
     "geoQuality": "verified",
     "geoIssue": ""
@@ -3940,10 +3940,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 1/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "arcgis-house-verified",
-    "lastUpdated": "2026-11-23T08:13:01.668Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:52:48.591Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-6858741b26",
@@ -4090,8 +4090,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-2f97558027",
@@ -4164,8 +4164,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT"
   },
   {
     "id": "evcs-chg-067b9bce00",
@@ -4207,8 +4207,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-eefdc09129",
@@ -4423,8 +4423,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-3e485041da",
@@ -4468,7 +4468,7 @@
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-4a0125327c",
@@ -4649,8 +4649,8 @@
     "district": "Đông Anh",
     "address": "Bên Hông nhà văn hóa Đông Anh",
     "city": "hanoi",
-    "lat": 21.1408166,
-    "lng": 105.8508479,
+    "lat": 21.140342,
+    "lng": 105.850876,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -4671,8 +4671,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 19/19 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "arcgis-poi-verified",
+    "lastUpdated": "2026-11-26T13:57:41.744Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -4682,8 +4682,8 @@
     "operator": "VinFast",
     "stationKind": "battery_swap",
     "stationKindLabel": "Trạm đổi pin",
-    "area": "Nội thành",
-    "district": "Long Biên",
+    "area": "Ngoại thành",
+    "district": "Đông Anh",
     "address": "Nhà văn hóa thôn Hậu, xã Đông Anh, TP Hà Nội (thuộc khu vực Việt Hùng cũ)",
     "city": "hanoi",
     "lat": 21.106888,
@@ -4945,8 +4945,8 @@
     "district": "Đông Anh",
     "address": "Đầu ngõ 113 đường Cao Lỗ, Nhà văn hóa Đông Anh, xã Đông Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.14039,
-    "lng": 105.851797,
+    "lat": 21.140342,
+    "lng": 105.850876,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -4967,8 +4967,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 36/40 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "arcgis-house-verified",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "arcgis-poi-verified",
+    "lastUpdated": "2026-11-26T13:57:41.956Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -4982,8 +4982,8 @@
     "district": "Đông Anh",
     "address": "Nhà văn hóa Phúc Lộc, xã Đông Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.141921,
-    "lng": 105.85087,
+    "lat": 21.1332178,
+    "lng": 105.8463539,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -5004,8 +5004,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 20/20 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:14.068Z",
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.665Z",
     "geoQuality": "needs_review",
     "geoIssue": "DEEP_RESIDENTIAL"
   },
@@ -5117,8 +5117,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT"
   },
   {
     "id": "evcs-swap-b4026aff31",
@@ -5315,8 +5315,8 @@
     "district": "Sóc Sơn",
     "address": "Số 118 Khu Miếu Thờ, Xã Sóc Sơn, Thành Phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.257904,
-    "lng": 105.849768,
+    "lat": 21.260408,
+    "lng": 105.850822,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -5337,8 +5337,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:14.274Z",
+    "coordSource": "tomtom-verified",
+    "lastUpdated": "2026-11-23T08:13:01.664Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -5395,8 +5395,8 @@
     "district": "Đông Anh",
     "address": "14 Đường Bắc Thăng Long Vực Dê, Xã Vĩnh Ngọc, Huyện Đông Anh, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.121799,
-    "lng": 105.829201,
+    "lat": 21.121874,
+    "lng": 105.813305,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -5430,8 +5430,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/10 cổng✧ 60kW trống 1/2 cổng✧ 3.5kW trống 8/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:42.166Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -5512,8 +5512,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-7c0ae7a0fb",
@@ -5898,8 +5898,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-f3a056103f",
@@ -6047,8 +6047,8 @@
     "district": "Đông Anh",
     "address": "174 Đường Đào Cam Mộc, Xã Uy Nỗ, Huyện Đông Anh, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.144308,
-    "lng": 105.864677,
+    "lat": 21.142206,
+    "lng": 105.866854,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -6076,8 +6076,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng✧ 3.5kW trống 0/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:42.375Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -6172,8 +6172,8 @@
     "district": "Đông Anh",
     "address": "Ban Chỉ huy phòng thủ khu vực 4 - Gia Lâm, xã Đông Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.141245,
-    "lng": 105.84685,
+    "lat": 21.154347,
+    "lng": 105.850688,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -6194,10 +6194,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 20/20 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:14.478Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL"
   },
   {
     "id": "evcs-swap-d5eecbe363",
@@ -6431,8 +6431,8 @@
     "district": "Long Biên",
     "address": "Phố Nông Vụ (Gần Tủ điện Ngã Tư) , Phường Phúc Lợi, Hà Nội",
     "city": "hanoi",
-    "lat": 21.043017,
-    "lng": 105.925852,
+    "lat": 21.0381407,
+    "lng": 105.9311988,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -6453,10 +6453,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 6/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:14.683Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-472dc7664f",
@@ -6838,8 +6838,8 @@
     "district": "Gia Lâm",
     "address": "69 ngõ 291 Ngô Xuân Quảng,Gia Lâm, Hà Nội",
     "city": "hanoi",
-    "lat": 21.019141,
-    "lng": 105.937358,
+    "lat": 21.0101,
+    "lng": 105.9391,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -6860,10 +6860,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 2/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:14.894Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-24776025b9",
@@ -7010,8 +7010,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-516868564c",
@@ -7097,8 +7097,8 @@
     "district": "Gia Lâm",
     "address": "Hầm Ruby 01-05., Vinhomes Ocean Park, xã Đa Tốn",
     "city": "hanoi",
-    "lat": 20.985766,
-    "lng": 105.931272,
+    "lat": 21.000715,
+    "lng": 105.944069,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -7119,10 +7119,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:15.102Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-da16e0fc29",
@@ -7535,8 +7535,8 @@
     "district": "Gia Lâm",
     "address": "Đường Hải Đăng, Xã Đa Tốn, Huyện Gia Lâm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.014447,
-    "lng": 105.945997,
+    "lat": 20.996099,
+    "lng": 105.9384,
     "isOperational": true,
     "statusText": "Mở 24/7 • Riêng tư • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -7563,10 +7563,10 @@
     ],
     "accessComments": "Mở 24/7 • Riêng tư • Miễn phí đỗ xe (✧ 30kW trống 2/2 cổng✧ 11kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:15.308Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.647Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,LOW_PRECISION"
   },
   {
     "id": "evcs-chg-959b4cdec5",
@@ -7786,8 +7786,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-bc8e6532a2",
@@ -7842,8 +7842,8 @@
     "district": "Gia Lâm",
     "address": "Đường Hải Đăng, Xã Đa Tốn, Huyện Gia Lâm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.014447,
-    "lng": 105.945997,
+    "lat": 20.9946,
+    "lng": 105.941902,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 60,
@@ -7870,10 +7870,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 60kW trống 4/6 cổng✧ 11kW trống 2/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:15.513Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-chg-5d71c7929a",
@@ -8192,8 +8192,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-adf602fe0d",
@@ -8414,8 +8414,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-d307ab8c2e",
@@ -8427,8 +8427,8 @@
     "district": "Hoài Đức",
     "address": "KM19 Đức Thượng, QL 32 Đức Thượng, Hoai Đức",
     "city": "hanoi",
-    "lat": 21.078972,
-    "lng": 105.687671,
+    "lat": 21.072251,
+    "lng": 105.694812,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -8449,8 +8449,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 15/15 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.657Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:17:42.815Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -8464,8 +8464,8 @@
     "district": "Hoài Đức",
     "address": "Ô số 3 Lỗ số 1, Cụm CN Lai xá, Xã Kim Chung",
     "city": "hanoi",
-    "lat": 21.069772,
-    "lng": 105.708457,
+    "lat": 21.060041,
+    "lng": 105.727699,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -8486,8 +8486,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:15.723Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.657Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -8692,8 +8692,8 @@
     "district": "Hoài Đức",
     "address": "Đại Lộ Thăng Long, Xã An Khánh, Huyện Hoài Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.00185,
-    "lng": 105.717244,
+    "lat": 21.007481,
+    "lng": 105.702085,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -8727,10 +8727,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 4/4 cổng✧ 11kW trống 2/2 cổng✧ 3.5kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:15.933Z",
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.662Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,COMMUNE_LEVEL"
   },
   {
     "id": "evcs-chg-c3a9ebb769",
@@ -8952,8 +8952,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-e80e2499e0",
@@ -9045,8 +9045,8 @@
     "district": "Hoài Đức",
     "address": "146 Phố Nhổn, Xã Kim Chung, Huyện Hoài Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.060041,
-    "lng": 105.727699,
+    "lat": 21.056981,
+    "lng": 105.729185,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -9073,8 +9073,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 0/2 cổng✧ 30kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:42.601Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -9125,7 +9125,7 @@
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID,LOW_PRECISION"
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-4d1940c431",
@@ -10094,8 +10094,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-29f3de815d",
@@ -10131,8 +10131,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-678c335954",
@@ -10168,8 +10168,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-09d844a7a1",
@@ -10389,8 +10389,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-397ea0a81e",
@@ -10554,7 +10554,7 @@
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 7/8 cổng✧ 7kW trống 4/8 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:16.149Z",
+    "lastUpdated": "2026-11-23T08:13:01.640Z",
     "geoQuality": "needs_review",
     "geoIssue": "DEEP_RESIDENTIAL"
   },
@@ -10641,8 +10641,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-91b43d3308",
@@ -11203,8 +11203,8 @@
     "district": "Mỹ Đức",
     "address": "Đường Xóm Thượng Dài, Xã Phù Lưu Tế, Huyện Mỹ Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.695167,
-    "lng": 105.738554,
+    "lat": 20.692438,
+    "lng": 105.742172,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -11232,10 +11232,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 3/4 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:16.351Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "COMMUNE_LEVEL,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-2da7a5c13e",
@@ -11291,8 +11291,8 @@
     "district": "Mỹ Đức",
     "address": "Đường Phúc Lâm-Hạ Dục, Xã Phúc Lâm, Huyện Mỹ Đức, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.810633,
-    "lng": 105.708003,
+    "lat": 20.6552943,
+    "lng": 105.7504559,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -11319,10 +11319,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 4/6 cổng✧ 7kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL"
   },
   {
     "id": "evcs-swap-c0348e784b",
@@ -11334,8 +11334,8 @@
     "district": "Thanh Xuân",
     "address": "83 Trường Chinh, Phường Phương Liệt, Thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 20.9978259,
-    "lng": 105.8396754,
+    "lat": 20.998032,
+    "lng": 105.839276,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -11356,8 +11356,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 20/20 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps-refined",
-    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:42.813Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -11445,8 +11445,8 @@
     "district": "Phú Xuyên",
     "address": "Quốc lộ 1A, km42, xã Châu Can",
     "city": "hanoi",
-    "lat": 20.684855,
-    "lng": 105.911743,
+    "lat": 20.7767016,
+    "lng": 105.9140748,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -11467,10 +11467,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/9 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-14bf24933c",
@@ -11764,7 +11764,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/5 pin)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:16.556Z",
+    "lastUpdated": "2026-11-23T08:13:01.659Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -12120,8 +12120,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-a0505e8185",
@@ -12133,8 +12133,8 @@
     "district": "Phú Xuyên",
     "address": "ĐT.428, Xã Tri Thủy, Huyện Phú Xuyên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.7029,
-    "lng": 105.9521,
+    "lat": 20.7583717,
+    "lng": 105.9112424,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -12161,10 +12161,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 1/2 cổng✧ 60kW trống 0/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-0d46c3d4b3",
@@ -12220,8 +12220,8 @@
     "district": "Phúc Thọ",
     "address": "Kilomet 5, Quốc lộ 21A, thôn Tân Phú , Xã Sơn Đông",
     "city": "hanoi",
-    "lat": 21.093596,
-    "lng": 105.499191,
+    "lat": 21.1022793,
+    "lng": 105.5524869,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -12242,10 +12242,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 15/15 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-1a9aa2eb2d",
@@ -12331,8 +12331,8 @@
     "district": "Phúc Thọ",
     "address": "21 Quốc lộ 21, Phường Trung Sơn Trầm",
     "city": "hanoi",
-    "lat": 21.099209,
-    "lng": 105.498253,
+    "lat": 21.112318,
+    "lng": 105.495486,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -12353,10 +12353,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.657Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:43.027Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-9374c64233",
@@ -12515,8 +12515,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-a6793e0063",
@@ -12800,8 +12800,8 @@
     "district": "Quốc Oai",
     "address": "Kilomet 4, đường 81, xã Sài Sơn",
     "city": "hanoi",
-    "lat": 21.016848,
-    "lng": 105.648179,
+    "lat": 21.015404,
+    "lng": 105.649391,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -12822,10 +12822,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 31/31 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:16.761Z",
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.670Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-d1902048f8",
@@ -13009,8 +13009,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d-paired",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-e7f34807c9",
@@ -13170,8 +13170,8 @@
     "district": "Quốc Oai",
     "address": "Cầu Giếng Ngang, Xã Cộng Hòa, Huyện Quốc Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.993507,
-    "lng": 105.644671,
+    "lat": 20.981217,
+    "lng": 105.678822,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 80,
@@ -13198,10 +13198,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 80kW trống 2/6 cổng✧ 20kW trống 2/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:16.966Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL"
   },
   {
     "id": "evcs-chg-4b5b2a153e",
@@ -13342,8 +13342,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-de9cc80466",
@@ -13485,8 +13485,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-0bff51e4e4",
@@ -13745,8 +13745,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-485edaf33c",
@@ -13844,8 +13844,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-bd1763b392",
@@ -13857,8 +13857,8 @@
     "district": "Quốc Oai",
     "address": "Đường Phủ Quốc, Xã Ngọc Mỹ, Huyện Quốc Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.988892,
-    "lng": 105.62892,
+    "lat": 20.9925911,
+    "lng": 105.6361209,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -13891,10 +13891,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 6/8 cổng✧ 60kW trống 3/4 cổng✧ 7kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "DEEP_RESIDENTIAL,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-388b1a1557",
@@ -13906,8 +13906,8 @@
     "district": "Quốc Oai",
     "address": "Đường 421B, Xã Sài Sơn, Huyện Quốc Oai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.017322,
-    "lng": 105.647225,
+    "lat": 21.018774,
+    "lng": 105.644249,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -13941,10 +13941,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 7/10 cổng✧ 60kW trống 1/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:17.171Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.648Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-f177628f0d",
@@ -14221,8 +14221,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-4c3fc3de8c",
@@ -14678,8 +14678,8 @@
     "district": "Sóc Sơn",
     "address": "40 Thôn Tân Long. Xã Kim Anh, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.224428,
-    "lng": 105.760218,
+    "lat": 21.2817183,
+    "lng": 105.7703287,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -14700,10 +14700,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID,COMMUNE_LEVEL"
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-9d7301c845",
@@ -14777,7 +14777,7 @@
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-68659a918d",
@@ -14789,8 +14789,8 @@
     "district": "Sóc Sơn",
     "address": "Thôn Hiền Lương,Xã Kim Anh, Hà Nội",
     "city": "hanoi",
-    "lat": 21.224428,
-    "lng": 105.760218,
+    "lat": 21.2817183,
+    "lng": 105.7703287,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -14811,7 +14811,7 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 29/30 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.667Z",
     "geoQuality": "needs_review",
     "geoIssue": "SHARED_CENTROID"
@@ -15085,8 +15085,8 @@
     "district": "Sóc Sơn",
     "address": "Km08+700 đường QL2, thôn Thạch Lỗi, xã Nội Bài, TP HN",
     "city": "hanoi",
-    "lat": 21.241403,
-    "lng": 105.821901,
+    "lat": 21.19818,
+    "lng": 105.829706,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -15107,10 +15107,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:19:36.925Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-2a1878bdd9",
@@ -15603,8 +15603,8 @@
     "district": "Sóc Sơn",
     "address": "KM24 Quốc Lộ 3, Xã Bắc Phú, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.2725,
-    "lng": 105.8865,
+    "lat": 21.269424,
+    "lng": 105.855021,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -15631,10 +15631,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 1/2 cổng✧ 20kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-4ee8e05467",
@@ -15690,8 +15690,8 @@
     "district": "Sóc Sơn",
     "address": "Cầu Vượt Sân Bay, Xã Phú Cường, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.214142,
-    "lng": 105.801626,
+    "lat": 21.2111955,
+    "lng": 105.8490024,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -15724,8 +15724,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/4 cổng✧ 60kW trống 1/2 cổng✧ 7kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:17.381Z",
+    "coordSource": "evcs-app-restored",
+    "lastUpdated": "2026-11-23T08:13:01.663Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -15739,8 +15739,8 @@
     "district": "Sóc Sơn",
     "address": "22 Đường Võ Nguyên Giáp, Xã Mai Đình, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.2029906,
-    "lng": 105.8327539,
+    "lat": 21.202532,
+    "lng": 105.832877,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -15786,8 +15786,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 1/12 cổng✧ 60kW trống 1/2 cổng✧ 22kW trống 1/1 cổng✧ 7kW trống 2/4 cổng✧ 3.5kW trống 3/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:43.257Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -15932,8 +15932,8 @@
     "district": "Sóc Sơn",
     "address": "Đường NB-1A, Xã Quang Tiến, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.248839,
-    "lng": 105.848629,
+    "lat": 21.234121,
+    "lng": 105.807597,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 180,
@@ -15960,8 +15960,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 180kW trống 2/2 cổng✧ 60kW trống 1/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:19:46.440Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -16055,8 +16055,8 @@
     "district": "Sóc Sơn",
     "address": "C11 Đường Xóm Chợ, Xã Phú Cường, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.203521,
-    "lng": 105.832074,
+    "lat": 21.198916,
+    "lng": 105.825772,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -16084,8 +16084,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 0/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:19:48.444Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -16378,8 +16378,8 @@
     "district": "Sóc Sơn",
     "address": "KM7, Xã Phú Cường, Huyện Sóc Sơn, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.212084,
-    "lng": 105.78482,
+    "lat": 21.200313,
+    "lng": 105.848548,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -16400,10 +16400,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-9b8886ebe9",
@@ -16798,8 +16798,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-1e8bf179ac",
@@ -16979,8 +16979,8 @@
     "district": "Hoài Đức",
     "address": "KĐT Lê Trọng Tấn - Geleximco, An Khánh, Hà Nội",
     "city": "hanoi",
-    "lat": 21.004485,
-    "lng": 105.731986,
+    "lat": 21.0054,
+    "lng": 105.73176,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -17001,10 +17001,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 31/31 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:17.590Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-9ca92fdcce",
@@ -17016,8 +17016,8 @@
     "district": "Sơn Tây",
     "address": "Kilomet 2+100, đường tránh Quốc lộ 32, thôn Thủ Trung, xã Thanh Mỹ",
     "city": "hanoi",
-    "lat": 21.1381,
-    "lng": 105.50112,
+    "lat": 21.130953,
+    "lng": 105.485001,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -17038,10 +17038,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:17.791Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-1f4ec6d2ff",
@@ -17497,8 +17497,8 @@
     "district": "Sơn Tây",
     "address": "Thanh Mỹ, Thành Phố Hà Nội, P. Tùng Thiện",
     "city": "hanoi",
-    "lat": 21.113129,
-    "lng": 105.494708,
+    "lat": 21.113211,
+    "lng": 105.475314,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -17519,10 +17519,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:17.996Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "coordSource": "arcgis-poi-verified",
+    "lastUpdated": "2026-11-26T13:57:43.485Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-8960f221cb",
@@ -17831,8 +17831,8 @@
     "district": "Sơn Tây",
     "address": "10 Ngách 9 Ngõ 17, Xã Thanh Mỹ, Thị Xã Sơn Tây, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.140914,
-    "lng": 105.502339,
+    "lat": 21.130953,
+    "lng": 105.485001,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 150,
@@ -17859,10 +17859,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 150kW trống 2/2 cổng✧ 60kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:18.198Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.643Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-e5554594d5",
@@ -17904,8 +17904,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.649Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-30528cdd48",
@@ -18009,8 +18009,8 @@
     "district": "Sơn Tây",
     "address": "Ngõ Phú Lâm 2 Đường Phú Nhi, Phường Phú Thịnh, Thị Xã Sơn Tây, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.148199,
-    "lng": 105.498497,
+    "lat": 21.150975,
+    "lng": 105.492875,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -18038,8 +18038,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 5/6 cổng✧ 3.5kW trống 6/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:43.694Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -18134,8 +18134,8 @@
     "district": "Sơn Tây",
     "address": "304 Phố Chùa Thông, Phường Trung Hưng, Thị Xã Sơn Tây, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.133789,
-    "lng": 105.503976,
+    "lat": 21.125578,
+    "lng": 105.502074,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -18163,10 +18163,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 1/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:18.401Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:43.915Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-f7db401dd4",
@@ -18308,8 +18308,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-f485a870dd",
@@ -18419,8 +18419,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT"
   },
   {
     "id": "evcs-swap-7494524cfc",
@@ -18752,8 +18752,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-96248fb879",
@@ -19122,8 +19122,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-0d624bd001",
@@ -19233,8 +19233,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps+roadside",
     "lastUpdated": "2026-11-23T08:13:01.659Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-0b00611996",
@@ -19579,8 +19579,8 @@
     "district": "Thạch Thất",
     "address": "Lô số 3 Cụm công nghiệp Bình Phú, Xã Quang Trung, Huyện Thạch Thất, Thành phố Hà Nội,",
     "city": "hanoi",
-    "lat": 21.024142,
-    "lng": 105.60683,
+    "lat": 21.018499,
+    "lng": 105.611641,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -19601,10 +19601,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 3/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:18.610Z",
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.659Z",
     "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "geoIssue": "DEEP_RESIDENTIAL,SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-7418f81d19",
@@ -19787,7 +19787,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:18.818Z",
+    "lastUpdated": "2026-11-23T08:13:01.672Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -19979,8 +19979,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-7a7a9ceb6a",
@@ -20231,8 +20231,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-375cc7971a",
@@ -20274,8 +20274,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-a53de458e8",
@@ -20447,8 +20447,8 @@
     "district": "Thạch Thất",
     "address": "Tỉnh Lộ 419 Liên Quan, Xã Phú Kim, Huyện Thạch Thất, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.062401,
-    "lng": 105.577664,
+    "lat": 21.0624309,
+    "lng": 105.5781642,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -20476,8 +20476,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:19.022Z",
+    "coordSource": "google-maps-refined",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -20795,8 +20795,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-58ed867a63",
@@ -20877,7 +20877,7 @@
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-edb427eb70",
@@ -20987,8 +20987,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-a60feba03a",
@@ -21098,8 +21098,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-a120dbf45a",
@@ -21598,7 +21598,7 @@
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 3/3 cổng✧ 3.5kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:19.228Z",
+    "lastUpdated": "2026-11-23T08:13:01.665Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -21822,8 +21822,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "commune-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "geoQuality": "needs_review",
+    "geoIssue": "COMMUNE_LEVEL,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-256672c3e1",
@@ -21859,8 +21859,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-9824b45ecf",
@@ -21896,8 +21896,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-1d8c08558d",
@@ -21977,8 +21977,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.664Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-36e0c6af25",
@@ -22014,8 +22014,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.641Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-3c78f9cc8c",
@@ -22310,8 +22310,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.638Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-1facd3a47d",
@@ -22323,8 +22323,8 @@
     "district": "Thanh Trì",
     "address": "Đường Phan Trọng Tuệ, Xã Tam Hiệp",
     "city": "hanoi",
-    "lat": 20.946259,
-    "lng": 105.828873,
+    "lat": 20.9324904,
+    "lng": 105.8466437,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -22345,10 +22345,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-2378d0246a",
@@ -22495,8 +22495,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.658Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-9a054138f2",
@@ -22742,8 +22742,8 @@
     "district": "Thanh Trì",
     "address": "Đường Đông Mỹ, Xã Đông Mỹ, Huyện Thanh Trì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.912094,
-    "lng": 105.873978,
+    "lat": 20.9324904,
+    "lng": 105.8466437,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -22777,10 +22777,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 5/6 cổng✧ 60kW trống 4/6 cổng✧ 3.5kW trống 10/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-65970aeaf0",
@@ -22902,7 +22902,7 @@
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 3/3 cổng✧ 3.5kW trống 3/3 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:19.440Z",
+    "lastUpdated": "2026-11-23T08:13:01.643Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -22916,8 +22916,8 @@
     "district": "Thanh Trì",
     "address": "KM12 Đường Ngọc Hồi, Xã Tứ Hiệp, Huyện Thanh Trì, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.924312,
-    "lng": 105.841103,
+    "lat": 20.9337,
+    "lng": 105.8469,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -22944,10 +22944,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/4 cổng✧ 60kW trống 0/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:19.641Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.662Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID,LOW_PRECISION"
   },
   {
     "id": "evcs-chg-ca5b40999e",
@@ -23162,7 +23162,7 @@
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 10/12 cổng✧ 60kW trống 1/4 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:19.846Z",
+    "lastUpdated": "2026-11-23T08:13:01.640Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -23274,8 +23274,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-f04f73540d",
@@ -23509,8 +23509,8 @@
     "district": "Thường Tín",
     "address": "207 Quán Gánh, Văn Binh, Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.870035,
-    "lng": 105.862918,
+    "lat": 20.89013,
+    "lng": 105.85747,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -23531,8 +23531,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:20.051Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.649Z",
     "geoQuality": "needs_review",
     "geoIssue": "SHARED_CENTROID"
   },
@@ -23768,8 +23768,8 @@
     "district": "Thường Tín",
     "address": "Số 95, Phố Quán Gánh, Xã Thường Tín, TP Hà Nội",
     "city": "hanoi",
-    "lat": 20.870035,
-    "lng": 105.862918,
+    "lat": 20.886487,
+    "lng": 105.866871,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -23790,10 +23790,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 15/15 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:20.256Z",
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoIssue": "COMMUNE_LEVEL,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-41c2e1a003",
@@ -23805,8 +23805,8 @@
     "district": "Thường Tín",
     "address": "51 Tỉnh Lộ 427, Xã Hòa Bình, Huyện Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.8795848,
-    "lng": 105.8340159,
+    "lat": 20.868452,
+    "lng": 105.843849,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -23834,8 +23834,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 7/10 cổng✧ 3.5kW trống 8/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:45.020Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -23886,8 +23886,8 @@
     "district": "Thường Tín",
     "address": "Quốc Lộ 1A, Xã Văn Bình, Huyện Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.870035,
-    "lng": 105.862918,
+    "lat": 20.89013,
+    "lng": 105.85747,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -23914,8 +23914,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/4 cổng✧ 60kW trống 2/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:20.458Z",
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.663Z",
     "geoQuality": "needs_review",
     "geoIssue": "SHARED_CENTROID"
   },
@@ -23929,8 +23929,8 @@
     "district": "Thường Tín",
     "address": "133 Tỉnh Lộ 429, Xã Tô Hiệu, Huyện Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.803774,
-    "lng": 105.883301,
+    "lat": 20.8614365,
+    "lng": 105.829854,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -23964,10 +23964,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 2/2 cổng✧ 11kW trống 1/1 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "commune-verified",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "approx",
-    "geoIssue": "COMMUNE_LEVEL"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-b21498fa93",
@@ -24009,8 +24009,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.646Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-5fe71f7873",
@@ -24101,8 +24101,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.663Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-45b12d4ad3",
@@ -24195,8 +24195,8 @@
     "district": "Thường Tín",
     "address": "Quốc Lộ 1A, Xã Nguyễn Trãi, Huyện Thường Tín, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.896072,
-    "lng": 105.850561,
+    "lat": 20.894257,
+    "lng": 105.855942,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -24224,10 +24224,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:20.664Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "commune-verified",
+    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "geoQuality": "approx",
+    "geoIssue": "COMMUNE_LEVEL"
   },
   {
     "id": "evcs-swap-7dd9bc209b",
@@ -24535,8 +24535,8 @@
     "district": "Ứng Hòa",
     "address": "Bến xe Trung tâm thương mại Thị trấn Vân Đình, Ứng Hòa, Hà Nội",
     "city": "hanoi",
-    "lat": 20.726755,
-    "lng": 105.776526,
+    "lat": 20.7346,
+    "lng": 105.769543,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -24557,10 +24557,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 10/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:20.872Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.644Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-d001a2e2b0",
@@ -24992,8 +24992,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-8c78bab020",
@@ -25041,8 +25041,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.662Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-82ee37e316",
@@ -25078,8 +25078,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.670Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-5bbf915688",
@@ -25981,8 +25981,8 @@
     "district": "Ba Đình",
     "address": "343 Đội Cấn, Phường Ngọc Hà, Hà Nội",
     "city": "hanoi",
-    "lat": 21.035954,
-    "lng": 105.817209,
+    "lat": 21.03604,
+    "lng": 105.8171,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -26003,10 +26003,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:21.087Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-0a247d438f",
@@ -26092,8 +26092,8 @@
     "district": "Ba Đình",
     "address": "Bến xe Kim Mã, Giảng Võ, Hà Nội",
     "city": "hanoi",
-    "lat": 21.032031,
-    "lng": 105.829378,
+    "lat": 21.0322,
+    "lng": 105.82923,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -26114,10 +26114,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:21.292Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-88c2e0f8ad",
@@ -26388,8 +26388,8 @@
     "district": "Ba Đình",
     "address": "THCS PHAN CHU TRINH - Số 24 Phố Nguyễn Công Hoan",
     "city": "hanoi",
-    "lat": 21.0274957,
-    "lng": 105.8142832,
+    "lat": 21.027395,
+    "lng": 105.813789,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -26410,8 +26410,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/7 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:45.255Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -26425,8 +26425,8 @@
     "district": "Ba Đình",
     "address": "THPT PHẠM HỒNG THÁI - Số 01, Phố Nguyễn Văn Ngọc, phường Giảng Võ, thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.028957,
-    "lng": 105.812918,
+    "lat": 21.0336751,
+    "lng": 105.8118693,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -26447,8 +26447,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:21.501Z",
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.659Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -26536,8 +26536,8 @@
     "district": "Ba Đình",
     "address": "Quận Ba Đình",
     "city": "hanoi",
-    "lat": 21.035586,
-    "lng": 105.831153,
+    "lat": 21.026932,
+    "lng": 105.814186,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -26558,8 +26558,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:21.710Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.658Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -26573,8 +26573,8 @@
     "district": "Ba Đình",
     "address": "Cột M6, hầm B3, Vincom Center Metropolis, số 29, đường Liễu Giai, phường Ngọc Khánh",
     "city": "hanoi",
-    "lat": 21.021677,
-    "lng": 105.815352,
+    "lat": 21.031496,
+    "lng": 105.815071,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -26595,8 +26595,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:21.914Z",
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:22:19.162Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -26781,7 +26781,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:22.122Z",
+    "lastUpdated": "2026-11-23T08:13:01.655Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -26829,7 +26829,7 @@
     "stationKind": "battery_swap",
     "stationKindLabel": "Trạm đổi pin",
     "area": "Nội thành",
-    "district": "Ba Đình",
+    "district": "Nam Từ Liêm",
     "address": "Trường Tiểu học Vinschool Gardenia",
     "city": "hanoi",
     "lat": 21.03477,
@@ -27080,8 +27080,8 @@
     "district": "Ba Đình",
     "address": "29 Liễu Giai, Phường Ngọc Khánh, Quận Ba Đình, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.03126,
-    "lng": 105.814598,
+    "lat": 21.031905,
+    "lng": 105.81398,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -27109,8 +27109,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 4/4 cổng✧ 3.5kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:22:23.225Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -27124,8 +27124,8 @@
     "district": "Ba Đình",
     "address": "29 Liễu Giai, Phường Ngọc Khánh, Quận Ba Đình, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.031263,
-    "lng": 105.814598,
+    "lat": 21.03115,
+    "lng": 105.81285,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -27153,8 +27153,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 18/18 cổng✧ 3.5kW trống 17/18 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:22:25.543Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -27390,8 +27390,8 @@
     "district": "Bắc Từ Liêm",
     "address": "Số 18 phố Nhật Tảo, phường Đông Ngạc, quận Bắc Từ Liêm, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0875803,
-    "lng": 105.7861584,
+    "lat": 21.088659,
+    "lng": 105.791837,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -27412,8 +27412,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.663Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:45.466Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -27686,8 +27686,8 @@
     "district": "Bắc Từ Liêm",
     "address": "TH ĐÔNG NGẠC B -  Đông Ngạc - Tp. Hà Nội",
     "city": "hanoi",
-    "lat": 21.089217,
-    "lng": 105.784359,
+    "lat": 21.09158,
+    "lng": 105.783275,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -27708,10 +27708,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.652Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "DEEP_RESIDENTIAL"
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:22:27.492Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-e42a81124d",
@@ -27784,8 +27784,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-e952e43e88",
@@ -27797,8 +27797,8 @@
     "district": "Bắc Từ Liêm",
     "address": "454 Đường Phạm Văn Đồng, Phường Xuân Đỉnh, Quận Bắc Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.068701,
-    "lng": 105.785073,
+    "lat": 21.068654,
+    "lng": 105.78495,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -27819,8 +27819,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 5/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "arcgis-house-verified",
-    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:22:33.291Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -27902,8 +27902,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.660Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-90956f722a",
@@ -27952,8 +27952,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-273d9f88b2",
@@ -28397,11 +28397,11 @@
     "stationKind": "battery_swap",
     "stationKindLabel": "Trạm đổi pin",
     "area": "Nội thành",
-    "district": "Cầu Giấy",
+    "district": "Đống Đa",
     "address": "3 Cầu Giấy, Phường Láng, Hà Nội",
     "city": "hanoi",
-    "lat": 21.027719,
-    "lng": 105.802696,
+    "lat": 21.028271,
+    "lng": 105.804471,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -28422,8 +28422,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:22.345Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:45.699Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -28434,11 +28434,11 @@
     "stationKind": "battery_swap",
     "stationKindLabel": "Trạm đổi pin",
     "area": "Nội thành",
-    "district": "Cầu Giấy",
+    "district": "Đống Đa",
     "address": "Số 112B Chùa Láng, Phường Láng, Hà Nội",
     "city": "hanoi",
-    "lat": 21.038386,
-    "lng": 105.805348,
+    "lat": 21.02326,
+    "lng": 105.8024,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -28459,10 +28459,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:22.556Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-4edd03dc9e",
@@ -28693,7 +28693,7 @@
     "stationKind": "battery_swap",
     "stationKindLabel": "Trạm đổi pin",
     "area": "Nội thành",
-    "district": "Cầu Giấy",
+    "district": "Đống Đa",
     "address": "34 Huỳnh Thúc Kháng kéo dài, Phường Láng, Hà Nội",
     "city": "hanoi",
     "lat": 21.0226025,
@@ -28918,8 +28918,8 @@
     "district": "Ba Đình",
     "address": "306B Kim Mã, Giảng Võ, Hà Nội",
     "city": "hanoi",
-    "lat": 21.030364,
-    "lng": 105.81666,
+    "lat": 21.02897,
+    "lng": 105.8044,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -28940,10 +28940,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:22.783Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.655Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-997f718d35",
@@ -29141,7 +29141,7 @@
     "address": "Vinhomes Skylake, ô đất E1.3, khu đô thị mới Cầu Giấy, phường Mỹ Đình",
     "city": "hanoi",
     "lat": 21.019812,
-    "lng": 105.771222,
+    "lng": 105.781761,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -29162,10 +29162,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:22.989Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.668Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-e783fb3ab4",
@@ -29244,7 +29244,7 @@
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 29/46 cổng✧ 3.5kW trống 18/26 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:23.192Z",
+    "lastUpdated": "2026-11-23T08:13:01.644Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -29375,8 +29375,8 @@
     "district": "Cầu Giấy",
     "address": "3 Phố Duy Tân, Phường Dịch Vọng Hậu, Quận Cầu Giấy, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.03186,
-    "lng": 105.784309,
+    "lat": 21.030383,
+    "lng": 105.785939,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -29403,8 +29403,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/4 cổng✧ 7kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:46.169Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -29418,8 +29418,8 @@
     "district": "Cầu Giấy",
     "address": "55B Đường Cầu Giấy, Phường Dịch Vọng, Quận Cầu Giấy, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.030874,
-    "lng": 105.792351,
+    "lat": 21.030464,
+    "lng": 105.800714,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -29440,8 +29440,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:46.379Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -29702,8 +29702,8 @@
     "district": "Cầu Giấy",
     "address": "222 Trần Duy Hưng, Phường Trung Hòa, Quận Cầu Giấy, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.0072697,
-    "lng": 105.7932566,
+    "lat": 21.006969,
+    "lng": 105.794342,
     "isOperational": true,
     "statusText": "Mở Th 2-CN 08h - 22h • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 250,
@@ -29743,8 +29743,8 @@
     ],
     "accessComments": "Mở Th 2-CN 08h - 22h • Công cộng • Gửi xe tính phí (✧ 250kW trống 0/3 cổng✧ 120kW trống 0/2 cổng✧ 60kW trống 1/4 cổng✧ 3.5kW trống 5/6 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:46.833Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -30239,7 +30239,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:23.423Z",
+    "lastUpdated": "2026-11-23T08:13:01.638Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -30438,8 +30438,8 @@
     "district": "Đống Đa",
     "address": "THPT KIM LIÊN - Số 1 ngõ 4C phố Đặng Văn Ngữ phường Kim Liên, thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 21.003457,
-    "lng": 105.82145,
+    "lat": 21.011091,
+    "lng": 105.831625,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -30460,8 +30460,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 2/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:23.770Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.639Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -30877,8 +30877,8 @@
     "district": "Hà Đông",
     "address": "Số 8, đường Quang Trung, phường Quang Trung",
     "city": "hanoi",
-    "lat": 20.9564341,
-    "lng": 105.7549248,
+    "lat": 20.9737888,
+    "lng": 105.777498,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -30899,7 +30899,7 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "partner-street-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
     "geoQuality": "verified",
     "geoIssue": ""
@@ -31345,8 +31345,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.639Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-db10238f36",
@@ -31506,8 +31506,8 @@
     "district": "Hà Đông",
     "address": "Số 01 Nguyễn Trãi, Hà Đông, Hà Nội",
     "city": "hanoi",
-    "lat": 20.971419,
-    "lng": 105.778794,
+    "lat": 20.9725,
+    "lng": 105.7797,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -31528,10 +31528,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:23.981Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.654Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-chg-08d2374336",
@@ -31543,8 +31543,8 @@
     "district": "Hà Đông",
     "address": "946 Quang Trung, Phường Yên Nghĩa, Hà Nội",
     "city": "hanoi",
-    "lat": 20.953323,
-    "lng": 105.75261,
+    "lat": 20.950911,
+    "lng": 105.749638,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -31565,8 +31565,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:47.048Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -31990,8 +31990,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.643Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-1ba55f76a7",
@@ -32071,8 +32071,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-f0d48e43ab",
@@ -32084,8 +32084,8 @@
     "district": "Hà Đông",
     "address": "39 Phố Lý Thường Kiệt, Phường Phú La, Quận Hà Đông, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.963375,
-    "lng": 105.767044,
+    "lat": 20.961286,
+    "lng": 105.764401,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -32112,8 +32112,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 0/2 cổng✧ 7kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:47.260Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -32283,8 +32283,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.647Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-0c195dd7be",
@@ -32986,8 +32986,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.665Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-d24865ff5e",
@@ -33036,8 +33036,8 @@
     "district": "Hai Bà Trưng",
     "address": "78 Trần Đại Nghĩa",
     "city": "hanoi",
-    "lat": 21.0063,
-    "lng": 105.8454,
+    "lat": 21.006958,
+    "lng": 105.844706,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -33058,10 +33058,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.658Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:47.469Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-c814d3dc0e",
@@ -33073,8 +33073,8 @@
     "district": "Hai Bà Trưng",
     "address": "156 Lê Thanh Nghị",
     "city": "hanoi",
-    "lat": 21.0001,
-    "lng": 105.8453,
+    "lat": 21.001881,
+    "lng": 105.844523,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -33095,10 +33095,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.658Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:47.679Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-225a445551",
@@ -33147,8 +33147,8 @@
     "district": "Hai Bà Trưng",
     "address": "Số 1 Đào Duy Anh, Phường Phương Mai",
     "city": "hanoi",
-    "lat": 21.0069553,
-    "lng": 105.8409269,
+    "lat": 21.007748,
+    "lng": 105.839917,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -33169,8 +33169,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:47.883Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -33369,8 +33369,8 @@
     "district": "Hai Bà Trưng",
     "address": "Hầm B2, Vincom Center Bà Triệu, số 191, đường Bà Triệu",
     "city": "hanoi",
-    "lat": 21.031015,
-    "lng": 105.835408,
+    "lat": 21.0115,
+    "lng": 105.8496,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -33391,10 +33391,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/9 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:24.207Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-chg-b51d4cc834",
@@ -33406,8 +33406,8 @@
     "district": "Hai Bà Trưng",
     "address": "191 Phố Bà Triệu, Phường Lê Đại Hành, Quận Hai Bà Trưng, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.0114,
-    "lng": 105.850021,
+    "lat": 21.010835,
+    "lng": 105.849176,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 30,
@@ -33441,10 +33441,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 30kW trống 2/2 cổng✧ 20kW trống 2/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:48.085Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-ce18786447",
@@ -34125,8 +34125,8 @@
     "district": "Hoàn Kiếm",
     "address": "Số 59-63 Phố Tràng Thi, Phường Cửa Nam, TP Hà Nội",
     "city": "hanoi",
-    "lat": 21.030504,
-    "lng": 105.845106,
+    "lat": 21.027738,
+    "lng": 105.8453,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -34147,8 +34147,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:23:10.875Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -34310,8 +34310,8 @@
     "district": "Bắc Từ Liêm",
     "address": "138 Phạm Văn Đồng, Phường Đông Ngạc, Hà Nội",
     "city": "hanoi",
-    "lat": 21.073874,
-    "lng": 105.78534,
+    "lat": 21.075857,
+    "lng": 105.785652,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -34332,8 +34332,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:48.295Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -34735,8 +34735,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-fd4132bd3c",
@@ -35267,7 +35267,7 @@
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.657Z",
     "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoIssue": "SHARED_CENTROID,STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-64bfa743a5",
@@ -35488,8 +35488,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.648Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-a471266163",
@@ -36306,8 +36306,8 @@
     "district": "Hoàng Mai",
     "address": "581 Đường Tam Trinh, Phường Yên Sở, Quận Hoàng Mai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.9792,
-    "lng": 105.864098,
+    "lat": 20.979428,
+    "lng": 105.864845,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -36328,10 +36328,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 3/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
-    "geoQuality": "approx",
-    "geoIssue": "LOW_PRECISION"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:48.516Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-135c7f333b",
@@ -36423,8 +36423,8 @@
     "district": "Hoàng Mai",
     "address": "535 Đường Tam Trinh, Phường Hoàng Văn Thụ, Quận Hoàng Mai, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.980301,
-    "lng": 105.863907,
+    "lat": 20.980607,
+    "lng": 105.86454,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -36445,10 +36445,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 19/34 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.639Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:49.212Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-e7efb97205",
@@ -36763,8 +36763,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.656Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-swap-96a0d8bbbc",
@@ -37109,8 +37109,8 @@
     "district": "Hoàng Mai",
     "address": "186 Định Công Hạ",
     "city": "hanoi",
-    "lat": 20.97785,
-    "lng": 105.84794,
+    "lat": 20.983792,
+    "lng": 105.82514,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -37131,8 +37131,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "tomtom-verified",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:49.426Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -37368,8 +37368,8 @@
     "district": "Long Biên",
     "address": "Số 1A, Đường Nguyễn Văn Linh, Phường Sài Đồng",
     "city": "hanoi",
-    "lat": 21.05479,
-    "lng": 105.889539,
+    "lat": 21.053122,
+    "lng": 105.889023,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -37390,8 +37390,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:24.425Z",
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.656Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -37429,8 +37429,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom-verified",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-b5743434fd",
@@ -37516,8 +37516,8 @@
     "district": "Long Biên",
     "address": "777, Ngo Gia Tu Rd, Duc Giang Ward, Viet Hung Ward, Hà Nội",
     "city": "hanoi",
-    "lat": 21.059959,
-    "lng": 105.896478,
+    "lat": 21.0694,
+    "lng": 105.9014,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -37538,10 +37538,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/14 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:24.626Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.647Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-4a0ee4f270",
@@ -38145,8 +38145,8 @@
     "district": "Long Biên",
     "address": "Sân Golf nước, The Harmony, khu đô thị sinh thái Vinhomes Riverside, Quận Long Biên, Thành phố Trung ương Hà Nội",
     "city": "hanoi",
-    "lat": 21.031151,
-    "lng": 105.886138,
+    "lat": 21.048626,
+    "lng": 105.908791,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -38167,10 +38167,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 7/10 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:24.839Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.659Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-cf8bce0ddb",
@@ -38256,8 +38256,8 @@
     "district": "Long Biên",
     "address": "Nhà xe ngoài trời, trường Mầm non Vinschool Harmony 1, Vinhomes Riverside 2, đường Chu Huy Mân",
     "city": "hanoi",
-    "lat": 21.036748,
-    "lng": 105.910317,
+    "lat": 21.043726,
+    "lng": 105.907883,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -38278,10 +38278,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:25.045Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-91335b200e",
@@ -38541,8 +38541,8 @@
     "district": "Long Biên",
     "address": "8 Phố Nguyễn Cao Luyện, Phường Đức Giang, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.068558,
-    "lng": 105.904037,
+    "lat": 21.06628,
+    "lng": 105.906067,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 30,
@@ -38576,10 +38576,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 30kW trống 0/1 cổng✧ 20kW trống 0/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.640Z",
-    "geoQuality": "needs_review",
-    "geoIssue": "SHARED_CENTROID"
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:49.649Z",
+    "geoQuality": "verified",
+    "geoIssue": ""
   },
   {
     "id": "evcs-chg-f058c21ea6",
@@ -38813,8 +38813,8 @@
     "district": "Long Biên",
     "address": "Hẻm 720 Nguyễn Văn Cừ, Phường Gia Thụy, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.055934,
-    "lng": 105.907527,
+    "lat": 21.044206,
+    "lng": 105.873095,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -38835,8 +38835,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/12 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:25.258Z",
+    "coordSource": "nominatim-rooftop-verified",
+    "lastUpdated": "2026-11-26T13:24:05.355Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -38974,8 +38974,8 @@
     "district": "Long Biên",
     "address": "35 Phố Hoàng Như Tiếp, Phường Bồ Đề, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.041582,
-    "lng": 105.880188,
+    "lat": 21.042896,
+    "lng": 105.876191,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -39002,8 +39002,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 3/4 cổng✧ 60kW trống 1/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:49.858Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -39046,7 +39046,7 @@
     "accessComments": "Mở 24/7 • Riêng tư • Gửi xe tính phí (✧ 20kW trống 2/2 cổng✧ 11kW trống 4/6 cổng)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:25.468Z",
+    "lastUpdated": "2026-11-23T08:13:01.641Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -39414,8 +39414,8 @@
     "district": "Long Biên",
     "address": "80 Đường Nguyễn Văn Cừ, Phường Ngọc Lâm, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.038063,
-    "lng": 105.86765,
+    "lat": 21.041,
+    "lng": 105.868599,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 22,
@@ -39436,10 +39436,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 22kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:25.680Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.640Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-chg-c3b9f07d38",
@@ -39495,8 +39495,8 @@
     "district": "Long Biên",
     "address": "15 Phố Ngọc Thụy, Phường Ngọc Thụy, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.055317,
-    "lng": 105.871834,
+    "lat": 21.046314,
+    "lng": 105.864919,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 30,
@@ -39517,8 +39517,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 30kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:50.084Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -39791,8 +39791,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.642Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-f9bde3af6d",
@@ -39890,8 +39890,8 @@
     "district": "Long Biên",
     "address": "1N9 Đường Huỳnh Văn Nghệ, Phường Phúc Đồng, Quận Long Biên, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.038692,
-    "lng": 105.899089,
+    "lat": 21.043726,
+    "lng": 105.907883,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -39919,10 +39919,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 1/1 cổng✧ 3.5kW trống 1/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:25.892Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.639Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-34d668ac00",
@@ -40066,8 +40066,8 @@
     "district": "Nam Từ Liêm",
     "address": "390/20 Tố Hữu, Phường Đại Mỗ, Thành phố Hà Nội",
     "city": "hanoi",
-    "lat": 20.9947012,
-    "lng": 105.7903328,
+    "lat": 20.992772,
+    "lng": 105.786998,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -40088,8 +40088,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 9/9 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.651Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:24:16.187Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -40251,8 +40251,8 @@
     "district": "Nam Từ Liêm",
     "address": "Hầm B2 chung cư Dreamland Bonanza, 23 phố Duy Tân",
     "city": "hanoi",
-    "lat": 21.018209,
-    "lng": 105.789221,
+    "lat": 21.0312,
+    "lng": 105.780792,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -40273,10 +40273,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:26.096Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.656Z",
+    "geoQuality": "approx",
+    "geoIssue": "LOW_PRECISION"
   },
   {
     "id": "evcs-swap-90907be12f",
@@ -40288,8 +40288,8 @@
     "district": "Cầu Giấy",
     "address": "Số 8 Phạm Hùng, phường Mai Dịch",
     "city": "hanoi",
-    "lat": 21.033529,
-    "lng": 105.779701,
+    "lat": 21.034267,
+    "lng": 105.779636,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -40310,8 +40310,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:50.550Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -40459,7 +40459,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:26.304Z",
+    "lastUpdated": "2026-11-23T08:13:01.655Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -40547,8 +40547,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phố Vũ Quỳnh, Mễ Trì Hạ, Từ Liêm, Hà Nội",
     "city": "hanoi",
-    "lat": 21.013892,
-    "lng": 105.781277,
+    "lat": 21.01281,
+    "lng": 105.775436,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -40569,8 +40569,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.652Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:24:20.096Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -40608,8 +40608,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.668Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-swap-7f6a254ad2",
@@ -40755,7 +40755,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:26.523Z",
+    "lastUpdated": "2026-11-23T08:13:01.658Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -40940,7 +40940,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 4/25 pin)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:26.725Z",
+    "lastUpdated": "2026-11-23T08:13:01.658Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -41015,8 +41015,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps-refined",
     "lastUpdated": "2026-11-23T08:13:01.672Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-5ec4076bca",
@@ -41273,7 +41273,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 16/28 pin)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:26.929Z",
+    "lastUpdated": "2026-11-23T08:13:01.672Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -41569,7 +41569,7 @@
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 13/13 pin)",
     "source": "EVCS.VN (Phone App)",
     "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:27.132Z",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -41583,8 +41583,8 @@
     "district": "Nam Từ Liêm",
     "address": "Nhà xe nổi F2 phân khu S1/S2, Vinhomes Smart City, phường Tây Mỗ",
     "city": "hanoi",
-    "lat": 20.99874,
-    "lng": 105.743053,
+    "lat": 21.0037309,
+    "lng": 105.7406274,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -41605,10 +41605,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/5 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:27.334Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "google-maps-refined",
+    "lastUpdated": "2026-11-23T08:13:01.671Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-f144b3884d",
@@ -41829,8 +41829,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.652Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-f0c7c3cda3",
@@ -41879,8 +41879,8 @@
     "district": "Nam Từ Liêm",
     "address": "1 Đường Lê Quang Đạo, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.014992,
-    "lng": 105.769615,
+    "lat": 21.014757,
+    "lng": 105.768561,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -41907,8 +41907,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 3/30 cổng✧ 7kW trống 9/30 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
-    "lastUpdated": "2026-11-23T08:13:01.660Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:50.769Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -42033,8 +42033,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT,STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-025027f281",
@@ -42226,8 +42226,8 @@
     "district": "Nam Từ Liêm",
     "address": "190 Đường Đại Mỗ, Phường Đại Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.993332,
-    "lng": 105.761147,
+    "lat": 20.985717,
+    "lng": 105.768014,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -42261,8 +42261,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 6/16 cổng✧ 60kW trống 0/2 cổng✧ 3.5kW trống 13/18 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.642Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:50.982Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -42276,8 +42276,8 @@
     "district": "Nam Từ Liêm",
     "address": "1 Đường Mễ Trì, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.012423,
-    "lng": 105.783134,
+    "lat": 21.012846,
+    "lng": 105.775688,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -42298,8 +42298,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 4/8 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:51.189Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -42313,8 +42313,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.001897,
-    "lng": 105.75121,
+    "lat": 20.9998356,
+    "lng": 105.7480899,
     "isOperational": true,
     "statusText": "Mở Th 2-CN 07h - 19h • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 180,
@@ -42335,10 +42335,10 @@
     ],
     "accessComments": "Mở Th 2-CN 07h - 19h • Công cộng • Miễn phí đỗ xe (✧ 180kW trống 29/50 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:27.543Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-dca690122f",
@@ -42411,8 +42411,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "google-maps",
     "lastUpdated": "2026-11-23T08:13:01.661Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-f0d97894fc",
@@ -42568,8 +42568,8 @@
     "district": "Nam Từ Liêm",
     "address": "35B Đường Hồ Mễ Trì, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.000307,
-    "lng": 105.788681,
+    "lat": 20.999819,
+    "lng": 105.791583,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -42597,10 +42597,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 1/1 cổng✧ 3.5kW trống 0/1 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d",
-    "lastUpdated": "2026-11-23T08:13:01.641Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:52.352Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-054ebd1aed",
@@ -42847,8 +42847,8 @@
     "district": "Nam Từ Liêm",
     "address": "35B Đường Hồ Mễ Trì, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.010348,
-    "lng": 105.778819,
+    "lat": 20.999819,
+    "lng": 105.791583,
     "isOperational": true,
     "statusText": "Mở Th 2-CN 06h - 20h • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -42888,10 +42888,10 @@
     ],
     "accessComments": "Mở Th 2-CN 06h - 20h • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 18/22 cổng✧ 20kW trống 10/10 cổng✧ 11kW trống 7/15 cổng✧ 3.5kW trống 10/11 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:27.764Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:52.560Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-551fa0621e",
@@ -42940,8 +42940,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.640Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-3797624f5d",
@@ -43191,8 +43191,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.001897,
-    "lng": 105.75121,
+    "lat": 20.9998356,
+    "lng": 105.7480899,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 20,
@@ -43226,10 +43226,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 20kW trống 10/10 cổng✧ 11kW trống 7/48 cổng✧ 3.5kW trống 10/10 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:27.973Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-3cc1ed1716",
@@ -43378,8 +43378,8 @@
     "district": "Nam Từ Liêm",
     "address": "Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.014067,
-    "lng": 105.781744,
+    "lat": 21.01158,
+    "lng": 105.785431,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Gửi xe tính phí",
     "maxPowerKw": 30,
@@ -43406,10 +43406,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Gửi xe tính phí (✧ 30kW trống 2/2 cổng✧ 11kW trống 3/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:28.181Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.650Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-5a86404ec2",
@@ -43471,8 +43471,8 @@
     "district": "Nam Từ Liêm",
     "address": "S16, Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 20.978767,
-    "lng": 105.741247,
+    "lat": 20.9998356,
+    "lng": 105.7480899,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 20,
@@ -43500,10 +43500,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 20kW trống 2/2 cổng✧ 3.5kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:28.384Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.664Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-1de072c593",
@@ -43700,8 +43700,8 @@
     "district": "Ba Đình",
     "address": "HUB - 626 Đường Bưởi, Phường Ngọc Hà, Hà Nội",
     "city": "hanoi",
-    "lat": 21.0471823,
-    "lng": 105.8065344,
+    "lat": 21.046734,
+    "lng": 105.80647,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -43722,8 +43722,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.665Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:52.776Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -43774,8 +43774,8 @@
     "district": "Tây Hồ",
     "address": "19B Ngõ 275 Âu Cơ, Quảng An",
     "city": "hanoi",
-    "lat": 21.067902,
-    "lng": 105.82728,
+    "lat": 21.070761,
+    "lng": 105.82476,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -43796,10 +43796,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:28.590Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d-paired",
+    "lastUpdated": "2026-11-23T08:13:01.670Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-swap-61caf107e1",
@@ -43885,8 +43885,8 @@
     "district": "Bắc Từ Liêm",
     "address": "Số 166, đường Phạm Văn Đồng, phường Xuân Đỉnh",
     "city": "hanoi",
-    "lat": 21.071739,
-    "lng": 105.785103,
+    "lat": 21.0590274,
+    "lng": 105.783294,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -43907,7 +43907,7 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "evcs-phone-3d-paired",
+    "coordSource": "evcs-app-restored",
     "lastUpdated": "2026-11-23T08:13:01.669Z",
     "geoQuality": "verified",
     "geoIssue": ""
@@ -43983,8 +43983,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "tomtom",
     "lastUpdated": "2026-11-23T08:13:01.671Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "WRONG_DISTRICT"
   },
   {
     "id": "evcs-swap-b597209aef",
@@ -44335,8 +44335,8 @@
     "source": "EVCS.VN (Phone App)",
     "coordSource": "evcs-phone-3d",
     "lastUpdated": "2026-11-23T08:13:01.644Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "geoQuality": "needs_review",
+    "geoIssue": "STREET_MISMATCH"
   },
   {
     "id": "evcs-chg-def1708883",
@@ -44348,8 +44348,8 @@
     "district": "Tây Hồ",
     "address": "Ngõ 603 Lạc Long Quân, Phường Xuân La, Quận Tây Hồ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.0648534,
-    "lng": 105.8058223,
+    "lat": 21.068498,
+    "lng": 105.808652,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 120,
@@ -44382,8 +44382,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 120kW trống 0/2 cổng✧ 60kW trống 0/2 cổng✧ 7kW trống 4/4 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.661Z",
+    "coordSource": "nominatim-street-verified",
+    "lastUpdated": "2026-11-26T13:25:05.692Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -44397,8 +44397,8 @@
     "district": "Tây Hồ",
     "address": "21B Hẻm 275 Âu Cơ, Phường Quảng An, Quận Tây Hồ, Hà Nội, Việt Nam",
     "city": "hanoi",
-    "lat": 21.065644,
-    "lng": 105.824782,
+    "lat": 21.070761,
+    "lng": 105.82476,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng • Miễn phí đỗ xe",
     "maxPowerKw": 60,
@@ -44419,10 +44419,10 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng • Miễn phí đỗ xe (✧ 60kW trống 2/2 cổng)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:28.795Z",
-    "geoQuality": "verified",
-    "geoIssue": ""
+    "coordSource": "evcs-phone-3d",
+    "lastUpdated": "2026-11-23T08:13:01.643Z",
+    "geoQuality": "needs_review",
+    "geoIssue": "SHARED_CENTROID"
   },
   {
     "id": "evcs-chg-8228016fdc",
@@ -44750,8 +44750,8 @@
     "district": "Thanh Xuân",
     "address": "233B Nguyễn Trãi, Khương Đình, Hà Nội",
     "city": "hanoi",
-    "lat": 20.997829,
-    "lng": 105.813155,
+    "lat": 20.9952848,
+    "lng": 105.8098217,
     "isOperational": false,
     "statusText": "Chờ kích hoạt",
     "maxPowerKw": 3.5,
@@ -44772,8 +44772,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Chờ kích hoạt)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "osm-poi-verified",
-    "lastUpdated": "2026-11-25T19:04:29.006Z",
+    "coordSource": "google-maps",
+    "lastUpdated": "2026-11-23T08:13:01.667Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
@@ -44898,8 +44898,8 @@
     "district": "Thanh Xuân",
     "address": "107 Ngụy Như Kon Tum, phường Thanh Xuân",
     "city": "hanoi",
-    "lat": 21.0027018,
-    "lng": 105.8046758,
+    "lat": 21.001833,
+    "lng": 105.804505,
     "isOperational": true,
     "statusText": "Mở 24/7 • Công cộng",
     "maxPowerKw": 3.5,
@@ -44920,8 +44920,8 @@
     ],
     "accessComments": "Mở 24/7 • Công cộng (✧ Có sẵn 5/35 pin)",
     "source": "EVCS.VN (Phone App)",
-    "coordSource": "google-maps",
-    "lastUpdated": "2026-11-23T08:13:01.669Z",
+    "coordSource": "arcgis-point-verified",
+    "lastUpdated": "2026-11-26T13:57:53.231Z",
     "geoQuality": "verified",
     "geoIssue": ""
   },
