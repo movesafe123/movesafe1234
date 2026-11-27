@@ -35,6 +35,21 @@ jobs:
         env:
           TOMTOM_KEY: ${{ secrets.TOMTOM_KEY }}
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: 💓 Giữ thức Supabase & Render Cloud (Keep-Alive)
+        continue-on-error: true
+        run: |
+          SB_URL="${SUPABASE_URL:-https://cuvleafsohxtchhgbdbk.supabase.co}"
+          SB_KEY="${SUPABASE_KEY:-sb_publishable_IL2L6IKBOYusIzdEGkK6PQ_QTD5OE4e}"
+          curl -fsS --max-time 8 "${SB_URL}/rest/v1/ev_stations?select=id&limit=1" \
+            -H "apikey: ${SB_KEY}" \
+            -H "Authorization: Bearer ${SB_KEY}" > /dev/null && echo "✓ Supabase keep-alive OK" || echo "⚠ Supabase ping failed"
+          curl -fsS --max-time 12 "https://movesafe1234.onrender.com/" > /dev/null && echo "✓ Render wake-up OK" || echo "⚠ Render ping skipped/cold"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: 🚀 Tự động Commit & Push dữ liệu mới nhất lên Cloud
         run: |

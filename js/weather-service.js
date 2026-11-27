@@ -144,6 +144,17 @@ class WeatherService {
     } catch (_e) {}
   }
 
+  _getVietnamHour(isoTime = null) {
+    if (typeof isoTime === 'string') {
+      const m = isoTime.match(/T(\d{2}):/);
+      if (m) {
+        const parsed = parseInt(m[1], 10);
+        if (Number.isFinite(parsed) && parsed >= 0 && parsed <= 23) return parsed;
+      }
+    }
+    return (new Date().getUTCHours() + 7) % 24;
+  }
+
   // Trích xuất lượng mưa an toàn đa nguồn (chống nuốt mất mưa rào/dông và bù suy diễn theo mã WMO)
   extractSafeRain(curr = {}) {
     if (!curr) return 0;
@@ -158,6 +169,22 @@ class WeatherService {
     else if ((wCode === 81 || wCode === 82) && maxRain < 10) maxRain = Math.max(maxRain, 10); // Mưa rào rất to
     else if (wCode === 80 && maxRain < 1.0) maxRain = 5; // Mưa rào vừa nhưng cảm biến đo trễ
     else if (wCode >= 61 && wCode <= 65 && maxRain < 1.0) maxRain = 2.5; // Mưa rào nhưng cảm biến đo trễ
+
+    if (maxRain < 0.1) return 0;
+    return Math.round(maxRain * 10) / 10;
+  }
+
+  // Trích xuất lượng mưa theo mốc 15 phút (mm/15p): quy đổi ngưỡng sàn WMO theo tỷ lệ 1/4 giờ
+  extractSafeRain15m({ precipitation = 0, rain = 0, weather_code = 0 } = {}) {
+    const p = typeof precipitation === 'number' ? precipitation : 0;
+    const r = typeof rain === 'number' ? rain : 0;
+    let maxRain = Math.max(p, r);
+
+    const wCode = weather_code || 0;
+    if (wCode >= 95 && maxRain < 3.8) maxRain = 3.8;
+    else if ((wCode === 81 || wCode === 82) && maxRain < 2.5) maxRain = 2.5;
+    else if (wCode === 80 && maxRain < 0.3) maxRain = 1.3;
+    else if (wCode >= 61 && wCode <= 65 && maxRain < 0.3) maxRain = 0.6;
 
     if (maxRain < 0.1) return 0;
     return Math.round(maxRain * 10) / 10;
@@ -325,7 +352,7 @@ class WeatherService {
       const current = data.current;
       let rain = this.extractSafeRain(current);
 
-      const isDay = current.is_day !== undefined ? (current.is_day === 1) : (new Date().getHours() >= 6 && new Date().getHours() < 18);
+      const isDay = current.is_day !== undefined ? (current.is_day === 1) : (this._getVietnamHour(current.time) >= 6 && this._getVietnamHour(current.time) < 18);
       let desc = this.getWmoDescription(current.weather_code, isDay);
       let icon = this.getWmoIcon(current.weather_code, isDay);
 
@@ -344,7 +371,8 @@ class WeatherService {
       };
     } catch (err) {
       console.error('Không thể lấy dữ liệu thời tiết:', err);
-      const isDay = (new Date().getHours() >= 6 && new Date().getHours() < 18);
+      const vnHour = this._getVietnamHour();
+      const isDay = (vnHour >= 6 && vnHour < 18);
       return {
         source: 'Cảm biến đô thị MoveSafe',
         cityName: cityName,
@@ -406,7 +434,7 @@ class WeatherService {
         const windSpeed = typeof curr.wind_speed_10m === 'number' ? Math.round(curr.wind_speed_10m) : 10;
         const wCode = curr.weather_code || 0;
         const floodRisk = this.calculateFloodRisk(rain);
-        const isDay = curr.is_day !== undefined ? (curr.is_day === 1) : (new Date().getHours() >= 6 && new Date().getHours() < 18);
+        const isDay = curr.is_day !== undefined ? (curr.is_day === 1) : (this._getVietnamHour(curr.time) >= 6 && this._getVietnamHour(curr.time) < 18);
 
         let desc = this.getWmoDescription(wCode, isDay);
         let icon = this.getWmoIcon(wCode, isDay);
@@ -446,7 +474,8 @@ class WeatherService {
         return serverStations;
       }
 
-      const defaultIsDay = (new Date().getHours() >= 6 && new Date().getHours() < 18);
+      const defaultVnHour = this._getVietnamHour();
+      const defaultIsDay = (defaultVnHour >= 6 && defaultVnHour < 18);
       return stations.map((st) => ({
         id: st.id,
         name: st.name,
@@ -554,24 +583,29 @@ class WeatherService {
       const windGusts = Math.round(curr.wind_gusts_10m || (windSpeed * 1.3));
       const rainNow = this.extractSafeRain(curr);
 
-      // Ước tính chỉ số UV: ưu tiên từ current.uv_index, nếu 0 ban ngày thì lấy từ hourly
-      const currentHour = new Date().getHours();
+      // Ước tính chỉ số UV theo giờ Việt Nam (UTC+7): ưu tiên current.uv_index, fallback hourly.uv_index
+      const currentHour = this._getVietnamHour(curr.time);
       let uvIndex = typeof curr.uv_index === 'number' ? curr.uv_index : 0;
       if (uvIndex === 0 && hourly.uv_index && Array.isArray(hourly.uv_index) && currentHour >= 7 && currentHour <= 17) {
-        uvIndex = hourly.uv_index[currentHour] || 0;
+        const hTimes = hourly.time || [];
+        const currHourPrefix = typeof curr.time === 'string' ? curr.time.slice(0, 13) : '';
+        const hIdx = currHourPrefix ? hTimes.findIndex(t => String(t).startsWith(currHourPrefix)) : -1;
+        uvIndex = (hIdx >= 0 ? hourly.uv_index[hIdx] : hourly.uv_index[currentHour]) || 0;
       }
       uvIndex = Math.round(uvIndex * 10) / 10;
 
-      // Cảm nhận nhiệt mặt đường (Road RealFeel): Nhựa đường hấp thụ bức xạ mặt trời
+      // Cảm nhận nhiệt mặt đường (Road RealFeel): Nhựa đường hấp thụ bức xạ mặt trời (chỉ tăng khi trời nắng & không mưa)
       const isDay = curr.is_day !== undefined ? (curr.is_day === 1) : (currentHour >= 6 && currentHour < 18);
-      const asphaltHeatBoost = (isDay && uvIndex >= 3) ? Math.round(uvIndex * 0.7) : 0;
+      const asphaltHeatBoost = (isDay && uvIndex >= 3 && rainNow < 0.3) ? Math.round(uvIndex * 0.7) : 0;
       const roadRealFeel = Math.round(apparentTemp + asphaltHeatBoost - (windSpeed * 0.08));
 
       // 8 mốc dự báo 15 phút (2 giờ tới)
       const times = min15.time || [];
       const temps15 = min15.temperature_2m || [];
       const appTemps15 = min15.apparent_temperature || [];
-      const rains15 = min15.precipitation || min15.rain || [];
+      const precip15 = min15.precipitation || [];
+      const rain15 = min15.rain || [];
+      const wmo15 = min15.weather_code || [];
       const winds15 = min15.wind_speed_10m || [];
 
       let hasRainIn2Hours = false;
@@ -589,30 +623,44 @@ class WeatherService {
           timeLabel = parts ? parts.slice(0, 5) : '';
         }
         if (!timeLabel) {
-          const d = new Date(Date.now() + i * 15 * 60 * 1000);
-          timeLabel = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+          const d = new Date(Date.now() + i * 15 * 60 * 1000 + 7 * 3600 * 1000);
+          timeLabel = `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
         }
 
         const tVal = typeof temps15[i] === 'number' ? Math.round(temps15[i]) : temp;
         const appTVal = typeof appTemps15[i] === 'number' ? Math.round(appTemps15[i]) : apparentTemp;
-        const rVal = typeof rains15[i] === 'number' ? (Math.round(rains15[i] * 10) / 10) : 0;
+        const rVal = this.extractSafeRain15m({
+          precipitation: precip15[i],
+          rain: rain15[i],
+          weather_code: wmo15[i]
+        });
         const wVal = typeof winds15[i] === 'number' ? Math.round(winds15[i]) : windSpeed;
 
-        const intervalRealFeel = Math.round(appTVal + asphaltHeatBoost - (wVal * 0.08));
+        const intervalHour = parseInt(timeLabel.slice(0, 2), 10);
+        const intervalIsDay = Number.isFinite(intervalHour) ? (intervalHour >= 6 && intervalHour < 18) : isDay;
+        let intervalHeatBoost = 0;
+        if (intervalIsDay && rVal < 0.3 && asphaltHeatBoost > 0) {
+          intervalHeatBoost = (intervalHour === 6 || intervalHour === 17)
+            ? Math.round(asphaltHeatBoost * 0.4)
+            : asphaltHeatBoost;
+        }
+        const intervalRealFeel = Math.round(appTVal + intervalHeatBoost - (wVal * 0.08));
         const relTime = i === 0 ? 'Hiện tại' : `+${i * 15}p`;
 
         if (rVal >= 0.5) {
-          hasRainIn2Hours = true;
-          if (rVal > maxRainIn2Hours) maxRainIn2Hours = rVal;
-          if (!rainStartRelTime && i > 0) rainStartRelTime = relTime;
+          if (i > 0 || rainNow === 0) {
+            hasRainIn2Hours = true;
+            if (rVal > maxRainIn2Hours) maxRainIn2Hours = rVal;
+            if (!rainStartRelTime) rainStartRelTime = i === 0 ? 'ngay lúc này' : relTime;
+          }
         }
 
         let roadStatus = 'Khô ráo';
         let barColor = '#10b981';
-        if (rVal >= 4.0) {
+        if (rVal >= 3.5) {
           roadStatus = 'Mưa to ngập';
           barColor = '#dc2626';
-        } else if (rVal >= 1.0) {
+        } else if (rVal >= 0.5) {
           roadStatus = 'Đường ướt trơn';
           barColor = '#ea580c';
         } else if (intervalRealFeel >= 39) {
@@ -658,10 +706,18 @@ class WeatherService {
       let comfortBadgeClass = 'cci-great';
       let comfortThemeColor = '#10b981';
 
-      if (rainNow >= 2.0 || maxRainIn2Hours >= 4.0) {
+      if (rainNow >= 10.0 || maxRainIn2Hours >= 5.0) {
+        comfortStatus = 'Mưa rất to - Nguy cơ ngập trũng';
+        comfortBadgeClass = 'cci-rain';
+        comfortThemeColor = '#dc2626';
+      } else if (rainNow >= 2.0 || maxRainIn2Hours >= 2.5) {
         comfortStatus = 'Mưa to - Đường ướt trơn';
         comfortBadgeClass = 'cci-rain';
         comfortThemeColor = '#2563eb';
+      } else if (rainNow >= 0.3) {
+        comfortStatus = 'Đang có mưa nhẹ - Đường trơn trượt';
+        comfortBadgeClass = 'cci-rain';
+        comfortThemeColor = '#3b82f6';
       } else if (roadRealFeel >= 40) {
         comfortStatus = 'Nắng nóng cực độ (Nguy cơ sốc nhiệt)';
         comfortBadgeClass = 'cci-danger';
@@ -670,6 +726,10 @@ class WeatherService {
         comfortStatus = 'Nắng gắt hầm hập (Cháy rát da)';
         comfortBadgeClass = 'cci-warning';
         comfortThemeColor = '#ea580c';
+      } else if (hasRainIn2Hours) {
+        comfortStatus = 'Sắp có mưa trong 2 giờ tới';
+        comfortBadgeClass = 'cci-moderate';
+        comfortThemeColor = '#2563eb';
       } else if (roadRealFeel >= 32 || uvIndex >= 6) {
         comfortStatus = 'Nắng nhẹ - Khá oi bức';
         comfortBadgeClass = 'cci-moderate';
@@ -685,13 +745,13 @@ class WeatherService {
         {
           id: 'sun_wear',
           name: 'Áo chống nắng dài tay',
-          needed: (uvIndex >= 5 || roadRealFeel >= 33) && isDay,
+          needed: (uvIndex >= 5 || roadRealFeel >= 33) && isDay && rainNow < 0.3,
           reason: uvIndex >= 8 ? 'Chỉ số UV cực gắt, rát da sau 15p' : 'Giảm nhiệt phả vào cánh tay'
         },
         {
           id: 'sunglasses',
           name: 'Kính râm chống chói',
-          needed: uvIndex >= 5 && isDay,
+          needed: uvIndex >= 5 && isDay && rainNow < 0.3,
           reason: 'Chống lóa mắt và bụi đường khi lái xe'
         },
         {
@@ -704,7 +764,9 @@ class WeatherService {
           id: 'raincoat',
           name: 'Áo mưa dự phòng trong cốp',
           needed: rainNow > 0 || hasRainIn2Hours,
-          reason: hasRainIn2Hours ? `Khả năng mưa rào lúc ${rainStartRelTime || 'trong 2h tới'}` : 'Đường phố khô ráo nhưng nên dự phòng'
+          reason: rainNow > 0
+            ? `Đang có mưa (${rainNow}mm/h), nên mặc áo mưa ngay`
+            : (hasRainIn2Hours ? `Khả năng mưa rào lúc ${rainStartRelTime || 'trong 2h tới'}` : 'Đường phố khô ráo nhưng nên dự phòng')
         },
         {
           id: 'water',
@@ -716,10 +778,16 @@ class WeatherService {
 
       // Lời khuyên hành trình thông minh
       let commuteAdvice = '';
-      if (hasRainIn2Hours && rainStartRelTime) {
-        commuteAdvice = `Dự kiến bắt đầu có mưa rào (${maxRainIn2Hours}mm) sau khoảng ${rainStartRelTime}. Bạn nên tranh thủ xuất phát sớm hoặc chuẩn bị sẵn áo mưa.`;
+      if (rainNow >= 5.0) {
+        commuteAdvice = `Đang có mưa to (${rainNow}mm/h), mặt đường trơn trượt và dễ ngập tại các điểm trũng. Bạn nên mặc áo mưa, bật đèn và bật chế độ né ngập${hasRainIn2Hours ? ` (mưa còn duy trì trong 2h tới)` : ''}.`;
+      } else if (rainNow > 0) {
+        commuteAdvice = `Hiện đang có mưa nhẹ (${rainNow}mm/h), mặt đường ướt trơn. Bạn nên mặc áo mưa và giữ khoảng cách an toàn${hasRainIn2Hours && rainStartRelTime ? `; lưu ý đợt mưa ${maxRainIn2Hours}mm/15p lúc ${rainStartRelTime}` : ''}.`;
+      } else if (hasRainIn2Hours && rainStartRelTime) {
+        commuteAdvice = `Dự kiến bắt đầu có mưa (${maxRainIn2Hours}mm/15p) ${rainStartRelTime === 'ngay lúc này' ? 'ngay lúc này' : `sau khoảng ${rainStartRelTime}`}. Bạn nên tranh thủ xuất phát sớm hoặc chuẩn bị sẵn áo mưa.`;
       } else if (roadRealFeel >= 37 && isDay) {
         commuteAdvice = `Mặt đường bê tông hấp thụ bức xạ rất lớn (cảm nhận ${roadRealFeel}°C). Bạn nên chọn các tuyến đại lộ có hàng cây râm mát và tránh dừng xe lâu dưới nắng gắt.`;
+      } else if (roadRealFeel < 18) {
+        commuteAdvice = `Thời tiết khá lạnh (cảm nhận mặt đường ${roadRealFeel}°C, gió ${windSpeed} km/h). Bạn nên mặc áo khoác chắn gió và giữ ấm khi di chuyển.`;
       } else if (comfortScore >= 80) {
         commuteAdvice = `Thời tiết hiện tại rất thoáng mát và dễ chịu (${temp}°C, gió ${windSpeed} km/h). Đây là khung giờ lý tưởng nhất để di chuyển hoặc đi dạo phố!`;
       } else {

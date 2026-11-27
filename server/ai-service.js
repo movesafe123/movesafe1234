@@ -707,16 +707,26 @@ class AIAssistantService {
       const maxT = Math.max(...temps);
       const maxRain = cityStations.reduce((m, s) => Math.max(m, s.rain1h || 0), 0);
       const rainingWards = cityStations.filter(s => (s.rain1h || 0) > 0);
+      const forecastWindowMax = [0, 1, 2].map(idx =>
+        cityStations.reduce((m, s) => Math.max(m, (Array.isArray(s.forecastRain) ? Number(s.forecastRain[idx]) : 0) || 0), 0)
+      );
 
       lines.push(`\n=== 4. DỮ LIỆU THỜI TIẾT ${cityStations.length} TRẠM PHƯỜNG/QUẬN TRÊN BẢN ĐỒ ===`);
       lines.push(`  - Tổng quan ${cityName}: Nhiệt độ ${minT}°C - ${maxT}°C | Lượng mưa cao nhất 1h qua: ${maxRain} mm/h (${rainingWards.length} trạm có mưa).`);
+      if (forecastWindowMax.some(v => v > 0)) {
+        lines.push(`  - Dự báo mưa cực đại 3 giờ tới (${cityName}): +1h: ${forecastWindowMax[0]}mm/h | +2h: ${forecastWindowMax[1]}mm/h | +3h: ${forecastWindowMax[2]}mm/h.`);
+      }
 
       if (anchor) {
         const nearestStation = [...cityStations].sort((a, b) =>
           calcDistM(anchor.lat, anchor.lng, a.lat, a.lng) - calcDistM(anchor.lat, anchor.lng, b.lat, b.lng)
         )[0];
         if (nearestStation) {
-          lines.push(`  - Trạm thời tiết sát khu vực đang hỏi (${nearestStation.name}): ${nearestStation.temp}°C, ${nearestStation.description || 'Khô ráo'}, lượng mưa 1h: ${nearestStation.rain1h || 0}mm, độ ẩm: ${nearestStation.humidity || 70}%.`);
+          const stDesc = nearestStation.description || nearestStation.weatherDesc || 'Khô ráo';
+          const stForecast = Array.isArray(nearestStation.forecastRain)
+            ? `, dự báo +1h/+2h/+3h: ${nearestStation.forecastRain.slice(0, 3).map(v => `${v || 0}mm`).join(' / ')}`
+            : '';
+          lines.push(`  - Trạm thời tiết sát khu vực đang hỏi (${nearestStation.name}): ${nearestStation.temp}°C, ${stDesc}, lượng mưa 1h: ${nearestStation.rain1h || 0}mm, độ ẩm: ${nearestStation.humidity || 70}%${stForecast}.`);
         }
       }
     }
@@ -1632,15 +1642,32 @@ QUY TẮC CẤM:
       }
 
       const maxRain = cityStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+      const maxForecastRain = cityStations.reduce((max, s) => {
+        const arr = Array.isArray(s.forecastRain) ? s.forecastRain : [];
+        return Math.max(max, ...arr.map(v => Number(v) || 0));
+      }, 0);
       const avgTemp = cityStations.length > 0
         ? Math.round(cityStations.reduce((sum, s) => sum + (s.temp || 26), 0) / cityStations.length)
         : 26;
+      const timeBadge = predictionOffsetHours > 0 ? ` *(Dự báo +${predictionOffsetHours}h tới)*` : '';
+      let weatherEvalText = 'Điều kiện mặt đường khô ráo, an toàn tuyệt đối cho cả xe máy và ô tô.';
+      if (maxRain >= 25) {
+        weatherEvalText = `Cảnh báo mưa rất to (${maxRain} mm/h), nguy cơ ngập nhanh tại các vùng trũng thấp; nên chọn tuyến né ngập.`;
+      } else if (maxRain >= 10) {
+        weatherEvalText = `Đang có mưa vừa (${maxRain} mm/h), mặt đường trơn trượt; cần giảm tốc độ và theo dõi rốn ngập.`;
+      } else if (maxRain > 0) {
+        weatherEvalText = `Có mưa nhỏ rải rác (${maxRain} mm/h), mặt đường hơi ướt; nên chuẩn bị áo mưa và giữ khoảng cách an toàn.`;
+      } else if (maxForecastRain >= 10) {
+        weatherEvalText = `Hiện tạnh ráo nhưng dự báo trong 1–3h tới có mưa vừa đến to (đỉnh ~${maxForecastRain} mm/h); nên tranh thủ xuất phát sớm hoặc mang sẵn áo mưa.`;
+      } else if (maxForecastRain >= 2.5) {
+        weatherEvalText = `Hiện khô ráo nhưng dự báo 1–3h tới có khả năng mưa nhẹ (~${maxForecastRain} mm/h); nên mang theo áo mưa dự phòng.`;
+      }
 
       return formatLocalResult({
-        text: `**Trạng thái Thời tiết & Ngập úng thực tế (${cityName})**:\n\n` +
+        text: `**Trạng thái Thời tiết & Ngập úng (${cityName})**${timeBadge}:\n\n` +
               `• **Tình trạng ngập**: Toàn bộ **${allFloods.length}/${allFloods.length} trạm đo** trên bản đồ hiện đang **khô ráo (0cm ngập)**.\n` +
-              `• **Thời tiết các quận/phường**: Nhiệt độ trung bình **${avgTemp}°C**, lượng mưa cao nhất **${maxRain} mm/h**.\n` +
-              `• **Đánh giá**: Điều kiện mặt đường khô ráo, an toàn tuyệt đối cho cả xe máy và ô tô. *(Bạn có thể bật nút "Giả lập Mưa Bão" trên thanh công cụ nếu muốn kiểm thử kịch bản ngập diện rộng).*`,
+              `• **Thời tiết các quận/phường**: Nhiệt độ trung bình **${avgTemp}°C**, lượng mưa 1h cao nhất **${maxRain} mm/h**${maxForecastRain > 0 ? ` (dự báo 1–3h tới đỉnh ~**${maxForecastRain} mm/h**)` : ''}.\n` +
+              `• **Đánh giá**: ${weatherEvalText}`,
         action: { type: 'SHOW_FLOOD_LAYER' },
         followUps
       });

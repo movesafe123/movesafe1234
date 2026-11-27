@@ -489,6 +489,13 @@ class LocalUrbanBot extends EventEmitter {
             const parsedTime = new Date(parsed.lastUpdated).getTime();
             if (Number.isFinite(parsedTime)) {
               cacheAgeMs = Math.max(0, Date.now() - parsedTime);
+              if (cacheAgeMs < 2 * 60 * 60 * 1000 && Array.isArray(parsed.floodPoints)) {
+                parsed.floodPoints.forEach((f) => {
+                  if (f && f.id && Number(f.depth_cm) >= 5) {
+                    this.floodMemory.set(f.id, { depth_cm: Number(f.depth_cm), updatedMs: parsedTime });
+                  }
+                });
+              }
             }
           }
         }
@@ -498,11 +505,11 @@ class LocalUrbanBot extends EventEmitter {
     }
 
     // Chỉ tự động cào & lập lịch nền khi chạy server thực tế (bỏ qua trong unit/API test hoặc CLI runner)
-    const isTestOrManual = process.env.NODE_ENV === 'test' ||
+    this._isTestOrManual = process.env.NODE_ENV === 'test' ||
       process.env.BOT_DISABLE_AUTO_INIT === '1' ||
       process.execArgv.some(arg => arg.startsWith('--test'));
 
-    if (!isTestOrManual) {
+    if (!this._isTestOrManual) {
       // Nếu cache vừa được cập nhật (< CRAWL_INTERVAL_MS), bỏ qua quét ngay khi khởi động để tiết kiệm API quota
       if (cacheAgeMs > config.BOT_CONFIG.CRAWL_INTERVAL_MS) {
         this.crawlAll().catch(e => console.error('[Bot] Lỗi trong lần quét đầu tiên:', e.message));
@@ -514,6 +521,18 @@ class LocalUrbanBot extends EventEmitter {
       setInterval(() => {
         this.crawlAll().catch(e => console.error('[Bot] Lỗi quét định kỳ:', e.message));
       }, config.BOT_CONFIG.CRAWL_INTERVAL_MS).unref();
+    }
+  }
+
+  async ensureFreshWeather(cityKey = 'hanoi') {
+    if (this._isTestOrManual) return;
+    const stations = (this.cachedData.weatherStations || {})[cityKey];
+    const sampleTs = Array.isArray(stations) && stations[0]?.updated_at
+      ? new Date(stations[0].updated_at).getTime()
+      : 0;
+    const WEATHER_MAX_AGE_MS = 15 * 60 * 1000;
+    if (!Array.isArray(stations) || stations.length === 0 || !sampleTs || (Date.now() - sampleTs) > WEATHER_MAX_AGE_MS) {
+      await this.crawlWeatherStations(cityKey);
     }
   }
 
@@ -632,7 +651,7 @@ class LocalUrbanBot extends EventEmitter {
           const stationSummary = {};
           Object.entries(this.cachedData.weatherStations || {}).forEach(([ck, list]) => {
             const arr = Array.isArray(list) ? list : [];
-            const maxRain = arr.reduce((mx, s) => Math.max(mx, Number(s.rain) || 0), 0);
+            const maxRain = arr.reduce((mx, s) => Math.max(mx, Number(s.rain1h ?? s.rain ?? 0) || 0), 0);
             stationSummary[ck] = { stationsCount: arr.length, maxCurrentRainMm: maxRain };
           });
           const deepestSamples = [...actuallyFlooded]
@@ -1374,7 +1393,7 @@ class LocalUrbanBot extends EventEmitter {
     try {
       const lats = stations.map(s => s.lat).join(',');
       const lngs = stations.map(s => s.lng).join(',');
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,is_day&hourly=precipitation,rain,showers&forecast_hours=6&timezone=Asia%2FBangkok`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,weather_code,wind_speed_10m,is_day&hourly=precipitation,rain,showers,weather_code&forecast_hours=6&timezone=Asia%2FBangkok`;
 
       let response = null;
       for (let attempt = 1; attempt <= 2; attempt++) {
@@ -1394,11 +1413,26 @@ class LocalUrbanBot extends EventEmitter {
         const curr = item.current || {};
         let rain = this.extractSafeRain(curr);
 
-        const hourlyRain = item.hourly?.precipitation || item.hourly?.rain || [];
+        const hTimes = item.hourly?.time || [];
+        const hPrecip = item.hourly?.precipitation || [];
+        const hRain = item.hourly?.rain || [];
+        const hShowers = item.hourly?.showers || [];
+        const hWmo = item.hourly?.weather_code || [];
+        const currHourPrefix = typeof curr.time === 'string' ? curr.time.slice(0, 13) : '';
+        const baseIdx = currHourPrefix ? Math.max(0, hTimes.findIndex(t => String(t).startsWith(currHourPrefix))) : 0;
+        const extractHourlyAt = (offset) => {
+          const i = baseIdx + offset;
+          return this.extractSafeRain({
+            precipitation: hPrecip[i],
+            rain: hRain[i],
+            showers: hShowers[i],
+            weather_code: hWmo[i]
+          });
+        };
         const forecastRain = [
-          Math.round((hourlyRain[1] || 0) * 10) / 10,
-          Math.round((hourlyRain[2] || 0) * 10) / 10,
-          Math.round((hourlyRain[3] || 0) * 10) / 10
+          extractHourlyAt(1),
+          extractHourlyAt(2),
+          extractHourlyAt(3)
         ];
 
         const isDay = curr.is_day !== 0;
@@ -1461,11 +1495,31 @@ class LocalUrbanBot extends EventEmitter {
     }
   }
 
+  // Quy đổi lượng mưa giờ -> mực nước mục tiêu theo độ trũng & triều cường (dùng chung cho Realtime & Forecast)
+  _computeTargetFloodDepth(baseDepth, localRain, stationId, vnHour) {
+    let targetDepth = 0;
+    if (localRain >= 25) {
+      targetDepth = Math.max(30, Math.min(55, Math.round(baseDepth * (localRain / 30))));
+    } else if (localRain >= 10) {
+      targetDepth = Math.max(15, Math.min(28, Math.round(baseDepth * 0.65)));
+    } else if (localRain >= 2.5) {
+      targetDepth = Math.max(10, Math.round(baseDepth * 0.35));
+    }
+
+    const isTidalStation = stationId === 'udi-01' || stationId === 'udi-03';
+    const isPeakTide = (vnHour >= 17 && vnHour <= 19) || (vnHour >= 5 && vnHour <= 7);
+    if (isTidalStation && isPeakTide && localRain >= 2) {
+      targetDepth = Math.max(targetDepth, 25);
+    }
+    return targetDepth;
+  }
+
   // Tính toán mực nước thực tế theo Mô hình Tích lũy Mưa & Tiêu Thoát Nước (Drainage Decay)
   computeRealtimeFloodPoints(activeCrowdsourcedFloods = []) {
     const weatherStations = this.cachedData.weatherStations || {};
     const isDemoFlood = process.env.DEMO_FLOOD === 'true';
     const nowMs = Date.now();
+    const vnHour = (new Date().getUTCHours() + 7) % 24;
 
     const realtimePoints = LOCAL_FLOOD_STATIONS.map(st => {
       const cityStations = weatherStations[st.city] || [];
@@ -1504,23 +1558,8 @@ class LocalUrbanBot extends EventEmitter {
       const elapsedHours = Math.max(0, (nowMs - prev.updatedMs) / 3600000);
       const DRAINAGE_RATE_CM_PER_HOUR = 12; // Rút 12cm nước mỗi giờ khi ngớt mưa
 
-      // Tính mức ngập mục tiêu dựa trên lượng mưa
-      let targetDepth = 0;
-      if (localRain >= 25) {
-        targetDepth = Math.max(30, Math.min(55, Math.round(baseDepth * (localRain / 30))));
-      } else if (localRain >= 10) {
-        targetDepth = Math.max(15, Math.min(28, Math.round(baseDepth * 0.65)));
-      } else if (localRain >= 2.5) {
-        targetDepth = Math.max(10, Math.round(baseDepth * 0.35));
-      }
-
-      // Kiểm tra triều cường TP.HCM
-      const isTidalStation = st.id === 'udi-01' || st.id === 'udi-03';
-      const vnHour = (new Date().getUTCHours() + 7) % 24;
-      const isPeakTide = (vnHour >= 17 && vnHour <= 19) || (vnHour >= 5 && vnHour <= 7);
-      if (isTidalStation && isPeakTide && localRain >= 2) {
-        targetDepth = Math.max(targetDepth, 25);
-      }
+      // Tính mức ngập mục tiêu dựa trên lượng mưa & triều cường
+      const targetDepth = this._computeTargetFloodDepth(baseDepth, localRain, st.id, vnHour);
 
       // Áp dụng độ trễ tiêu thoát: nước không thể biến mất ngay lập tức khi tạnh mưa
       const decayedDepth = Math.max(0, Math.round(prev.depth_cm - (DRAINAGE_RATE_CM_PER_HOUR * elapsedHours)));
@@ -1576,10 +1615,19 @@ class LocalUrbanBot extends EventEmitter {
     const stations = (this.cachedData.weatherStations || {})[cityKey] || [];
     const maxForecastRain = stations.reduce((max, s) => {
       const rains = s.forecastRain || [0, 0, 0];
-      return Math.max(max, rains[offsetHours - 1] || 0);
+      return Math.max(max, Number(rains[offsetHours - 1]) || 0);
+    }, 0);
+    const windowMaxForecastRain = stations.reduce((max, s) => {
+      const rains = Array.isArray(s.forecastRain) ? s.forecastRain : [0, 0, 0];
+      let stationPeak = 0;
+      for (let step = 0; step < offsetHours; step++) {
+        stationPeak = Math.max(stationPeak, Number(rains[step]) || 0);
+      }
+      return Math.max(max, stationPeak);
     }, 0);
 
-    const vnHour = (new Date().getUTCHours() + 7 + offsetHours) % 24;
+    const baseUtcHour = new Date().getUTCHours();
+    const vnHour = (baseUtcHour + 7 + offsetHours) % 24;
     const isPeakHour = (vnHour >= 7 && vnHour <= 9) || (vnHour >= 17 && vnHour <= 19);
     const isNightTime = (vnHour >= 22 || vnHour <= 5);
 
@@ -1589,8 +1637,9 @@ class LocalUrbanBot extends EventEmitter {
     // 1. Dự báo ngập (Nội suy mưa cục bộ 3 trạm gần nhất & tích lũy/tiêu thoát tuần tự từng giờ)
     const predictedFloods = [];
     const currentCityFloods = (this.cachedData.floodPoints || []).filter(f => f.city === cityKey && f.depth_cm > 0);
+    const shouldEvaluateFloods = windowMaxForecastRain >= 2.5 || (cityKey === 'hcm' && windowMaxForecastRain >= 2) || currentCityFloods.length > 0;
 
-    if (maxForecastRain >= 4 || currentCityFloods.length > 0) {
+    if (shouldEvaluateFloods) {
       const candidateStations = [...LOCAL_FLOOD_STATIONS.filter(s => s.city === cityKey)];
       currentCityFloods.forEach(cf => {
         if (!candidateStations.some(s => s.id === cf.id)) {
@@ -1619,16 +1668,19 @@ class LocalUrbanBot extends EventEmitter {
             if (withForecast.length > 0) {
               localStepRain = withForecast.reduce((mx, s) => Math.max(mx, Number(s.forecastRain[step - 1]) || 0), 0);
             } else {
-              localStepRain = maxForecastRain;
+              localStepRain = windowMaxForecastRain;
             }
           } else {
             localStepRain = maxForecastRain;
           }
 
-          const rainBoost = localStepRain >= 25 ? 1.2 : (localStepRain >= 10 ? 0.8 : (localStepRain >= 4 ? 0.45 : 0));
-          const stepProjected = Math.round(baseDepth * rainBoost);
+          const vnStepHour = (baseUtcHour + 7 + step) % 24;
+          const stepProjected = this._computeTargetFloodDepth(baseDepth, localStepRain, st.id, vnStepHour);
           const stepResidual = Math.max(0, depth - 12);
-          depth = Math.max(stepProjected, stepResidual);
+          // Nếu vừa có nước tồn dư vừa có mưa mới liên tiếp, cộng dồn phần tích lũy (giới hạn 60cm)
+          depth = (stepProjected > 0 && stepResidual > 0)
+            ? Math.min(60, Math.max(stepProjected, stepResidual) + Math.round(Math.min(stepProjected, stepResidual) * 0.25))
+            : Math.max(stepProjected, stepResidual);
         }
 
         const finalDepth = depth;
@@ -1643,18 +1695,18 @@ class LocalUrbanBot extends EventEmitter {
             lng: st.lng,
             depth_cm: finalDepth,
             predicted_depth_cm: finalDepth,
-            danger_level: finalDepth > 30 ? 'critical' : (finalDepth >= 15 ? 'medium' : 'low'),
+            danger_level: finalDepth >= 30 ? 'critical' : (finalDepth >= 15 ? 'medium' : 'low'),
             passable_motorbike: finalDepth < 20,
-            passable_car: finalDepth < 35,
+            passable_car: finalDepth < 30,
             target_hour: offsetHours,
             confidence: Math.round((0.92 - offsetHours * 0.04) * 100) / 100,
-            advice: finalDepth > 0
-              ? `Dự báo sau +${offsetHours}h mực nước còn ~${finalDepth}cm.`
-              : `Dự báo sau +${offsetHours}h nước đã rút hết.`
+            advice: `Dự báo sau +${offsetHours}h mực nước đạt ~${finalDepth}cm.`
           });
         }
       });
     }
+
+    const hasPredictedFloodHazard = predictedFloods.some(f => f.depth_cm >= 15);
 
     // 2. Dự báo kẹt xe Spatio-Temporal:
     const predictedTraffic = [];
@@ -1686,8 +1738,8 @@ class LocalUrbanBot extends EventEmitter {
         let futureSpeed = inc.speedKmh || 15;
         let futureDelay = inc.delaySeconds || 300;
 
-        if (isNightTime) {
-          // Ban đêm: Tiêu tán nhanh
+        if (isNightTime && !hasPredictedFloodHazard && maxForecastRain < 10) {
+          // Ban đêm: Tiêu tán nhanh (trừ khi đang mưa lớn hoặc ngập)
           const decayedLevel = Math.max(1, 3 - offsetHours);
           if (decayedLevel >= 3) {
             futureLevel = decayedLevel;
@@ -1696,8 +1748,8 @@ class LocalUrbanBot extends EventEmitter {
           } else {
             return; // Đã tiêu tán hoàn toàn lúc nửa đêm, không vẽ kẹt xe
           }
-        } else if (isPeakHour || maxForecastRain >= 10) {
-          // Tiến vào giờ cao điểm hoặc mưa: Duy trì hoặc tăng độ trễ
+        } else if (isPeakHour || maxForecastRain >= 10 || hasPredictedFloodHazard) {
+          // Tiến vào giờ cao điểm, mưa lớn hoặc còn ngập sâu: Duy trì hoặc tăng độ trễ
           futureLevel = Math.min(5, (inc.speedKmh && inc.speedKmh < 10) ? 5 : 4);
           futureSpeed = Math.min(12, futureSpeed);
           futureDelay = Math.round(futureDelay * 1.25);
@@ -1726,7 +1778,7 @@ class LocalUrbanBot extends EventEmitter {
     });
 
     // 2.2. Bước 2: Khởi phát điểm nghẽn giờ cao điểm theo chuỗi lịch sử 7 ngày
-    if (isPeakHour || baseline.congestionIndex >= 3.2 || maxForecastRain >= 12) {
+    if (isPeakHour || baseline.congestionIndex >= 3.2 || maxForecastRain >= 12 || hasPredictedFloodHazard) {
       const candidateIntersections = CORE_INTERSECTIONS_GEO.filter(s => s.city === cityKey);
       candidateIntersections.forEach((item, idx) => {
         // Kiểm tra xem vị trí này đã có điểm ùn tắc nào trong danh sách dự báo chưa
@@ -1739,7 +1791,7 @@ class LocalUrbanBot extends EventEmitter {
 
         const currentJamCount = predictedTraffic.filter(p => p.isJam).length;
         if (!alreadyHas && currentJamCount < 15) {
-          const peakLevel = (isPeakHour && maxForecastRain >= 10) ? 5 : (isPeakHour ? 4 : 3);
+          const peakLevel = (isPeakHour && (maxForecastRain >= 10 || hasPredictedFloodHazard)) ? 5 : (isPeakHour ? 4 : 3);
           const estSpeed = peakLevel === 5 ? 8 : (peakLevel === 4 ? 14 : 20);
           predictedTraffic.push({
             id: `ai-pred-hist-${cityKey}-${idx}`,
@@ -1764,6 +1816,7 @@ class LocalUrbanBot extends EventEmitter {
       targetHour: offsetHours,
       clockHour: vnHour,
       maxForecastRain,
+      peakWindowRain: windowMaxForecastRain,
       historicalBaseline: baseline,
       floodPoints: predictedFloods,
       trafficIncidents: predictedTraffic,

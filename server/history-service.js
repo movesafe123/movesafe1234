@@ -199,18 +199,43 @@ class HistoryService {
       await fs.promises.writeFile(this.historySummaryFile, JSON.stringify(payload, null, 2), 'utf-8');
       console.log(`[HistoryService] 💾 Đã lưu snapshot lịch sử lúc ${new Date().toLocaleTimeString()} (Tổng số mốc: ${payload.snapshots.length})`);
 
-      // Đẩy nhẹ lên Supabase Cloud (chế độ nền, không chặn tiến trình)
-      this.pushSnapshotToSupabase(newSnapshot);
+      // Đẩy lên Supabase Cloud (chờ hoàn tất tối đa 5s để CLI/GitHub Actions không thoát sớm)
+      const isTestEnv = process.env.NODE_ENV === 'test' || process.execArgv.some(arg => arg.startsWith('--test'));
+      if (!isTestEnv) {
+        await this.pushSnapshotToSupabase(newSnapshot);
+      }
     } catch (e) {
       console.warn('[HistoryService] Lỗi khi ghi snapshot lịch sử:', e.message);
     }
   }
 
-  // Đẩy snapshot giao thông và ngập lụt lên Supabase (Fire-and-forget)
+  // Đẩy snapshot giao thông và ngập lụt lên Supabase (có timeout an toàn 5s)
   async pushSnapshotToSupabase(newSnapshot) {
     const url = config.API_KEYS.SUPABASE_URL;
     const key = config.API_KEYS.SUPABASE_KEY;
-    if (!url || !key) return;
+    if (!url || !key) return { ok: false, reason: 'missing_config' };
+
+    const headers = {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    };
+
+    const postWithTimeout = async (endpoint, bodyObj) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      try {
+        return await fetch(`${url}${endpoint}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(bodyObj),
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+    };
 
     try {
       const getWeatherTag = (rainMm) => rainMm > 20 ? 'heavy_rain' : (rainMm > 0 ? 'light_rain' : 'clear');
@@ -239,16 +264,7 @@ class HistoryService {
         }
       ];
 
-      fetch(`${url}/rest/v1/traffic_history`, {
-        method: 'POST',
-        headers: {
-          'apikey': key,
-          'Authorization': `Bearer ${key}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(trafficRows)
-      }).catch(() => {});
+      const tasks = [postWithTimeout('/rest/v1/traffic_history', trafficRows)];
 
       // Ghi đồng thời các điểm đang ngập thực tế vào bảng flood_history
       const floodRows = [];
@@ -267,18 +283,27 @@ class HistoryService {
       });
 
       if (floodRows.length > 0) {
-        fetch(`${url}/rest/v1/flood_history`, {
-          method: 'POST',
-          headers: {
-            'apikey': key,
-            'Authorization': `Bearer ${key}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify(floodRows)
-        }).catch(() => {});
+        tasks.push(postWithTimeout('/rest/v1/flood_history', floodRows));
       }
-    } catch (err) {}
+
+      // Định kỳ dọn dẹp dữ liệu > 7 ngày trên Supabase (12 giờ/lần) tránh tràn 500MB Free
+      const nowMs = Date.now();
+      if (!this._lastSupabaseCleanMs || (nowMs - this._lastSupabaseCleanMs) > 12 * 60 * 60 * 1000) {
+        this._lastSupabaseCleanMs = nowMs;
+        tasks.push(postWithTimeout('/rest/v1/rpc/clean_old_urban_history', {}));
+      }
+
+      const results = await Promise.allSettled(tasks);
+      const trafficRes = results[0];
+      const ok = trafficRes?.status === 'fulfilled' && trafficRes.value?.ok;
+      if (!ok) {
+        const statusInfo = trafficRes?.status === 'fulfilled' ? `HTTP ${trafficRes.value?.status}` : trafficRes?.reason?.message;
+        console.warn(`[HistoryService] Ghi Supabase chưa thành công (${statusInfo || 'unknown'}).`);
+      }
+      return { ok };
+    } catch (err) {
+      return { ok: false, reason: err.message };
+    }
   }
 
   calcAvgSpeed(incidents) {

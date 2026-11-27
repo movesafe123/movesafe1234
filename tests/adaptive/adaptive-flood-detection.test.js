@@ -164,4 +164,106 @@ describe('Adaptive Feature Test: Resilient Rain & Flood Hazard Engine', () => {
     assert.strictEqual(resetPoint.passable_motorbike, true);
     assert.strictEqual(resetPoint.passable_car, true);
   });
+
+  // Test Intent 5: Dự báo tương lai +2h vẫn giữ ngập tồn dư từ cơn mưa lớn ở +1h & tích lũy mưa liên tiếp
+  it('[AFT-05] Spatio-temporal future prediction preserves residual flooding at +2h from a +1h storm and accumulates sustained rain', () => {
+    const prevStations = botService.cachedData.weatherStations;
+    const prevFloods = botService.cachedData.floodPoints;
+    const prevMemory = new Map(botService.floodMemory);
+
+    try {
+      botService.floodMemory.clear();
+      botService.cachedData.floodPoints = [];
+
+      // Kịch bản A: Hiện tại khô, +1h mưa 35mm/h, +2h tạnh mưa (0mm/h)
+      botService.cachedData.weatherStations = {
+        hanoi: [
+          {
+            id: 'st-test-hn',
+            city: 'hanoi',
+            lat: 21.0268,
+            lng: 105.8409,
+            rain1h: 0,
+            forecastRain: [35, 0, 0]
+          }
+        ]
+      };
+
+      const pred2h = botService.getFuturePredictions('hanoi', 2);
+      assert.strictEqual(pred2h.peakWindowRain, 35, 'Phải ghi nhận đỉnh mưa cửa sổ +1h..+2h là 35mm');
+      const nk2h = pred2h.floodPoints.find(f => f.id === 'ai-pred-hsdc-01');
+      assert.ok(nk2h, 'Dù +2h đã tạnh mưa nhưng nước ngập do mưa 35mm lúc +1h chưa thể rút sạch ngay');
+      assert.ok(nk2h.depth_cm >= 20, `Mực nước tồn dư ở +2h phải >= 20cm, thực tế: ${nk2h.depth_cm}cm`);
+
+      // Kịch bản B: Mưa vừa 20mm/h kéo dài 2 giờ liên tiếp [20, 20, 0] -> phải cao hơn mưa 1 giờ đơn lẻ
+      botService.cachedData.weatherStations = {
+        hanoi: [
+          {
+            id: 'st-test-hn',
+            city: 'hanoi',
+            lat: 21.0268,
+            lng: 105.8409,
+            rain1h: 0,
+            forecastRain: [20, 20, 0]
+          }
+        ]
+      };
+      const sustained1h = botService.getFuturePredictions('hanoi', 1).floodPoints.find(f => f.id === 'ai-pred-hsdc-01');
+      const sustained2h = botService.getFuturePredictions('hanoi', 2).floodPoints.find(f => f.id === 'ai-pred-hsdc-01');
+      assert.ok(sustained1h && sustained2h, 'Mưa liên tiếp 20mm/h phải xuất hiện điểm ngập');
+      assert.ok(sustained2h.depth_cm > sustained1h.depth_cm, `Mưa 20mm/h kéo dài 2h (${sustained2h.depth_cm}cm) phải tích lũy sâu hơn 1h (${sustained1h.depth_cm}cm)`);
+    } finally {
+      botService.cachedData.weatherStations = prevStations;
+      botService.cachedData.floodPoints = prevFloods;
+      botService.floodMemory = prevMemory;
+    }
+  });
+
+  // Test Intent 6: Mô hình Render AI (server-ai/main.py) & Supabase fallback đọc đúng trạng thái thời tiết và schema chuẩn
+  it('[AFT-06] Render server-ai model fetches live Open-Meteo hourly forecast and aligns prediction schema with client', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const pyCode = fs.readFileSync(path.join(__dirname, '../../server-ai/main.py'), 'utf8');
+    const supaCode = fs.readFileSync(path.join(__dirname, '../../js/supabase-service.js'), 'utf8');
+
+    // 1. server-ai/main.py phải gọi trực tiếp Open-Meteo hourly forecast + trích xuất WMO floor + tự làm mới cache
+    assert.ok(pyCode.includes('api.open-meteo.com/v1/forecast'), 'Render AI phải gọi Open-Meteo trực tiếp thay vì chỉ đọc file JSON tĩnh');
+    assert.ok(pyCode.includes('extract_safe_rain_py'), 'Render AI phải đồng bộ extract_safe_rain_py');
+    assert.ok(pyCode.includes('_ensure_fresh_predictions'), 'Render AI phải tự làm mới dự báo theo TTL thay vì kẹt dữ liệu boot');
+    assert.ok(pyCode.includes('"floodPoints": active_flood_points') && pyCode.includes('"trafficIncidents": traffic_geo'), 'Render AI phải trả về đầy đủ floodPoints & trafficIncidents khớp Client');
+    assert.ok(pyCode.includes('@app.get("/api/health")'), 'Render AI phải có route /api/health cho healthCheckPath');
+
+    // 2. Supabase fallback không đọc nhầm tên thuộc tính appState (isSimulationMode / latestCityWeather / active flood)
+    assert.ok(!supaCode.includes('window.appState?.simulationMode'), 'Phải dùng isSimulationMode thay vì simulationMode');
+    assert.ok(!supaCode.includes('window.appState?.currentWeather'), 'Phải dùng latestCityWeather/latestWeatherStations thay vì currentWeather');
+    assert.ok(supaCode.includes('hasActiveFlood'), 'Chỉ tính ngập khi có trạm depth_cm > 0, không đếm cả 23 trạm 0cm');
+  });
+
+  // Test Intent 7: HistoryService.pushSnapshotToSupabase hoàn tất đồng bộ (await) tránh bị process.exit cắt ngang
+  it('[AFT-07] HistoryService awaits Supabase snapshot push and handles network errors safely', async () => {
+    const historyService = require('../../server/history-service');
+    const origFetch = global.fetch;
+    const calledUrls = [];
+
+    try {
+      global.fetch = async (url) => {
+        calledUrls.push(String(url));
+        return { ok: true, status: 201 };
+      };
+
+      const sampleSnapshot = {
+        timestamp: new Date().toISOString(),
+        hanoi: { avgSpeedKmh: 28, congestionIndex: 2.2, maxRainMm: 12, activeFloodSpots: [{ id: 'hsdc-01', name: 'Nguyễn Khuyến', depth_cm: 20, danger_level: 'medium' }] },
+        hcm: { avgSpeedKmh: 25, congestionIndex: 2.5, maxRainMm: 0, activeFloodSpots: [] },
+        danang: { avgSpeedKmh: 36, congestionIndex: 1.2, maxRainMm: 0, activeFloodSpots: [] }
+      };
+
+      const res = await historyService.pushSnapshotToSupabase(sampleSnapshot);
+      assert.strictEqual(res.ok, true, 'pushSnapshotToSupabase phải await và trả về kết quả thành công');
+      assert.ok(calledUrls.some(u => u.includes('/rest/v1/traffic_history')), 'Phải ghi traffic_history');
+      assert.ok(calledUrls.some(u => u.includes('/rest/v1/flood_history')), 'Phải ghi flood_history khi có điểm ngập');
+    } finally {
+      global.fetch = origFetch;
+    }
+  });
 });

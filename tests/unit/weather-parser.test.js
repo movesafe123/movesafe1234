@@ -192,4 +192,99 @@ describe('Module TC-WTH: Weather Parser & Meteorological Services', () => {
     assert.strictEqual(safeFlood.danger_level, 'safe');
     assert.strictEqual(safeFlood.passable_motorbike, true);
   });
+
+  // TC-WTH-009: Suy luận dự báo 15P & lời khuyên khi đang mưa vs sắp mưa vs hoàng hôn
+  it('[TC-WTH-009] getCommuteComfortData avoids contradictory rain advice, cools wet asphalt, and handles 15m WMO floors', async () => {
+    const origFetch = global.fetch;
+    try {
+      // Case A: Đang mưa to (rainNow = 12mm/h) và vẫn mưa tiếp ở +15p
+      global.fetch = async () => ({
+        ok: true,
+        json: async () => ({
+          current: {
+            time: '2026-07-15T14:00',
+            temperature_2m: 29,
+            apparent_temperature: 34,
+            relative_humidity_2m: 90,
+            precipitation: 12,
+            rain: 12,
+            showers: 0,
+            weather_code: 81,
+            wind_speed_10m: 15,
+            wind_gusts_10m: 28,
+            uv_index: 6,
+            is_day: 1
+          },
+          hourly: { time: ['2026-07-15T14:00'], uv_index: [6] },
+          minutely_15: {
+            time: [
+              '2026-07-15T14:00',
+              '2026-07-15T14:15',
+              '2026-07-15T14:30',
+              '2026-07-15T14:45'
+            ],
+            temperature_2m: [29, 28, 28, 28],
+            apparent_temperature: [34, 33, 33, 33],
+            precipitation: [3.0, 2.8, 0, 0],
+            rain: [3.0, 2.8, 0, 0],
+            weather_code: [81, 80, 3, 3],
+            wind_speed_10m: [15, 14, 10, 10]
+          }
+        })
+      });
+
+      const rainyData = await weather.getCommuteComfortData(21.01, 105.81, 'Hà Nội');
+      assert.strictEqual(rainyData.rainNow, 12);
+      assert.ok(rainyData.comfortStatus.toLowerCase().includes('mưa'), 'Trạng thái phải phản ánh đang mưa');
+      assert.ok(rainyData.commuteAdvice.includes('Đang có mưa to'), 'Đang mưa to không được khuyên xuất phát sớm hoặc báo đường khô ráo');
+      assert.ok(!rainyData.commuteAdvice.includes('khô ráo'), 'Không được mâu thuẫn báo khô ráo khi rainNow=12');
+      assert.strictEqual(rainyData.gearList.find(g => g.id === 'raincoat').needed, true);
+      assert.strictEqual(rainyData.gearList.find(g => g.id === 'sun_wear').needed, false, 'Đang mưa không đề xuất áo chống nắng');
+      assert.strictEqual(rainyData.timeline15[0].realFeel, Math.round(34 - 15 * 0.08), 'Đang mưa mặt đường không cộng nhiệt bức xạ nắng');
+
+      // Case B: Chiều muộn trời quang (17:30 -> 18:30), sắp mưa lúc +30p, qua hoàng hôn bỏ cộng nhiệt mặt đường
+      weather._comfortCache = {};
+      global.fetch = async () => ({
+        ok: true,
+        json: async () => ({
+          current: {
+            time: '2026-07-15T17:30',
+            temperature_2m: 32,
+            apparent_temperature: 35,
+            relative_humidity_2m: 72,
+            precipitation: 0,
+            rain: 0,
+            showers: 0,
+            weather_code: 1,
+            wind_speed_10m: 10,
+            wind_gusts_10m: 15,
+            uv_index: 5,
+            is_day: 1
+          },
+          hourly: { time: ['2026-07-15T17:00'], uv_index: [5] },
+          minutely_15: {
+            time: [
+              '2026-07-15T17:30',
+              '2026-07-15T17:45',
+              '2026-07-15T18:00',
+              '2026-07-15T18:15'
+            ],
+            temperature_2m: [32, 31, 30, 29],
+            apparent_temperature: [35, 34, 33, 32],
+            precipitation: [0, 0, 0, 0],
+            rain: [0, 0, 0, 0],
+            weather_code: [1, 1, 80, 3],
+            wind_speed_10m: [10, 10, 12, 10]
+          }
+        })
+      });
+
+      const sunsetData = await weather.getCommuteComfortData(21.02, 105.82, 'Hà Nội');
+      assert.ok(sunsetData.timeline15[2].rain >= 1.3, 'Mã WMO 80 ở mốc 15p phải kích hoạt ngưỡng sàn mưa 15p');
+      assert.strictEqual(sunsetData.timeline15[3].realFeel, Math.round(32 - 10 * 0.08), 'Sau 18h00 tối không còn cộng nhiệt mặt trời');
+      assert.ok(sunsetData.commuteAdvice.includes('+30p'), 'Phải cảnh báo mưa bắt đầu sau +30p');
+    } finally {
+      global.fetch = origFetch;
+    }
+  });
 });

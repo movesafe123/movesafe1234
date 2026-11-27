@@ -171,14 +171,17 @@ class SupabaseService {
   async getTrafficPrediction(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return null;
 
-    // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
+    // 1. Thử gọi API backend Node.js / Render AI (hỗ trợ cả offsetHours & offset)
     try {
       const res = await fetch((typeof window !== "undefined" && typeof window.getApiUrl === "function") ? window.getApiUrl(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`) : `/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
-        const preds = json.trafficPredictions || json.traffic;
+        const preds = json.trafficIncidents || json.trafficPredictions || json.traffic;
         if (Array.isArray(preds)) {
-          return preds;
+          const geoPreds = preds.filter(p => Number.isFinite(Number(p?.lat)) && Number.isFinite(Number(p?.lng)) && (p.target_hour === undefined || Number(p.target_hour) === Number(offsetHours)));
+          if (geoPreds.length > 0 || Array.isArray(json.trafficIncidents)) {
+            return geoPreds;
+          }
         }
       }
     } catch (e) {}
@@ -210,7 +213,7 @@ class SupabaseService {
     // Heuristics theo nhịp sinh hoạt thực tế tại Việt Nam: Ban đêm (22h - 5h) thông thoáng, không tạo kẹt xe giả định
     const vnHour = (new Date().getUTCHours() + 7 + offsetHours) % 24;
     const isNight = vnHour >= 22 || vnHour <= 5;
-    if (isNight && !window.appState?.simulationMode) {
+    if (isNight && !window.appState?.isSimulationMode) {
       return [];
     }
 
@@ -230,14 +233,14 @@ class SupabaseService {
   async getFloodPredictions(offsetHours, city = 'hanoi') {
     if (offsetHours === 0) return [];
 
-    // 1. Thử gọi API backend Node.js (hỗ trợ cả offsetHours & offset)
+    // 1. Thử gọi API backend Node.js / Render AI (hỗ trợ cả offsetHours & offset)
     try {
       const res = await fetch((typeof window !== "undefined" && typeof window.getApiUrl === "function") ? window.getApiUrl(`/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`) : `/api/predictions?city=${city}&offsetHours=${offsetHours}&offset=${offsetHours}`);
       if (res.ok) {
         const json = await res.json();
-        const preds = json.floodPredictions || json.floods;
+        const preds = json.floodPoints || json.floodPredictions || json.floods;
         if (Array.isArray(preds)) {
-          return preds;
+          return preds.filter(f => (f.target_hour === undefined || Number(f.target_hour) === Number(offsetHours)) && Number(f.depth_cm ?? f.predicted_depth_cm ?? 0) > 0);
         }
       }
     } catch (e) {}
@@ -256,9 +259,14 @@ class SupabaseService {
     }
 
     // Kiểm tra xem hiện tại có mưa hoặc chế độ mô phỏng đang bật không
-    const isSimulating = Boolean(window.appState?.simulationMode);
-    const hasRain = (window.appState?.currentWeather?.rain1h || 0) > 0 ||
-      (window.appState?.liveData?.floodPoints && window.appState.liveData.floodPoints.length > 0);
+    const isSimulating = Boolean(window.appState?.isSimulationMode);
+    const cityWeatherRain = Number(window.appState?.latestCityWeather?.rain1h || 0);
+    const stationsMaxRain = (window.appState?.latestWeatherStations || []).reduce((mx, s) => {
+      const fRain = Array.isArray(s?.forecastRain) ? Number(s.forecastRain[offsetHours - 1] || 0) : 0;
+      return Math.max(mx, Number(s?.rain1h || 0), fRain);
+    }, 0);
+    const hasActiveFlood = (window.appState?.liveData?.floodPoints || []).some(f => f.city === city && (f.depth_cm || 0) > 0 && f.danger_level !== 'safe');
+    const hasRain = cityWeatherRain >= 2.5 || stationsMaxRain >= 2.5 || hasActiveFlood;
 
     if (!isSimulating && !hasRain) {
       // Trời tạnh ráo hoàn toàn và không có dữ liệu ngập => không tạo điểm ngập giả định

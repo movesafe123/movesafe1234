@@ -825,9 +825,14 @@ class GoogleMapsApp {
   resolveSmartDefaultAvoidLevel() {
     const floods = typeof this.getCurrentFloods === 'function' ? this.getCurrentFloods() : [];
     const activeFloods = floods.filter(f => (f.depth_cm || 0) > 0 && f.danger_level !== 'safe');
-    const stations = Array.isArray(this.latestWeatherStations) ? this.latestWeatherStations : [];
+    const stations = Array.isArray(this.latestWeatherStations) && this.latestWeatherStations.length > 0
+      ? this.latestWeatherStations
+      : ((this.liveData?.weatherStations || {})[this.currentCity] || []);
+    const predOffset = Number(this.currentPredictionOffset) || 0;
     const maxStationRain = stations.reduce((max, st) => {
-      const rainVal = Number(st?.rain1h ?? st?.rain ?? 0);
+      const rainVal = predOffset > 0 && Array.isArray(st?.forecastRain)
+        ? Number(st.forecastRain[predOffset - 1] ?? st?.rain1h ?? st?.rain ?? 0)
+        : Number(st?.rain1h ?? st?.rain ?? 0);
       return Number.isFinite(rainVal) ? Math.max(max, rainVal) : max;
     }, 0);
     const cityRain = Number(this.latestCityWeather?.rain1h ?? this.latestCityWeather?.rain ?? 0);
@@ -4121,6 +4126,7 @@ class GoogleMapsApp {
       try {
         let aiFloods = [];
         let aiTraffics = [];
+        let apiSucceeded = false;
 
         // 1. Thử lấy từ API Dự báo Tương lai (/api/predictions) của Backend
         try {
@@ -4131,31 +4137,38 @@ class GoogleMapsApp {
           if (res.ok) {
             const data = await res.json();
             if (data && data.status === 'success') {
-              aiFloods = data.floodPoints || [];
-              aiTraffics = data.trafficIncidents || [];
+              const hasNodeSchema = Array.isArray(data.floodPoints) || Array.isArray(data.trafficIncidents);
+              if (hasNodeSchema) {
+                apiSucceeded = true;
+                aiFloods = data.floodPoints || [];
+                aiTraffics = data.trafficIncidents || [];
+              }
             }
           }
         } catch {}
 
         // 2. Nội suy Spatio-Temporal cho chế độ Giả lập hoặc dự phòng Client khi Offline
         const decayFactor = Math.max(0.35, 1 - offset * 0.22);
-        const buildDecayedFloods = (list) => (list || []).map(f => {
-          const newDepth = Math.max(0, Math.round((f.depth_cm || 0) * decayFactor));
+        const buildDecayedFloods = (list, useLinearDrainage = false) => (list || []).map(f => {
+          const currDepth = f.depth_cm || 0;
+          const newDepth = useLinearDrainage
+            ? Math.max(0, Math.round(currDepth - 12 * offset))
+            : Math.max(0, Math.round(currDepth * decayFactor));
           return {
             ...f,
             depth_cm: newDepth,
-            danger_level: newDepth > 30 ? 'critical' : (newDepth >= 15 ? 'medium' : 'low'),
+            danger_level: newDepth >= 30 ? 'critical' : (newDepth >= 15 ? 'medium' : 'low'),
             passable_motorbike: newDepth < 20,
-            passable_car: newDepth < 35,
+            passable_car: newDepth < 30,
             name: String(f.name || '').startsWith('[DỰ BÁO') ? f.name : `[DỰ BÁO +${offset}h] ${f.name}`,
             advice: newDepth > 0
               ? `Dự báo sau +${offset}h mức nước giảm còn ~${newDepth}cm do trạm bơm đang vận hành.`
               : `Dự báo sau +${offset}h nước đã rút hết, mặt đường khô ráo.`
           };
-        }).filter(f => f.depth_cm > 0);
+        }).filter(f => f.depth_cm >= 10);
 
         if (this.isSimulationMode) {
-          const simDecayed = buildDecayedFloods(this.getSimulatedFloods(this.currentCity));
+          const simDecayed = buildDecayedFloods(this.getSimulatedFloods(this.currentCity), false);
           simDecayed.forEach(sf => {
             if (!aiFloods.some(existing => existing.id === sf.id || existing.name === sf.name)) {
               aiFloods.push(sf);
@@ -4163,9 +4176,9 @@ class GoogleMapsApp {
           });
         }
 
-        if (aiFloods.length === 0 && aiTraffics.length === 0) {
+        if (!apiSucceeded && aiFloods.length === 0 && aiTraffics.length === 0) {
           const baseFloods = (this.liveData.floodPoints || []).filter(f => f.city === this.currentCity);
-          aiFloods = buildDecayedFloods(baseFloods);
+          aiFloods = buildDecayedFloods(baseFloods, true);
 
           const baseTraffics = (this.liveData.trafficIncidents || []).filter(t => t.city === this.currentCity);
           aiTraffics = baseTraffics.filter((t, idx) => t.type === 'roadwork' || t.type === 'road_closure' || (idx % (offset + 1) === 0));
@@ -4427,9 +4440,17 @@ class GoogleMapsApp {
     const routeFloods = recommended.matchedFloods || [];
     const routeTraffics = recommended.matchedTraffics || [];
 
-    // Lấy thời tiết
-    const weatherStations = (this.liveData.weatherStations || {})[this.currentCity] || [];
-    const maxRain = weatherStations.reduce((max, s) => Math.max(max, s.rain1h || 0), 0);
+    // Lấy thời tiết (ưu tiên latestWeatherStations mới nhất & xét forecastRain khi xem dự báo +1..3h)
+    const weatherStations = (Array.isArray(this.latestWeatherStations) && this.latestWeatherStations.length > 0)
+      ? this.latestWeatherStations
+      : ((this.liveData.weatherStations || {})[this.currentCity] || []);
+    const predOffset = Number(this.currentPredictionOffset) || 0;
+    const maxRain = weatherStations.reduce((max, s) => {
+      const r = predOffset > 0 && Array.isArray(s.forecastRain)
+        ? Number(s.forecastRain[predOffset - 1] ?? s.rain1h ?? 0)
+        : Number(s.rain1h ?? 0);
+      return Number.isFinite(r) ? Math.max(max, r) : max;
+    }, 0);
     const avgTemp = weatherStations.length > 0
       ? Math.round(weatherStations.reduce((sum, s) => sum + (s.temp || 26), 0) / weatherStations.length)
       : 26;

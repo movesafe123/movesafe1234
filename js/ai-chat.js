@@ -821,7 +821,8 @@ class AIChat {
       humidity: w.humidity,
       windSpeed: w.windSpeed,
       rain1h: w.rain1h,
-      weatherDesc: w.weatherDesc,
+      forecastRain: Array.isArray(w.forecastRain) ? w.forecastRain.slice(0, 3) : undefined,
+      description: w.description || w.weatherDesc || '',
       aqi: w.aqi
     }));
 
