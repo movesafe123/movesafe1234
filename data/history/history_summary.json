@@ -3,31 +3,8 @@
   "retentionDays": 7,
   "totalSnapshots": 22,
   "createdAt": "2026-10-14T10:38:30.530Z",
-  "updatedAt": "2026-11-26T15:39:13.083Z",
+  "updatedAt": "2026-11-27T00:25:36.543Z",
   "snapshots": [
-    {
-      "timestamp": "2026-11-19T18:31:44.916Z",
-      "date": "2026-11-20",
-      "hour": 1,
-      "hanoi": {
-        "avgSpeedKmh": 39,
-        "congestionIndex": 1,
-        "maxRainMm": 0.1,
-        "activeFloodSpots": []
-      },
-      "hcm": {
-        "avgSpeedKmh": 38,
-        "congestionIndex": 1,
-        "maxRainMm": 0,
-        "activeFloodSpots": []
-      },
-      "danang": {
-        "avgSpeedKmh": 40,
-        "congestionIndex": 1,
-        "maxRainMm": 0.1,
-        "activeFloodSpots": []
-      }
-    },
     {
       "timestamp": "2026-11-20T01:06:33.927Z",
       "date": "2026-11-20",
@@ -658,6 +635,29 @@
         "avgSpeedKmh": 37,
         "congestionIndex": 1,
         "maxRainMm": 0.2,
+        "activeFloodSpots": []
+      }
+    },
+    {
+      "timestamp": "2026-11-27T00:25:36.543Z",
+      "date": "2026-11-27",
+      "hour": 7,
+      "hanoi": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "hcm": {
+        "avgSpeedKmh": 13,
+        "congestionIndex": 5,
+        "maxRainMm": 0,
+        "activeFloodSpots": []
+      },
+      "danang": {
+        "avgSpeedKmh": 19,
+        "congestionIndex": 5,
+        "maxRainMm": 0.1,
         "activeFloodSpots": []
       }
     }
